@@ -1,0 +1,36 @@
+### CodeBlocks ###
+*.layout
+*.depend
+*.bak
+*.res
+*.tmp
+*.wbk
+*.o
+
+# generated directories
+WSpace/Dev/*.exe
+WSpace/Dev/Obj/
+Working/Pity/
+Руководство/
+
+# Windows shortcuts
+*.lnk
+*.exe
+
+# другие рабочие файлы
+*.что
+
+#
+#client> git reset --soft $(git log --reverse --format=%H | head -n 1)
+#client> git commit --amend
+#client> git push origin master -f
+#
+#server> git gc 
+#
+#git checkout --orphan newBranch
+#git add -A  # Add all files and commit them
+#git commit
+#git branch -D master  # Deletes the master branch
+#git branch -m master  # Rename the current branch to master
+#git push -f origin master  # Force push master branch to github
+#git gc --aggressive --prune=all     # remove the old files
