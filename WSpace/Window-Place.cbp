@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Window - Place" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<MakeCommands>
+			<Build command="" />
+			<CompileFile command="" />
+			<Clean command="" />
+			<DistClean command="" />
+			<AskRebuildNeeded command="" />
+			<SilentBuild command=" &gt; $(CMD_NULL)" />
+		</MakeCommands>
+		<Build>
+			<Target title="A-lib32">
+				<Option output="Lib/Window32" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Dev/Obj/" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+			</Target>
+			<Target title="A-lib64">
+				<Option output="Lib/Window64" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="Dev/Obj/" />
+				<Option type="2" />
+				<Option compiler="gnu_gcc_stable" />
+			</Target>
+			<Target title="Window Shapes">
+				<Option platforms="Windows;" />
+				<Option output="Dev/Window-shapes" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="Dev" />
+				<Option object_output="Dev/Obj/" />
+				<Option type="0" />
+				<Option compiler="gnu_gcc_stable" />
+				<Compiler>
+					<Add directory="../Tools/Glut" />
+					<Add directory="../Window" />
+				</Compiler>
+				<Linker>
+					<Add library="comdlg32" />
+				</Linker>
+			</Target>
+			<Target title="Window Trial">
+				<Option platforms="Windows;" />
+				<Option output="Dev/Window-trial" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="Dev" />
+				<Option object_output="Dev/Obj/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add directory="../Window" />
+				</Compiler>
+				<Linker>
+					<Add library="gomp" />
+				</Linker>
+			</Target>
+			<Target title="Interpolation-Extrapolation">
+				<Option platforms="Windows;" />
+				<Option output="Dev/Interpolation-Extrapolation" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="Dev" />
+				<Option object_output="Dev/Obj/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Linker>
+					<Add library="Lib/libWindow32.a" />
+				</Linker>
+			</Target>
+			<Target title="Analitic Field Space">
+				<Option platforms="Windows;" />
+				<Option output="Dev/Analitic Field Space" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="Dev" />
+				<Option object_output="Dev/Obj/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Linker>
+					<Add library="Lib/libWindow32.a" />
+				</Linker>
+			</Target>
+			<Target title="GLFW Shapes">
+				<Option platforms="Windows;" />
+				<Option output="Dev/GLFW-shapes" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="Dev" />
+				<Option object_output="Dev/Obj/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Option projectIncludeDirsRelation="2" />
+				<Compiler>
+					<Add directory="../Window" />
+					<Add directory="../Tools/Glut" />
+					<Add directory="../Tools/GlFw" />
+					<Add directory="../../SoftWare/GLfw/include/GLFW" />
+				</Compiler>
+				<Linker>
+					<Add library="../../SoftWare/Dev/Lib/libglfw3_static.a" />
+					<Add library="comdlg32" />
+				</Linker>
+			</Target>
+			<Target title="GLFW Trial">
+				<Option platforms="Windows;" />
+				<Option output="Dev/GLFW-trial" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="Dev" />
+				<Option object_output="Dev/Obj/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add directory="../Tools/GlFw" />
+					<Add directory="../../SoftWare/GLfw/include/GLFW" />
+				</Compiler>
+				<Linker>
+					<Add library="../../SoftWare/Dev/Lib/libglfw3_static.a" />
+					<Add library="comdlg32" />
+					<Add library="gomp" />
+				</Linker>
+			</Target>
+			<Target title="UTF-8-Unicode-OEM(866)alt">
+				<Option platforms="Windows;" />
+				<Option output="Dev/UtC" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="Data" />
+				<Option object_output="Dev/Obj/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="..\..\Window\Fonts\UTF-8(866).txt" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Linker>
+					<Add library="comdlg32" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Os" />
+			<Add option="-Winit-self" />
+			<Add option="-Wredundant-decls" />
+			<Add option="-std=gnu++98" />
+			<Add option="-funsigned-char" />
+			<Add option="-finput-charset=utf-8" />
+			<Add option="-fopenmp" />
+			<Add option="-ffast-math" />
+			<Add option="-fno-exceptions" />
+			<Add option="-Wunused" />
+		</Compiler>
+		<Linker>
+			<Add option="-s" />
+			<Add library="opengl32" />
+			<Add library="glu32" />
+			<Add library="gdi32" />
+		</Linker>
+		<Unit filename="../Math/Complex.h">
+			<Option target="A-lib64" />
+			<Option target="A-lib32" />
+		</Unit>
+		<Unit filename="../Math/Function.cpp">
+			<Option target="A-lib64" />
+			<Option target="A-lib32" />
+			<Option target="Interpolation-Extrapolation" />
+		</Unit>
+		<Unit filename="../Math/Function.h">
+			<Option target="A-lib64" />
+			<Option target="A-lib32" />
+		</Unit>
+		<Unit filename="../Math/Hermite.cpp">
+			<Option target="A-lib32" />
+			<Option target="A-lib64" />
+			<Option target="Interpolation-Extrapolation" />
+		</Unit>
+		<Unit filename="../Math/Hermite.h">
+			<Option target="A-lib32" />
+			<Option target="A-lib64" />
+			<Option target="Interpolation-Extrapolation" />
+		</Unit>
+		<Unit filename="../Math/Power.cpp">
+			<Option target="A-lib64" />
+			<Option target="A-lib32" />
+		</Unit>
+		<Unit filename="../Math/Tensor.cpp">
+			<Option target="A-lib64" />
+			<Option target="A-lib32" />
+		</Unit>
+		<Unit filename="../Math/Tensor.h">
+			<Option target="A-lib64" />
+			<Option target="A-lib32" />
+		</Unit>
+		<Unit filename="../Math/Vector.h">
+			<Option target="A-lib64" />
+			<Option target="A-lib32" />
+		</Unit>
+		<Unit filename="../Math/Volume.cpp">
+			<Option target="A-lib64" />
+			<Option target="A-lib32" />
+		</Unit>
+		<Unit filename="../Math/Volume.h">
+			<Option target="A-lib64" />
+			<Option target="A-lib32" />
+		</Unit>
+		<Unit filename="../Tools/Allocate.cpp">
+			<Option target="A-lib64" />
+			<Option target="A-lib32" />
+		</Unit>
+		<Unit filename="../Tools/Allocate.h">
+			<Option target="A-lib64" />
+			<Option target="A-lib32" />
+		</Unit>
+		<Unit filename="../Tools/FileOpen.cpp">
+			<Option target="A-lib64" />
+			<Option target="A-lib32" />
+			<Option target="GLFW Shapes" />
+			<Option target="UTF-8-Unicode-OEM(866)alt" />
+		</Unit>
+		<Unit filename="../Tools/GlFw/Utility.cpp">
+			<Option target="GLFW Shapes" />
+			<Option target="GLFW Trial" />
+		</Unit>
+		<Unit filename="../Tools/GlFw/View.h">
+			<Option target="GLFW Shapes" />
+			<Option target="GLFW Trial" />
+		</Unit>
+		<Unit filename="../Tools/GlFw/Window.cpp">
+			<Option target="GLFW Shapes" />
+			<Option target="GLFW Trial" />
+		</Unit>
+		<Unit filename="../Tools/GlFw/Window.h">
+			<Option target="GLFW Trial" />
+		</Unit>
+		<Unit filename="../Tools/Glut/Geometry.cpp">
+			<Option target="Window Shapes" />
+			<Option target="Window Trial" />
+			<Option target="GLFW Shapes" />
+			<Option target="GLFW Trial" />
+		</Unit>
+		<Unit filename="../Tools/Glut/Geometry.h">
+			<Option target="Window Shapes" />
+			<Option target="Window Trial" />
+			<Option target="GLFW Trial" />
+		</Unit>
+		<Unit filename="../Tools/Glut/Teapot.cpp">
+			<Option target="Window Shapes" />
+			<Option target="GLFW Shapes" />
+		</Unit>
+		<Unit filename="../Tools/Math.Rc">
+			<Option compilerVar="WINDRES" />
+			<Option target="Window Shapes" />
+			<Option target="Window Trial" />
+			<Option target="GLFW Shapes" />
+			<Option target="GLFW Trial" />
+		</Unit>
+		<Unit filename="../Tools/StrCpy.cpp">
+			<Option target="A-lib32" />
+			<Option target="A-lib64" />
+			<Option target="Window Shapes" />
+			<Option target="Window Trial" />
+			<Option target="GLFW Shapes" />
+			<Option target="GLFW Trial" />
+			<Option target="UTF-8-Unicode-OEM(866)alt" />
+		</Unit>
+		<Unit filename="../Tools/Utah/Tea.cpp">
+			<Option target="Window Trial" />
+			<Option target="GLFW Trial" />
+		</Unit>
+		<Unit filename="../Type.h">
+			<Option target="A-lib32" />
+			<Option target="A-lib64" />
+			<Option target="Window Shapes" />
+			<Option target="Window Trial" />
+			<Option target="GLFW Shapes" />
+			<Option target="GLFW Trial" />
+		</Unit>
+		<Unit filename="../Window/ConIO.cpp">
+			<Option target="A-lib32" />
+			<Option target="A-lib64" />
+			<Option target="Window Shapes" />
+			<Option target="Window Trial" />
+			<Option target="GLFW Shapes" />
+			<Option target="GLFW Trial" />
+		</Unit>
+		<Unit filename="../Window/ConIO.h">
+			<Option target="A-lib32" />
+			<Option target="A-lib64" />
+			<Option target="Window Shapes" />
+			<Option target="Window Trial" />
+			<Option target="GLFW Shapes" />
+			<Option target="GLFW Trial" />
+		</Unit>
+		<Unit filename="../Window/Examples/UtC.cpp">
+			<Option target="UTF-8-Unicode-OEM(866)alt" />
+		</Unit>
+		<Unit filename="../Window/Examples/Window-shapes.cpp">
+			<Option target="Window Shapes" />
+			<Option target="GLFW Shapes" />
+		</Unit>
+		<Unit filename="../Window/Examples/Window-trial.cpp">
+			<Option target="Window Trial" />
+			<Option target="GLFW Trial" />
+		</Unit>
+		<Unit filename="../Window/Julian.cpp">
+			<Option target="A-lib64" />
+			<Option target="Window Shapes" />
+			<Option target="A-lib32" />
+			<Option target="GLFW Shapes" />
+			<Option target="GLFW Trial" />
+			<Option target="Interpolation-Extrapolation" />
+		</Unit>
+		<Unit filename="../Window/Sym_CCCP.c">
+			<Option compilerVar="CC" />
+			<Option target="A-lib32" />
+			<Option target="A-lib64" />
+			<Option target="Window Shapes" />
+			<Option target="Window Trial" />
+			<Option target="GLFW Shapes" />
+			<Option target="GLFW Trial" />
+		</Unit>
+		<Unit filename="../Window/UniCode.cpp">
+			<Option target="A-lib32" />
+			<Option target="A-lib64" />
+			<Option target="Window Shapes" />
+			<Option target="Window Trial" />
+			<Option target="GLFW Shapes" />
+			<Option target="GLFW Trial" />
+			<Option target="UTF-8-Unicode-OEM(866)alt" />
+		</Unit>
+		<Unit filename="../Window/View.cpp">
+			<Option target="A-lib32" />
+			<Option target="A-lib64" />
+			<Option target="Window Shapes" />
+			<Option target="GLFW Shapes" />
+		</Unit>
+		<Unit filename="../Window/View.h">
+			<Option target="A-lib32" />
+			<Option target="A-lib64" />
+		</Unit>
+		<Unit filename="../Window/Window-Free.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option target="A-lib32" />
+			<Option target="A-lib64" />
+		</Unit>
+		<Unit filename="../Window/Window-Place.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option target="A-lib32" />
+			<Option target="A-lib64" />
+		</Unit>
+		<Unit filename="../Window/Window.cpp">
+			<Option target="A-lib32" />
+			<Option target="A-lib64" />
+			<Option target="Window Shapes" />
+			<Option target="Window Trial" />
+		</Unit>
+		<Unit filename="../Window/Window.h">
+			<Option target="A-lib32" />
+			<Option target="A-lib64" />
+			<Option target="Window Shapes" />
+			<Option target="Window Trial" />
+		</Unit>
+		<Unit filename="../Window/Window_Help.cpp">
+			<Option target="A-lib32" />
+			<Option target="A-lib64" />
+			<Option target="Window Shapes" />
+			<Option target="Window Trial" />
+		</Unit>
+		<Unit filename="../Window/Window_Menu.cpp">
+			<Option target="A-lib64" />
+			<Option target="Window Shapes" />
+			<Option target="A-lib32" />
+		</Unit>
+		<Unit filename="../Working/Analitics.cpp">
+			<Option target="Analitic Field Space" />
+		</Unit>
+		<Unit filename="../Working/Interpolation and Extrapolation.cpp">
+			<Option target="Interpolation-Extrapolation" />
+		</Unit>
+		<Extensions>
+			<wxsmith version="1">
+				<gui name="wxWidgets" src="" main="" init_handlers="necessary" language="CPP" />
+			</wxsmith>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

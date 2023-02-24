@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Vector &amp; Tensor" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Dipole">
+				<Option platforms="Windows;" />
+				<Option output="Dev/Dipole" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="Dev/" />
+				<Option object_output="Dev/Obj/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+				<Linker>
+					<Add library="gomp" />
+				</Linker>
+			</Target>
+			<Target title="Vector-Tensor">
+				<Option platforms="Windows;" />
+				<Option output="Dev/Vector and Tensor" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="Dev/" />
+				<Option object_output="Dev/Obj/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+			</Target>
+			<Target title="Tensor Base Space">
+				<Option platforms="Windows;" />
+				<Option output="Dev/Tensor Base Space" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="Dev/" />
+				<Option object_output="Dev/Obj/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+			</Target>
+			<Target title="Phyzical Corpuscules">
+				<Option platforms="Windows;" />
+				<Option output="Dev/Physical Simulation" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="Dev/" />
+				<Option object_output="Dev/Obj/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+				<Linker>
+					<Add library="gomp" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Os" />
+			<Add option="-funsigned-char" />
+			<Add option="-fopenmp" />
+			<Add option="-mthreads" />
+			<Add option="-fno-enforce-eh-specs" />
+			<Add option="-fno-exceptions" />
+			<Add option="-ffast-math" />
+			<Add option="-funsafe-math-optimizations" />
+			<Add option="-fno-trapping-math" />
+		</Compiler>
+		<Linker>
+			<Add option="-s" />
+			<Add library="opengl32" />
+			<Add library="glu32" />
+			<Add library="gdi32" />
+		</Linker>
+		<Unit filename="../Math/Complex.h">
+			<Option target="Tensor Base Space" />
+		</Unit>
+		<Unit filename="../Math/Function.cpp">
+			<Option link="0" />
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="../Math/Function.h">
+			<Option target="Tensor Base Space" />
+		</Unit>
+		<Unit filename="../Math/Model.cpp">
+			<Option target="Tensor Base Space" />
+			<Option target="Phyzical Corpuscules" />
+		</Unit>
+		<Unit filename="../Math/Model.h">
+			<Option target="Tensor Base Space" />
+		</Unit>
+		<Unit filename="../Math/Power.cpp">
+			<Option target="Tensor Base Space" />
+			<Option target="Vector-Tensor" />
+		</Unit>
+		<Unit filename="../Math/Tensor.cpp" />
+		<Unit filename="../Math/Tensor.h">
+			<Option target="Tensor Base Space" />
+		</Unit>
+		<Unit filename="../Math/Vector.h">
+			<Option target="Tensor Base Space" />
+		</Unit>
+		<Unit filename="../Math/Volume.cpp">
+			<Option target="Tensor Base Space" />
+			<Option target="Phyzical Corpuscules" />
+		</Unit>
+		<Unit filename="../Math/Volume.h">
+			<Option target="Tensor Base Space" />
+		</Unit>
+		<Unit filename="../Tools/Allocate.cpp" />
+		<Unit filename="../Tools/Math.Rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
+		<Unit filename="../Tools/StrCpy.cpp" />
+		<Unit filename="../Type.h" />
+		<Unit filename="../Window/ConIO.cpp" />
+		<Unit filename="../Window/ConIO.h" />
+		<Unit filename="../Window/Julian.cpp" />
+		<Unit filename="../Window/UniCode.cpp" />
+		<Unit filename="../Window/View.cpp">
+			<Option target="Tensor Base Space" />
+			<Option target="Phyzical Corpuscules" />
+			<Option target="Dipole" />
+		</Unit>
+		<Unit filename="../Window/View.h" />
+		<Unit filename="../Window/Window.cpp" />
+		<Unit filename="../Window/Window.h" />
+		<Unit filename="../Window/Window_Help.cpp" />
+		<Unit filename="../Window/Window_Menu.cpp" />
+		<Unit filename="../Working/Dipoles.cpp">
+			<Option target="Dipole" />
+		</Unit>
+		<Unit filename="../Working/Dipoles.h">
+			<Option target="Dipole" />
+		</Unit>
+		<Unit filename="../Working/Dipoles_math.cpp">
+			<Option target="Dipole" />
+		</Unit>
+		<Unit filename="../Working/Dipoles_tools.cpp">
+			<Option target="Dipole" />
+		</Unit>
+		<Unit filename="../Working/Dipoles_video.cpp">
+			<Option target="Dipole" />
+		</Unit>
+		<Unit filename="../Working/Mfp_2009-01-15.cpp">
+			<Option target="Phyzical Corpuscules" />
+		</Unit>
+		<Unit filename="../Working/Phyzical Simulations.cpp">
+			<Option target="Phyzical Corpuscules" />
+		</Unit>
+		<Unit filename="../Working/Tensor Base Space.cpp">
+			<Option target="Tensor Base Space" />
+		</Unit>
+		<Unit filename="../Working/Tensor to ConIO.cpp">
+			<Option target="Vector-Tensor" />
+			<Option target="Tensor Base Space" />
+		</Unit>
+		<Unit filename="../Working/Vector and Tensor.cpp">
+			<Option target="Vector-Tensor" />
+		</Unit>
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="C++tools" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="FText">
+				<Option output="../../Work/FText" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="Data" />
+				<Option object_output="Dev/Obj/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="*.VSL" />
+			</Target>
+			<Target title="SWAB">
+				<Option output="Dev/SWAB" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="Data" />
+				<Option object_output="Dev/Obj/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="0גכעגכע.vsl" />
+				<Compiler>
+					<Add option="-funsigned-char" />
+					<Add option="-fexec-charset=UTF-8" />
+					<Add option="-finput-charset=UTF-8" />
+					<Add option="-DUNICODE" />
+				</Compiler>
+			</Target>
+			<Target title="C-WhetStones">
+				<Option platforms="Windows;" />
+				<Option output="Dev/WhetStones(-c-)" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="Data" />
+				<Option object_output="Dev/Obj/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+			</Target>
+			<Target title="Complex">
+				<Option platforms="Windows;" />
+				<Option output="Dev/Complex" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="Dev" />
+				<Option object_output="Dev/Obj/" />
+				<Option type="1" />
+				<Option compiler="gnu_gcc_nightly" />
+				<Option parameters="UTF-8(866).txt" />
+				<Compiler>
+					<Add option="-Wnon-virtual-dtor" />
+					<Add option="-Wshadow" />
+					<Add option="-Winit-self" />
+					<Add option="-Wredundant-decls" />
+					<Add option="-Wcast-align" />
+					<Add option="-Winline" />
+					<Add option="-Wunreachable-code" />
+					<Add option="-Wmissing-declarations" />
+					<Add option="-Wswitch-enum" />
+					<Add option="-Wswitch-default" />
+					<Add option="-std=c90" />
+				</Compiler>
+				<Linker>
+					<Add library="comdlg32" />
+				</Linker>
+			</Target>
+			<Target title="DC3-Interpolation-Extrapolation">
+				<Option platforms="Windows;" />
+				<Option output="Dev/DC3" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../Vessel/Digitize" />
+				<Option object_output="Dev/Obj/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters='&quot;JAPAN Bulk Carrier (vsl).dc3&quot;' />
+				<Linker>
+					<Add library="comdlg32" />
+				</Linker>
+			</Target>
+			<Target title="UTFiles">
+				<Option output="Dev/UTFiles" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="Data" />
+				<Option object_output="Dev/Obj/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters='&quot;0גכעגכע.vsl&quot;' />
+				<Compiler>
+					<Add option="-funsigned-char" />
+					<Add option="-fexec-charset=UTF-8" />
+					<Add option="-finput-charset=UTF-8" />
+				</Compiler>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-fexpensive-optimizations" />
+			<Add option="-Os" />
+			<Add option="-funsigned-char" />
+			<Add option="-ffast-math" />
+			<Add option="-fno-exceptions" />
+			<Add option="-fno-trapping-math" />
+			<Add option="-mthreads" />
+			<Add option="-Wunused" />
+		</Compiler>
+		<Linker>
+			<Add option="-s" />
+			<Add option="-static" />
+		</Linker>
+		<Unit filename="../Math/Gsl/Complex.c">
+			<Option compilerVar="CPP" />
+			<Option target="Complex" />
+		</Unit>
+		<Unit filename="../Math/Gsl/Complex_test.c">
+			<Option compilerVar="CPP" />
+			<Option target="Complex" />
+		</Unit>
+		<Unit filename="../Math/Gsl/complex_math.h">
+			<Option target="Complex" />
+		</Unit>
+		<Unit filename="../Math/Vector.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="../Tools/Allocate.cpp">
+			<Option target="DC3-Interpolation-Extrapolation" />
+		</Unit>
+		<Unit filename="../Tools/FileOpen.cpp">
+			<Option target="DC3-Interpolation-Extrapolation" />
+		</Unit>
+		<Unit filename="../Tools/Math.Rc">
+			<Option compilerVar="CPP" />
+			<Option target="C-WhetStones" />
+		</Unit>
+		<Unit filename="../Tools/StrCpy.cpp">
+			<Option target="DC3-Interpolation-Extrapolation" />
+		</Unit>
+		<Unit filename="../Type.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="../Window/UniCode.cpp">
+			<Option target="DC3-Interpolation-Extrapolation" />
+		</Unit>
+		<Unit filename="../Working/Contour.cpp">
+			<Option target="DC3-Interpolation-Extrapolation" />
+		</Unit>
+		<Unit filename="../Working/Contour.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="../Working/FText.c">
+			<Option compilerVar="CC" />
+			<Option target="FText" />
+		</Unit>
+		<Unit filename="../Working/SWAB.c">
+			<Option compilerVar="CC" />
+			<Option target="SWAB" />
+		</Unit>
+		<Unit filename="../Working/UTFiles.cpp">
+			<Option target="UTFiles" />
+		</Unit>
+		<Unit filename="../Working/WHET.c">
+			<Option compilerVar="CC" />
+			<Option target="C-WhetStones" />
+		</Unit>
+		<Unit filename="../Working/zxDC3.cpp">
+			<Option target="DC3-Interpolation-Extrapolation" />
+		</Unit>
+		<Extensions>
+			<DoxyBlocks>
+				<comment_style block="0" line="0" />
+				<doxyfile_project />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot />
+				<general />
+			</DoxyBlocks>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

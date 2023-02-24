@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Fortran origin sources" />
+		<Option pch_mode="2" />
+		<Option compiler="gfortran" />
+		<Option virtualFolders="Ship/" />
+		<Build>
+			<Target title="Hollandia">
+				<Option output="Dev/Hollandia" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../Ship" />
+				<Option object_output="Dev/Obj" />
+				<Option type="1" />
+				<Option compiler="gfortran" />
+			</Target>
+			<Target title="TransForm">
+				<Option output="Dev/TransForm" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../Готман/Data" />
+				<Option object_output="Dev/Obj" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="MASSIV_ORD_33_Wl.DAT" />
+			</Target>
+			<Target title="Total_begin_33_wl">
+				<Option output="Dev/Total_begin_33_wl" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../Готман/Data" />
+				<Option object_output="Dev/Obj" />
+				<Option type="1" />
+				<Option compiler="gfortran" />
+				<Compiler>
+					<Add option="-std=f95" />
+					<Add option="-fimplicit-none" />
+				</Compiler>
+			</Target>
+			<Target title="Derivat_33_(2)rod">
+				<Option output="Dev/Derivat_33_(2)rod" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../Готман/Data" />
+				<Option object_output="Dev/Obj" />
+				<Option type="1" />
+				<Option compiler="gfortran" />
+				<Compiler>
+					<Add option="-fimplicit-none" />
+				</Compiler>
+			</Target>
+			<Target title="Mich(33)_Rodina">
+				<Option output="Dev/Mich(33)_Rodina" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../Готман/Data" />
+				<Option object_output="Dev/Obj" />
+				<Option type="1" />
+				<Option compiler="gfortran" />
+				<Compiler>
+					<Add option="-fimplicit-none" />
+				</Compiler>
+			</Target>
+			<Target title="WhetStone">
+				<Option output="Dev/WhetStone(fortran)" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="Data" />
+				<Option object_output="Dev/Obj" />
+				<Option type="1" />
+				<Option compiler="gfortran" />
+			</Target>
+			<Target title="Whet">
+				<Option output="Dev/WhetStone" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="Data" />
+				<Option object_output="Dev/Obj" />
+				<Option type="1" />
+				<Option compiler="gfortran" />
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-ffast-math" />
+			<Add option="-fexpensive-optimizations" />
+			<Add option="-Os" />
+			<Add option="-Wunused" />
+		</Compiler>
+		<Linker>
+			<Add option="-s" />
+		</Linker>
+		<Unit filename="../Ship/Hollandia.for">
+			<Option weight="0" />
+			<Option target="Hollandia" />
+		</Unit>
+		<Unit filename="../Tools/Math.Rc">
+			<Option compilerVar="CPP" />
+			<Option target="WhetStone" />
+			<Option target="Whet" />
+		</Unit>
+		<Unit filename="../Tools/Ship.Rc">
+			<Option compilerVar="WINDRES" />
+			<Option virtualFolder="Ship/" />
+			<Option target="Hollandia" />
+			<Option target="Total_begin_33_wl" />
+			<Option target="Derivat_33_(2)rod" />
+			<Option target="TransForm" />
+			<Option target="Mich(33)_Rodina" />
+		</Unit>
+		<Unit filename="../Type.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="../Working/WHET.f">
+			<Option weight="0" />
+			<Option target="WhetStone" />
+		</Unit>
+		<Unit filename="../Working/WhetStones.f">
+			<Option weight="0" />
+			<Option target="Whet" />
+		</Unit>
+		<Unit filename="../Готман/Derivat_33_(2)rod.f">
+			<Option weight="0" />
+			<Option target="Derivat_33_(2)rod" />
+		</Unit>
+		<Unit filename="../Готман/Mich(33)_Rodina.f">
+			<Option weight="0" />
+			<Option target="Mich(33)_Rodina" />
+		</Unit>
+		<Unit filename="../Готман/Total_begin_33_wl.f">
+			<Option weight="0" />
+			<Option target="Total_begin_33_wl" />
+		</Unit>
+		<Unit filename="../Готман/TransForm.c">
+			<Option compilerVar="CPP" />
+			<Option target="TransForm" />
+		</Unit>
+		<Extensions />
+	</Project>
+</CodeBlocks_project_file>
