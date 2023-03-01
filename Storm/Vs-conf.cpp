@@ -67,13 +67,11 @@ Hull& Hull::Config()
     if( h!=hX )// сдвиг центра масс и пересчет тензора инерции под новую высоту
     { Vector G=Gravity; Gravity.z+=h-hX; h=hX; inMass=Steiner(inMass,G,Gravity);
     }
-    if( D!=Draught )
-    { if( !Read( FileName,D ) )
+    if( D!=Draught )                  // предварительная очистка волнового поля
+    { if( !Read( FileName,D ) )       // главные оси и геометрические параметры
            Break( "Ошибка повторного чтения корпуса %s",FileName );
-     int sKt=Storm->Kt;
-      Storm->Original( false ).Kt=0;  // предварительная очистка волнового поля
-      mM=0.0; Initial().Floating();   // главные оси и геометрические параметры
-      Storm->Kt=sKt;
+     int sKt=Storm->Kt; Storm->Original( false ).Kt=0;
+      mM=0.0; Initial().Floating().wPrint( true ); Storm->Kt=sKt;
     }
     sT=max( 0.5,sTime )*60; sTime=sT/60.0;
   } while( ans!=_Esc ); return *this;
@@ -122,7 +120,7 @@ Field& Field::Config() // Height = 1.134*Lw*Hw/_Pd/2.0;
     H2=h2=hW*Swell.Height/Swell.Length; g2=(_Pi-atan2(Swell.x.y,Swell.x.x))*_Rd;
     H3=h3=hW*Surge.Height/Surge.Length; g3=(_Pi-atan2(Surge.x.y,Surge.x.x))*_Rd;
     switch( ans=T.Answer( ans ) )
-    { case  1: ++(Exp.wave%=3); break;         // Initial() модель волнения
+    { case  1: (++Exp.wave)%=3; break;         // Initial() модель волнения
       case  2: Exp.peak^=true;  break;         // Initial() колебания или волны
       case  3: Exp.draw+=ScanStatus()&SHIFT?-1:1; break;
       case  4: Exp.view+=ScanStatus()&SHIFT?-1:1; break;
@@ -130,38 +128,44 @@ Field& Field::Config() // Height = 1.134*Lw*Hw/_Pd/2.0;
 //    case 12: Swell.Height=h2*Swell.Length/hW; break;
 //    case 17: Surge.Height=h3*Surge.Length/hW; break;
     }
-    if( H1!=h1 )Wind.Height=h1*Wind.Length/hW;   // Wind .axiZ( _Pi-g1*_dR );
-    if( H2!=h2 )Swell.Height=h2*Swell.Length/hW; // Swell.axiZ( _Pi-g2*_dR );
-    if( H3!=h3 )Surge.Height=h3*Surge.Length/hW; // Surge.axiZ( _Pi-g3*_dR );
-    Wind.Initial( Wind.Length,hW*Wind.Height/Wind.Length,g1 );
+    if( H1!=h1 )Wind.Height=h1*Wind.Length/hW;     // Wind .axiZ( _Pi-g1*_dR );
+    if( H2!=h2 )Swell.Height=h2*Swell.Length/hW;   // Swell.axiZ( _Pi-g2*_dR );
+    if( H3!=h3 )Surge.Height=h3*Surge.Length/hW;   // Surge.axiZ( _Pi-g3*_dR );
+    if(  Wind.Height>Wind.Length/hW  ){ h1=1.0;  Wind.Height=Wind.Length/hW; }
+    if( Swell.Height>Swell.Length/hW ){ h2=1.0; Swell.Height=Swell.Length/hW; }
+    if( Surge.Height>Surge.Length/hW ){ h3=1.0; Surge.Height=Surge.Length/hW; }
+     Wind.Initial( Wind.Length, hW*Wind.Height/Wind.Length,g1 );
     Swell.Initial( Swell.Length,hW*Swell.Height/Swell.Length,g2 );
     Surge.Initial( Surge.Length,hW*Surge.Height/Surge.Length,g3 );
-    /*if( Exp.wave!=1 )*/ Original( false );
-  } while( ans!=_Esc ); return *this;
+    if( Exp.wave!=1 )Original( false );
+  } while( ans!=_Esc ); waveLog(); return *this;
 }
-//
-//!  Конфигурационные и протокольные записи (*.vil vessel-initiation+logging)
-//
-// считывание угловых величин в румбах навигационного компаса (или розы ветров)
+//!    Конфигурационные и протокольные записи (*.vil vessel-initiation+logging)
+//     считывание угловых величин в румбах навигационного компаса (розы ветров)
 //
 static char* RtoD( char *s, Real &D )
-{ int i,k; const char *M[]={"N","O","S","W"};
-  while( *s && *s<=' ' )++s;                        // отсечение левых пробелов
-  for( i=0; i<strlen( s ); i++ )                   // с поиском окончания слова
-   if( s[i]<'A' && s[i]!='"' ){ if( s[i] )s[i++]=0; break; } // к любому слову
-  for( k=0; k<32; k++ )
-  { if( !strcmp( Rmbs[k],s )
-    || ( !strcmp( M[k/8],s ) && !(k%8) ) ){ D=Real( k%32 )*11.25; break; }
-  } return s+i;
+{ int i=0; const char *M[]={"N","O","S","W"};
+  while( *s && *s<=' ' )++s; while( s[i]>='@' || s[i]=='"' )++i; s[i++]=0;
+  if( i>1 )for( int k=0; k<32; k++ ) // поиск буквосочетания в выделенном слове
+    if( !strcmp( Rmbs[k],s ) || ( !strcmp( M[k/8],s ) && !(k%8) ) )
+      { D=Real( k )*11.25; return s+i; } return 0;   // здесь ноль - как ошибка
+}
+//     выборка метрического множителя для меры длины [см, дм или м]
+//
+static char *AtoM( char *s, Real &M )
+{ int l=0; while( *s && *s<=' ' )++s;
+  if( !memcmp( s,"см",l=strlen("см") ) )M/=100.0; else // сантиметры
+  if( !memcmp( s,"дм",l=strlen("дм") ) )M/=10.0; else // дециметры
+  if(  memcmp( s, "м",l=strlen("м") ) )return 0; return s+l;
 }
 //   предустановка посадки с назначением курса и заданной скорости хода корабля
 //
 Hull& Hull::Get( char *s )
-{ char *z; Real W;                // числовые величины разделяются запятыми
+{ char *z; Real W,D=-1;           // числовые величины разделяются запятыми
   if( z=strchr( s,',' ) )*z++=0;  //! ограничение поля новой числовой величины
   if( strcut( s ) )               //  изначальный курс корабля в румбах или °'"
-  { if( wcspbrk( U2W( s ),L"NOSW" ) ){ s=RtoD( s,Course ); Course*=_dR; }
-                                else { s=AtoD( s,Course ); Course*=_dR; } }
+  { if( strpbrk( s,"NOSW" ) ){ RtoD( s,Course ); Course*=_dR; }
+                        else { AtoD( s,Course ); Course*=_dR; } }
   if( z && *z )                   //! заданная скорость хода: Fn, узлы или м/с
   { if( z=strchr( s=z,',' ) )*z++=0;
     if( strcut( s ) )             // выборка величины назначаемой скорости хода
@@ -174,21 +178,23 @@ Hull& Hull::Get( char *s )
     if( z && *z )                   //! изменение или переназначение осадки
     { if( z=strchr( s=z,',' ) )*z++=0;
       if( strcut( s ) )             // изменение осадки или её переназначение
-      { if( strpbrk( s,"+-" ) )W=Draught+strtod( s,&s ); else W=strtod( s,&s );
-        if( W>0 && W!=Draught )     // изменение конструктивной осадки парохода
-        if( !Read( FileName,W ) )Break( "Ошибка смены осадки: %s",FileName );
+      { bool c=strpbrk( s,"+-" )!=0; D=strtod( s,&s ); AtoM( s,D );
+        if( c )D+=Draught;          // отсрочка пересчитывания из-за getString
       }
       if( z && *z )            //! установка дифферента по динамической статике
       { if( z=strchr( s=z,',' ) )*z++=0;
         if( strcut( s ) )
-        { if( wcspbrk( U2W(s),L"°'\"") ){ s=AtoD( s,Trim ); Trim*=_dR; } else
-            { Trim=strtod( s,&s ); Trim=asin( 2*Trim/Length ); }
-          if( sin( fabs( Trim )*Length/2.0>Draught ) )
-              Trim=asin( 2*copysign( Draught,Trim )/Length );
+        { if( strpbrk( s,"°'\"") ){ AtoD( s,Trim ); Trim*=_dR; } else
+          { Trim=strtod( s,&s ); AtoM( s,Trim ); Trim=asin(-2*Trim/Length ); }
+          if( sin( fabs( Trim )*Length/2.0>Draught ) )       // ограничение
+            Trim=asin( 2*copysign( Draught,Trim )/Length );  // макс.дифферента
         }
         if( z && *z )          //! выбор модели штормовой гидромеханики корабля
-        if( strcut( s=z ) ){ int i=atoi( s ); if( i>=0&&i<=4 )Statum=byte(i); }
-  } } } return *this;
+        if( strcut( s=z ) )Statum=byte( minmax( 0,atoi( s ),4 ) );
+      }
+      if( D>0 && D!=Draught )     // изменение конструктивной осадки парохода
+      if( !Read( FileName,D ) )Break( "Ошибка смены осадки: %s",FileName );
+  } } return *this;
 }
 //    настройка вычислительной акватории и условий генерации штормовых волн
 //
@@ -197,8 +203,8 @@ Field& Field::Get( char *s )
   if( z=strchr( s,',' ) )*z++=0;   // ограничение поля новой числовой величины
   if( strcut( s ) )        //! уточнение размерений числовой опытовой акватории
   { Real L=strtod( s,&s );
-    Real W=strtod( s,&s ); while( *s && *s<=' ' )++s; // очистка левых пробелов
-    if( !memcmp( s,"м",strlen("м") ) ){ if( L>0 )Long=L; if( W>0 )Wide=W; }else
+    Real W=strtod( s,&s );
+    if( AtoM( s,L ) ){ s=AtoM( s,W ); if( L>0 )Long=L; if( W>0 )Wide=W; } else
     { if( L>0 )Long=L*VL;                         // вариант размеров бассейна
       if( W>0 )Wide=W*VL;                         // относительно длины корабля
     } if( Long<VL*4 )Long=VL*4;                   // контроль слишком малых
@@ -226,13 +232,12 @@ Waves::Get( char *s, Real &L, Real &H, Real &D )  // характеристик�
   if( z=strchr( s,',' ) )*z++=0;  //! ограничение поля новой числовой величины
   if( strcut( s ) )               // волнение может определяться в периодах °'"
   { if( wcspbrk( U2W(s),L"°'\"") ){ s=AtoD( s,L ); L*=3600; L*=_g*L/_Pd; } else
-    { L=strtod( s,&s );           // длина волны в метрах \ долях длины корабля
-      if( !wcschr( U2W( s ),L'м' ) )L *= Vessel->Length;
-  } }
-  if( z && *z )                            //! интенсивность или высота волны
-  { if( z=strchr( s=z,',' ) )*z++=0;       // относительно обрушающегося гребня
+    { L=strtod( s,&s );if( !AtoM(s,L) )L*=Vessel->Length; // wcschr(U2W(s),L'м')
+  } }                             // длина волны в метрах \ долях длины корабля
+  if( z && *z )                   //! интенсивность или высота волны в метрах
+  { if( z=strchr( s=z,',' ) )*z++=0; // относительно обрушающегося гребня
     if( strcut( s ) )               // интенсивность (высота) морского волнения
-    { H=strtod( s,&s ); if( wcschr( U2W( s ),L'м' ) )H*=hW/L; if( H>1 )H=1; }
+    { H=strtod( s,&s ); if( AtoM( s,H ) )H*=hW/L; if( H>1 )H=1; }
     if( z && *z )                  //! направление распространения гребней волн
     { if( z=strchr( s=z,',' ) )*z++=0;     // -- указывается курсом из картушки
       while( *s && *s<=' ' )s++;      // приведение к первому значимому символу

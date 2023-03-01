@@ -185,8 +185,8 @@ bool Hull::Read( const char FName[],   // здесь имя приходит в 
 Ok: Str=stringData( Fh );            // Длинная строка в буфере входного файла
   if( *Str++==30 )                   //  '\30'=''
   { Real x,y,z;                      // здесь продолжается серия проверок
-    Vector Ofs={0,0,0};              // приведение к миделю и основной линии OЛ
     int i,j,k,n;                     //  ... или к циклу двойной вложенности
+    Ofs=Zero;                        // приведение к миделю и основной линии OЛ
     if( Str=strchr( Str,'<' ) )
     if( s=strchr( ++Str,'>' ) )      // выборка имени проекта в угловых скобках
     { *s=0; while( *Str<=' ' )++Str; // ?если нет названия проекта <- имя файла
@@ -523,11 +523,7 @@ if( !fb && np<=3  )
       if( kl<=wl.length )Ins( n+1 )=ml;
     }
 #endif
-                                             // освобождение временных ресурсов
-    free( Sm ),free( St ); textcolor( WHITE );
-    cprint( 1,7,"  >>> %s \n  >>>  { L=%g, B=%g, T=%g }^%g "
-                " Stern[%d] + Hull[%d] + Stem[%d]  ",
-     ShipName,Length,Breadth,Draught,Ofs.z,Stern.length,Nframes,Stem.length );
+    free( Sm ),free( St );                   // освобождение временных ресурсов
     //
     // небольшая перенастройка визуализации сцены с кораблем
     //

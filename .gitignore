@@ -8,6 +8,7 @@
 *.o
 
 # generated directories
+Vessel/Digitize/
 WSpace/Dev/*.exe
 WSpace/Dev/Obj/
 Working/Pity/
@@ -20,6 +21,8 @@ Working/Pity/
 # другие рабочие файлы
 *.что
 
+#git gc --aggressive --prune=all # удаление ненужных бренчей
+#git filter-branch --tree-filter 'rm -rf [/путь/к/папке/ненужных/файлов]'
 #
 #client> git reset --soft $(git log --reverse --format=%H | head -n 1)
 #client> git commit --amend
@@ -33,4 +36,3 @@ Working/Pity/
 #git branch -D master  # Deletes the master branch
 #git branch -m master  # Rename the current branch to master
 #git push -f origin master  # Force push master branch to github
-#git gc --aggressive --prune=all     # remove the old files
