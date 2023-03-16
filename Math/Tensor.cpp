@@ -54,11 +54,13 @@ Matrix& Matrix::operator *= ( _Matrix r ){           // преобразован
 //
 Tensor& Tensor::operator*=( _Real s )           // - простое изменение масштаба
       { x*=s; y*=s; z*=s; d*=(s*s*s); xi/=s,yi/=s,zi/=s; return *this; }
+Tensor& Tensor::operator/=( _Real s )           // - или то же, но наоборот
+      { x/=s; y/=s; z/=s; d/=(s*s*s); xi*=s,yi*=s,zi*=s; return *this; }
 Tensor& Tensor::operator*=( _Matrix m )  // подъем к абсолютной системе отсчета
       {  *this = Matrix::operator*=( m ); return det(); }
 Tensor& Tensor::operator /= ( _Tensor r ){           // преобразование тензоров
 #if 1                                                //! ?как бы надо домножать
-   x=(Vector){ x.x *r.xi.x + x.y*r.yi.x + x.z*r.zi.x, //!  - только на обратный!
+   x=(Vector){ x.x*r.xi.x + x.y*r.yi.x + x.z*r.zi.x, //!  - только на обратный!
                x.x*r.xi.y + x.y*r.yi.y + x.z*r.zi.y, // использовано тензорное
                x.x*r.xi.z + x.y*r.yi.z + x.z*r.zi.z },  // правило суммирования
    y=(Vector){ y.x*r.xi.x + y.y*r.yi.x + y.z*r.zi.x,    // немых индексов
@@ -101,6 +103,11 @@ Vector operator / ( _Vector v, _Tensor m )       // подъем индексо�
        { v % m.xi, v % m.yi, v % m.zi };         // и снова - есть вопросы ???
   #endif
      }
+Matrix roll( _Real a,_Vector v )       // поворот относительно произвольной оси
+   { const Real c=cos( a ),s=sin( a ),c1=1-c; return (Matrix){
+     { v.x*v.x*c1+c,     v.x*v.y*c1-v.z*s, v.x*v.z*c1+v.y*s },
+     { v.y*v.x*c1+v.z*s, v.y*v.y*c1+c,     v.y*v.z*c1-v.x*s },
+     { v.z*v.x*c1-v.y*s, v.z*v.y*c1+v.x*s, v.z*v.z*c1+c   } }; }
 Matrix rolX( _Real a )
    { const Real c=cos(a),s=sin(a); return (Matrix){{1,0,0},{0,c,-s},{0,s,c}}; }
 Matrix rolY( _Real a )
@@ -118,9 +125,11 @@ Tensor& Tensor::axiZ( _Real a )
 //Tensor& Tensor::rotX( _Real a ){ return *this *= rolX( a ); }
 //Tensor& Tensor::rotY( _Real a ){ return *this *= rolY( a ); }
 //Tensor& Tensor::rotZ( _Real a ){ return *this *= rolZ( a ); }
-Tensor& Tensor::rotX( _Real a ){ return Tensor::operator *= (rolX( a )); }
-Tensor& Tensor::rotY( _Real a ){ return Tensor::operator *= (rolY( a )); }
-Tensor& Tensor::rotZ( _Real a ){ return Tensor::operator *= (rolZ( a )); }
+Tensor& Tensor::Rotate( _Real a, _Vector v )     // поворот по произвольной оси
+                               { return Tensor::operator *= ( roll( a,v ) ); }
+Tensor& Tensor::rotX( _Real a ){ return Tensor::operator *= ( rolX( a ) ); }
+Tensor& Tensor::rotY( _Real a ){ return Tensor::operator *= ( rolY( a ) ); }
+Tensor& Tensor::rotZ( _Real a ){ return Tensor::operator *= ( rolZ( a ) ); }
 //
 //    Переходы в локальной Vector-in и глобальной Point-out системах координат
 //

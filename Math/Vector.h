@@ -85,9 +85,9 @@ struct Point     // Координатная точка в масштабах а
   Point& operator-=(_Vector d ){ X-=d.x,Y-=d.y,Z-=d.z; return *this; }
   //
   //     Исходные арифметические действия с координатными точками и векторами  //
- friend Point  operator+( Point c,_Vector e){ return c+=e; }
- friend Point  operator-( Point c,_Vector e){ return c-=e; }
- friend Vector operator-(_Point c,_Point e )
+ friend Point  operator + ( Point c,_Vector e ){ return c+=e; }
+ friend Point  operator - ( Point c,_Vector e ){ return c-=e; }
+ friend Vector operator - (_Point c,_Point e )
              { return (Vector){c.X-e.X,c.Y-e.Y,c.Z-e.Z }; }
 };
 //

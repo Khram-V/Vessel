@@ -196,10 +196,11 @@ Hull& Hull::Drawing( byte type ) // 0 - DrawMode; 1 - корпус; 2 + проф
   //  исходные и действующие центры и плечи гидростатических сил и моментов
   //
  Point P=out( Buoyancy ),Q=out( Gravity ),      // начальной величины и тяжести
-       C=out( vB ),F=out( vF ),M=out( vM ),     // центр объёма, ВЛ и метацентр
-       S=out( Metacenter ),W=out( Floatable );  // метацентр для тихой воды
-///ctor R = Gravity-vB;                         // гидростатическое плечо
- colors c = M.Z-Q.Z>=hX ? green : ( M.Z-Q.Z>=0 ? yellow : red );
+       C=out( vB ),F=out( vF ),M=F,I=out(Zero), // центр объёма, ВЛ и метацентр
+       W=out( Floatable ),S=W; M.Z=I.Z+vM.x;       // исходные центры ВЛ и мета.
+                               S.Z=I.Z+Metacenter.x;
+///ctor R = Gravity-vB;   гидростатическое плечо
+ colors c = vM.z>=hX ? green : ( vM.z<0 ? red:yellow );
   //
   //  оси корабельных координат - векторы локального базиса от центра величины
   //

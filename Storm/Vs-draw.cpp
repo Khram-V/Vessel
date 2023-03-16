@@ -57,19 +57,14 @@ Hull& Hull::Contour_Lines()      // рисуем контуры габаритн
 //
 const static byte Rumb[]
  ={_North,_North_East,_East,_South_East,_South,_South_West,_West,_North_West };
-const char *Rmbs[] = { "Nord","NtO","NNO","NOtN","NO","NOtO","ONO","OtN",
-                        "Ost","OtS","OSO","SOtO","SO","SOtS","SSO","StO",
-                      "Su\"d","StW","SSW","SWtS","SW","SWtW","WSW","WtS",
-                       "West","WtN","WNW","NWtW","NW","NWtN","NNW","NtW" };
+
 #define P( x,y ) glVertex3dv( B*(Vector){ x,y } )
 
 static void DirWave( const Waves &W, colors C, Place &D )
 { Real H=W.Height/Vessel->Length*4,L=W.Length/Vessel->Length;
  _Tensor B=W; color( C,0,0.6 ); glBegin( GL_POLYGON );
-  P(0,0),P(-H,-L+H),P(0,-L),P(H,-L+H),P(-H,L),P(0,L-H),P(H,L);
-  glEnd();
-  color( C );
-  if( (H=angle( H=atan2( W.x.y,-W.x.x )))<0.0 )H+=_Pd;
+  P(0,0),P(-H,-L+H),P(0,-L),P(H,-L+H),P(-H,L),P(0,L-H),P(H,L); glEnd();
+  color( C ); if( (H=angle( H=atan2( W.x.y,-W.x.x )))<0.0 )H+=_Pd;
  char S[24],*s=S;
   snprintf( S,23,"%3s:%3.1f/%3.1f\n",
             Rmbs[int(H*32/_Pd+0.49)%32],W.Height,W.Length/W.Cw );
@@ -171,11 +166,8 @@ Hull& Hull::Naviga_Inform( Window *Win )
                                   "          h %.1f << %.1f",
   DtoA( Storm->Trun/3600,3 ),Storm->Tstep,Speed*3600/_Mile,cSp*3600/_Mile,
   Speed/sqrt(_g*Length),sqr(Speed)*_Pd/_g/Length, Volume,iV,
-  Surface,iS, Floatage,iF, Metacenter.z,vM.z, hX,(vM-Gravity).z );
+  Surface,iS, Floatage,iF, Metacenter.x,vM.x, hX,vM.z );
 
-//     ( Tensor(*this)* Metacenter ).z,
-//     ( Tensor(*this)*vM ).z,
-//  hX,( Tensor(*this)*(vM-Gravity) ).z );
   if( Win==this )
   if( (l=Route.length-1)>=12 )
   { Real Dt=Storm->Tstep/Storm->tKrat;   // расчетный шаг в циклах эксперимента
@@ -203,6 +195,13 @@ Hull& Hull::Naviga_Inform( Window *Win )
     for( Max.z=(Min.z=Route[k].z-eps)+eps*2,i=k+1; i<=l; i++ )
        { Real r=Route[i].z; if( Max.z<r )Max.z=r; else if( Min.z>r )Min.z=r; }
     //
+    // сохраняя асимметрию масштабов - центровка графиков относительно нуля
+    //
+/*  Max.x=min(_Ph,max(Max.x,-Min.x)); Min.x=max(-_Ph,min(-Max.x,Min.x));
+    if( Max.x<-Min.x )Max.x=-Min.x;   if( Min.x>-Max.x )Min.x=-Max.x;
+    if( Max.y<-Min.y )Max.y=-Min.y;   if( Min.y>-Max.y )Min.y=-Max.y;
+    if( Max.z<-Min.z )Max.z=-Min.z;   if( Min.z>-Max.z )Min.z=-Max.z;
+*/  //
     // подпись экстремальных величин на правом незатеняемом участочке
     //
     Compass.Alfabet( 20,"Times New Roman",FW_MEDIUM,true );
