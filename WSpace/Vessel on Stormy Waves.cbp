@@ -13,7 +13,7 @@
 				<Option object_output="Dev/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters='&quot;A-1206 Cruise-2.vsl&quot;' />
+				<Option parameters='&quot;БПК «Стерегущий»-61.vsl&quot; &quot;A-1206 Cruise-2.vsl&quot;' />
 				<Option projectCompilerOptionsRelation="0" />
 				<Option projectLinkerOptionsRelation="2" />
 			</Target>
@@ -38,7 +38,11 @@
 				<Option compiler="gnu_gcc_stable" />
 				<Option parameters='&quot;БПК «Стерегущий»-61&quot;' />
 				<Option projectCompilerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-m64" />
+				</Compiler>
 				<Linker>
+					<Add option="-m64" />
 					<Add library="pthread" />
 					<Add library="dl" />
 				</Linker>

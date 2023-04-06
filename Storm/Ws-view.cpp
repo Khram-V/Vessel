@@ -147,15 +147,16 @@ bool Field::Draw()
   }
 //!   Информационная табличка о режимах проведения вычислительного эксперимента
 //
-  Vessel->Naviga_Inform( this );  // картушка морского волнения, курса+скорости
+ Hull &V=*Vessel; _Real S=V.Speed,L=V.Length;
+  V.Naviga_Inform( this );        // картушка морского волнения, курса+скорости
   color( navy );Print(2,1,Exp.peak?"Трохоидальные волны:":"В полных потоках:");
   color( blue );Print( ModelWave[Exp.wave&3] );
- _Real S=Vessel->Speed,L=Vessel->Length; //byte &B=Vessel->hiFlow;
-  color( black ); Print( 2,2,Model[Vessel->Statum] );
-  Print( 2,3,
-     "Курс %0.1f°, дрейф %0.1f°, скорость %0.1f узлов (Fr=%4.2f, Lw/L=%4.2f) ",
-     Vessel->Course*360/_Pd,angle(Vessel->Course,-Vessel->Swing[-1].z)*360/_Pd,
-     S*3600/_Mile,S/sqrt(_g*L),sqr(S)*_Pd/_g/L );
+//color( blue ); Print( 2,1,"%s: %s",
+//   Exp.peak?"Трохоидальные волны":"В полных потоках",ModelWave[Exp.wave&3] );
+  color( black ); Print( 2,2,Model[V.Statum] ); Print( 2,3,
+    "Курс %0.1f°, дрейф %0.1f°, скорость %0.1f узлов (Fr=%4.2f, Lw/L=%4.2f) ",
+     V.Course*360/_Pd,angle(V.Course,-V.Swing[-1].z)*360/_Pd,S*3600/_Mile,
+     S/sqrt(_g*L),sqr(S)*_Pd/_g/L );
   Save().Refresh();                    // перерисовка с наложенными площадками
   return Recurse=false;
 }

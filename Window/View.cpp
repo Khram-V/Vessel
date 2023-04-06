@@ -15,38 +15,36 @@ SeaColor[black+257] =    // переопределение расцветки п
 void color( colors clr ){ glColor4ubv((GLubyte*)(SeaColor[clr].c));}// alfa=255
 void color( colors clr,_Real b,_Real a )  // bright: -1 на черный; +1 до белого
 #define B( c )((b<0?(c*(1+b)):(c+(255-c)*b))/255) // ...с затенением\подсветкой
-{ byte *C=SeaColor[clr].c; glColor4d(B(C[0]),B(C[1]),B(C[2]),a ); } // alfa:0-1
+{ byte *C=SeaColor[clr].c; glColor4d( B(C[0]),B(C[1]),B(C[2]),a ); }// alfa:0÷1
 #undef B
-//   тонкая линия из точки (a) в точку (b)  ... в однородных координатах OpenGL//const Real * dot( const Real* a, colors clr ){ if( clr!=empty )color( clr ); glVertex3dv( a ); return a; }      // осторожноconst Real * spot( const Real* a, _Real Size, colors color ){ glPushAttrib( GL_POINT_BIT );
-  glPointSize( (float)Size ); glBegin( GL_POINTS ); dot( a,color ); glEnd();
+//   тонкая линия из точки (a) в точку (b)  ... в однородных координатах OpenGL//const Real * dot( const Real* a, colors clr ){ if( clr!=empty )color( clr ); glVertex3dv(a); return a; } // осторожная точкаconst Real * spot( const Real* a, _Real Size, colors clr )  // и повторение dot{ glPushAttrib( GL_POINT_BIT ); glPointSize( (float)Size );
+  glBegin( GL_POINTS ); if( clr!=empty )color( clr ); glVertex3dv(a); glEnd();
   glPopAttrib(); return a;
 }
 const Real * line( const Real* a, const Real* b )
 { glBegin( GL_LINES ),glVertex3dv( a ),glVertex3dv( b ),glEnd(); return b; }
-const Real * line( const Real* a, const Real* b, colors clr ){ if( clr!=empty )color( clr ); line( a,b ); return b; }void liney( const Real* a,const Real* b, colors clr ) // две линии по ординатам{ if( clr!=empty )color( clr );  glBegin( GL_LINES ); glVertex3dv( a ); glVertex3dv( b );                       glVertex3d( a[0],-a[1],a[2] );                       glVertex3d( b[0],-b[1],b[2] ); glEnd();}                                                         // 32 секторных румбаconst Real * circle( const Real *a, _Real r, bool fill )  //  в плоскости X-Y
+const Real * line( const Real* a, const Real* b, colors clr ){ if( clr!=empty )color( clr ); line( a,b ); return b; }void liney( const Real* a,const Real* b, colors clr ) // две линии по ординатам{ if( clr!=empty )color( clr );  glBegin( GL_LINES ); glVertex3dv( a ); glVertex3dv( b );         glVertex3d( a[0],-a[1],a[2] ); glVertex3d( b[0],-b[1],b[2] ); glEnd();}                                                         // 32 секторных румбаconst Real * circle( const Real *a, _Real r, bool fill )  //    в плоскости X-Y
 { glBegin( fill?GL_POLYGON:GL_LINE_LOOP ); for( Real q=0; q<_Pd; q+=_Ph/8 )
   glVertex3d( a[0]+r*sin( q ),a[1]+r*cos( q ),a[2] ); glEnd(); return a;
 }
-void rectangle( const Real *LD,const Real *RU,bool fill ) // прямоугольник X-Y
+void rectangle( const Real *LD,const Real *RU,bool fill )  // прямоугольник X-Y
 { glBegin( fill?GL_QUADS:GL_LINE_LOOP ),
   glVertex3dv( LD ),glVertex3d( RU[0],LD[1],LD[2] ),
   glVertex3dv( RU ),glVertex3d( LD[0],RU[1],RU[2] ),glEnd();
 }
-//    ... из точки (a) в точку (b) с объемной стрелкой в долях длины//const Real* arrow( const Real *_a,const Real *_b,_Real l,colors clr ){ Vector &a=*(Vector*)_a,&b=*(Vector*)_b;  Vector d=a-b; d*=l/abs( d );  Vector e={ d.z/5,d.x/5,d.y/5 },f={ e.z,e.x,e.y },g=b+d/2;
-                           line( a,d+=b,clr );   glBegin( GL_LINE_LOOP ),dot( g ),dot( d+e ),dot( b ),dot( d-e ),                           dot( g ),dot( d+f ),dot( b ),dot( d-f ),                           dot( g ),glEnd(); return _b;}void axis( Place &P,_Real L,_Real Y,_Real Z,
+//    ... из точки (a) в точку (b) с объемной стрелкой в долях длины//const Real* arrow( const Real *_a,const Real *_b,_Real l,colors clr ){ Vector &a=*(Vector*)_a,&b=*(Vector*)_b,d=a-b; d*=l/abs( d );  Vector e={ d.z/5,d.x/5,d.y/5 },f={ e.z,e.x,e.y },g=b+d/2; line( a,d+=b,clr );   glBegin( GL_LINE_LOOP ),dot( g ),dot( d+e ),dot( b ),dot( d-e ),                           dot( g ),dot( d+f ),dot( b ),dot( d-f ),                           dot( g ),glEnd(); return _b;}void axis( Place &P,_Real L,_Real Y,_Real Z,
   const char *x,const char *y,const char *z,colors clr ){ const Real l=L/100;   arrow( (Point){ 0,0,-Z },(Point){ 0,0,Z },l,clr ),   arrow( (Point){ 0,-Y,0 },(Point){ 0,Y,0 },l ),   arrow( (Point){ -L,0,0 },(Point){ L,0,0 },l ); color( clr,-0.5 );
   P.Text( _North,0,0,Z,z )
    .Text( _North,0,Y+l,0,y )
    .Text( _North_East,L+l,0,0,x );
 }
 View::View( const char* Tt, int X,int Y, int W,int H, _Real Size )
-    : Window( Tt,X,Y,W,H ),
-    eye( (Vector){ -130,-10,0 } ),look( (Vector){ 0,0,30 } ),
+    :Window( Tt,X,Y,W,H ),eye( (Vector){-130,-10,0} ),look( (Vector){0,0,30} ),
     Distance( Size?-Size:-.8*Width ),   // расстояние от камеры до места съёмки
     mx( 0 ),my( 0 )                     //  указатель мышки в нулевое положение
   { View_initial();
-//  glFogf( GL_FOG_START,-Distance );
-//  glFogf( GL_FOG_END,Distance );
+//  glFogf( GL_FOG_START,-Distance/3 );
+//  glFogf( GL_FOG_END,Distance/3 );
   }
 bool View::Draw(){ Activate();       // с исключением двойной перенастройки
   glMatrixMode( GL_PROJECTION );     // размерах фрагмента экрана сброс текущих

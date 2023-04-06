@@ -158,8 +158,10 @@ bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
       switch( Key=wParam )
       { case VK_BACK  : Key=_BkSp; break;      // 8 -> _BkSp(14)
         case VK_TAB   : Key=_Tab;  break;      // 9 -> _Tab(30)
-        case VK_CANCEL: PostQuitMessage( VK_CANCEL ); break;
-//      case VK_CANCEL: exit( VK_CANCEL );     // 3 -> просто на выход
+        case VK_CANCEL: //Close();
+                        PostQuitMessage( VK_CANCEL );
+                     // exit( VK_CANCEL );     // 3 -> просто на выход
+                        return true;
       } PutChar( Key );                        // и ещё одна запись в буфер
     }   break;
 //  case WM_TIMER: if( idEvent==wParam )       // 275 -> внутренняя процедура

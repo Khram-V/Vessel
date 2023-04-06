@@ -99,8 +99,8 @@ Field& Field::Simulation()  // моделирование волнения в и
   GrWave=Exp.wave>1?10:17.6; // количество волн для одного структурного цикла
   if( Trun<Tnew )           // на свободной границе нужен точный отсчёт времени
   { Real Ts,Tr=Trun;        // начальный отсчёт времени по выходу через секунду
-    if( Vessel->Statum || Exp.wave>1 )Ts=Tstep/tKrat;  // гидромеханика корабля
-                                 else Ts=Tnew-Trun;    // или чистая кинематика
+    if( Vessel->Statum || Exp.wave>1 )Ts=Tstep/tKrat; // гидромеханика корабля
+                                 else Ts=Tstep/tKrat; //Tnew-Trun; // или чистая кинематика
     //
     //   Главный цикл во времени для проведения вычислительного эксперимента
     //
@@ -289,7 +289,17 @@ Real Field::Value( Point A )
 }
 //! дополнение морских координат уровнем поверхности воды
 //
-Vector Field::Locus( Point P ){ P.Z = Value( P ); return *(Vector*)(&P); }
+#if 1
+Vector Field::Locas( Point P ){ P.Z = Value( P ); return *(Vector*)(&P); }
+#else
+Vector Field::Locas( Point P )
+{ Vector &W=*(Vector*)(&P); W.z=0;
+  W.z = Wind.Wave( Tlaps*3600,W ).z
+     + Swell.Wave( Tlaps*3600,W ).z   // координаты хранятся в исходном массиве
+     + Surge.Wave( Tlaps*3600,W ).z;
+  return W;                           //
+}
+#endif
 //
 //! Билинейная интерполяция по неравномерной сетке к новой волновой поверхности
 //

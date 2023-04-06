@@ -33,16 +33,16 @@ Place& Place::AlfaBit( unsigned char *DispCCCP )     /// старый совет
 //
 Place& Place::Alfabet( int h, const char *fn, int weight, bool italic )
 { //wglMakeCurrent( Site->hDC,Site->hRC );
-  if( !Fnt )Fnt=(Font*)calloc( sizeof(Font),1 );    // ставится локальный адрес
-  if( Fnt->Base )glDeleteLists( Fnt->Base,ListsGroup ); Fnt->Base=0;
-  if( Fnt->hF )DeleteObject( Fnt->hF );                 Fnt->Bit=NULL;
-  LOGFONT logfont={};                             // Setup Font characteristics
+   if( !Fnt )Fnt=(Font*)calloc( sizeof(Font),1 );   // ставится локальный адрес
+   if( Fnt->Base )glDeleteLists( Fnt->Base,ListsGroup ); Fnt->Base=0;
+   if( Fnt->hF )DeleteObject( Fnt->hF );                 Fnt->Bit=NULL;
+  LOGFONT logfont={};                         // Setup Font characteristics ≡ 0
    logfont.lfHeight       = h<6?Site->ScreenHeight/48:h; //  высота шрифта = 1?
 // logfont.lfWidth        = 0;
    logfont.lfEscapement   = GM_COMPATIBLE;         //   GM_ADVANCED - 0
 // logfont.lfOrientation  = 0;
-   logfont.lfWeight       = weight;  //FW_DONTCARE+THIN,ULTRALIGHT,LIGHT,NORMAL
-   logfont.lfItalic       = italic;  //    MEDIUM,SEMIBOLD,BOLD,EXTRABOLD,HEAVY
+   logfont.lfWeight       = weight; // FW_DONTCARE+THIN,ULTRALIGHT,LIGHT,NORMAL
+   logfont.lfItalic       = italic; //    MEDIUM,SEMIBOLD,BOLD,EXTRABOLD,HEAVY
 // logfont.lfUnderline    = false;
 // logfont.lfStrikeOut    = false;
    logfont.lfCharSet      = RUSSIAN_CHARSET;    // DEFAULT_CHARSET ANSI_CHARSET
@@ -51,8 +51,8 @@ Place& Place::Alfabet( int h, const char *fn, int weight, bool italic )
    logfont.lfQuality      = DEFAULT_QUALITY;          // PROOF_QUALITY
    logfont.lfPitchAndFamily=FF_MODERN|FIXED_PITCH;    // FF_ROMAN DEFAULT_PITCH
    strcpy( logfont.lfFaceName,fn?fn:"Courier New");   // имя шрифта 32 байта
-   Fnt->hF = CreateFontIndirect( &logfont );            // Create the font
-  HFONT oFont=(HFONT)SelectObject( Site->hDC,Fnt->hF ); // and display list
+   Fnt->hF = CreateFontIndirect( &logfont );          // Create the font and
+  HFONT oFont=(HFONT)SelectObject( Site->hDC,Fnt->hF );  // display list
    Fnt->Base=glGenLists( ListsGroup );
    if( !wglUseFontBitmaps( Site->hDC,0,ListsGroup,Fnt->Base ) ) //! странная ??
         wglUseFontBitmaps( Site->hDC,0,ListsGroup,Fnt->Base );  //! проблема ??

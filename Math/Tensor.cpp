@@ -103,6 +103,9 @@ Vector operator / ( _Vector v, _Tensor m )       // подъем индексо�
        { v % m.xi, v % m.yi, v % m.zi };         // и снова - есть вопросы ???
   #endif
      }
+//Vector& Vector::operator /= ( _Tensor m ){ return *this=Vector(*this)/m; }
+//   { const Vector v=*this; x=v%m.xi; y=v%m.yi; z=v%m.zi; return *this; }
+
 Matrix roll( _Real a,_Vector v )       // поворот относительно произвольной оси
    { const Real c=cos( a ),s=sin( a ),c1=1-c; return (Matrix){
      { v.x*v.x*c1+c,     v.x*v.y*c1-v.z*s, v.x*v.z*c1+v.y*s },
@@ -143,14 +146,13 @@ Vector Base::in( _Point A ){ return Vector( A-(Point)*this ) / (Tensor)*this; }
 //      приводится к последовательному исполнению: axiX(a).rotY(b).rotZ(c)
 //
 Matrix Krylov(_Real a,_Real b,_Real c ) // крен, дифферент, рыскание в радианах
-{ return (Matrix){                      // c1*a2*b3
- (Vector){ cos( c )*cos( b ),
-           sin( c )*cos( b ), -sin( b ) },
- (Vector){ sin( a )*sin( b )*cos( c )-cos( a )*sin( c ),
-           sin( a )*sin( b )*sin( c )+cos( a )*cos( c ), sin( a )*cos( b ) },
- (Vector){ cos( a )*sin( b )*cos( c )+sin( a )*sin( c ),
-           cos( a )*sin( b )*sin( c )-sin( a )*cos( c ), cos( a )*cos( b ) } };
-
+{ return (Matrix)                       // c1*a2*b3
+  { (Vector){ cos( c )*cos( b ),sin( c )*cos( b ),-sin( b ) },
+    (Vector){ sin( a )*sin( b )*cos( c )-cos( a )*sin( c ),
+              sin( a )*sin( b )*sin( c )+cos( a )*cos( c ),sin( a )*cos( b ) },
+    (Vector){ cos( a )*sin( b )*cos( c )+sin( a )*sin( c ),
+              cos( a )*sin( b )*sin( c )-sin( a )*cos( c ),cos( a )*cos( b ) }
+  };
 // (Vector){ cos( b )*cos( c ),sin( a )*sin( b )*cos( c )-cos( a )*sin( c ),
 //                             cos( a )*sin( b )*cos( c )+sin( a )*sin( c ) },
 // (Vector){ cos( b )*sin( c ),sin( a )*sin( b )*sin( c )+cos( a )*cos( c ),
@@ -168,17 +170,17 @@ Matrix Euler( _Real a,_Real b,_Real c )   // а-вперед; b-вправо; с
             -sin( a )*sin( c )+cos( a )*cos( b )*cos( c ),-cos( a )*sin( b ) },
    (Vector){ sin( b )*sin( c ),sin( b )*cos( c ),cos( b ) } };
 }
-//    Смещение базисных осей для тензора инерции (Гюйгенс-Штейнер)
+//    Смещение базисных осей для тензора инерции (иначе по Гюйгенсу-Штейнеру)
 //    M - тензор инерции; С - координаты центра масс; R - новая точка отсчета
 //
-#define SH( A )(Matrix){ (Vector){  A.y*A.y+A.z*A.z,-A.x*A.y,-A.x*A.z }, \
-                         (Vector){ -A.y*A.x, A.x*A.x+A.z*A.z,-A.y*A.z }, \
-                         (Vector){ -A.z*A.x,-A.z*A.y, A.x*A.x+A.y*A.y } }
-
+static Matrix SH( _Vector A )
+     { return (Matrix){ (Vector){  A.y*A.y+A.z*A.z,-A.x*A.y,-A.x*A.z },
+                        (Vector){ -A.y*A.x, A.x*A.x+A.z*A.z,-A.y*A.z },
+                        (Vector){ -A.z*A.x,-A.z*A.y, A.x*A.x+A.y*A.y } };
+     }
 Matrix Steiner( _Matrix M,_Vector C ){ return M-SH( C ); }   // просто к центру
 Matrix Steiner( _Matrix M,_Vector C,_Vector R )  // Сначала к базисному центру,
-     { return M - SH( C ) + SH( R );            // затем к новой точке вращения
-     }
+              { return M - SH( C ) + SH( R ); } // затем к новой точке вращения
 /*
 Matrix& Matrix::Krylov(_Real a,_Real b,_Real c ) // крен - дифферент - рыскание
 { x.x=cos( b )*cos( c ),x.y=sin( a )*sin( b )*cos( c ) - cos( a )*sin( c ),

@@ -142,12 +142,12 @@ void _OutBitText( const char *str, byte *bit, int &X,int &Y,int bX )
 //
 static
 void _OutText( const char *str, int base, int &X,int &Y, int bX,int pX )
-{ static float P[4]={ 0.0,0.0,0.0,0.0 };      // для выборки новой позиции chX
-   glPushAttrib( GL_LIST_BIT );               // собственно печать текста
+{  glPushAttrib( GL_LIST_BIT );               // собственно печать текста
    glListBase( base ); glCallLists( strlen( str ),GL_UNSIGNED_BYTE,str );
-   if( bX>0 ){ glGetFloatv( GL_CURRENT_RASTER_POSITION,P ); X=P[0]-pX; }
    glPopAttrib();
-   glFlush();
+// glFlush();
+  static int P[4]={ 0,0,0,0 };                // для выборки новой позиции chX
+   if( bX>0 ){ glGetIntegerv( GL_CURRENT_RASTER_POSITION,P ); X=P[0]-pX; }
 }
 Place& Place::String( const char *T )  // исходная строка реально не изменяется
 { TextContext St;
@@ -158,8 +158,10 @@ Place& Place::String( const char *T )  // исходная строка реал
     if( AF.Bit )
     { if( cbX<=0 )chX-=strlen(str)*AF.W;
       glRasterPos2i( chX,chY ); _OutBitText( str,AF.Bit,chX,chY,cbX ); } else
-    { if( cbX<=0 )chX-=AlfaRect( str,true ).cx;
-      glRasterPos2i( chX,chY ); _OutText( str,AF.Base,chX,chY,cbX,pX ); }
+    { //long l=AlfaRect( str,true ).cx;
+      if( cbX<=0 )chX-=AlfaRect( str,true ).cx;
+      glRasterPos2i(chX,chY); _OutText( str,AF.Base,chX,chY,cbX,pX ); //chX+=l+1;
+    }
     if( !w )break; w[0]='\n'; chY-=AF.H; str=w+1;     //  будет еще одна строка
     if( cbX>0 )chX=(cbX-1)*AF.W; else chX=Width+AF.W*cbX;
   } return *this;
@@ -181,8 +183,8 @@ Place& Place::String( Course Dir, const Real *P, const char* T )
 }
 #include <stdio.h>   // блок для четырёх вариантов текстовых надписей в формате
 #include <stdarg.h>  // с реентерабельной\стековой подстрочкой переменной длины
-#define Arg va_list a; va_start(a,fmt); int l=vsnprintf(0,0,fmt,a)+1; \
-              { char s[l]; vsnprintf(s,l,fmt,a); va_end(a); String
+#define Arg va_list a; va_start( a,fmt ); int l=vsnprintf( 0,0,fmt,a )+1; \
+              { char s[l]; vsnprintf( s,l,fmt,a ); va_end( a ); String
 #define Str ; } return *this; // просто с "временной" строчкой на всё и про всё
 Place& Place::Print( const char *fmt,... ){ Arg( s )Str }
 Place& Place::Print( int x,int y, const char *fmt,... )

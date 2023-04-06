@@ -8,10 +8,11 @@
 //
 #include "Vessel.h"       // объекты и производные операции с корпусом на волне
                           // + дополнения графической среды OpenGL-Window-Place
-static int Board=0,         // 'о' штевни; '-' левый и '+' правый борт
+static int// Board=0,       // 'о' штевни; '-' левый и '+' правый борт
            Level=0,         // -2-днище -1-вода 0-ватерлиния 1-смочен 2-сухой
            wLine=1;         // -1-ниже; +1-выше цвета конструктивной ватерлинии
-static Flex Wu,Wd;          // ватерлиния: слева - всплытие, справа погружение
+//static Flex Wu,Wd;        // ватерлиния: слева - всплытие, справа погружение
+static Flex M;              // ватерлиния: слева - всплытие, справа погружение
 static bool drawHull=false, // прорисовка корпуса | гидродинамический процесс
             Part=false;     // false= днище и ватерлиния; true= надводный борт
 static Real ArLen=0.1;      // относительная длина для стрелок на шпациях
@@ -58,9 +59,7 @@ if( Level<0 )
 //!  сборка сортировкой двух фрагментов ватерлинии в интервале одной шпации
 //
 void Hull::waterPoints( _Vector N,_Vector Q,_Vector P )
-{ if(!Board)return; // на транцах пока без учёта действующей площади ватерлинии
- Flex &M=Board*(z.z<0?-1:1)<0?Wd:Wu; // шпангоуты и разделение шпаций по бортам
-  if( !M.length )M+=P,M+=N;       // сначала добавляется одна центральная точка
+{ if( !M.length )M+=P,M+=N;       // сначала добавляется одна центральная точка
       else  { if( P.x<M[0].x )M/=N,M/=P; else if( P.x>M[-2].x )M+=P,M+=N; }
   if( P!=Q ){ if( Q.x<M[0].x )M/=N,M/=Q; else if( Q.x>M[-2].x )M+=Q,M+=N; }
 }
@@ -109,29 +108,35 @@ Part_of_hull:                                   // разделение корп
   for( int k=0; k<=Nframes+2; k++ )             // штевни и шпангоуты Nframes+3
   if( Shell[k] )                                // -- есть ли сам корпус
   if( Shell[k][0]>0 )                           // -- не пропущена ли шпация
-  { Board=0;                                    // -- сначала берутся штевни
+  { M.length=0;
     if( !k || k==Nframes+2 )                    // здесь рассматриваются
-    for( i=1; i<=Shell[k][0]; i++ )             // транцевые расширения,
-    { Vertex P=Select( k,i+!k ),Q=Select( k,i+1-!k ),   // если таковые есть
-             p=Select( k,-i-!k ),q=Select( k,!k-i-1 );  // -- левый борт
-      if( P!=p )Triangle( p,P,Q );                      // две точки
-      if( Q!=q )Triangle( Q,q,p );                      //  на входе
+    { for( M.length=0,i=1; i<=Shell[k][0]; i++ )       // транцевые расширения,
+      { Vertex P=Select( k,i+!k ),Q=Select( k,i+1-!k ),    // если таковые есть
+               p=Select( k,-i-!k ),q=Select( k,!k-i-1 );   // -- левый борт
+        if( P!=p )Triangle( p,P,Q );                       // две точки на входе
+        if( Q!=q )Triangle( Q,q,p );                  // сначала берутся штевни
+      }
+      if( M.length )                                  // всё на левый борт
+        { for( j=0; j<M.length; j++ )wL+=M[j]; wl+=M.length; wr+=0; }
     } else                      // стандартные шпации начинаем с +правого борта
     if( (n=Shell[k][0])>=3 )    // здесь присутствует хотя бы один треугольник?
-    { for( Wd.length=Wu.length=0,Board=-1; Board<2; Board+=2 )
+    { for( int Board=-1; Board<2; Board+=2 )
       { Vertex P=Select( k,Board>0?-1:1 ),   // это блок стандартных шпаций
                Q=Select( k,Board>0?-2:2 );   // сначала левый-> правый шпангоут
+        M.length=0;
         for( i=3; i<=Shell[k][0]; i++ )      // всех теоретических шпангоутов
         { Vertex R=Select( k,Board>0?-i:i ); // попутная разборка треугольников
           if( Board>0 )Triangle( P,Q,R );                     // правый борт
                   else Triangle( Q,P,R );                     //  -- и левый
           if( Shell[k][i]&( LeftFrame|SternPost ) )P=R;       // к кормовому
                                               else Q=R;       // перпендикуляру
+        }            // шпация замыкается свободной поверхностью по уровню воды
+        if( !Part )  //  сборка всей ватерлинии вместе с нормалями [0..Nframes]
+//      if( M.length )
+        { bool B=Board*(z.z<0?-1:1)>0;
+          Flex &W=B?wL:wR; InList &L=B?wl:wr;                 // без отсечки
+          for( j=0; j<M.length; j++ )W+=M[j]; L+=W.length;    // первой точки
         }
-      }              // шпация замыкается свободной поверхностью по уровню воды
-      if( !Part )    //  сборка всей ватерлинии вместе с нормалями [0..Nframes]
-      { for( j=0; j<Wu.length; j++ )wL+=Wu[j]; wl+=wL.length;   // без отсечки
-        for( j=0; j<Wd.length; j++ )wR+=Wd[j]; wr+=wR.length;   // первой точки
       }
     }
   }

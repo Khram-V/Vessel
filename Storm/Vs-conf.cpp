@@ -34,7 +34,7 @@ void logAdemp(){ if( VIL ){ const Vector &M=Vessel->DampM;
 } }
 void Model_Config( Window* Win )
 { byte &St=Vessel->Statum,ans=St;
-  Mlist Menu[]={ {1,0,"   Выбор модели гидромеханики корабля"},{2,45,Model[0]},
+  Mlist Menu[]={ {1,0,"  Выбор модели гидромеханики корабля"},{2,45,Model[0]},
              {1,45,Model[1]},{1,45,Model[2]},{1,45,Model[3]},{1,45,Model[4]} };
   TextMenu T( Mlist( Menu ),Win,47,1 );
   if( (ans=T.Answer( ans+1 )-1)==_Esc-1 )ans=St;
@@ -86,7 +86,7 @@ Hull& Hull::Config()
     { if( !Read( FileName,D ) )       // главные оси и геометрические параметры
            Break( "Ошибка повторного чтения корпуса %s",FileName );
      int sKt=Storm->Kt; Storm->Original( false ).Kt=0;
-      mM=0.0; Initial().Floating(); Storm->Kt=sKt; wPrint( true );
+      Initial().Floating(); Storm->Kt=sKt; wPrint( true );
     }
     if( DF!=DampF ){ DF=DampF; logMdemp(); }
     if( DM!=DampM ){ DM=DampM; logAdemp(); }
@@ -138,7 +138,7 @@ Field& Field::Config() // Height = 1.134*Lw*Hw/_Pd/2.0;
     H2=h2=hW*Swell.Height/Swell.Length; g2=(_Pi-atan2(Swell.x.y,Swell.x.x))*_Rd;
     H3=h3=hW*Surge.Height/Surge.Length; g3=(_Pi-atan2(Surge.x.y,Surge.x.x))*_Rd;
     switch( ans=T.Answer( ans ) )
-    { case  1: (++Exp.wave)%=3; break;         // Initial() модель волнения
+    { case  1: Exp.wave++; Exp.wave%=3; break; // Initial() модель волнения
       case  2: Exp.peak^=true;  break;         // Initial() колебания или волны
       case  3: Exp.draw+=ScanStatus()&SHIFT?-1:1; break;
       case  4: Exp.view+=ScanStatus()&SHIFT?-1:1; break;
