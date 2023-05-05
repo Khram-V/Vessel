@@ -13,7 +13,7 @@
 				<Option object_output="Dev/Obj/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters='&quot;A-1206 Cruise-2.vsl&quot;' />
+				<Option parameters='Арктикаборг &quot;A-1206 Cruise-2.vsl&quot;' />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-m32" />

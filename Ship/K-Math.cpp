@@ -253,9 +253,9 @@ void Building()                       //       ___\│ г--+-┼--°°L¬\+/
     for( int z=0; z<nz; z++ ){ float *_1=A[z],*_2=A[z+1],fr=*_1++,FR=*_2++;
       for( int x=0; x<nx; x++ ){ int Nb[nl-1]={ 0 };
         for( int b=0;b<4; b++ ){ float f,F,Fr;
-          if(  b<1  ){ z++;     f=fr,Fr=F=FR; } else{ f=Fr;
-            if( b<2 ){ x++;       Fr=F=*_2++; } else
-            if( b<3 ){ --z; FR=Fr,Fr=F=*_1++; } else
+          if(  b<1  ){ z++;      f=fr; Fr=F=FR; } else{ f=Fr;
+            if( b<2 ){ x++;       Fr=F = *_2++; } else
+            if( b<3 ){ --z; FR=Fr,Fr=F = *_1++; } else
                      { --x; F=fr,fr=Fr; } }
           for( int k=0;k<nl-1;k++ ){ float Y=(k+1)*Breadth/(-2*nl),y=Y+f; Y+=F;
             if( Y==0 )list( , ) else

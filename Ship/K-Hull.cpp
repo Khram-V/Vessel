@@ -167,7 +167,7 @@ int Hull::Write()
     FPutS( "коэффициент общей полноты",";  δ=%5.3lg",Volume/Bwl/Lwl/Draught );
     fprintf( Fh,";\n" );
     sprintf( Str+256,"%04d.%s.%02d %s%s",y,_Mnt[m-1],d,_Day[D%7],DtoA( T,3 ) );
-    FPutS( Str+256,";  %s",Str );
+    FPutS( Str+256,";  %s",fname(Str) );
     fclose( Fh ); Fh=0; return 0;
   } return 1;
 }

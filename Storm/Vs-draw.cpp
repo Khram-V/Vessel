@@ -44,13 +44,13 @@ Hull& Hull::Contour_Lines()      // рисуем контуры габаритн
   for( Real s=0; s<S*2; s+=dS )
   { R=Traverse*( s/S )-Traverse; color( lightgreen ); glBegin( GL_LINE_STRIP );
     for( R.z=0; R.z>=D; R.z+=dQ )dot( F.Wave(Trun,R) ); glEnd(); color( cyan );
-    for( R.z=0; R.z>=D; R.z+=dP ){ F.Wave(Trun,P=R,V); arrow(P,P+V,abs(V)/6); }
+    for( R.z=0; R.z>=D; R.z+=dP ){ P=F.WaveV(Trun,R,V); arrow(P,P+V,abs(V)/6); }
   }
   dS=( S=abs( Ahead ) )/120.0;
   for( Real s=0; s<S*2; s+=dS )
   { R=Ahead*( s/S )-Ahead; color( lightgreen ); glBegin( GL_LINE_STRIP );
     for( R.z=0; R.z>=D; R.z+=dQ )dot( F.Wave(Trun,R) ); glEnd(); color( cyan );
-    for( R.z=0; R.z>=D; R.z+=dP ){ F.Wave(Trun,P=R,V); arrow(P,P+V,abs(V)/6); }
+    for( R.z=0; R.z>=D; R.z+=dP ){ P=F.WaveV(Trun,R,V); arrow(P,P+V,abs(V)/6); }
   } glLineWidth( 1 ); return *this;
 }
 //! общая навигационная информация о состоянии корабля

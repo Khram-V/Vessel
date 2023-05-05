@@ -136,7 +136,7 @@ Field(_Real L,_Real W,_Real T,     // длина, ширина бассейна,
     { if( VIL ){ fclose( VIL ); ++i; }               //++ с отметкой её наличия
       VIL=_wfopen( U2W( fext( V.FileName,"vil" ) ),L"rb+" ); // файл для модели
       if( VIL && i<2 )       // без общей настройки волны в долях длины корабля
-        { Lw*=V.Length/100; Ls*=V.Length/100; Lr*=V.Length/100; } // не мудрёно
+        { Lw*=V.Length/36; Ls*=V.Length/36; Lr*=V.Length/36; } // не мудрёно
     }
     if( VIL )while( !feof( VIL ) )                        // к настройке модели
     { char *s=getString( VIL );
@@ -436,7 +436,7 @@ int main() // int ans, char **av )
 //{
 //do{ Sea.Simulation(); WaitTime( 100 ); }while( Ship.asYet() && Sea.asYet() );
 
-#pragma omp task
+//#pragma omp task
 {
   do                                            // -=+*&#
   { static int i=0; cprint( 1,22,"%c",( "0123456789ABCDEF" )[++i%=16] );

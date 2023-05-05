@@ -20,10 +20,10 @@ Vector& Flex::Insert( int k )                   // вставка точки п�
 }
 Vector Flex::Delete( int k )      // одна точка вытаскивается и векторного ряда
 { Vector V={ 0,0,0 };             //  без укорочения числового массива в памяти
-   if( length>0 )if( (k=minmax(0,k,length))<length )
-     for( V=P[k]; k<length-1; k++ )P[k]=P[k+1]; return V;
+   if( k>=0 && k<length ){ --length; for( V=P[k]; k<length; k++ )P[k]=P[k+1]; }
+  return V;
 }
-#if 0
+#if 0                             /// -- временно  исключено
 Vector& Flex::operator+=(_Vector R){ return Insert(length)=R; } // конец списка
 Vector& Flex::operator/=(_Vector R){ return Insert(0)=R; }// замещение в начале
 

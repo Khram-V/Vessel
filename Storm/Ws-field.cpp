@@ -54,10 +54,13 @@ Vector Waves::Wave( _Real T,int y,int x )       // в отсчетах сето�
 Vector Field::Wave( _Real T, _Vector R )        // новое местоположение частицы
 { Vector W=Wind.Wave( T,R )+Swell.Wave( T,R )+Surge.Wave( T,R )-R*2; return W;
 }
-void Field::Wave( _Real T, Vector &R, Vector &W )  // местоположение и скорость
-{ Vector P,p,v; Wind.Wave( T,P=R,W );
+Vector Field::WaveV( _Real T,_Vector R,Vector &W ) // местоположение и скорость
+{ Vector P=R;
+  if( !Exp.wave )W=0; else
+  { Vector p,v; Wind.Wave( T,P,W );
                Swell.Wave( T,p=R,v ); P+=p-R; W+=v;
-               Surge.Wave( T,p=R,v ); P+=p-R; W+=v; R=P;
+               Surge.Wave( T,p=R,v ); P+=p-R; W+=v;
+  } return P;
 }
 //!  Раздельная визуализация волновых процессов в независимом графическом окне
 //      -=- вычисление текущего смещения точки в пространстве в новом времени

@@ -13,7 +13,7 @@
 				<Option object_output="Dev/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters='&quot;БПК «Стерегущий»-61.vsl&quot; &quot;A-1206 Cruise-2.vsl&quot;' />
+				<Option parameters='Examples\Кубик &quot;A-1200 Early&quot; &quot;Речной теплоход «Родина» (Готман)&quot; &quot;БПК «Стерегущий»-61.vsl&quot; &quot;A-1206 Cruise-2.vsl&quot;' />
 				<Option projectCompilerOptionsRelation="0" />
 				<Option projectLinkerOptionsRelation="2" />
 			</Target>
@@ -86,6 +86,9 @@
 		</Compiler>
 		<Linker>
 			<Add option="-s" />
+			<Add option="-static-libstdc++" />
+			<Add option="-static-libgcc" />
+			<Add option="-static" />
 			<Add library="opengl32" />
 			<Add library="glu32" />
 			<Add library="gdi32" />

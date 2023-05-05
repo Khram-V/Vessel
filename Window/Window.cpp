@@ -166,7 +166,7 @@ bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
     }   break;
 //  case WM_TIMER: if( idEvent==wParam )       // 275 -> внутренняя процедура
 //                 { PutTimer(); return true; } break;
-    case WM_CLOSE:                  // =16 - сигнал о возможности закрытия окна
+    case WM_CLOSE: Close();         // =16 - сигнал о возможности закрытия окна
       DestroyWindow( hWnd ); break; // внутри идёт запрос закрытия окна Windows
     case WM_DESTROY:     // =2 здесь должны быть закрыты все внутренние объекты
          Close(); break; // безусловно (вторично) срабатывает деструктор Window
