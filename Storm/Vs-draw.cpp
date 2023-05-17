@@ -76,9 +76,9 @@ Hull& Hull::Naviga_Inform( Window *Win )
 { Field &S=*Storm;
  Tensor B;                       // единичный масштаб пространственного тензора
  Vector C=Swing[-1]; C.z+=_Ph;  // крен, дифферент и курс корабля (в геобазисе)
- TextContext TS( true );
  int i,l=-0.2*hypot( Width,Height );                  // размер из аксонометрии
  Place Compass( Win,PlaceOrtho );                     // | PlaceAbove
+ TextContext TS( true );
   Compass.Area( 0,0,1.25*l,l ).Activate( true );      // c единичной разметкой
   //
   //! картушка морского волнения, курса, скорости корабля
@@ -87,7 +87,7 @@ Hull& Hull::Naviga_Inform( Window *Win )
  Real L=min( 1.0,Length // условная высота и длина стрелки волны в картушке
   / max( max( S.Wind.Length,S.Swell.Length ),S.Surge.Length ) );
   glTranslated( 0,-0.1,0 );
-  glScaled( .9*L,.9*L,1 );
+  glScaled( 0.9*L,0.9*L,1 );
   color( white,0,.33 ),circle( (Point){0},1/L );  // круг картушки 110% корпуса
  bool left=int( 2+Course/_Ph )&1; Compass.Print( left?-1:1,1,"" ); color(navy);
   DirWave( S.Wind,green,Compass );           // ветровая волна
@@ -114,12 +114,6 @@ Hull& Hull::Naviga_Inform( Window *Win )
     if( (!left && (i<11 || i>15)) || (left && (i<17 || i>21 ) ) )
     Text( (::Course)Rumb[((i+18)/4)%8],0.96*V,"%s",Rmbs[(i+16)%32] );
   }
-  //  поверхность действующей и сильно искривлённой ватерлинии
-  //
-  B.axiZ( _Ph )/=Length/2; color( navy ); glBegin( GL_LINE_LOOP );
-  for( i=0;i<wL.length;i+=2 )dot( B*(Tensor(*this)*wL[i]) );
-  for( i=0;i<wR.length;i+=2 )dot( B*(Tensor(*this)*wR[i]) ); glEnd();
-  //
   //  контроль положения руля весьма полезен для понимания маневров на волнении
   //
  Real U,H; B.axiZ( C.z );
@@ -145,9 +139,16 @@ Hull& Hull::Naviga_Inform( Window *Win )
   }
   //  контрольная полупрозрачная плоскость для чисто конструктивной ватерлинии
   //
-  color( lightgray,0.0,0.5 ); glBegin( GL_POLYGON );
-  for( i=0; i<WaterLine.length; i++ )dot( B*WaterLine[i] );
-  for( i=WaterLine.length-1; i>=0; i-- )dot( B*~WaterLine[i] ); glEnd();
+  glBegin( GL_TRIANGLES ); //GL_POLYGON ); //GL_TRIANGLE_FAN );
+  for( i=0; i<WaterLine.length; i+=3 )
+  { color( lightcyan,0,0.5 ); dot( (Point){0} ); color( lightgray,0,0.5 );
+                              dot( B*WaterLine[i+1] );
+                              dot( B*WaterLine[i+2] ); } glEnd();
+  //
+  //  поверхность действующей и сильно искривлённой ватерлинии
+  //
+  B.axiZ( -_Ph )/=Length/2; B=Tensor(*this)*B; color( gray,-0.25 );
+  for( i=0; i<wL.length; i+=3 )line( B*wL[i+1],B*wL[i+2] );
   //
   //  в центре картушки подписывается текущий курс и действующая скорость судна
   //
@@ -196,16 +197,17 @@ Hull& Hull::Naviga_Inform( Window *Win )
     //
     H=max( Max.x,Max.y );   // дальнейшее масштабирование по максимуму от X и Y
     U=10.0*_dR/H;
-    color( lightcyan,0.8 ); rectangle( (Point){-Lp,-1.0},(Point){Lp-Lt,1.0} );
+//  color( lightcyan,.8,.75 ); rectangle( (Point){-Lp,-1},(Point){Lp-Lt,1} );
     if( U<1.0 )
-    { color( lightgreen,0.0,0.2 );         // 10° - комфортная радость на борту
+    { color( lightgreen,0.0,0.2 );        // <10° - комфортная радость на борту
       rectangle( (Point){-Lp,U},(Point){Lp-Lt,min(1.0,2*U)} );
       rectangle( (Point){-Lp,-U},(Point){Lp-Lt,max(-1.0,-2*U)} );
-      if( U<0.5 )
-      { color( lightblue,0.7,0.5 );        // 20° - невыносимое веселье в качке
-        rectangle( (Point){-Lp,2*U},(Point){Lp-Lt,1} );
-        rectangle( (Point){-Lp,-2*U},(Point){Lp-Lt,-1} );
-    } }
+//    if( U<0.5 )
+//    { color( lightblue,0.7,0.5 );       // >20° - невыносимое веселье в качке
+//      rectangle( (Point){-Lp,2*U},(Point){Lp-Lt,1} );
+//      rectangle( (Point){-Lp,-2*U},(Point){Lp-Lt,-1} );
+//    }
+    }
     //
     // подпись экстремальных величин на правом незатеняемом участочке
     //
@@ -225,10 +227,7 @@ Hull& Hull::Naviga_Inform( Window *Win )
     //
     // закрашенный профиль волны по вертикальной качке
     //
-    line( (Point){-Lp,0,0},(Point){Lp-Lt,0,0},cyan );       // уровень среднего
-    line( (Point){-Lp,-0.5},(Point){Lp-Lt,-0.5},lightgreen );
-    line( (Point){-Lp,0.5},(Point){Lp-Lt,0.5} ); color( lightgreen,.7 );
-    rectangle( (Point){Lp-Lt,-0.5},(Point){Lp,0.46} );
+    color( lightgreen,.7,.8 ); rectangle( (Point){Lp-Lt,-.5},(Point){Lp,.46} );
     glBegin( GL_QUAD_STRIP );
     for( i=k; i<=l; i++ )
       glVertex3d( -Lp+(i-k)*L,0,0 ),
@@ -290,13 +289,17 @@ Hull& Hull::Naviga_Inform( Window *Win )
     Compass.Print( -1,0,"%+3.1f/%+3.1f",maxA+1,minA+1 );
     U=60.0*Lp/Real(Compass.Width);
     H=55.0/Real(Compass.Height);
-    color( lightcyan,0.8 );
+    line( (Point){-Lp,0,0},(Point){Lp-Lt,0,0},cyan );       // уровень среднего
+    glColor3f( BkColor );
     rectangle( (Point){-Lp,1-H},     (Point){-Lp+U, 1-H/5} );
     rectangle( (Point){-Lp,-1+H*0.8},(Point){-Lp+U,-1+H/5} );
     rectangle( (Point){-Lp,-H/2.2},  (Point){-Lp+U,   H/2.2} );
-    color( black ); Compass.Text( _North_East,-Lp,-1,0," -g" );
-                    Compass.Text(       _East,-Lp, 0,0,"  g" );
-                    Compass.Text( _South_East,-Lp, 1,0," 3g" );
+    color( yellow,-0.4 );
+    line( (Point){-Lp,-0.5},(Point){Lp-Lt,-0.5} );
+    line( (Point){-Lp,0.5},(Point){Lp-Lt,0.5} );
+    Compass.Text( _North_East,-Lp,-1,0," -g" );
+    Compass.Text(       _East,-Lp, 0,0,"  g" );
+    Compass.Text( _South_East,-Lp, 1,0," 3g" );
   } return *this;
 }
 //  Простая визуализация формы исходного корпуса в независимом графическом окне
@@ -308,7 +311,7 @@ bool Hull::Draw()                // Виртуальная процедура п
   glEnable( GL_LIGHTING );                                // OpenGL - на корпус
   glEnable( GL_CULL_FACE );
   glEnable( GL_DEPTH_TEST );
-  glClearColor( 0.9,0.95,0.99,1 );            // голубоватый цвет фона и полная
+  glClearColor( BkColor,1 );                  // голубоватый цвет фона и полная
   glClear( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT ); // расчистка всего экрана
   glMatrixMode( GL_PROJECTION ); glLoadIdentity(); // сброс матричных координат
   gluPerspective( 15,Real(Width)/Height,-1e6,1e1 ); // к перспективной проекции
@@ -320,9 +323,6 @@ bool Hull::Draw()                // Виртуальная процедура п
 //axis(*this,Length/1.8,Breadth/1.8,Draught,"X","Y","Z"); // Координатные оси
   Drawing(); color( blue );                               // и рисунок в памяти
   Print( 2,1,"%s\n { %s }\n %s",sname( FileName ),ShipName,Model[Statum] );
-// hiFlow&1?"Кинематика по хордам 4-х точек скольжения над волновыми склонами":
-//(!(hiFlow&2)?"Вертикальная гидростатика: бортовая-килевая-вертикальная качка":
-//             "Архимедовы градиенты по склонам волн: все шесть видов качки" );
   Save().Refresh(); Recurse=false; return false;
 }
 /*

@@ -58,7 +58,7 @@ static void PopMatrix()          //! и затем восстановление 
 //     - переключение и временное сохранение состояния контекстной среды OpenGL
 //               с отработкой деструктора для восстановления исходного контента
 //
-bool glAct( const Window *Win ){ return wglMakeCurrent( Win->hDC,Win->hRC ); }
+inline bool glAct( const Window *W ){ return wglMakeCurrent( W->hDC,W->hRC ); }
 //             конструктор = пролог с восстановлением через эпилог = деструктор
 glContext::glContext( const Window* W ) : DC( wglGetCurrentDC() )   // prologue
   { if( W->hDC==DC )DC=0; else { RC=wglGetCurrentContext(); glAct( W ); } }

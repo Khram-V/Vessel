@@ -8,14 +8,18 @@
 //
 #include "Vessel.h"       // объекты и производные операции с корпусом на волне
                           // + дополнения графической среды OpenGL-Window:Place
-static int // Board=0,      // 'о' штевни; '-' левый и '+' правый борт
-           Level=0,         // -2-днище -1-вода 0-ватерлиния 1-смочен 2-сухой
-           wLine=1;         // -1-ниже; +1-выше цвета конструктивной ватерлинии
-static Flex M;              // ватерлиния: слева - всплытие, справа погружение
+static int //Board=0,       // 'о' штевни; '-' левый и '+' правый борт
+           Level=-2;        // -2-днище -1-вода 0-ватерлиния 1-смочен 2-сухой
+//         wLine=1;         // -1-ниже; +1-выше цвета конструктивной ватерлинии
+//atic Flex wL;             // изменчивые отрезки фрагментов ватерлинии
+                            // по уровню воды в шпациях левого/правого борта
 static bool drawHull=false, // прорисовка корпуса | гидродинамический процесс
             Part=false;     // false= днище и ватерлиния; true= надводный борт
 static Real ArLen=0.1;      // относительная длина для стрелок на шпациях
-                            // ~~~~~~ // ...
+
+Vertex::Vertex( _Vector _a_ ) // { *this=V; }  // конструктор и собственно
+{ w=Storm->Value( Point::operator=(Vessel->out( Vector::operator=(_a_) ) ) );
+}
 Vertex& Vertex::operator = ( _Vector _a_ )
 { w=Storm->Value( Point::operator=(Vessel->out( Vector::operator=(_a_) ) ) );
   return *this;
@@ -25,12 +29,15 @@ void Hull::drawTriangle(_Vertex a,_Vertex b,_Vertex c ) // отработка т
   else                                    //  перерасчет характеристик обводов
   { const byte Mode=DrawMode&3;           //  для полупрозрачной картинки нужна
     if( !Part && Level>0 || Part && Level<=0 )return; // двухэтапная прорисовка
-    color( !Level?lightblue:wLine<0?green:dimgray,                 // расцветка
+    if( !Level && Mode>2 )return;
+    int wLine = a.z+b.z+c.z<=0.0 ? -1:1;
+//        = a.z<=0.0 && b.z<=0.0 && c.z<=0.0 ? -1:1; //  действующая ватерлиния
+    color( !Level?lightblue : (wLine<0?green:dimgray),             // расцветка
          ( abs( Level )<2?0.75:1.0 )*( Level>0&&wLine<0?-0.25:     // затенение
                                        Level<0&&wLine>0?-0.15:0.0 ), //    воды
                !Level ? (Mode&&Mode<3?0.7:0.2 ) :        // прозрачность борта
-                   Level>0 ? ( Mode>2?0.8:0.2 ) :        // настраивается по
-                             ( Mode>1?0.9:0.2 ) );       // режиму визуализации
+                 ( Level>0 ? ( Mode>2?0.8:0.2 ) :        // настраивается по
+                             ( Mode>1?0.9:0.2 ) ) );     // режиму визуализации
     const Point &A=(Point)a,&B=(Point)b,&C=(Point)c;
     glBegin( DrawMode&4?GL_LINE_LOOP:GL_TRIANGLES );    // контуры или покрытия
     glNormal3dv( (B-A)*(C-A) ),glVertex3dv( (Real*)( &A ) ),      // dir ( ?? )
@@ -56,40 +63,42 @@ if( Level<0 )
   }
 }
 //!  сборка сортировкой двух фрагментов ватерлинии в интервале одной шпации
+//           (здесь надо найти локализованное решение по выбору ориентации)
 //
-void Hull::waterPoints( _Vector N,_Vector Q,_Vector P )
-{ if( !M.length )M+=P,M+=N;       // сначала добавляется одна центральная точка
-      else  { if( P.x<M[0].x )M/=N,M/=P; else if( P.x>M[-2].x )M+=P,M+=N; }
-  if( P!=Q ){ if( Q.x<M[0].x )M/=N,M/=Q; else if( Q.x>M[-2].x )M+=Q,M+=N; }
+void Hull::waterPoints( _Vector N,_Vector Q,_Vector P ){ wL+=N;
+  if( (Tensor(*this)*(N*(P-Q))).z>=0 ){ wL+=Q; wL+=P; } else { wL+=P; wL+=Q; }
 }
 void Hull::divideTriangle
-( _Vertex T,_Real t,_Vertex R,_Real r,_Vertex L,_Real l )
+( _Vertex T,_Real t, _Vertex R,_Real r, _Vertex L,_Real l )
 { _Vertex rR=(Vector)T+(R-T)*(t/(t-r)),       // правая точка пересечения ребра
-          lL=(Vector)T+(L-T)*(t/(t-l)); Level=t>=0?-1:1;// треугольника и левая
-  if( rR!=lL )waterPoints( dir((lL-T)*(T-rR)),lL,rR );  // +++
-          drawTriangle( T,rR,lL ); Level=t<0?-1:1;
+          lL=(Vector)T+(L-T)*(t/(t-l)); Level=t>=0?-1:1; // треугольника и левая
+  if( rR!=lL )waterPoints( dir( (lL-T)*(T-rR) ),lL,rR ); // +++
+          drawTriangle( T,rR,lL );
+  if( !l && !r )return;                 Level=t<0?-1:1;
   if( !l )drawTriangle( L,rR,R ); else
   if( !r )drawTriangle( R,L,lL ); else
   if( fabs( r )>fabs( l ) )drawTriangle( R,L,lL ),drawTriangle( R,lL,rR );
                       else drawTriangle( L,lL,rR ),drawTriangle( L,rR,R );
 }
-void Hull::Triangle( _Vertex a,_Vertex b,_Vertex c ) // обработка треугольника
-{ if( a.y || b.y || c.y )            // далее точки на базисе открытого моря
-  { Real aZ=a.w-a.Z,                 // (+)под (-)над водой = метка на бортовой
+void Hull::Triangle( _Vertex a,_Vertex b,_Vertex c )  // обработка треугольника
+{ if( a.y || b.y || c.y )            // ~~ далее точки на базисе открытого моря
+  { Real aZ=a.w-a.Z,                 // (+)погружение (-)борт над водой = метка
          bZ=b.w-b.Z,                 // обшивке под/над действующей ватерлинией
-         cZ=c.w-c.Z;                                 // WL на подъем или спуск?
-  //if( aZ==0 && bZ==0 && cZ==0 )return;             // значит будут повторения
-//  wLine = a.z<=0 && b.z<=0.0 && c.z<=0.0 ? -1:1;   // действующая ватерлиния
-    wLine = a.z+b.z+c.z<=0 ? -1:1;   // действующая ватерлиния
-    if( aZ==0&&bZ==0 ){Level=cZ<0?2:-2;waterPoints(dir((b-c)*(c-a)),a,b);}else
-    if( bZ==0&&cZ==0 ){Level=aZ<0?2:-2;waterPoints(dir((c-a)*(a-b)),b,c);}else
-    if( cZ==0&&aZ==0 ){Level=bZ<0?2:-2;waterPoints(dir((a-b)*(b-c)),c,a);}else
+         cZ=c.w-c.Z;                 // WL на подъем или спуск?
+
+//  if( aZ==0.0 && bZ==0.0 && cZ==0.0 )return;       // значит будут повторения
+//  wLine = a.z<=0.0 && b.z<=0.0 && c.z<=0.0 ? -1:1; //  действующая ватерлиния
+//  wLine = a.z+b.z+c.z<0.0 ? -1:1;
+    Level = -2; //wLine*2; //-2;
+    if( aZ==0&&bZ==0 ){ if( cZ>0 )waterPoints( dir((b-c)*(c-a)),b,a ); else Level=2; } else
+    if( bZ==0&&cZ==0 ){ if( aZ>0 )waterPoints( dir((c-a)*(a-b)),c,b ); else Level=2; } else
+    if( cZ==0&&aZ==0 ){ if( bZ>0 )waterPoints( dir((a-b)*(b-c)),a,c ); else Level=2; } else
+    if( aZ<=0&&bZ<=0&&cZ<=0 )Level=2; else    // треугольник целиком над волной
     if( aZ>=0&&bZ>=0&&cZ>=0 )Level=-2; else  // треугольник полностью под водой
-    if( aZ<=0&&bZ<=0&&cZ<=0 )Level=2;  else  // треугольник целиком над волной
-    { Real ab=aZ*bZ,bc=bZ*cZ,ca=cZ*aZ;       // иначе рассечение по ватерлинии
-      if( ab<=0&&ca<0 )divideTriangle(a,aZ,b,bZ,c,cZ); else    // выбор вершины
-      if( bc<=0&&ab<0 )divideTriangle(b,bZ,c,cZ,a,aZ); else     // треугольника
-      if( ca<=0&&bc<0 )divideTriangle(c,cZ,a,aZ,b,bZ); return;   // для деления
+    { Real ab=aZ*bZ,bc=bZ*cZ,ca=cZ*aZ;        // иначе рассечение по ватерлинии
+      if( ab<0&&ca<=0 ){ divideTriangle( a,aZ,b,bZ,c,cZ ); return; } // выбор вершины
+      if( bc<0&&ab<=0 ){ divideTriangle( b,bZ,c,cZ,a,aZ ); return; } // треугольника
+      if( ca<0&&bc<=0 ){ divideTriangle( c,cZ,a,aZ,b,bZ ); return; } // для деления
     } drawTriangle( a,b,c );
   }
 }
@@ -99,77 +108,56 @@ Hull& Hull::Floating( bool onlyDraw )
 { // работа с треугольниками обшивки корпуса и фрагментами ватерлинии в шпациях
   // ~~   троекратная дорисовка корпуса по уровням относительно ватерлинии
   // ~~       обусловливается последовательностью наложения прозрачности
- int i,j,k,n; Part=false;         // разделение корпуса на прозрачные подуровни
-              drawHull=onlyDraw;  // копия режима расчетов(-) или прорисовки(+)
+ int i,n; Part=false;             // разделение корпуса на прозрачные подуровни
+          drawHull=onlyDraw;      // копия режима расчетов(-) или прорисовки(+)
   if( !onlyDraw )ThreeInitial();  // начальная чистка для интегрируемых величин
-  wL.length=wR.length=0;                        // вся ватерлиния с нормалями
-  wl.length=wr.length=0;                        // отсечки ватерлинии в шпациях
+  wL.length=0;               // ватерлиния с нормалями и разделёнными отрезками
 Part_of_hull:                                   // разделение корпуса на уровни
   for( int k=0; k<=Nframes+2; k++ )             // штевни и шпангоуты Nframes+3
   if( Shell[k] )                                // -- есть ли сам корпус
   if( Shell[k][0]>0 )                           // -- не пропущена ли шпация
-  { M.length=0;
-    if( !k || k==Nframes+2 )                    // здесь рассматриваются
-    { for( M.length=0,i=2; i<Shell[k][0]-1; i++ )      // транцевые расширения,
-      { Vertex P=Select( k,i+!k ),Q=Select( k,i+1-!k ),   // если таковые есть
-               p=Select( k,-i-!k ),q=Select( k,!k-i-1 );  // -- левый борт
-          if( P!=p )Triangle( p,P,Q );                      // две точки на входе
-          if( Q!=q )Triangle( Q,q,p );                  // сначала берутся штевни
-      }
-      if( M.length )                                  // всё на левый борт
-        { for( j=0; j<M.length; j++ )wL+=M[j]; wl+=M.length; wr+=0; }
+  { if( !k || k==Nframes+2 )                           // здесь рассматриваются
+    for( i=2; i<Shell[k][0]-1; i++ )                   // транцевые расширения
+    { Vertex P=Select( k,i+!k ),Q=Select( k,i+1-!k ),  // если таковые есть
+             p=Select( k,-i-!k ),q=Select( k,!k-i-1 ); // -- левый борт
+        if( P!=p )Triangle( p,P,Q );                   // две точки на входе
+        if( Q!=q )Triangle( Q,q,p );                  // сначала берутся штевни
     } else                      // стандартные шпации начинаем с +правого борта
     if( (n=Shell[k][0])>=3 )    // здесь присутствует хотя бы один треугольник?
-    { for( int Board=-1; Board<2; Board+=2 )
-      { Vertex P=Select( k,Board>0?-1:1 ),   // это блок стандартных шпаций
-               Q=Select( k,Board>0?-2:2 );   // сначала левый-> правый шпангоут
-        M.length=0;
-        for( i=3; i<=Shell[k][0]; i++ )      // всех теоретических шпангоутов
-        { Vertex R=Select( k,Board>0?-i:i ); // попутная разборка треугольников
-          if( Board>0 ){ Triangle( P,Q,R ); }                 // правый борт
-                  else { Triangle( Q,P,R ); }                 //  -- и левый
-          if( Shell[k][i]&( LeftFrame|SternPost ) )P=R;       // к кормовому
-                                              else Q=R;       // перпендикуляру
-        }            // шпация замыкается свободной поверхностью по уровню воды
-        if( !Part )  //  сборка всей ватерлинии вместе с нормалями [0..Nframes]
-        { bool B=Board*(z.z<0?-1:1)>0;
-          Flex &W=B?wL:wR; InList &L=B?wl:wr;                 // без отсечки
-          for( j=0; j<M.length; j++ )W+=M[j]; L+=W.length;    // первой точки
-        }
-      }
-    }
-  }
+    for( int Board=-1; Board<2; Board+=2 )
+    { Vertex P=Select( k,Board>0?-1:1 ),     // это блок стандартных шпаций
+             Q=Select( k,Board>0?-2:2 );     // сначала левый-> правый шпангоут
+      for( i=3; i<=Shell[k][0]; i++ )        // всех теоретических шпангоутов
+      { Vertex R=Select( k,Board>0?-i:i );   // попутная разборка треугольников
+        if( Board>0 )Triangle( P,Q,R );                       // правый борт
+                else Triangle( Q,P,R );                       //  -- и левый
+        if( Shell[k][i]&( LeftFrame|SternPost ) )P=R;         // к кормовому
+                                            else Q=R;         // перпендикуляру
+  } } }
   //! Ватерлиния выведена из расчетного блока по форме и объему обводов корпуса
-  //!
-  if( !Part )                   // действующая ватерлиния готовится с нормалями
-  { for( Level=i=j=k=0; k<=Nframes; i=wl[k],j=wr[k],k++ )// с отсечками выборок
-    { for( int ii=i,jj=j;; )                             // в интервалах шпаций
-      { if( i+2<wl[k] && j+2<wr[k] )
-        { if( abs( wL[i]-wR[j+2] )<abs( wL[i+2]-wR[j] ) )jj+=2; else ii+=2;
-        } else if( i+2<wl[k] )ii+=2;
-          else if( j+2<wr[k] )jj+=2; else break;  // поверхность за ватерлинией
-        if( ii>i ){ drawTriangle( wL[i],wL[ii],wR[j] ); i+=2; }    // Vector ??
-            else  { drawTriangle( wR[jj],wR[j],wL[i] ); j+=2; }    // to Vertex
-      }
-    }
+              // без ватерлинии будет теоретический центр => ноль на ватерлинии
+  if( !Part ) //   теоретическая и действующая ватерлиния готовятся с нормалями
+  { Vector wM={ 0,0,0 }; Real l,L=0.0; Level=0;
+    for( i=0; i<wL.length; i+=3 ){ l=abs( wL[i+2]-wL[i+1] ); L+=l;
+                            wM += 0.5*l*( wL[i+1]+wL[i+2] );} if( L>eps )wM/=L;
+    for( i=0; i<wL.length; i+=3 )drawTriangle( wL[i+1],wL[i+2],wM );
+    if( !Storm->Kt )             // конструктивная или теоретическая ватерлиния
+     for( WaterLine.length=i=0; i<wL.length; i++ )WaterLine += wL[i];
+    //
     // завершение геометрической графики просто белая конструктивная ватерлиния
     //
-    if( onlyDraw )
-    { Point P,Q,Py,Qy; Vector q; color( white ); glLineWidth( 5 );
-      for( i=0,q=WaterLine[0]; i<WaterLine.length; P=Q,Py=Qy,i++ )
-      { Q=out( q ),Qy=out( ~q );
-        if( !i ){ if( q.y!=0.0)line( Q,Qy ); }
-        else line( P,Q=out( q=WaterLine[i] ) ),line( Py,Qy=out( ~q ) );
-      } if( q.y!=0.0 )line( Q,Qy ); glLineWidth( 1 );
-    //
+    if( onlyDraw ){ color( !Trim?silver:cyan ); glLineWidth( 5 );
+      for( i=0; i<WaterLine.length; i+=3 )
+        line( out( WaterLine[i+1] ),out( WaterLine[i+2] ) ); glLineWidth( 1 );
+    }
     // действующая ватерлиния выстраивается из фрагментов пересечения
     // треугольников в шпациях, с нормалями и стрелками вперед по курсу корабля
-#if 1
+/*
 #define Wline( L )for( i=0; i<L.length-2; i+=2 ){ q=( (L[i]+L[i+2])*0.5 );   \
  arrow(out(L[i]),out(L[i+2]),ArLen*.67),arrow(out(q),out(q+L[i+1]),ArLen*.5); }
       color( lightblue,DrawMode&3?0.0:0.3 ); Wline( wR ) Wline( wL )
-#endif
-    }
+*/
+    //
     //! собственно блок моделирования отражения потоков/волн от корпуса корабля
 /*  else
     if( Storm->Exp.wave>1 )      // отражение локальных скоростей от ватерлинии
@@ -259,7 +247,6 @@ Hull& Hull::Drawing( byte type ) // 0 - DrawMode; 1 - корпус; 2 + проф
  int i,j,k; color( blue,0,0.5 );
   for( i=Route.length-1; i>0; i-- )line( Route[i]-Locate,Route[i-1]-Locate ),
                                    spot( Route[i]-Locate,5 );
-  //                               points( -Locate,10,lightmagenta );
   //
   //   рисуем и подписываем шпангоуты, как есть ...
   //
@@ -282,9 +269,9 @@ Hull& Hull::Drawing( byte type ) // 0 - DrawMode; 1 - корпус; 2 + проф
   } }
   if( Mode ) // теперь прорисовка штевней с оконтуриванием транцевых расширений
   { for( k=0; k<Stern.length-1; k++ )
-      L1( Stern[k],Stern[k+1],Stern[k].z<0 ? green:dimgray )
+     L1( Stern[k],Stern[k+1],Stern[k].z<0 ? green:dimgray )
     for( k=0; k<Stem.length-1; k++ )
-      L1( Stem[k+1],Stem[k],Stem[k].z<0 ? green:dimgray )
+     L1( Stem[k+1],Stem[k],Stem[k].z<0 ? green:dimgray )
   }
   if( Mode>1 )glEnable( GL_LINE_SMOOTH );   // восстановление сглаживания линий
                     // включение одноразовой прорисовки корпуса вместо расчетов

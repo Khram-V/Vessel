@@ -13,7 +13,7 @@
 				<Option object_output="Dev/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters='Examples\Кубик &quot;A-1200 Early&quot; &quot;Речной теплоход «Родина» (Готман)&quot; &quot;БПК «Стерегущий»-61.vsl&quot; &quot;A-1206 Cruise-2.vsl&quot;' />
+				<Option parameters='Арктикаборг &quot;A-1206 Cruise-2.vsl&quot; Examples\Кубик &quot;A-1200 Early&quot; &quot;Речной теплоход «Родина» (Готман)&quot; &quot;БПК «Стерегущий»-61.vsl&quot;' />
 				<Option projectCompilerOptionsRelation="0" />
 				<Option projectLinkerOptionsRelation="2" />
 			</Target>
@@ -25,7 +25,14 @@
 				<Option compiler="gnu_gcc_stable32" />
 				<Option parameters='&quot;Эскадренный броненосец «Цесаревич».vsl&quot;' />
 				<Option projectCompilerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-std=gnu++98" />
+					<Add option="-fPIC" />
+					<Add option="-m32" />
+				</Compiler>
 				<Linker>
+					<Add option="-m32" />
 					<Add library="pthread" />
 					<Add library="dl" />
 				</Linker>
@@ -86,7 +93,6 @@
 		</Compiler>
 		<Linker>
 			<Add option="-s" />
-			<Add option="-static-libstdc++" />
 			<Add option="-static-libgcc" />
 			<Add option="-static" />
 			<Add library="opengl32" />

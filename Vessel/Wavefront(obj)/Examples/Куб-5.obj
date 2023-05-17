@@ -1,7 +1,7 @@
 # < Куб 5x5 >
 mtllib Vessel.mtl
 # Stern[0]
-# Sp1[10]=0
+# Sp1[12]=0
 v -5 -5 0
 v -5 -5 0
 v -5 -5 5
@@ -12,7 +12,9 @@ v -5 5 5
 v -5 5 -5
 v -5 5 0
 v -5 5 0
-# Sp2[10]=10
+v -5 0 0
+v -5 0 0
+# Sp2[12]=12
 v 5 -5 0
 v 5 -5 0
 v 5 -5 5
@@ -23,55 +25,57 @@ v 5 5 5
 v 5 5 -5
 v 5 5 0
 v 5 5 0
-# Stem[0]=20 
-# ShipHull[20]
+v 5 0 0
+v 5 0 0
+# Stem[0]=24 
+# ShipHull[24]
 # Sp1
 usemtl green
-f 10 2 4
-f 10 4 6
+f 12 2 4
+f 12 4 6
 usemtl gray
-f 10 6 8
-f 10 8 10
+f 12 6 8
+f 12 8 10
 usemtl green
-f 1 9 3
-f 3 9 5
+f 1 11 3
+f 3 11 5
 usemtl gray
-f 5 9 7
-f 7 9 9
+f 5 11 7
+f 7 11 9
 # Sp2
 usemtl green
-f 2 12 14
-f 2 14 4
-f 4 14 16
-f 4 16 6
+f 2 14 16
+f 2 16 4
+f 4 16 18
+f 4 18 6
 usemtl gray
-f 6 16 18
-f 6 18 8
-f 8 18 20
-f 8 20 10
+f 6 18 20
+f 6 20 8
+f 8 20 22
+f 8 22 10
 usemtl green
-f 11 1 13
-f 13 1 3
-f 13 3 15
-f 15 3 5
+f 13 1 15
+f 15 1 3
+f 15 3 17
+f 17 3 5
 usemtl gray
-f 15 5 17
-f 17 5 7
-f 17 7 19
-f 19 7 9
+f 17 5 19
+f 19 5 7
+f 19 7 21
+f 21 7 9
 # Sp3
 usemtl green
-f 12 20 14
-f 14 20 16
+f 14 24 16
+f 16 24 18
 usemtl gray
-f 16 20 18
-f 18 20 20
+f 18 24 20
+f 20 24 22
 usemtl green
-f 19 11 13
-f 19 13 15
+f 23 13 15
+f 23 15 17
 usemtl gray
-f 19 15 17
-f 19 17 19
+f 23 17 19
+f 23 19 21
 #
 # Куб-5
 #

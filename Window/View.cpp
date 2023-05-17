@@ -92,7 +92,8 @@ bool View::KeyBoard( byte key )   // к спуску из внешних вир�
   } Draw(); return true;                 // либо - запрос от клавиатуры погашен
 }
 // Настройка начальной раскраски и освещенности графического пространства/сцены
-//              ... здесь необходима предварительная установка контекста OpenGLvoid View_initial(){  glClearColor( 0.9,0.95,0.99,1 );   // светлый оттенок экранного фона и затем   glClear( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT ); // полная расчистка окна//+glFrontFace( GL_CCW );              // CW грани с обходом по часовой стрелке
+//              ... здесь необходима предварительная установка контекста OpenGLvoid View_initial(){  glClearColor( 0.9,0.95,0.99,1 );   // светлый оттенок экранного фона и затем   glClear( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT ); // полная расчистка окна//        | GL_ACCUM_BUFFER_BIT|GL_STENCIL_BUFFER_BIT );
+//+glFrontFace( GL_CCW );              // CW грани с обходом по часовой стрелке
 //+glCullFace ( GL_BACK );             // FRONT_AND_BACK какие отбираются грани
 //+glEnable   ( GL_CULL_FACE );        // включение режима отбора треугольников   glPointSize( 1.0 );   glHint     ( GL_POINT_SMOOTH_HINT,GL_NICEST );   glEnable   ( GL_POINT_SMOOTH );   glLineWidth( 1.0 );
    glHint     ( GL_LINE_SMOOTH_HINT,GL_NICEST );   glEnable   ( GL_LINE_SMOOTH );     // сглаживание линий   glPolygonMode( GL_FRONT,GL_FILL );
@@ -100,27 +101,22 @@ bool View::KeyBoard( byte key )   // к спуску из внешних вир�
    glShadeModel( GL_SMOOTH );       // FLAT закраска с использованием полутонов
    glHint     ( GL_POLYGON_SMOOTH_HINT,GL_NICEST );   glEnable   ( GL_POLYGON_SMOOTH); // Really Nice Perspective Calculations   glHint     ( GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST );   glBlendFunc( GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA );
    glAlphaFunc( GL_ALWAYS,0 );
-
    glEnable( GL_DITHER );               // Предопределение графической среды
    glEnable( GL_ALPHA_TEST );
    glEnable( GL_BLEND );
-
    glFogi( GL_FOG_MODE,GL_EXP2 );   glFogf( GL_FOG_DENSITY,0.0016 );// glFogf( GL_FOG_START,-Distance );// glFogf( GL_FOG_END,Distance );   glHint( GL_FOG_HINT,GL_NICEST );   glEnable( GL_FOG );// glEnable( GL_STENCIL_TEST );#if 1   glLightModelfv( GL_LIGHT_MODEL_AMBIENT,(const float[]){ 0.8,1,0.9,0.75 } );
    glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER,true );
    glLightModeli( GL_LIGHT_MODEL_TWO_SIDE,true );
-
    glMaterialfv( GL_FRONT_AND_BACK,GL_AMBIENT, (const float[]){.2,.2,.2,1.} );
    glMaterialfv( GL_FRONT_AND_BACK,GL_DIFFUSE, (const float[]){.8,.8,.8,1.} );
    glMaterialfv( GL_FRONT_AND_BACK,GL_SPECULAR,(const float[]){.5,.5,.5,.5} );
    glMaterialfv( GL_FRONT_AND_BACK,GL_EMISSION,(const float[]){.0,.0,.0,1.} );
    glMateriali( GL_FRONT_AND_BACK,GL_SHININESS,127 ); // степень отсветки
-
    glLightfv( GL_LIGHT0,GL_AMBIENT, (const float[]){.1,.3,.2,.6}); // окружение
    glLightfv( GL_LIGHT0,GL_DIFFUSE, (const float[]){.6,.8, 1, 1}); // рассеяние
    glLightfv( GL_LIGHT0,GL_SPECULAR,(const float[]){.8,.9, 1, 1}); // отражение
    glLightfv( GL_LIGHT0,GL_EMISSION,(const float[]){.6,.6,.6, 1}); // излучение
    glLightfv( GL_LIGHT0,GL_POSITION,(const float[]){-2000,20,-100,1});
-
    glLightfv( GL_LIGHT1,GL_AMBIENT, (const float[]){.1,.2,.3,.8}); // окружение
    glLightfv( GL_LIGHT1,GL_DIFFUSE, (const float[]){.8, 1, 1, 1}); // рассеяние
    glLightfv( GL_LIGHT1,GL_SPECULAR,(const float[]){.6,.8,.9, 1}); // отражение

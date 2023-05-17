@@ -225,7 +225,7 @@ Waves& Waves::Clear()  // очистка для перезапусков выч�
 Field& Field::Original( bool init ) // очистка или переустановка волнового поля
 { for( int y=0; y<mY; y++ )      // предварительная разметка сеточных координат
   for( int x=0; x<mX; x++ )      // визуализации для обобщенного волнового поля
-     { Vector &W=Ws[y][x]; W.x=x*dS-Long/2; W.y=dS*(y-Real(mY-1)/2); W.z=0.0; }
+    { Vector &W=Ws[y][x]; W.x=x*dS-Long/2; W.y=dS*(y-Real(mY-1)/2); W.z=0.0; }
   if( init || Exp.wave>=2 )
     { if( logTime() )fprintf( VIL," ⇒ возобновление ⇒ 0\"[0]\n" );
       Trun=Tlaps=0.0; Kt=0;      // реальное время для моделирования [сек, час]
@@ -236,9 +236,9 @@ Field& Field::Original( bool init ) // очистка или переустан�
       Surge.Clear(); wavePrint(); return *this; // вал
 }
 Hull& Hull::Original()
-{ if( !Storm )return *this;      // здесь пролог может быть ещё не завершён
-  Volume=Surface=Floatage=0.0;   // согласовать с Vs-math
-  inWater=0.0; inMass=0.0; vR=0.0; // mM=0.0; - на Three-Initial
+{ if( !Storm )return *this;          // здесь пролог может быть ещё не завершён
+  Volume=Surface=Floatage=0.0;       // согласовать с Vs-math
+  inWater=0.0; inMass=0.0; vR=0.0;   // mM=0.0; - на Three-Initial
   Gravity=Buoyancy=Floatable=Metacenter=Zero; Locate=Zero;
   //! контролируемый начальный отсчет для запуска всего процесса моделирования
   Route.length=Rate.length=Swing.length=Whirl.length=0;
@@ -351,7 +351,7 @@ bool Field::KeyBoard( byte Keyb )
                } Distance=-0.8*Long;   // ... от точки взгляда до места обзора
                eye=(Vector){ 150,-16.4,0 },look=(Vector){ 0,-10,0 }; break;
     case _Esc:
-     if( MessageBox( 0,UtA("Завершение эксперимента")," Storm :: Sea",
+     if( MessageBox( 0,UtA( "Завершение эксперимента" )," Storm :: Sea",
        MB_APPLMODAL|MB_ICONQUESTION|MB_OKCANCEL|MB_DEFBUTTON1 )==IDOK )Close();
             return true;
    default: return View::KeyBoard( Keyb );

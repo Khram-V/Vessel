@@ -77,7 +77,7 @@ bool Field::Draw()
   gluPerspective( 16.2,Real( Width )/Height,-63,63 );     // экранных пропорций
   gluLookAt( 0,0,Distance,look.x,look.y,look.z,0,1,0 );  // точка обзора
   glMatrixMode( GL_MODELVIEW ); glLoadIdentity();       // в исходное положение
-  glClearColor( 0.9,0.95,0.99,1 );                      // цвет фона окна и
+  glClearColor( BkColor,1 );                      // цвет фона окна и
   glClear( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT );   // полная расчистка
   glRotated( eye.y-90,1,0,0 );                          // поставить на киль
   glRotated( eye.z,   0,1,0 );                          // дифферент

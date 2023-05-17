@@ -22,11 +22,11 @@ Hull& Hull::Write()  // запись в Wavefront Technologies for Advanced Visu
   //
   //       последовательная запись всего массива опорных точек в текстовый файл
   //
-  fprintf( F,"# < %s >\nmtllib Vessel.mtl\n# Stern[%d]\n",
-                      ShipName,(n=Stern.length)*2 );            // заголовок
-  for( i=0; i<n; i++ )printF( Stern[i] );                       // ахтерштевень
-  for( k=0; k<Nframes; k++ )                                    // и следом все
-  { L[k+1]=L[k]+n*2;                                            // шпангоуты
+  fprintf( F,"# < %s >\nmtllib Vessel.mtl\n# Stern[%d]\n",    // файл расцветки
+                      ShipName,(n=Stern.length)*2 );          // в заголовоках
+  for( i=0; i<n; i++ )printF( Stern[i] );                     // ахтерштевень
+  for( k=0; k<Nframes; k++ )                                  // и следом все
+  { L[k+1]=L[k]+n*2;                                          // шпангоуты
     fprintf( F,"# Sp%d[%d]=%d\n",k+1,(n=Frame[k].length)*2,L[k+1] );
     for( i=0; i<n; i++ )printF( Frame[k][i] );
   }
