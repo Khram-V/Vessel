@@ -8,7 +8,7 @@
 #define __Matrix_Tensor_Base_
 #include "Vector.h"
 
-struct Matrix; typedef const Matrix& _Matrix; // чистая матрица тензора
+struct Matrix; typedef const Matrix& _Matrix; // чистая матрица для тензора
 struct Tensor; typedef const Tensor& _Tensor; // тензор собственного базиса
 struct Base;   typedef const Base&   _Base;   // определённый Эвклидовый базис
 //

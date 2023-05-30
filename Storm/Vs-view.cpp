@@ -142,13 +142,17 @@ Part_of_hull:                                   // разделение корп
                             wM += 0.5*l*( wL[i+1]+wL[i+2] );} if( L>eps )wM/=L;
     for( i=0; i<wL.length; i+=3 )drawTriangle( wL[i+1],wL[i+2],wM );
     if( !Storm->Kt )             // конструктивная или теоретическая ватерлиния
-     for( WaterLine.length=i=0; i<wL.length; i++ )WaterLine += wL[i];
+      for( WaterLine.length=i=0; i<wL.length; i++ )WaterLine += wL[i];
     //
     // завершение геометрической графики просто белая конструктивная ватерлиния
     //
     if( onlyDraw ){ color( !Trim?silver:cyan ); glLineWidth( 5 );
       for( i=0; i<WaterLine.length; i+=3 )
-        line( out( WaterLine[i+1] ),out( WaterLine[i+2] ) ); glLineWidth( 1 );
+         line( out( WaterLine[i+1] ),out( WaterLine[i+2] ) ); glLineWidth( 1 );
+      for( i=0; i<wL.length; i+=3 ){ Vector q=(wL[i+1]+wL[i+2])/2;
+         arrow( out( wL[i+1] ),out( wL[i+2] ),ArLen*.67,navy );
+         arrow( out( q ),out( q+wL[i]),ArLen*.5,gray );
+      }
     }
     // действующая ватерлиния выстраивается из фрагментов пересечения
     // треугольников в шпациях, с нормалями и стрелками вперед по курсу корабля
@@ -227,8 +231,8 @@ Hull& Hull::Drawing( byte type ) // 0 - DrawMode; 1 - корпус; 2 + проф
   //
   //  направление действия архимедовых сил всплытия
   //
-//  arrow( O,O + 2*Breadth*dir( vW ),1,red );
-//  arrow( O,O + 2*Breadth*(Tensor(*this)*(dir( vW ))),1,red );
+  //  arrow( O,O + 2*Breadth*dir( vW ),1,red );
+  //  arrow( O,O + 2*Breadth*(Tensor(*this)*(dir( vW ))),1,red );
   //
   //  разметка гидростатических центров
   //
@@ -241,6 +245,8 @@ Hull& Hull::Drawing( byte type ) // 0 - DrawMode; 1 - корпус; 2 + проф
   Text( _Up,spot( M,18,c ),"M " );         // действующий метацентр
   if( S!=M )arrow( spot( S,12 ),M,ArLen ); // начальный метацентр - тихой воды
   glLineWidth( 1 ); arrow( C,M,ArLen );    // метацентрический радиус вертикаль
+  arrow                                    // центр гидродинамических пар сил
+    ( arrow( Q,spot( out( vD ),8,green ),ArLen ),F,ArLen );
   //
   //  маршрут корабля по поверхности взволнованного моря
   //

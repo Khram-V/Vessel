@@ -2,6 +2,75 @@
 ///   Первый пакет векторно-тензорных математических преобразований
 ///      (c)2013, В.Храмушин, Санкт-Петербургский университет
 ///
+//    Традиционные векторные операции обособлены в аналитической геометрии
+//
+#include "Vector.h"
+//
+// ... или арифметико-логические операции с векторами в (не)дружественной среде
+//
+//                                                             встречный вектор
+Vector operator - ( _Vector a ){ return (Vector){ -a.x,-a.y,-a.z }; }
+Vector operator * ( _Vector c,_Real w ){ return (Vector){ c.x*w,c.y*w,c.z*w }; }
+Vector operator * ( _Real w,_Vector c ){ return (Vector){ w*c.x,w*c.y,w*c.z }; }
+Vector operator / ( _Vector c,_Real w ){ return (Vector){ c.x/w,c.y/w,c.z/w }; }
+Vector operator + (_Vector c,_Vector e){ return (Vector){c.x+e.x,c.y+e.y,c.z+e.z}; }
+Vector operator - (_Vector c,_Vector e){ return (Vector){c.x-e.x,c.y-e.y,c.z-e.z}; }
+
+bool operator + ( _Vector a ){ return a.x!=0 || a.y!=0.0 || a.z!=0.0; }
+bool operator ! ( _Vector a ){ return a.x==0 && a.y==0.0 && a.z==0.0; }
+bool operator ==( _Vector a,_Vector b ){ return a.x==b.x&&a.y==b.y&&a.z==b.z; }
+bool operator !=( _Vector a,_Vector b ){ return a.x!=b.x||a.y!=b.y||a.z!=b.z; }
+//
+//   %-скалярное, &-покомпонентное и *-векторное умножение свободных векторов
+//   =
+//   * - нормаль - векторное произведение для ориентированной площади основания
+//   & - покомпонентное перемножение, изменение масштабов или внесение поправок
+//   % - проекция от скалярного произведения векторов - сброс косого скольжения
+//                                или = скалярное произведение проекции вектора
+//
+Real operator % ( _Vector a,_Vector b ){ return a.x*b.x+a.y*b.y+a.z*b.z; }
+Vector operator * ( _Vector a,_Vector b )
+       { return (Vector){ a.y*b.z-a.z*b.y,a.z*b.x-a.x*b.z,a.x*b.y-a.y*b.x }; }
+Vector& Vector::operator*=( _Vector d )  // произведение ортогонального вектора
+  { Real a=y*d.z-z*d.y,b=z*d.x-x*d.z; z=x*d.y-y*d.x; x=a; y=b; return *this; }
+                // покомпонентное произведение/сопоставление скалярных поправок
+Vector& Vector::operator&=( _Vector d ){ x*=d.x,y*=d.y,z*=d.z; return *this; }
+
+
+/*                                                          встречный вектор
+Vector operator - ( Vector a ){ a.x=-a.x,a.y=-a.y,a.z=-a.z; return a; }
+Vector operator * ( Vector c, _Real w  ){ return c*=w; }
+Vector operator * ( _Real w, Vector c  ){ return c*=w; }
+Vector operator / ( Vector c, _Real w  ){ return c/=w; }
+Vector operator + ( Vector c,_Vector e ){ return c+=e; }
+Vector operator - ( Vector c,_Vector e ){ return c-=e; }
+bool operator ! ( _Vector a ){ return a.x==0 && a.y==0.0 && a.z==0.0; }
+bool operator==(_Vector a,_Vector b){return a.x==b.x&&a.y==b.y&&a.z==b.z;}
+bool operator!=(_Vector a,_Vector b){return a.x!=b.x||a.y!=b.y||a.z!=b.z;}
+//
+//   * - нормаль - векторное произведение для ориентированной площади основания
+//   & - покомпонентное перемножение, изменение масштабов или внесение поправок
+//   % - проекция от скалярного произведения векторов - сброс косого скольжения
+//                                    = скалярное произведение проекции вектора
+Real operator % (_Vector a,_Vector b){ return a.x*b.x+a.y*b.y+a.z*b.z; }
+    // %-скалярное, &-покомпонентное и *-векторное умножение свободных векторов
+Vector operator * ( Vector a,_Vector b ){ return a*=b; }
+//      { return (Vector){ a.y*b.z-a.z*b.y,a.z*b.x-a.x*b.z,a.x*b.y-a.y*b.x }; }
+//
+//     Элементарные и раскрываемые операции-функции
+//
+Real   sqr( _Real a ){ return a*a; }
+Real   abs( _Real a ){ return fabs( a ); }
+Real  norm( _Vector a ){ return a.x*a.x + a.y*a.y + a.z*a.z; }
+Real   abs( _Vector a ){ Real n=norm( a ); return n>0.0?sqrt( n ):0.0; }
+Vector dir( _Vector a ){ Real n=norm( a ); return n>0.0?a/sqrt( n )
+                                                    : (Vector){0,0,0}; }
+Vector In3(_Vector A,_Vector B,_Vector C,_Real x)// Кривая в трёх точках
+{ return (A*(x-1)*x+C*x*(x+1))/2-B*(x+1)*(x-1); }// с координатами A:-1,B:0,C:2
+Vector In2(_Vector A,_Vector B,_Real x )  // Прямая линия по двух точкам
+{ return A*(1-x) + B*x; }                        // единичных координат A:0,B:1
+*/
+
 //    В геометрических построениях и физических операциях тензоры
 //        служат для фиксации физических полей в локальных базисах,
 //    и - для взаимного преобразования координат векторных отсчетов

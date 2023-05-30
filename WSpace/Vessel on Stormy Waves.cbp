@@ -13,7 +13,7 @@
 				<Option object_output="Dev/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters='Арктикаборг &quot;A-1206 Cruise-2.vsl&quot; Examples\Кубик &quot;A-1200 Early&quot; &quot;Речной теплоход «Родина» (Готман)&quot; &quot;БПК «Стерегущий»-61.vsl&quot;' />
+				<Option parameters='&quot;Буксир «Арктикаборг»&quot; &quot;A-1200 Early&quot; Examples\Куб-5 &quot;БПК «Стерегущий»-61&quot; &quot;OSU Regional Class Research Vessel&quot; &quot;Буксир «Витязь»&quot; &quot;A-1206 Cruise-2.vsl&quot; &quot;Речной теплоход «Родина» (Готман)&quot;' />
 				<Option projectCompilerOptionsRelation="0" />
 				<Option projectLinkerOptionsRelation="2" />
 			</Target>

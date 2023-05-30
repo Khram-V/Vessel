@@ -6,7 +6,6 @@
 //         k<0  є { length+k÷0 } — отрицательные ≡ обратный отсчёт  P[length-k]
 //
 #include "Vessel.h"
-
         Flex:: Flex(): length( 0 ),P( NULL ){}
         Flex::~Flex(){ if( length ){ Allocate( 0,P ); length=0; P=NULL; } }
 Vector& Flex:: operator[]( int k )
@@ -23,6 +22,9 @@ Vector Flex::Delete( int k )      // одна точка вытаскивает�
    if( k>=0 && k<length ){ --length; for( V=P[k]; k<length; k++ )P[k]=P[k+1]; }
   return V;
 }
+Vector& Flex::operator+=(_Vector R){ return Insert(length)=R;}// в конце списка
+Vector& Flex::operator/=(_Vector R){ return Insert(0)=R;} // замещение в начале
+
 #if 0                             /// -- временно  исключено
 Vector& Flex::operator+=(_Vector R){ return Insert(length)=R; } // конец списка
 Vector& Flex::operator/=(_Vector R){ return Insert(0)=R; }// замещение в начале

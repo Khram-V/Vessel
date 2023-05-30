@@ -9,9 +9,6 @@
                                               //
 struct Point;  typedef const Point& _Point;   // точка дальних мировых отсчетов
 struct Vector; typedef const Vector& _Vector; // свободный разностный вектор
-struct Matrix; typedef const Matrix& _Matrix; // чистая матрица тензора
-struct Tensor; typedef const Tensor& _Tensor; // тензор собственного базиса
-struct Base;   typedef const Base&   _Base;   // связанный базис Евклидовой СК
                     //
 struct Vector       // Определение векторных операций в трехмерном пространстве
 { Real x,y,z;       //   ( совершенно открытый разностный и свободный объект )
@@ -28,12 +25,11 @@ struct Vector       // Определение векторных операци�
 //Vector& operator =  ( _Vector d ){ x=d.x,y=d.y,z=d.z; return *this; }
   Vector& operator += ( _Vector d ){ x+=d.x,y+=d.y,z+=d.z; return *this; }
   Vector& operator -= ( _Vector d ){ x-=d.x,y-=d.y,z-=d.z; return *this; }
-  Vector& operator *= ( _Vector d )     // произведение ортогонального вектора
-    { Real a=y*d.z-z*d.y,b=z*d.x-x*d.z; z=x*d.y-y*d.x; x=a,y=b; return *this; }
-        // { return *this =(Vector){ y*d.z-z*d.y, z*d.x-x*d.z, x*d.y-y*d.x }; }
-  Vector& operator &= ( _Vector d ){ x*=d.x,y*=d.y,z*=d.z; return *this; }
-                                        // покомпонентное произведение поправок
-//??
+  // %-скалярное, &-покомпонентное и *-векторное умножение свободных векторов
+  Vector& operator *= ( _Vector d ); // произведение ортогонального вектора
+  Vector& operator &= ( _Vector d ); // { x*=d.x,y*=d.y,z*=d.z; return *this; }
+                                     // покомпонентное произведение поправок
+///??
 //Vector& operator *= (_Matrix );  // выход из местного базиса в глобальную СК
 //Vector& operator /= (_Tensor );  // переход в локальный ортогональный базис
 //Vector& operator &= ( Vector d ){ return *this = d *= x*d.x+y*d.y+z*d.z; }
@@ -54,31 +50,25 @@ struct Vector       // Определение векторных операци�
 };
 //     Арифметические операции с векторами в (не)дружественной среде
 //                                                             встречный вектор
-inline Vector operator - ( Vector a ){ a.x=-a.x,a.y=-a.y,a.z=-a.z; return a; }
-inline Vector operator * ( Vector c, _Real w  ){ return c*=w; }
-inline Vector operator * ( _Real w, Vector c  ){ return c*=w; }
-inline Vector operator / ( Vector c, _Real w  ){ return c/=w; }
-inline Vector operator + ( Vector c,_Vector e ){ return c+=e; }
-inline Vector operator - ( Vector c,_Vector e ){ return c-=e; }
-inline bool operator ! ( _Vector a ){ return a.x==0 && a.y==0.0 && a.z==0.0; }
-inline bool operator==(_Vector a,_Vector b){return a.x==b.x&&a.y==b.y&&a.z==b.z;}
-inline bool operator!=(_Vector a,_Vector b){return a.x!=b.x||a.y!=b.y||a.z!=b.z;}
+bool   operator ! ( _Vector ), operator + ( _Vector ),
+       operator ==( _Vector,_Vector ), operator !=( _Vector,_Vector );
+Vector operator - ( _Vector ),
+       operator / ( _Vector,_Real ),
+       operator * ( _Vector,_Real ),   operator * ( _Real,_Vector ),
+       operator + ( _Vector,_Vector ), operator - ( _Vector,_Vector ),
+       operator * ( _Vector,_Vector );
+//      { return (Vector){ a.y*b.z-a.z*b.y,a.z*b.x-a.x*b.z,a.x*b.y-a.y*b.x }; }
 //
 //   * - нормаль - векторное произведение для ориентированной площади основания
 //   & - покомпонентное перемножение, изменение масштабов или внесение поправок
 //   % - проекция от скалярного произведения векторов - сброс косого скольжения
 //                                    = скалярное произведение проекции вектора
-inline Real operator % (_Vector a,_Vector b){ return a.x*b.x+a.y*b.y+a.z*b.z; }
-    // %-скалярное, &-покомпонентное и *-векторное умножение свободных векторов
-inline Vector operator * ( Vector a,_Vector b ){ return a*=b; }
-//      { return (Vector){ a.y*b.z-a.z*b.y,a.z*b.x-a.x*b.z,a.x*b.y-a.y*b.x }; }
+Real operator % ( _Vector a,_Vector b ); // { return a.x*b.x+a.y*b.y+a.z*b.z; }
 //
 //     В абсолютных координатах используются упрощённые операции с точкой Point
 //
 struct Point     // Координатная точка в масштабах абсолютного пространства
 { Real X,Y,Z;    // обозначаются прописными буквами абсолютно зависимых величин
-         operator Real*(){ return (Real*)this; }
-//       operator Vector(){ return *((Vector*)this); }
   Point& operator =(_Real r ){ X=r; Y=Z=0.0; return *this; }         // очистка
 //Point& operator/=(_Real r ){ X/=r,Y/=r,Z/=r; return *this; }       // масштаб
   Point& operator+=(_Vector d ){ X+=d.x,Y+=d.y,Z+=d.z; return *this; } // сумма
@@ -89,6 +79,8 @@ struct Point     // Координатная точка в масштабах а
  friend Point  operator - ( Point c,_Vector e ){ return c-=e; }
  friend Vector operator - (_Point c,_Point e )
              { return (Vector){c.X-e.X,c.Y-e.Y,c.Z-e.Z }; }
+//operator Vector(){ return *((Vector*)this); }
+  operator Real*(){ return (Real*)this; }     // для внешних операций и графики
 };
 //
 //     Элементарные и раскрываемые операции-функции
