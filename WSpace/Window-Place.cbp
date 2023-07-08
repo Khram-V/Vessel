@@ -181,6 +181,7 @@
 		<Unit filename="../Math/Tensor.cpp">
 			<Option target="A-lib64" />
 			<Option target="A-lib32" />
+			<Option target="Window Shapes" />
 		</Unit>
 		<Unit filename="../Math/Tensor.h">
 			<Option target="A-lib64" />

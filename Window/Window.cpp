@@ -444,33 +444,34 @@ static void CALLBACK TimerProc( HWND hWind,UINT uMsg,UINT_PTR timerId,DWORD St)
     if( Win )
     { if( !Win->mSec )Win->isTimer=false; else
       if( !Win->isTimer )
-      { Win->isTimer=true; // настройка OpenGL с контекстным эпилогом перерисовки
+      { Win->isTimer=true; // настройка OpenGL контекстным эпилогом перерисовки
         { glContext S( Win ); if( Win->Timer() )Win->Save().Refresh(); }
         Win->isTimer=false;
-    } } return;                        // фиксируется фоновая подложка всего окна
+      }
+    } return;                        // фиксируется фоновая подложка всего окна
   }
   if( tId!=timerId )return;              // всякие Sleep и т.п. пусть идут мимо
   ::KillTimer( 0,timerId );              // отключаем таймер, пока не изменился
   if( extFree )                          // запуск вычислений на заданное время
-  { DWORD Rt,T;     //,St=GetTickCount() -- отсчет начала приоритетных расчётов
+  { DWORD Rt,T;   //,  St=GetTickCount() -- отсчет начала приоритетных расчётов
     do{ WinExecute();                    // выборка предыдущих операций Windows
       T=GetTickCount();                  // отметка реального времени счёта
       if( !extFree() )mWait=0;           //! исполнение или полный выход =false
       RealTime+=(Rt=GetTickCount())-T;   // использованный интервал времени #0
       if( mWait && Rt-St>=mWork )        //- перезапуск по истечению свободного
-        { tId=::SetTimer( 0,0,mWait,TimerProc ); break; } // рабочего кванта к
+      { tId=::SetTimer( 0,0,mWait,TimerProc ); break; }   // рабочего кванта к
     } while( mWait );                                    // повтору безвременья
   } else mWait=0;
 }
 Window& Window::SetTimer( DWORD mS,bool(*inTm)() )    // время+адрес исполнения
-{ if( !mS )KillTimer(); else                          // включается таймер №12
+{ if( !mS )KillTimer(); else                          //  включается таймер №12
   { ::SetTimer( hWnd,idEvent,mSec=mS,TimerProc ); extTime=inTm; // выбор адреса
   } WinExecute( hWnd ); return *this;                // очистка очереди Windows
 }
 Window& Window::KillTimer()
 { if( mSec )                             // приостановка с ожиданием завершения
   { mSec=0; while( isTimer )if( !WinRequest() )WaitMessage();
-    extTime=NULL; ::KillTimer( hWnd,idEvent );  // теряется внешняя связь
+    extTime=NULL; ::KillTimer( hWnd,idEvent );        // теряется внешняя связь
   } return *this;
 }
 DWORD WaitTime( DWORD Wait,        // активная задержка для внешнего управления

@@ -128,7 +128,7 @@ Field& Field::Simulation()  // моделирование волнения в и
       } else             //! прямой вычислительный эксперимент разделением волн
       if( Exp.wave>1 )   // по всем трём независимым структурам из частиц-ячеек
       { Vector dR={0,0,0};  // продвижение по курсу корабля за один шаг времени
-        if( Vessel->Route.length>1 )dR=Vessel->Route[-2]-Vessel->Route[-1];
+        if( Vessel->Route.len>1 )dR=Vessel->Route[-2]-Vessel->Route[-1];
 #pragma omp parallel sections
         {
 #pragma omp section             // длиннопериодный накат трансокеанских штормов

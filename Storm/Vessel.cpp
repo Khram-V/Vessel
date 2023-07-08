@@ -68,18 +68,18 @@ Hull::Hull():View      // в прицепе View окошко графическ
   Ofs=Zero; mx=my=0;              // и мышку тоже в исходное
   Activate();                     // привязка к Window::Place, и первый рисунок
   glPolygonMode( GL_FRONT_AND_BACK,GL_FILL );
-  color( navy ); Alfabet(22,"Arial",800).Print( 2,1," Vessel  -  " );
+  color( navy ); Alfabet(22,"Arial",  800).Print( 2,1," Vessel  -  " );
   color( blue ); Alfabet(20,"Courier",800).Print("штормовая гидромеханика\n");
-  color( cyan ); Alfabet( 19,"Lucida",600 ).Print
-                 ( "   Штормовая мореходность корабля\n"
-                   "       вычислительный эксперимент\n" );
+  color( cyan ); Alfabet(19,"Lucida", 600).Print
+                 ( "     Мореходные качества корабля -\n"
+                   "        вычислительный эксперимент\n" );
   color(green ); Alfabet( 18,"Times",1,1 ).Print
-                 ( "©1975-2022 Калининград - Сахалин - יְרוּשָׁלַיִם\n\n" );
+                 ( "©1975-2023  Калининград - Сахалин - יְרוּשָׁלַיִם\n\n" );
   color(black ); Alfabet( 20,"Times",1,1 ).Print( -2,-2,
-                   "Оптимальное проектирование корабля\n"
-                   "эффективность океанского мореплавания" );
+                   "Сообразованные архитектура и обводы корпуса\n"
+                   " - эффективность всепогодного мореплавания" );
   color(yellow); Alfabet( 12,"Times",1,1 )
-                .Print( -3,0,"©Василий Храмушин" ).Save().Show();
+                .Print( -3,0,"© Василий Храмушин" ).Save().Show();
   // WaitTime( 500 );
  int Ac; WCHAR **Av=CommandLineToArgvW( GetCommandLineW(),&Ac );
   if( !Read(  Ac>1 ? W2U( Av[1] ) : "*.vsl" ) )
@@ -241,7 +241,7 @@ Hull& Hull::Original()
   inWater=0.0; inMass=0.0; vR=0.0;   // mM=0.0; - на Three-Initial
   Gravity=Buoyancy=Floatable=Metacenter=Zero; Locate=Zero;
   //! контролируемый начальный отсчет для запуска всего процесса моделирования
-  Route.length=Rate.length=Swing.length=Whirl.length=0;
+  Route.len=Rate.len=Swing.len=Whirl.len=0;
   Route += Zero;             // первый координатный отсчет на маршруте парохода
   Rate  += Zero;             // начальная скорость хода == 0              [м/с]
   Swing += Zero;             // ориентация в пространстве в трёх углах Крылова
@@ -538,14 +538,14 @@ Hull& Hull::wPrint( bool log ) // информация по смоченному
       "  >>> { L=%g, B=%g, T=%g, Ψ=%s\\δd=%.0fсм }^%g  K(а.%d<шп[%d]>%d.ф)"
 //    " гидромеханика{ %X }  ",
       ,ShipName,Length,Breadth,Draught,DtoA(Trim*_Rd,2),asin(Trim)*Length*50,
-      Ofs.z,Stern.length,Nframes,Stem.length,Statum );
+      Ofs.z,Stern.len,Nframes,Stem.len,Statum );
     if( VIL )
     { logTime(); fprintf( VIL,"\n  ⇒ %s \n"
       "  ⇒ { L=%g, B=%g, T=%g, Ψ=%s\\δd=%.0fсм }^%g  К(а.%d<шп[%d]>%d.ф)\n"
       "  ⇒ { δ=%.2f, W=%.1f m³, S=%.1f m², F=%.1f m² }\n"
       "  ⇒ С{ x=%.1f, z=%.2f }, zG=%.2f, r=%.2f, h=%.2f [м]",
       ShipName,Length,Breadth,Draught,DtoA(Trim*_Rd,2),asin(Trim)*Length*50,
-      Ofs.z,Stern.length,Nframes,Stem.length,Volume/Length/Breadth/Draught,
+      Ofs.z,Stern.len,Nframes,Stem.len,Volume/Length/Breadth/Draught,
       Volume,Surface,Floatage,Buoyancy.x,Buoyancy.z,Gravity.z,
                               Metacenter.z-Buoyancy.z,hX );
       if( F.Kt<2 )logHydro(),logMdemp(),logAdemp(); fprintf(VIL,"\n");

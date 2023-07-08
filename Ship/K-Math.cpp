@@ -305,7 +305,7 @@ void Building()                       //       ___\│ г--+-┼--°°L¬\+/
 //
 //   Прорисовка проекции корпус (основного теоретического чертежа)
 //
-void Draw_Hull( int ids, Plane &_W )   // Проекция корпус
+void Draw_Hull( int ids, Plane &_W )                         // Проекция корпус
 { int i,k,m,n; Real x,y,z;
   if( ids )
   { __Grid z=min( Depth,Draught*2 );                              // Сетка
@@ -332,22 +332,25 @@ void Draw_Hull( int ids, Plane &_W )   // Проекция корпус
   { if( !m && k==Kh.Ms+1 ){ m=1; k=Kh.Ms; }
     glBegin( GL_LINE_STRIP );
     if( Hull_Keys&1 )
-    for( Real a=0; a<=1.0005; a+=0.001 )    // 1000 точек по контуру шпангоута
-    { Kh.F[k].YiZ( a,y,z );                 // контуры шпангоутов
+    for( Real a=0; a<=1.0005; a+=0.001 )    //! 1000 точек по контуру шпангоута
+    { Kh.F[k].YaZ( a,y,z );                 // контуры шпангоутов
       if( z>Draught )__Board else __Water   // синие сверху и зеленые под водой
       if( !m )y=-y; glVertex2d( y,z );
     } else                                 // или изображение исходных контуров
     { Frame &W=Kh.F[k]; Real wz,wy; __Water
       for( i=0; i<=W.N; i++ )
       { z=W.z[i],y=W.y[i];
-        if( !m )y=-y;
-        if( i>0 )                        // пересчёт смоченной точки на контуре
-        if( wz<Draught && z>Draught )
+        if( !m )y=-y;                    // пересчёт смоченной точки на контуре
+        if( i>0 && wz<Draught && z>Draught )
           { y=wy+(Draught-wz)*(y-wy)/(z-wz); z=Draught; --i; }
         if( z>Draught )__Board
         glVertex2d( wy=y,wz=z );
-      }
-    } glEnd();
+    } } glEnd();                           // если нет сплайнового сглаживания,
+    if( !(Hull_Keys&1 ) )                  //  то отмечаются шпангоутные точки
+    { Frame &W=Kh.F[k]; glPointSize( 3 ); gl_GRAY; glBegin( GL_POINTS );
+      for( i=0; i<=W.N; i++ )glVertex2d( m?W.y[i]:-W.y[i],W.z[i] );
+      glEnd(); glPointSize( 1 );
+    }
   } __Deck
   glBegin( GL_LINE_STRIP );  glVertex2d( -Kh.Asy[0],Kh.Asy(0) );
   for( k=1; k<=Kh.Asy.N; k++)glVertex2d( -Kh.Asy[k],Kh.Asy(k) );
@@ -379,7 +382,7 @@ void line( _Real x1,_Real z1,_Real x2,_Real z2 )
 Plaze::Plaze( int nz, int nx, _Real Board ): Nz( nz ),Nx( nx )
 { int  i,j;
  Real x,y,z,w;
-   Y=(Real**)Allocate( Nz,Nx*sizeof(Real) );
+   Y=(Real**)Allocate( Nz,Nx*sizeof(Real) );  // Таблица ординат - действующая
   QV=(Real**)Allocate( Nz,Nx*sizeof(Real) );  // Источники со смещенными узлами
   Xa=(Real*) Allocate( Nz*sizeof(Real)    );  // абсциссы ахтерштевня
   Xs=(Real*) Allocate( Nz*sizeof(Real)    );  //   и форштевня

@@ -146,7 +146,7 @@ void _OutText( const char *str, int base, int &X,int &Y, int bX,int pX )
    glListBase( base ); glCallLists( strlen( str ),GL_UNSIGNED_BYTE,str );
    glPopAttrib();
 // glFlush();
-  static int P[4]={ 0,0,0,0 };                // для выборки новой позиции chX
+  int P[4]={ 0,0,0,0 };                // для выборки новой позиции chX
    if( bX>0 ){ glGetIntegerv( GL_CURRENT_RASTER_POSITION,P ); X=P[0]-pX; }
 }
 Place& Place::String( const char *T )  // исходная строка реально не изменяется
@@ -158,9 +158,13 @@ Place& Place::String( const char *T )  // исходная строка реал
     if( AF.Bit )
     { if( cbX<=0 )chX-=strlen(str)*AF.W;
       glRasterPos2i( chX,chY ); _OutBitText( str,AF.Bit,chX,chY,cbX ); } else
-    { //long l=AlfaRect( str,true ).cx;
-      if( cbX<=0 )chX-=AlfaRect( str,true ).cx;
-      glRasterPos2i(chX,chY); _OutText( str,AF.Base,chX,chY,cbX,pX ); //chX+=l+1;
+#if 0                         /// так должно быть, но работает только в Intel
+    { if( cbX<=0 )chX-=AlfaRect( str,true ).cx;
+      glRasterPos2i(chX,chY); _OutText( str,AF.Base,chX,chY,cbX,pX );
+#else                         // небольшая перепутаница в AMD-OpenGL - что жаль
+    { long l=AlfaRect( str,true ).cx;  if( cbX<=0 )chX-=l;
+      glRasterPos2i(chX,chY); _OutText( str,AF.Base,chX,chY,cbX,pX ); chX+=l+1;
+#endif
     }
     if( !w )break; w[0]='\n'; chY-=AF.H; str=w+1;     //  будет еще одна строка
     if( cbX>0 )chX=(cbX-1)*AF.W; else chX=Width+AF.W*cbX;
@@ -175,9 +179,9 @@ Place& Place::String( Course Dir, const Real *P, const char* T )
    glRasterPos3d( P[0],P[1],P[2] );           // плоская надпись со смещением
   SIZE sz=AlfaRect( str,true ); dx= -sz.cx/2; // _Center
    if( Dir&_East  )dx = 4;      dy= -sz.cy/6; // сдвиги и переносы строк
-   if( Dir&_West  )dx = -sz.cx - 4;           // здесь отключены
-   if( Dir&_North )dy =  sz.cy/5 + 3;
-   if( Dir&_South )dy = -sz.cy + 3; glBitmap( 0,0,0,0,dx,dy,NULL );
+   if( Dir&_West  )dx =-sz.cx - 4;            // здесь отключены
+   if( Dir&_North )dy = sz.cy/5 + 3;
+   if( Dir&_South )dy =-sz.cy + 3; glBitmap( 0,0,0,0,dx,dy,NULL );
    if( AF.Bit )_OutBitText( str,AF.Bit,dx,dy,1 );
          else  _OutText( str,AF.Base,dx,dy,1,pX ); return *this;
 }

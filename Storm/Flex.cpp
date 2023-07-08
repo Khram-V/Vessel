@@ -2,41 +2,41 @@
 //    Flex — пространственная вектор-функция абсолютного скалярного аргумента
 //         = параметрическое построение неразрывного трехмерного контура/кривой
 //         # отслеживание векторных величин в зависимости от шага во времени
-//         k>=0 є { 0÷length-1 } — положительные индексы с прямым отсчётом P[k]
-//         k<0  є { length+k÷0 } — отрицательные ≡ обратный отсчёт  P[length-k]
+//         k>=0 є { 0÷len-1 } — положительные индексы с прямым отсчётом P[k]
+//         k<0  є { len+k÷0 } — отрицательные ≡ обратный отсчёт  P[len-k]
 //
 #include "Vessel.h"
-        Flex:: Flex(): length( 0 ),P( NULL ){}
-        Flex::~Flex(){ if( length ){ Allocate( 0,P ); length=0; P=NULL; } }
+        Flex:: Flex(): len( 0 ),P( NULL ){}
+        Flex::~Flex(){ if( len ){ Allocate( 0,P ); len=0; P=NULL; } }
 Vector& Flex:: operator[]( int k )
-{ return P[minmax(0,k>=0?k:k+length,length-1)]; // выборка внутренней точки [k]
+{ return P[minmax(0,k>=0?k:k+len,len-1)]; // выборка внутренней точки [k]
 }
 Vector& Flex::Insert( int k )                   // вставка точки по индексу [k]
 { int l=isAlloc( (void*)P )/sizeof( Vector );   //= длина внутри памяти массива
-      k=minmax( 0,k,length ); ++length;         //  от нуля до следующей ячейки
-  if( l<=length )P=(Vector*)Allocate( (length+1020)*sizeof(Vector),P );   //+48
-  for( l=length-1; l>k; l-- )P[l]=P[l-1]; return P[k];
+      k=minmax( 0,k,len ); ++len;         //  от нуля до следующей ячейки
+  if( l<=len )P=(Vector*)Allocate( (len+1020)*sizeof(Vector),P );   //+48
+  for( l=len-1; l>k; l-- )P[l]=P[l-1]; return P[k];
 }
 Vector Flex::Delete( int k )      // одна точка вытаскивается и векторного ряда
 { Vector V={ 0,0,0 };             //  без укорочения числового массива в памяти
-   if( k>=0 && k<length ){ --length; for( V=P[k]; k<length; k++ )P[k]=P[k+1]; }
+   if( k>=0 && k<len ){ --len; for( V=P[k]; k<len; k++ )P[k]=P[k+1]; }
   return V;
 }
-Vector& Flex::operator+=(_Vector R){ return Insert(length)=R;}// в конце списка
+Vector& Flex::operator+=(_Vector R){ return Insert(len)=R;}// в конце списка
 Vector& Flex::operator/=(_Vector R){ return Insert(0)=R;} // замещение в начале
 
 #if 0                             /// -- временно  исключено
-Vector& Flex::operator+=(_Vector R){ return Insert(length)=R; } // конец списка
+Vector& Flex::operator+=(_Vector R){ return Insert(len)=R; } // конец списка
 Vector& Flex::operator/=(_Vector R){ return Insert(0)=R; }// замещение в начале
 
 Vector Flex::Get( int k )     // выборка с изъятием из уже существующего списка
-{ Vector Q; if( length<=0 )Q=0.0; else // в пустой последовательности нет точек
-  { Q=P[k=minmax(0,k,--length)]; while(++k<=length)P[k-1]=P[k]; } return Q;
+{ Vector Q; if( len<=0 )Q=0.0; else // в пустой последовательности нет точек
+  { Q=P[k=minmax(0,k,--len)]; while(++k<=len)P[k-1]=P[k]; } return Q;
 }
-Vector Flex::operator()( Real arg )        +++ необходима проверка на length==0
+Vector Flex::operator()( Real arg )        +++ необходима проверка на len==0
   { if( arg<0.0 )return *P; else                 // аргумент: 0.0<=A<=1.0
-    if( arg>1.0 )return *(P+(length-1)); else    // в обход индексного контроля
-    { int k=minmax( 0,int(arg*=length-1),length-2 );   // * интервальный отсчёт
+    if( arg>1.0 )return *(P+(len-1)); else    // в обход индексного контроля
+    { int k=minmax( 0,int(arg*=len-1),len-2 );   // * интервальный отсчёт
       Vector *R=P+k; return R[0]+(R[1]-R[0])*(arg-k);  // линейная интерполяция
   } }                           // последовательность в трехмерном пространстве
 operator Flex::Vector*(){ return P; } // адресный доступ ко всему вектору точек

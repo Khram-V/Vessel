@@ -13,7 +13,7 @@
 
 short Active=0;                   // 0x01 файл считанн и подготовлен к работе
                                   // 0x02 полностью выполнена первая прорисовка
-int Hull_Keys=0x01;               // Набор ключей - параметров
+unsigned Hull_Keys=0x01;          // Набор ключей - параметров
                                   // 0x01 - задействовать сплайн-интерполяцию
 Real Xo=0,Xm=1,Length=2,Lmx=2,Lwl=2,   // Длина и длина по ватерлинии
           Breadth=0.2,Bmx=0.2,Bwl=0.2, // Ширина и ширина по ватерлинии
@@ -69,6 +69,22 @@ Plane& Plane::Set(_Real X,_Real Z,_Real _X,_Real _Z )// отступ от пра
          Area( ux-W,uz-H,ax-ux,az-uz );            // правый\нижний и размер
          Focus(); return *this;
        }
+//
+//     Экранные и физические координаты отмеряются от заданного прямоугольника
+//
+bool Plane::Is( int x,int z ){ z=H-z; return x>ax&&x<ux&&z>az&&z<uz; }
+Real Plane::X( int x ){ return aX + x*dx; }
+Real Plane::Z( int z ){ return aZ + z*dz; }// Нормальные координаты во ViewPort
+ int Plane::x( _Real X ){ return int( ( X-aX )/dx ); }
+ int Plane::z( _Real Z ){ return int( ( Z-aZ )/dz ); }
+//
+// Координаты анти-относительно реальных отсчетов внутри активного окна Windows
+//
+Real Plane::wX( int x ){ return aX + (x-ax)*dx; }   // X( x-ax )
+Real Plane::wZ( int z ){ return aZ + (H-z-az)*dz; } // Y( H-y-ay )
+//int Plane::xw( _Real X ){ return x( X )+ax; }
+//int Plane::zw( _Real Z ){ return H-z( Z )-az; } - ??
+//
 //static void Loft_Place( bool rShape=false )
 void MainDraw::Loft( bool rShape )          // общая разметка графического поля
 { const int Up=12,Left=32,Down=120,Band=24,Bord=6;   // под текущую ширину окна
@@ -154,17 +170,17 @@ int main() // int ans, char *argv[], char *envp[] )
   //
   //  Уединенное приветствие
   //
-  gl_MAGENTA; Win.Alfabet(26,"Arial",800).Print( 2,1,"Корабль  —  " );
-  gl_BLUE;    Win.Alfabet(20,"Courier",800).Print("морская гидромеханика\n");
-  gl_CYAN;    Win.Alfabet(19,"Lucida",600)
-                 .Print( "   Лаборатория вычислительной гидромеханики"
-                         "\n           и морских исследований"
-                         "\n   РОССИЯ, Южно-Сахалинск, Санкт-Петербург\n\n" );
-  gl_BLACK;   Win.Alfabet(20,"Times",1,1).Print( 2,-2,
-                 "Вычислительные эксперименты по штормовой мореходности\n"
-                 "Гидростатика, остойчивость, волновое сопротивление," );
-  gl_YELLOW;  Win.Alfabet(12,"Times",1,1)
-                 .Print( -3,0,"©1975-22, Василий Храмушин" ).Show();
+  gl_BLUE; Win.Alfabet( 26,"Arial",800).Print( 2,1,"Корабль  —  " );
+           Win.Alfabet( 20,"Courier",800).Print("морская гидромеханика\n" );
+  gl_CYAN; Win.Alfabet( 19,"Lucida",600 )
+              .Print( "   Лаборатория вычислительной гидромеханики"
+                      "\n           и морских исследований"
+                      "\n   РОССИЯ, Южно-Сахалинск - Санкт-Петербург\n\n" );
+  gl_GREEN; Win.Alfabet( 20,"Times",1,1).Print( 2,-2,
+                  "Вычислительные эксперименты по штормовой мореходности\n"
+                  "Гидростатика, остойчивость, волновое сопротивление," );
+  gl_YELLOW; Win.Alfabet(12,"Times",1,1)
+                .Print( -3,0,"©1975-23, Василий Храмушин" ).Show();
   WaitTime( 500 );
 //
 //      подборка управляющих параметров и структур с информацией

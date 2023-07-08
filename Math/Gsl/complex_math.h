@@ -6,8 +6,8 @@
 #include <Math.h>
 
 typedef struct{ double x,y; } complex; // Complex numbers
-#define real(z) (z.x)
-#define imag(z) (z.y)
+#define real( z ) ( z.x )
+#define imag( z ) ( z.y )
 
 complex polar( const double& r,const double& theta ); // r×e^(i×theta)
 #define ONE    ((complex){1.0,0.0})

@@ -79,12 +79,10 @@ bool Video::KeyBoard( byte key )
 //      в обще-системном таймере WaitTime
 //
 bool Video::Timer()
-{
-//  if( !isTimer )
-//  { isTimer=true; bool Res=Draw(); isTimer=false; return Res;
-//  } return false;
-
-  return Draw();
+{ static bool isTimer=false;
+  if( !isTimer )
+  { isTimer=true; bool Res=Draw(); isTimer=false; return Res;
+  } return false; // return Draw();
 }
 bool Video::Draw()
 { int i,k,key=GetKey(),                        // запрос key-символа

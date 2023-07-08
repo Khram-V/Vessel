@@ -13,7 +13,7 @@
 				<Option object_output="Dev/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters='&quot;Буксир «Арктикаборг»&quot; &quot;A-1200 Early&quot; Examples\Куб-5 &quot;БПК «Стерегущий»-61&quot; &quot;OSU Regional Class Research Vessel&quot; &quot;Буксир «Витязь»&quot; &quot;A-1206 Cruise-2.vsl&quot; &quot;Речной теплоход «Родина» (Готман)&quot;' />
+				<Option parameters='&quot;Крейсер «Рюрик»-II-1905&quot; &quot;EFF04 для Курил&quot; &quot;Г-5 Туполев&quot; &quot;2006 Плавниковый подзор&quot; &quot;Крейсер «Варяг»-58&quot; &quot;A-1206 Cruise-2.vsl&quot; &quot;Эскадренный броненосец «Цесаревич»&quot; &quot;Буксир «Арктикаборг»&quot; &quot;A-1200 Early&quot; Examples\Куб-5 &quot;БПК «Стерегущий»-61&quot; &quot;OSU Regional Class Research Vessel&quot; &quot;Буксир «Витязь»&quot; &quot;Речной теплоход «Родина» (Готман)&quot;' />
 				<Option projectCompilerOptionsRelation="0" />
 				<Option projectLinkerOptionsRelation="2" />
 			</Target>

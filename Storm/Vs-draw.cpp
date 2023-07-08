@@ -140,7 +140,7 @@ Hull& Hull::Naviga_Inform( Window *Win )
   //  контрольная полупрозрачная плоскость для чисто конструктивной ватерлинии
   //
   glBegin( GL_TRIANGLES ); //GL_POLYGON ); //GL_TRIANGLE_FAN );
-  for( i=0; i<WaterLine.length; i+=3 )
+  for( i=0; i<WaterLine.len; i+=3 )
   { color( lightcyan,0,0.5 ); dot( (Point){0} ); color( lightgray,0,0.5 );
                               dot( B*WaterLine[i+1] );
                               dot( B*WaterLine[i+2] ); } glEnd();
@@ -148,7 +148,7 @@ Hull& Hull::Naviga_Inform( Window *Win )
   //  поверхность действующей и сильно искривлённой ватерлинии
   //
   B.axiZ( -_Ph )/=Length/2; B=Tensor(*this)*B; color( gray,-0.25 );
-  for( i=0; i<wL.length; i+=3 )line( B*wL[i+1],B*wL[i+2] );
+  for( i=0; i<wL.len; i+=3 )line( B*wL[i+1],B*wL[i+2] );
   //
   //  в центре картушки подписывается текущий курс и действующая скорость судна
   //
@@ -170,7 +170,7 @@ Hull& Hull::Naviga_Inform( Window *Win )
   Speed/sqrt(_g*Length),sqr(Speed)*_Pd/_g/Length, Volume,iV,
   Surface,iS, Floatage,iF, Metacenter.x,vM.x, hX,vM.z );
   if( Win==this )
-  if( (l=Route.length-1)>=12 )
+  if( (l=Route.len-1)>=12 )
   { Real Dt=S.Tstep/S.tKrat;             // расчетный шаг в циклах эксперимента
     //                                                                z=x.y-y.x
     //!  внешний блок графиков по кинематике корпуса на штормовом волнении моря
@@ -241,11 +241,11 @@ Hull& Hull::Naviga_Inform( Window *Win )
     //
     // поверху накладывается бортовая и килевая качка
     //
-    glBegin( GL_LINE_STRIP ); color( blue );
+     color( blue ); glBegin( GL_LINE_STRIP );
     for( i=k; i<=l; i++ )glVertex3d( -Lp+(i-k)*L,(Swing[i].y-Trim)/H,0 ); glEnd();
     Compass.Print( -1,Max.x>Max.y?2:1,DtoA( (Trim+Max.y)*_Rd,-1 ) )
            .Print( -3,4,"/Y" );         // дифферент вокруг ординаты  по оси Y
-    glBegin( GL_LINE_STRIP ); color( magenta );
+     color( magenta ); glBegin( GL_LINE_STRIP );
     for( i=k; i<=l; i++ )glVertex3d( -Lp+(i-k)*L,i90(Swing[i].x)/H,0 ); glEnd();
     Compass.Print( -1,Max.x>Max.y?1:2,DtoA( Max.x*_Rd,-1 ) )
            .Print( -5,4,"X " );         // крен относительно абсциссы на оси X
@@ -281,7 +281,7 @@ Hull& Hull::Naviga_Inform( Window *Win )
       if( i-k>2 )glVertex3d( -Lp+(i-k-1)*L,(F1-F2-F2+F3)/D2/2,0 ); F1=F2,F2=F3;
     } glEnd();
     Compass.Print( -1,-1,"%+3.1f/%+3.1f",maxF+1,minF+1 );
-    glBegin( GL_LINE_STRIP ); color( magenta,0.5 );
+    color( magenta,0.5 ); glBegin( GL_LINE_STRIP );
     for( i=k; i<=l; i++ )
     { A3=Route[i].z + Length*sin( Swing[i].y )/2;             // корма
       if( i-k>2 )glVertex3d( -Lp+(i-k-1)*L,(A1-A2-A2+A3)/D2/2,0 ); A1=A2,A2=A3;
@@ -289,17 +289,17 @@ Hull& Hull::Naviga_Inform( Window *Win )
     Compass.Print( -1,0,"%+3.1f/%+3.1f",maxA+1,minA+1 );
     U=60.0*Lp/Real(Compass.Width);
     H=55.0/Real(Compass.Height);
-    line( (Point){-Lp,0,0},(Point){Lp-Lt,0,0},cyan );       // уровень среднего
+    line( (Point){-Lp},(Point){Lp-Lt},cyan );       // уровень среднего
     glColor3f( BkColor );
-    rectangle( (Point){-Lp,1-H},     (Point){-Lp+U, 1-H/5} );
-    rectangle( (Point){-Lp,-1+H*0.8},(Point){-Lp+U,-1+H/5} );
-    rectangle( (Point){-Lp,-H/2.2},  (Point){-Lp+U,   H/2.2} );
+    rectangle( (Point){-Lp,1-H},      (Point){-Lp+U,1-H/4} ); // сверху
+    rectangle( (Point){-Lp,-H/2.2},   (Point){-Lp+U,H/3}   ); // в центре
+    rectangle( (Point){-Lp,-1+H*0.75},(Point){-Lp+U,-1 }   ); // внизу
     color( yellow,-0.4 );
     line( (Point){-Lp,-0.5},(Point){Lp-Lt,-0.5} );
     line( (Point){-Lp,0.5},(Point){Lp-Lt,0.5} );
-    Compass.Text( _North_East,-Lp,-1,0," -g" );
-    Compass.Text(       _East,-Lp, 0,0,"  g" );
-    Compass.Text( _South_East,-Lp, 1,0," 3g" );
+    Compass.Text( _North, Lp=U/2-Lp,-1,0," -g" );
+    Compass.Text( _Center,Lp,        0,0,"  g" );
+    Compass.Text( _South, Lp,        1,0," 3g" );
   } return *this;
 }
 //  Простая визуализация формы исходного корпуса в независимом графическом окне

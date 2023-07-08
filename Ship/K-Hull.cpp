@@ -28,6 +28,7 @@ static void FPutS( const char _Comm[], const char fmt[], ... );
 //      Считывание/запись численного описания формы корпуса
 //        (при первом обращении возвращается корпус МИДВ)
 //
+void Hull::allocate(int N){ F=(Frame*)Allocate((Ns=N)*sizeof(Frame),F); Ms=-1;}
 void Hull::Simple_Hull( int Nx, int Nz, int Nf )
 { for( int i=Nx; i<Ns; i++ )F[i].free(); allocate( Nx );
   for( int i=0; i<Nx; i++ )F[i].allocate( Nz );  Ms=Ns/2;
@@ -195,7 +196,7 @@ static void FPutS( const char _Comm[], const char fmt[], ... )
     { while( k+m<80 ){ Str[l++]=' '; k++; } strcpy( Str+l,_Comm );
     } fprintf( Fh,"%s\n",Str );
 }
-///   Польские материалы от А.Дегтярёва
+///   Польские материалы от Александра Борисовича Дегтярёва
 //
 int Hull::Read_from_Polland()
 { int i,j,k,l,m,Nx,Nz,n=0;    // Размерения судна и размерность таблицы ординат
