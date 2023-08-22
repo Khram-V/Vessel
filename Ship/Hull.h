@@ -52,7 +52,7 @@ struct Frame
  ~Frame(){ free(); }
   Real G( _Real Z, bool=false );     // эмуляция плазовой ординаты по аппликате
   Real operator()(_Real A ){ return G( A ); }
-  Real& operator[]( int k ){ return y[k]; }; // In/Out доступ к функции
+  Real& operator[]( int k ){ return y[k]; };  // In/Out доступ к функции
   Real& operator()( int k ){ return z[k]; }; // аргументу по индексному отсчету
   void SpLine(); void Easy();     // подготовка к работе и сброс сплайн-функции
   void YaZ( Real A, Real &Y,Real &Z ); // и, - не совсем последовательный поиск
@@ -66,7 +66,7 @@ class Hull{ public:
  Frame *F,                           // Ряд Ns\Ms теоретических шпангоутов
        Stx,Sty,Asx,Asy;              // Форштевень и ахтерштевень, нос\корма
   Hull(): Ns(0),Ms(1),Nstem(2),F(0){ Name[0]=0; } // (Name=(char*)malloc( MAX_PATH*4 ))[0]=0; }
- ~Hull(){ allocate( 0 ); free( Name ); }
+//~Hull(){ allocate( 0 ); free( Name ); }
   void allocate( int N );                     // вектор адресов для шпангоутов
   void Analytics();                           // варианты аналитических обводов
   void Init();                                // водоизмещение, площади и др.

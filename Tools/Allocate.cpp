@@ -28,10 +28,10 @@ void **Allocate( size_t,size_t,void* );             // и по строкам - 
 
 inline void* ALset( size_t *A, const size_t L )
   { *A++ =0, *A++ =0, *A++ =0, *A++ =L; return A;   // Сдвиг на 4 слова int
-  }                                                 //            или 128 бит
+  }                                                 //        что равно 128 бит
 size_t isAlloc( void* A )                           // На выходе длина в байтах
-{ if( A )return ( (size_t*)A )[-1]; else return 0;  //   или количество
-}                                                   //     строк матрицы
+{ if( A )return ( (size_t*)A )[-1]; else return 0;  //    или количество
+}                                                   //        строк матрицы
 void *Allocate( size_t s, void *A )                 // Линейный массив в байтах
 { size_t S=0;                                       //  ++ 4 слова выравнивания
   if( s || A )                                      // длина или реальный адрес

@@ -240,14 +240,13 @@ Hull& Hull::Original()
   Volume=Surface=Floatage=0.0;       // согласовать с Vs-math
   inWater=0.0; inMass=0.0; vR=0.0;   // mM=0.0; - на Three-Initial
   Gravity=Buoyancy=Floatable=Metacenter=Zero; Locate=Zero;
-  //! контролируемый начальный отсчет для запуска всего процесса моделирования
-  Route.len=Rate.len=Swing.len=Whirl.len=0;
+  //!  контролируемый начальный отсчет для запуска всего процесса моделирования
+  Route.len=Rate.len=Swing.len=Whirl.len=0;  // нулевая начальная инициализация
   Route += Zero;             // первый координатный отсчет на маршруте парохода
   Rate  += Zero;             // начальная скорость хода == 0              [м/с]
   Swing += Zero;             // ориентация в пространстве в трёх углах Крылова
   Whirl += Zero;             // скорости изменения крена, дифферента и курса
  return Initial().Floating();// установка главных осей и геометрические расчеты
-//               .wPrint( true );
 }
 //!    Интерактивное управление выполняющимся вычислительным экспериментом
 ///

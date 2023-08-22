@@ -9,9 +9,11 @@
 Hull& Hull::Contour_Lines()      // рисуем контуры габаритного прямоугольного
 { glLineWidth( 0.05 );           // параллелепипеда по заданным размерениям
   glEnable( GL_LINE_SMOOTH );    // сглаживание линий
-#define V(a,b,c)glVertex3dv(out((Vector){a Length/2,b Breadth/2,c Draught/2-Draught/2})),
-  color(cyan),glBegin(GL_LINE_LOOP),V(+,+,+)V(+,-,+)V(-,-,+)V(-,+,+)glEnd();
-  color(gray),glBegin(GL_LINE_LOOP),V(+,+,-)V(+,-,-)V(-,-,-)V(-,+,-)glEnd();
+#define V(a,b,c)glVertex3dv \
+      ( out( (Vector){xm a Length/2,b Breadth/2,c Draught/2-Draught/2} ) ),
+ Real xm=(Keel[0]+Keel[Nframes+1])/2;
+  color( cyan ),glBegin(GL_LINE_LOOP),V(+,+,+)V(+,-,+)V(-,-,+)V(-,+,+)glEnd();
+  color( gray ),glBegin(GL_LINE_LOOP),V(+,+,-)V(+,-,-)V(-,-,-)V(-,+,-)glEnd();
 #undef V
 ///
 //!   прорисовка линий тока и профилей волн по курсу и траверзу корабля

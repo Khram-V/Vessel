@@ -70,18 +70,18 @@ public: string(); ~string();          // начальная установка=2
 Real AxisStep( Real );                    // Step for Axis Estimation
 char* DtoA( Real,int=0,const char* ="°"); // (±)ⁿ123°45'67"00 как круговая мера
 char* AtoD( char*, Real& );               // (°)÷(:) с возможной заменой на ':'
-template<class real>int find( const real *A, const real &Ar, int N );
+template<class real>int find( const real *A, const real &Ar, int len );
 //template<class real>inline real Angle( const real &A )          // A° = ±180°
 //                                     { return remainder( A,360 ); }
 //
 //    Работа с обычными текстовыми строчками
 //
 int strcut( char* Str );                 // Убираются концевые пробелы, символы
-void Break( const char Msg[],... );      // с подсчетом оставшейся длины строки
+void Break( const char Msg[], ... );     // с подсчетом оставшейся длины строки
 char* fname( const char* FileName );     // Поиск собственно самого имени файла
-char* sname( char* FullFileName );         // то же, но с отсечением расширения
-char* fext ( char*, const char* Ex=0 );     // Принудительная замена расширения
-#if defined(_STDIO_H_)||defined(_INC_STDIO) // имён файлов FileName Extensions
+char* sname( char* ShortFileName  );     // то же имя, с отсечённым расширением
+char* fext ( char*, const char* Ext=0 ); // c принудительной заменой расширения
+#if defined(_STDIO_H_)||defined(_INC_STDIO) // имён файлов: FileName.Extensions
 FILE *FileOpen                           // ++ кодировка длинных строк FileOpen
   ( char *fn, const char *tp, const char *ex, const char *ch, const char *tl );
 char *getString( FILE *F );              // Чтение строки на статическом адресе

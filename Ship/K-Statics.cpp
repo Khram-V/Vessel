@@ -12,7 +12,7 @@
 static int w1=2,wN=8;     // нижняя и верхняя ватерлинии на диаграмме Рида
 static Real Amax=180,     // Максимальный угол накренения в градусах
             Zmet=0;       // Относительная аппликата центра тяжести
-static byte Mode=0x00;    // 0x00 - плечи остойчивости формы при Zg=Zc
+static byte Mode=0x03;    // 0x00 - плечи остойчивости формы при Zg=Zc
                           // 0x01 - остойчивость с метацентрической высотой
                           // 0x02 - положение ЦТ относительно ватерлинии
 //
@@ -24,7 +24,7 @@ const int nA=180,         // Количество углов накренени�
 
 struct WinStability: public Window
 { WinStability( int W,int H ): Window( " Ship Hull Hydrostatics",0,0,W,H ){}
- virtual bool Draw();      // главная процедура для прорисовки всех результатов
+ virtual bool Draw();     // главная процедура для прорисовки всех результатов
 };
 static WinStability *stWin=0;
 static Plane  *wS=0,      // Окно проекции корпус
@@ -55,8 +55,12 @@ struct Hydrostatic        // подборка гидростатических �
   void Graphics();
   void Stability();
   void Stability_Lines();
-  int  Stability_Menu();
   void Axis_Statics( _Real A, bool clear=true );
+  int  Stability_Menu();
+  Real In( _Real z, Real *F )
+ { if( nZ<2 )return 0.0; else
+   { int k=minmax(0,int( z/dZ ),nZ-2); return F[k]+(F[k+1]-F[k])*(z-k*dZ)/dZ;
+ } }
 };
 Hydrostatic::Hydrostatic(): Lmax( Depth ),Lmin( Do )
 { int i,k; Real x,z;
@@ -68,7 +72,7 @@ Hydrostatic::Hydrostatic(): Lmax( Depth ),Lmin( Do )
   for( k=0; k<nZ; k++ )
   { Vol[k]=zCV[k]=Swl[k]=Srf[k]=xCW[k]=xCV[k]=Jx[k]=Jy[k]=rx[k]=Ry[k]=zM[k]=0;
     for( int i=0; i<nA; i++ )aV[i][k]=0, // грузовой размер с креном
-                              aC[i][k]=0; // центр величины от ОЛ
+                             aC[i][k]=0; // центр величины от ОЛ
 } }
 //   Основные кривые элементов теоретического чертежа формы
 //   корпуса судна, с определением его базовых характеристик
@@ -80,7 +84,7 @@ void Hydrostatic::Initial()     // Процедура предварительн
   { R=r=sX=S=0.0;               // Первый прогон интегрирования, нулевая ширина
     x=Xo; //-dX/2;              //  для вычисления площадей, объемов
     z=dZ*( Real( k )+0.5 );     //  их моментов инерции (z+1/2 - центр объема)
-    for( i=0; i<nX; i++,x+=dX )//  и метацентрических радиусов
+    for( i=0; i<nX; i++,x+=dX ) //  и метацентрических радиусов
     {  S+=( y=Y[k][i] );        //
        r+=y*y*y;                // стр.61 у Владимира Вениаминовича С-Т-Ш
        R+=y*x*x;                //
@@ -104,22 +108,23 @@ void Hydrostatic::Initial()     // Процедура предварительн
   for( k=1; k<nZ; k++ )         //
   { S+=(Y[k][0]+Y[k-1][0]+Y[k][nX-1]+Y[k-1][nX-1])*dZ;  // без двойки два борта
     for( i=1; i<nX; i++ )
-    { y=Y[k][i];
-      S+=sqrt( 1+sqr( ( Y[k][i-1]-y )/dX )+sqr( ( Y[k-1][i]-y )/dZ ) )*dX*dZ*2;
-//    { y=Y[k][i];
-//      if( y>0 )S+=sqrt( 1.0+norm( Y[k-1][i]-y,Y[k][i-1]-y ) )*dX*dZ*2;
+    { y=Y[k][i]; Real yx=Y[k][i-1],yz=Y[k-1][i];
+      if( y>0&&yx>0&&yz>0 )S+=sqrt( 1.0+norm( (yx-y)/dX,(yz-y)/dZ ) )*dX*dZ*2;
+      //       S+=sqrt( 1+norm( (Y[k][i-1]-y)/dX,(Y[k-1][i]-y)/dZ ) )*dX*dZ*2;
     } Srf[k]=S;
     if( Vol[k]<EpsV )zCV[k]=dZ*( Real( k )+0.5 ),xCV[k]=xCV[k-1]; else
     { zCV[k]=zCV[k]*2/(Vol[k]+Vol[k-1]);
       xCV[k]=xCV[k]/( Vol[k]+Swl[k]*dZ ); //+Xo;// половинка счетной ватерлинии
-  } }
+    }
+  }
   for( k=0; k<nZ; k++ )
   { zCV[k]+=Do; if( Vol[k]<EpsV )Ry[k]=rx[k]=0; else
                 { rx[k]=Jx[k]/Vol[k]; //*2/(Vol[k]+Vol[k-1]);
                   Ry[k]=Jy[k]/Vol[k];
                 } zM[k]=rx[k]+zCV[k];
-  }                                 // необходима предварительная предустановка
-}
+  }                  // необходима предварительная предустановка
+}                    // struct Vector { Real x,y,z; } A={ 1,0,0}, R={ dX,1,0 };
+
 static void MinMax( Real *F, int N, Real &Min, Real &Max, const int mx=0 )
 {                         if( !mx )Min=F[0]-0.1,Max=F[0]+0.1;
   for( int i=0; i<N; i++ )if( Min>F[i] )Min=F[i]; else
@@ -165,6 +170,8 @@ void Hydrostatic::Graphics()
   gl_BLUE;
     Graphic_for_Element( Vol,-40,0,Vol[nZ-1],-4,k++,"V" );
     Graphic_for_Element( Srf,-40,0,Srf[nZ-1], 4,k++,"S" );
+  gl_LIGHTRED;
+    stWin->Text( _South_West,0,0,0,"КЭТЧ " );
   gl_GREEN;
     MinMax( xCW+1,nZ-2,mn,mx );
     MinMax( xCV+1,nZ-2,mn,mx,1 ); if( mn<Xo )mn=Xo;
@@ -173,8 +180,8 @@ void Hydrostatic::Graphics()
     Graphic_for_Element( xCV,-80,mn,mx,0,k++, "xC" ); // величины
     Graphic_for_Element( xCW,-80,mn,mx,0,k+=2,"xS" ); // и площади
     Graphic_for_Element( Swl,-80,0,Swl[nZ-1],-4,k+=2,"Swl" );
-  gl_LIGHTRED;
-    stWin->Text( _South_West,0,0,0,"КЭТЧ " );
+//  gl_LIGHTRED;
+//    stWin->Text( _South_West,0,0,0,"КЭТЧ " );
   gl_RED;
     MinMax( rx,nZ,mn,mx );
     Graphic_for_Element( rx,-120,0,min(mx,Breadth ),-4,k++,"r" );
@@ -261,6 +268,7 @@ void Hydrostatic::Stability()
        k;                // Индекс контрольной осадки (*cos)
  Real  Z,A,dA,           // Ведущие аргументы
        V,Mx,My;          // Объемные сумматоры моментов элементарной площадки
+//const Real DM=Depth-Do;
   stWin->Activate(); wT->Set( 0.0,Lmin=-Depth,A=M_PI*Amax/180.0,Lmax=Depth );
   Axis_Statics( A ); dA=A/=nA;          // Шаг по углу накренения
   for( j=0; j<nA; j++,A+=dA )
@@ -318,8 +326,6 @@ void Hydrostatic::Stability()
     if( !k && j%(nA/16)==1 )stWin->Show();
   }
 }
-inline Real Interpol( _Real arg, Real *A ){ return  A[0] + ( A[1]-A[0] )*arg; }
-
 void Hydrostatic::Stability_Lines()           // Быстрая отрисовка плеч
 { int i,j,k;                                  // статической остойчивости формы
   Real dA=M_PI*Amax/( nA*180.0 ),A=dA,        // Шаг по углу накренения
@@ -334,23 +340,23 @@ void Hydrostatic::Stability_Lines()           // Быстрая отрисовк
   for( j=0; j<nA; j++,A+=dA )
   { for( k=1; k<nZ; k++ )
     { Real V=Vol[k];                              // Поиск аргумента-осадки
-      for( i=1; aV[j][i]<V && i<nZ-1; )i++;       //   по грузовому размеру
+      for( i=1; aV[j][i]<V && i<nZ-1; )i++;         //   по грузовому размеру
       Sw[k]=i-(aV[j][i]-V)/(aV[j][i]-aV[j][i-1]); // - индексная метка осадки
     }
     for( k=w1*2; k<=wN*2; k++ )                 // расчетные плечи остойчивости
-    { Real dV,z=( k*dW-Do )/dZ, &Sm=aP[j][k-w1*2]; // формы/статики ...
-      int m=z,i=int( Sw[m] );                   // интерполяция к теоретическим
+    { Real dV,z=k*dW-Do,&Sm=aP[j][k-w1*2];      // формы/статики ...
+      int m=z/dZ,i=int( Sw[m] );                // интерполяция к теоретическим
       if( i<0 )i=0; else if( i>=nZ-1 )i=nZ-2;   // ватерлиниям -- только --
       if( m<0 )m=0; else if( m>=nZ-1 )m=nZ-2;   // -- с одной промежуточной
       dV = Sw[m]-i;                             //  0 - от центра величины
-      dC = aC[j][i+1]*dV + aC[j][i]*( 1-dV );   //  1 - c метацентра - полметра
-      switch( Mode&0x3 )                        //  2 - над ватерлинией
-      { case 0: Sm=dC.y-( Interpol( z-m,zCV+m )-Do+Zmet)*sin( A ); break;
-        case 1: Sm=dC.y-( Interpol( z-m,zM+m )-Do-Zmet )*sin( A ); break;
-        case 2: Sm=dC.y-( k*dW-Do+Zmet-Do )*sin( A ); break;
-        case 3: Sm=dC.y-( Zmet-Do )*sin( A );
+      dC = aC[j][i+1]*dV + aC[j][i]*( 1-dV );   //  1 - Метацентрическая высота
+      switch( Mode&0x3 )                        //  2 - относительно ватерлинии
+      { case 0: Sm=dC.y-( In( z,zCV )+Zmet-Do )*sin( A ); break; // 3 ЦТ над ОЛ
+        case 1: Sm=dC.y-( In( z,zM )-Zmet-Do )*sin( A ); break;
+        case 2: Sm=dC.y-( k*dW+Zmet-Do )*sin( A ); break;
+        case 3: Sm=dC.y-( Zmet-Do-dZ )*sin( A );
       }
-      if( Sm>Lmax )Lmax=Sm; else if( Sm<Lmin)Lmin=Sm;
+      if( Sm>Lmax )Lmax=Sm; else if( Sm<Lmin )Lmin=Sm;
   } } Lmax*=1.12; Lmin*=1.12;
   stWin->Activate();
   wT->Set( 0,Lmin,A,min( Lmax,Breadth ) );                // в разметке срезан
@@ -377,7 +383,8 @@ static bool Mouse_in_Window( int x, int y )
   return false;
 }
 int Hydrostatic::Stability_Menu()
-{ Mlist Menu_S[]={ { 1,0,"   Диаграмма Рида" }
+{ const Real z=Draught-Do;
+  Mlist Menu_S[]={ { 1,0,"   Диаграмма Рида" }
                  , { 2,1 },{ 0,5,"%5.2lf",&Zmet }       // выбор типа диаграммы
                  , { 1,5,"Максимальный угол крена %1°",&Amax }
                  , { 1,2,"Выбор ватерлиний  с %2d",&w1},{0,2,"  по %2d",&wN} };
@@ -389,13 +396,11 @@ int Hydrostatic::Stability_Menu()
       case 3: Menu_S[1].Msg="ЦТ над основной линией  "; break;
     }
   if( (ans=T.Answer( ans ))==1 )
-  { int nW = int( Draught/dZ + 1e-3 ); // номер ватерлинии
-    switch( ++Mode&=3 )
-    { case 0: Zmet -= zCV[nW];             break;
-      case 1: Zmet =  rx[nW]-Zmet;         break;
-      case 2: Zmet =  zM[nW]-Zmet-Draught; break;
-      case 3: Zmet += Draught;
-    }
+  switch( ++Mode&=3 )
+  { case 0: Zmet -= In( z,zCV );             break;
+    case 1: Zmet  = In( z,rx )-Zmet;         break;
+    case 2: Zmet  = In( z,zM )-Zmet-Draught; break;
+    case 3: Zmet += Draught;
   } else
   if( ans )
   { if( fabs( Amax )>180 )Amax=180; // и контроль
@@ -471,6 +476,7 @@ void Hull_Statics()             // кривых элементов теорет�
     LD.Initial();             // проведение расчетов гидростатических кривых
     LD.Graphics();            // расчет кривых элементов теоретического чертежа
     LD.Stability();           // процедура сделает видимыми плечи остойчивости
+    Zmet=LD.In( Draught-Do,LD.zM ); // h=0 нулевая поперечная остойчивость
 MainLoop:
   switch( ans )
   { case _Esc:StabWin.Close(); break;

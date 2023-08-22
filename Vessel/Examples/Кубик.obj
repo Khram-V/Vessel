@@ -1,0 +1,180 @@
+# < Куб 20x20 >
+mtllib Vessel.mtl
+# Stern[0]
+# Sp0[1]=0
+v -5 0 0
+v -5 0 0
+# Sp1[5]=2
+v -5 -10 0
+v -5 -10 0
+v -5 -10 10
+v -5 -10 -10
+v -5 0 10
+v -5 0 -10
+v -5 10 10
+v -5 10 -10
+v -5 10 0
+v -5 10 0
+# Sp2[5]=12
+v 0 -10 0
+v 0 -10 0
+v 0 -10 10
+v 0 -10 -10
+v 0 0 10
+v 0 0 -10
+v 0 10 10
+v 0 10 -10
+v 0 10 0
+v 0 10 0
+# Sp3[5]=22
+v 5 -10 0
+v 5 -10 0
+v 5 -10 10
+v 5 -10 -10
+v 5 0 10
+v 5 0 -10
+v 5 10 10
+v 5 10 -10
+v 5 10 0
+v 5 10 0
+# Sp4[5]=32
+v 10 -10 0
+v 10 -10 0
+v 10 -10 10
+v 10 -10 -10
+v 10 0 10
+v 10 0 -10
+v 10 10 10
+v 10 10 -10
+v 10 10 0
+v 10 10 0
+# Sp5[5]=42
+v 15 -10 0
+v 15 -10 0
+v 15 -10 10
+v 15 -10 -10
+v 15 0 10
+v 15 0 -10
+v 15 10 10
+v 15 10 -10
+v 15 10 0
+v 15 10 0
+# Sp6[1]=52
+v 15 0 0
+v 15 0 0
+# Stem[0]=54 
+# ShipHull[54]
+#~~~~~~~~~~
+# Stern
+# Stem
+# Sp0
+usemtl green
+f 2 4 6
+f 2 6 8
+usemtl gray
+f 2 8 10
+f 2 10 12
+usemtl green
+f 3 1 5
+f 5 1 7
+usemtl gray
+f 7 1 9
+f 9 1 11
+# Sp1
+usemtl green
+f 4 14 6
+f 6 14 16
+f 6 16 8
+f 8 16 18
+usemtl gray
+f 8 18 10
+f 10 18 20
+f 10 20 12
+f 12 20 22
+usemtl green
+f 13 3 5
+f 13 5 15
+f 15 5 7
+f 15 7 17
+usemtl gray
+f 17 7 9
+f 17 9 19
+f 19 9 11
+f 19 11 21
+# Sp2
+usemtl green
+f 14 24 16
+f 16 24 26
+f 16 26 18
+f 18 26 28
+usemtl gray
+f 18 28 20
+f 20 28 30
+f 20 30 22
+f 22 30 32
+usemtl green
+f 23 13 15
+f 23 15 25
+f 25 15 17
+f 25 17 27
+usemtl gray
+f 27 17 19
+f 27 19 29
+f 29 19 21
+f 29 21 31
+# Sp3
+usemtl green
+f 24 34 26
+f 26 34 36
+f 26 36 28
+f 28 36 38
+usemtl gray
+f 28 38 30
+f 30 38 40
+f 30 40 32
+f 32 40 42
+usemtl green
+f 33 23 25
+f 33 25 35
+f 35 25 27
+f 35 27 37
+usemtl gray
+f 37 27 29
+f 37 29 39
+f 39 29 31
+f 39 31 41
+# Sp4
+usemtl green
+f 34 44 36
+f 36 44 46
+f 36 46 38
+usemtl gray
+f 38 46 50
+f 38 50 40
+f 40 50 42
+f 42 50 52
+usemtl green
+f 43 33 35
+f 43 35 45
+f 45 35 37
+usemtl gray
+f 45 37 49
+f 49 37 39
+f 49 39 41
+f 49 41 51
+# Sp5
+usemtl green
+f 44 54 46
+f 46 54 48
+usemtl gray
+f 48 54 50
+f 50 54 52
+usemtl green
+f 53 43 45
+f 53 45 47
+usemtl gray
+f 53 47 49
+f 53 49 51
+#
+# Кубик
+#

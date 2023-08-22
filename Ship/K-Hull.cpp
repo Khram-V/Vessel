@@ -53,6 +53,8 @@ void Hull::Aphines( _Real cX,_Real cY,_Real cZ )
 }
 ///      Считывание корпуса "по контурам штевней и шпангоутов"
 //                                                    01-12-01
+Real MZ( _Real Z ){ if( Do>Z )Do=Z; if( Depth<Z )Depth=Z; return Z; }
+
 int Hull::Read_from_Frames()          // Здесь продолжается
 { char *s,*c;                         // серия проверок:
   if( (s=strchr( Str+1,'<' ))!=NULL )
@@ -60,41 +62,39 @@ int Hull::Read_from_Frames()          // Здесь продолжается
   { *c=0;
     while( *(++s)<=' ' )if( *s==0 )break;
     if( strcut( s )>0 )               // 3. ?поле имени не пустое
-    { int i,k=0,n=0; Real w,o;
+    { int i,k=0,n=0; Real o;
       strcpy( Name,s );  FGetS();
       sscanf( Str,"%d%d",&n,&k );     //
       if( n>1 && k>0 && k<=n )        // 4. количество шпангоутов >1
       { allocate( n );                //    и мидель не скраю
         Ms=k;                         // для повторного чтения
         FGetS(); o=0.0;               // сдвиг ОЛ-основной линии
-        sscanf( Str,"%lf%lf%lf%lf",&Length,&Breadth,&Draught,&o );
+        sscanf( Str,"%lf%lf%lf%lf",&Length,&Breadth,&Draught,&o ); Depth=Do=0;
         //
         // Ахтерштевень (начало прямого считывания из файла данных)
         //
         FGetS(); n=strtol( Str,&s,0 ); Asx.allocate( n );
-        for( i=0; i<n; i++ )Asx(i)=strtod( s,&s )-o,Asx[i]=strtod( s,&s );
+        for( i=0; i<n; i++ )Asx(i)=MZ( strtod( s,&s )-o ),Asx[i]=strtod( s,&s );
         FGetS(); n=strtol( Str,&s,0 ); Asy.allocate( n );
-        for( i=0; i<n; i++ )Asy(i)=strtod( s,&s )-o,Asy[i]=strtod( s,&s );
+        for( i=0; i<n; i++ )Asy(i)=MZ( strtod( s,&s )-o ),Asy[i]=strtod( s,&s );
         //
         // Собственно корпус  ( - в том же последовательном потоке )
         //
         for( k=0; k<Ns; k++ )
         { Frame &W=F[k];
           FGetS(); W.allocate( n=strtol( Str,&s,0 ) ); W.X=strtod( s,&s );
-          for( i=0; i<n; i++ )
-          { W.z[i]=w=strtod( s,&s )-o; W.y[i]=strtod( s,&s );
-            if( !i && !k )Do=Depth=w; else
-            { if( Depth<w )Depth=w;
-              if( Do>w )Do=w;
-          } }
-        } //Height-=Do;
+          for( i=0;i<n;i++ ){ W.z[i]=MZ(strtod(s,&s)-o); W.y[i]=strtod(s,&s); }
+//          { W.z[i]=w=strtod( s,&s )-o; W.y[i]=strtod( s,&s );
+//            if( !i && !k )Do=Depth=w; else
+//              { if( Depth<w )Depth=w; if( Do>w )Do=w; } }
+        }   //Height-=Do;
         //
         // Форштевень (табличные данные здесь заканчиваются, далее - строки)
         //
         FGetS(); n=strtol( Str,&s,0 ); Sty.allocate( n );
-        for( i=0; i<n; i++ )Sty(i)=strtod( s,&s )-o,Sty[i]=strtod( s,&s );
+        for( i=0; i<n; i++ )Sty(i)=MZ( strtod( s,&s )-o ),Sty[i]=strtod( s,&s );
         FGetS(); n=strtol( Str,&s,0 ); Stx.allocate( n );
-        for( i=0; i<n; i++ )Stx(i)=strtod( s,&s )-o,Stx[i]=strtod( s,&s );
+        for( i=0; i<n; i++ )Stx(i)=MZ( strtod( s,&s )-o ),Stx[i]=strtod( s,&s );
         //
         // ...по необходимости лучше дополнить описание штевней
         //    нежели решать ротозейские проблемы из за их отсутствия
