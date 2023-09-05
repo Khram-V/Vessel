@@ -14,24 +14,19 @@
               --   4 - компоненты скорости на обшивке под волновыми гребнями */
 
 bool logTime(){ const Field &S=*Storm; if( !VIL || S.Kt<2 )return false; else
- return fprintf( VIL,"\n T:%s[%d]",DtoA(Storm->Trun/3600,-3),Storm->Kt )>0;
-}
+ return fprintf( VIL,"\n T:%s[%d]",DtoA(Storm->Trun/3600,-3),Storm->Kt )>0; }
 void logMeta(){ if( VIL ){ const Hull &S=*Vessel;
  fprintf(VIL,"\n  ⇒ Гидростатика: С{ x=%.1f, z=%.2f }, zG=%.2f, r=%.2f, h=%.2f"
  + logTime(), S.Buoyancy.x,S.Buoyancy.z,S.Gravity.z,
-              S.Metacenter.z-S.Buoyancy.z,S.hX );
-} }
+              S.Metacenter.z-S.Buoyancy.z,S.hX ); } }
 void logHydro(){ if( VIL ){ const byte St=Vessel->Statum;
-     fprintf(VIL,"\n  ⇒ Гидромеханика[%d]: %s"+logTime(),St,Model[St]);
-} }
-void logMdemp(){ if( VIL ){ const Vector &F=Vessel->DampF;
+     fprintf(VIL,"\n  ⇒ Гидромеханика[%d]: %s"+logTime(),St,Model[St]); } }
+void logMdemp(){ if( VIL ){ const Vector &F=Vessel->muF;
  fprintf( VIL,"\n  ⇒ Демпфирование движений: { ξ=%4.2lf, η=%4.2lf, ζ=%4.2lf }"
-        + logTime(), F.x,F.y,F.z );
-} }
-void logAdemp(){ if( VIL ){ const Vector &M=Vessel->DampM;
- fprintf( VIL,"\n  ⇒ Демпфирование вращений: { θ=%4.2lf, φ=%4.2lf, ν=%4.2lf }"
-        +logTime(), M.x,M.y,M.z );
-} }
+        + logTime(), F.x,F.y,F.z ); } }
+void logAdemp(){ if( VIL ){ const Vector &M=Vessel->muM;
+ fprintf( VIL,"\n  ⇒ Демпфирование вращений: { θ=%4.2lf, ψ=%4.2lf, χ=%4.2lf }"
+        +logTime(), M.x,M.y,M.z ); } }
 void Model_Config( Window* Win )
 { byte &St=Vessel->Statum,ans=St;
   Mlist Menu[]={ {1,0,"  Выбор модели гидромеханики корабля"},{2,45,Model[0]},
@@ -61,15 +56,15 @@ Hull& Hull::Config()
         , { 1,34 }           // закраска или контуры триангуляционного покрытия
         , { 1,34 }           // варианты гидромеханики корабля и морских волн
         , { 1,4,"Метацентрическая высота:   %4.1lf",&hX },{ 0,0," м" }
-        , { 1,4,"Демпфирование-X %4.2lf",&DampF.x},{0,4," Y %4.2lf",&DampF.y }
-                                                  ,{0,4," Z %4.2lf",&DampF.z }
-        , { 1,4," Борт %4.2lf",&DampM.x }, { 0,4," Киль %4.2lf",    &DampM.y }
-                                         , { 0,4," Рыскание %4.2lf",&DampM.z }
+        , { 1,4,"Демпфирование-X %4.2lf",&muF.x},{0,4," Y %4.2lf",&muF.y }
+                                                ,{0,4," Z %4.2lf",&muF.z }
+        , { 1,4," Борт %4.2lf",&muM.x }, { 0,4," Киль %4.2lf",    &muM.y }
+                                       , { 0,4," Рыскание %4.2lf",&muM.z }
         , { 1,4,"Практическая осадка:    %5.2lf",&D },    { 0,0," м" }
         , { 1,5,"Кинематические графики  %5.2lf",&sTime },{ 0,0," мин" }
         };
   TextMenu T( Mlist(Menu),this,1,1 ); int ans=-1; Real h=hX;
-  Vector DF=DampF,DM=DampM;
+  Vector DF=muF,DM=muM;
   do
   { Menu[1].Msg=(char*)HView[DrawMode&3]; // выбор метода прорисовки корпуса
     Menu[2].Msg=DrawMode&4 ? "Контуры рёбер триангуляционного покрытия"
@@ -88,9 +83,9 @@ Hull& Hull::Config()
      int sKt=Storm->Kt; Storm->Original( false ).Kt=0;
       Initial().Floating(); Storm->Kt=sKt; wPrint( true );
     }
-    if( DF!=DampF ){ DF=DampF; logMdemp(); }
-    if( DM!=DampM ){ DM=DampM; logAdemp(); }
-    sT=max( 0.5,sTime )*60; sTime=sT/60.0;
+    if( DF!=muF ){ DF=muF; logMdemp(); }          // коэффициенты демпфирования
+    if( DM!=muM ){ DM=muM; logAdemp(); } DampInit();
+    sT=max( 0.5,sTime )*60; sTime=sT/60.0;      // протяжённость графиков качки
   } while( ans!=_Esc );
   return *this;
 }
@@ -156,7 +151,9 @@ Field& Field::Config() // Height = 1.134*Lw*Hw/_Pd/2.0;
     Swell.Initial( Swell.Length,hW*Swell.Height/Swell.Length,g2 );
     Surge.Initial( Surge.Length,hW*Surge.Height/Surge.Length,g3 );
     if( Exp.wave!=1 )Original( false );
-  } while( ans!=_Esc ); logWave(); return *this;
+    Vessel->DampInit();                     // на случай изменения шага времени
+  } while( ans!=_Esc ); logWave();
+  return *this;
 }
 //!    Конфигурационные и протокольные записи (*.vil vessel-initiation+logging)
 //     считывание угловых величин в румбах навигационного компаса (розы ветров)
@@ -282,4 +279,14 @@ Waves::Get( char *s, Real &L, Real &H, Real &D )  // характеристик�
 //    if( z && *z ){ if( strcut( s=z ) ){} } // к номеру исходного гребня волны
     }
   } return *this;
+}
+//  уточнение коэффициентов углового и поступательного демпфирования
+//
+void Hull::DampInit()
+{ nM=muM*Ts; /** &/inMass */ nM.x = (1.0-exp( -nM.x ))/nM.x;
+                             nM.y = (1.0-exp( -nM.y ))/nM.y;
+                             nM.z = (1.0-exp( -nM.z ))/nM.z;
+  nF=muF*Ts; /** &/Volume */ nF.x = (1.0-exp( -nF.x ))/nF.x;
+                             nF.y = (1.0-exp( -nF.y ))/nF.y;
+                             nF.z = (1.0-exp( -nF.z ))/nF.z;
 }

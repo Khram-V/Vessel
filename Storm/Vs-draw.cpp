@@ -78,7 +78,7 @@ Hull& Hull::Naviga_Inform( Window *Win )
 { Field &S=*Storm;
  Tensor B;                       // единичный масштаб пространственного тензора
  Vector C=Swing[-1]; C.z+=_Ph;  // крен, дифферент и курс корабля (в геобазисе)
- int i,l=-0.2*hypot( Width,Height );                  // размер из аксонометрии
+ int i,l=-0.18*hypot( Win->Width,Win->Height );        // размер из аксонометрии
  Place Compass( Win,PlaceOrtho );                     // | PlaceAbove
  TextContext TS( true );
   Compass.Area( 0,0,1.25*l,l ).Activate( true );      // c единичной разметкой
@@ -234,7 +234,7 @@ Hull& Hull::Naviga_Inform( Window *Win )
     for( i=k; i<=l; i++ )
       glVertex3d( -Lp+(i-k)*L,0,0 ),
       glVertex3d( -Lp+(i-k)*L,(Route[i].z*2-mz)/Max.z-0.5,0 ); glEnd();
-    glLineWidth( 1.6 );  color( green ); glBegin( GL_LINE_STRIP );
+    color( green ); glLineWidth( 1.6 ); glBegin( GL_LINE_STRIP );
     for( i=k; i<=l; i++ )
       glVertex3d( -Lp+(i-k)*L,(Route[i].z*2-mz)/Max.z-0.5,0 ); glEnd();
     Compass.Print( -1,3,"%3.2f",(Max.z+mz)/2 )
@@ -243,18 +243,17 @@ Hull& Hull::Naviga_Inform( Window *Win )
     //
     // поверху накладывается бортовая и килевая качка
     //
-     color( blue ); glBegin( GL_LINE_STRIP );
-    for( i=k; i<=l; i++ )glVertex3d( -Lp+(i-k)*L,(Swing[i].y-Trim)/H,0 ); glEnd();
+    color( blue ); glBegin( GL_LINE_STRIP );
+    for( i=k; i<=l; i++)glVertex3d(-Lp+(i-k)*L,(Swing[i].y-Trim)/H,0); glEnd();
     Compass.Print( -1,Max.x>Max.y?2:1,DtoA( (Trim+Max.y)*_Rd,-1 ) )
            .Print( -3,4,"/Y" );         // дифферент вокруг ординаты  по оси Y
-     color( magenta ); glBegin( GL_LINE_STRIP );
-    for( i=k; i<=l; i++ )glVertex3d( -Lp+(i-k)*L,i90(Swing[i].x)/H,0 ); glEnd();
+    color( magenta ); glBegin( GL_LINE_STRIP );
+    for( i=k; i<=l; i++)glVertex3d( -Lp+(i-k)*L,i90(Swing[i].x)/H,0 ); glEnd();
     Compass.Print( -1,Max.x>Max.y?1:2,DtoA( Max.x*_Rd,-1 ) )
            .Print( -5,4,"X " );         // крен относительно абсциссы на оси X
     //
     // и три ускорения свободного падения по наблюдениям в оконечностях корпуса
     //
-//! if( !Statum )return *this;
    Real A1,A2=0,A3,F1,F2=0,F3,maxA,minA,maxF,minF,D2=Dt*Dt*_g;
     glBegin( GL_QUAD_STRIP );
     for( i=k; i<=l; i++ )

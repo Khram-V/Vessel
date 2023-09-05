@@ -8,8 +8,7 @@
 #include "Vessel.h"
         Flex:: Flex(): len( 0 ),P( NULL ){}
         Flex::~Flex(){ if( len ){ Allocate( 0,P ); len=0; P=NULL; } }
-Vector& Flex:: operator[]( int k )
-{ return P[minmax(0,k>=0?k:k+len,len-1)]; }     // выборка внутренней точки [k]
+Vector& Flex:: operator[]( int k ){ return P[minmax(0,k>=0?k:k+len,len-1)]; } // выборка внутренней точки [k]
 Vector& Flex::Insert( int k )                   // вставка точки по индексу [k]
 { int l=isAlloc( (void*)P )/sizeof( Vector );   //= длина внутри памяти массива
       k=minmax( 0,k,len ); ++len;               //  от нуля до следующей ячейки

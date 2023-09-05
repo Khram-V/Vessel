@@ -13,7 +13,7 @@ static void printF( Vector V )
 }
 static void crossPoint( _Point A,_Point B,_Point C, int a,int b,int c )
 { if( fabs( A.Y )<eps && fabs( B.Y )<eps && fabs( C.Y )<eps )return;
-  int l=A.Z+B.Z+C.Z<0.0;
+  int l=A.Z<=0 && B.Z<=0 && C.Z<=0; // A.Z+B.Z+C.Z<=0.0;
   if( fColor!=l )fprintf( F,"usemtl %s\n",(fColor=l)?"green":"gray" );
                  fprintf( F,"f %d %d %d\n",a,b,c );
 }
