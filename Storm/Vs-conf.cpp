@@ -22,10 +22,10 @@ void logMeta(){ if( VIL ){ const Hull &S=*Vessel;
 void logHydro(){ if( VIL ){ const byte St=Vessel->Statum;
      fprintf(VIL,"\n  ⇒ Гидромеханика[%d]: %s"+logTime(),St,Model[St]); } }
 void logMdemp(){ if( VIL ){ const Vector &F=Vessel->muF;
- fprintf( VIL,"\n  ⇒ Демпфирование движений: { ξ=%4.2lf, η=%4.2lf, ζ=%4.2lf }"
+ fprintf(VIL,"\n  ⇒ Демпфирование движений: μ { ξ=%4.2lf, η=%4.2lf, ζ=%4.2lf }"
         + logTime(), F.x,F.y,F.z ); } }
 void logAdemp(){ if( VIL ){ const Vector &M=Vessel->muM;
- fprintf( VIL,"\n  ⇒ Демпфирование вращений: { θ=%4.2lf, ψ=%4.2lf, χ=%4.2lf }"
+ fprintf(VIL,"\n  ⇒ Демпфирование вращений: μ { θ=%4.2lf, ψ=%4.2lf, χ=%4.2lf }"
         +logTime(), M.x,M.y,M.z ); } }
 void Model_Config( Window* Win )
 { byte &St=Vessel->Statum,ans=St;
@@ -224,7 +224,15 @@ Hull& Hull::Get( char *s )
       if( !Read( FileName,D ) )Break( "Ошибка смены осадки: %s",FileName );
   } } return *this;
 }
-//    настройка вычислительной акватории и условий генерации штормовых волн
+//    выборка факторов демпфирования поступательных и угловых колебаний корпуса
+//
+Hull& Hull::GetDam( char *s )
+{ char *z;                      // тройки числовых величины разделяются запятой
+  if( z=strchr( s,',' ) )*z++=0;  //! ограничение поля новой числовой величины
+  sscanf( s,"%lg%lg%lg",&muF.x,&muF.y,&muF.z ); s=z;
+  sscanf( s,"%lg%lg%lg",&muM.x,&muM.y,&muM.z ); DampInit(); return *this;
+}
+//     настройка вычислительной акватории и условий генерации штормовых волн
 //
 Field& Field::Get( char *s )
 { char *z; Real &VL=Vessel->Length;
@@ -283,10 +291,10 @@ Waves::Get( char *s, Real &L, Real &H, Real &D )  // характеристик�
 //  уточнение коэффициентов углового и поступательного демпфирования
 //
 void Hull::DampInit()
-{ nM=muM*Ts; /** &/inMass */ nM.x = (1.0-exp( -nM.x ))/nM.x;
-                             nM.y = (1.0-exp( -nM.y ))/nM.y;
-                             nM.z = (1.0-exp( -nM.z ))/nM.z;
-  nF=muF*Ts; /** &/Volume */ nF.x = (1.0-exp( -nF.x ))/nF.x;
-                             nF.y = (1.0-exp( -nF.y ))/nF.y;
-                             nF.z = (1.0-exp( -nF.z ))/nF.z;
+{ nM=muM*(0.5*Ts); /** &/inMass */ nM.x = (1.0-exp( -nM.x ))/nM.x;
+                                   nM.y = (1.0-exp( -nM.y ))/nM.y;
+                                   nM.z = (1.0-exp( -nM.z ))/nM.z;
+  nF=muF*(0.5*Ts); /** &/Volume */ nF.x = (1.0-exp( -nF.x ))/nF.x;
+                                   nF.y = (1.0-exp( -nF.y ))/nF.y;
+                                   nF.z = (1.0-exp( -nF.z ))/nF.z;
 }

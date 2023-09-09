@@ -57,44 +57,43 @@ Hull& Hull::Contour_Lines()      // рисуем контуры габаритн
 }
 //! общая навигационная информация о состоянии корабля
 //
-const static byte Rumb[]
-={ _North,_North_East,_East,_South_East,_South,_South_West,_West,_North_West };
+const static byte Rumb[]=
+ { _North,_North_East,_East,_South_East,_South,_South_West,_West,_North_West };
 
 #define P( x,y ) glVertex3dv( B*(Vector){ x,y } )
 inline Real i90( _Real r ){ return r>_Ph ? _Pi-r : ( r<-_Ph ? -_Pi-r : r ); }
 
 static void DirWave( const Waves &W, colors C, Place &D )
-{ Real H=W.Height/Vessel->Length*4,L=W.Length/Vessel->Length;
- _Tensor B=W; if( H/L<0.06 )H=L*0.06; color( C,0,0.6 ); glBegin( GL_POLYGON );
-  P(0,0),P(-H,-L+H),P(0,-L),P(H,-L+H),P(-H,L),P(0,L-H),P(H,L); glEnd();
-  color( C ); if( (H=angle( H=atan2( W.x.y,-W.x.x )))<0.0 )H+=_Pd;
- char S[24],*s=S;
-  snprintf( S,23,"%3s:%3.1f/%3.1f\n",
-            Rmbs[int(H*32/_Pd+0.49)%32],W.Height,W.Length/W.Cw );
-  if( s=strchr( S,'.' ) ){ *s=',';
-    if( s=strchr( s,'.' ) )*s='\"'; } D.Print( S );
-}
+{ if( W.Height )
+  { Real H=W.Height/Vessel->Length*4,L=W.Length/Vessel->Length;
+   _Tensor B=W; if( H/L<.06 )H=L*.06; color( C,0,.6 ); glBegin( GL_POLYGON );
+    P(0,0),P(-H,-L+H),P(0,-L),P(H,-L+H),P(-H,L),P(0,L-H),P(H,L); glEnd();
+    color( C ); if( (H=angle( H=atan2( W.x.y,-W.x.x )))<0.0 )H+=_Pd;
+   char S[24],*s=S;
+    snprintf( S,23,"%3s:%3.1f/%3.1f\n",
+              Rmbs[int(H*32/_Pd+0.49)%32],W.Height,W.Length/W.Cw );
+    if( s=strchr( S,'.' ) ){ *s=',';
+      if( s=strchr( s,'.' ) )*s='\"'; } D.Print( S );
+} }
 Hull& Hull::Naviga_Inform( Window *Win )
-{ Field &S=*Storm;
- Tensor B;                       // единичный масштаб пространственного тензора
- Vector C=Swing[-1]; C.z+=_Ph;  // крен, дифферент и курс корабля (в геобазисе)
- int i,l=-0.18*hypot( Win->Width,Win->Height );        // размер из аксонометрии
- Place Compass( Win,PlaceOrtho );                     // | PlaceAbove
- TextContext TS( true );
-  Compass.Area( 0,0,1.25*l,l ).Activate( true );      // c единичной разметкой
+{ Field &S=*Storm; Tensor B;     // единичный масштаб пространственного тензора
+ Vector C=Swing[-1]; C.z+=_Ph;   // крен, дифферент и курс корабля(в геобазисе)
+ int i,l=-0.18*hypot( Win->Width,Win->Height );       // размер из аксонометрии
+ Place Compass( Win,PlaceOrtho );      // | PlaceAbove ~~ c единичной разметкой
+ TextContext TS( true ); Compass.Area( 0,0,1.25*l,l ).Activate( true );
   //
   //! картушка морского волнения, курса, скорости корабля
-  //+ отметки трёх волновых полей Wind+Swell+Surge = Length+Height+=Tensor::x
+  //+  отметки трёх волновых полей Wind+Swell+Surge = Length+Height+=Tensor::x
   //                                                        амплитуда=>высота/2
- Real L=min( 1.0,Length // условная высота и длина стрелки волны в картушке
-  / max( max( S.Wind.Length,S.Swell.Length ),S.Surge.Length ) );
+ Real L=min( 1.0,Length     // условная высота и длина стрелки волны в картушке
+      / max( max( S.Wind.Length,S.Swell.Length ),S.Surge.Length ) );
   glTranslated( 0,-0.1,0 );
   glScaled( 0.9*L,0.9*L,1 );
   color( white,0,.33 ),circle( (Point){0},1/L );  // круг картушки 110% корпуса
  bool left=int( 2+Course/_Ph )&1; Compass.Print( left?-1:1,1,"" ); color(navy);
-  DirWave( S.Wind,green,Compass );           // ветровая волна
-  DirWave( S.Swell,blue,Compass );           // свежая зыбь
-  DirWave( S.Surge,cyan,Compass );           // реликтовый накат
+  if( S.Exp.wave&3 )DirWave( S.Wind,green,Compass ),        // ветровая волна
+                    DirWave( S.Swell,blue,Compass ),        // свежая зыбь
+                    DirWave( S.Surge,cyan,Compass );        // реликтовый накат
   //
   //  стрелка-указатель заданного курса корабля
   //
@@ -157,7 +156,7 @@ Hull& Hull::Naviga_Inform( Window *Win )
   color( lightblue,-0.25 );
   Text( _Center,(Point){0},"%s ",DtoA( atan2(-x.y,x.x )*_Rd,-1 ) );
   Text( _Down,(Point){0},"%3.1fуз",Speed*3600/_Mile );
-  ///
+  //
   //!  графики качки в окне аксонометрической проекции корпуса корабля
   //
   color( navy ); Win->Print( 1,-7," Time %s + %.2f\"\n"
@@ -210,12 +209,11 @@ Hull& Hull::Naviga_Inform( Window *Win )
 //      rectangle( (Point){-Lp,-2*U},(Point){Lp-Lt,-1} );
 //    }
     }
-    //
-    // подпись экстремальных величин на правом незатеняемом участочке
+    //   подпись экстремальных величин на правом незатеняемом участочке
     //
     Compass.Alfabet( 20,"Times New Roman",FW_MEDIUM,true );
     //
-    // разметка шкалы времени
+    //   разметка шкалы времени
     //
    Real dT=(l-k)*Dt;                   // видимый интервал времени эксперимента
     U=dT<60?AxisStep(dT)/5:AxisStep(dT/60)*10;  // поминутный шаг шкалы времени
@@ -227,7 +225,7 @@ Hull& Hull::Naviga_Inform( Window *Win )
       Compass.Text( _North,(Point){ mX,1 },DtoA( i*U/3600,3 ) );
     } Compass.Text( _North_East,(Point){ Lp-Lt,1 },DtoA( dT/3600,3 ) );
     //
-    // закрашенный профиль волны по вертикальной качке
+    //   закрашенный профиль волны по вертикальной качке
     //
     color( lightgreen,.7,.8 ); rectangle( (Point){Lp-Lt,-.5},(Point){Lp,.46} );
     glBegin( GL_QUAD_STRIP );
@@ -246,11 +244,11 @@ Hull& Hull::Naviga_Inform( Window *Win )
     color( blue ); glBegin( GL_LINE_STRIP );
     for( i=k; i<=l; i++)glVertex3d(-Lp+(i-k)*L,(Swing[i].y-Trim)/H,0); glEnd();
     Compass.Print( -1,Max.x>Max.y?2:1,DtoA( (Trim+Max.y)*_Rd,-1 ) )
-           .Print( -3,4,"/Y" );         // дифферент вокруг ординаты  по оси Y
+           .Print( -3,4,"/Y" );          // дифферент вокруг ординаты  по оси Y
     color( magenta ); glBegin( GL_LINE_STRIP );
     for( i=k; i<=l; i++)glVertex3d( -Lp+(i-k)*L,i90(Swing[i].x)/H,0 ); glEnd();
     Compass.Print( -1,Max.x>Max.y?1:2,DtoA( Max.x*_Rd,-1 ) )
-           .Print( -5,4,"X " );         // крен относительно абсциссы на оси X
+           .Print( -5,4,"X " );          // крен относительно абсциссы на оси X
     //
     // и три ускорения свободного падения по наблюдениям в оконечностях корпуса
     //
@@ -290,7 +288,7 @@ Hull& Hull::Naviga_Inform( Window *Win )
     Compass.Print( -1,0,"%+3.1f/%+3.1f",maxA+1,minA+1 );
     U=60.0*Lp/Real(Compass.Width);
     H=55.0/Real(Compass.Height);
-    line( (Point){-Lp},(Point){Lp-Lt},cyan );       // уровень среднего
+    line( (Point){-Lp},(Point){Lp-Lt},cyan );         // уровень среднего
     glColor3f( BkColor );
     rectangle( (Point){-Lp,1-H},      (Point){-Lp+U,1-H/4} ); // сверху
     rectangle( (Point){-Lp,-H/2.2},   (Point){-Lp+U,H/3}   ); // в центре
@@ -306,7 +304,7 @@ Hull& Hull::Naviga_Inform( Window *Win )
 //  Простая визуализация формы исходного корпуса в независимом графическом окне
 //  с прорисовкой корпуса корабля после специальной настройки графической среды
 //
-bool Hull::Draw()                // Виртуальная процедура простой перерисовки
+bool Hull::Draw()                  // Виртуальная процедура простой перерисовки
 { static bool Recurse=false;
   if( Recurse || !ShipName )return false; Recurse=true; Activate();
   glEnable( GL_LIGHTING );                                // OpenGL - на корпус
@@ -318,11 +316,11 @@ bool Hull::Draw()                // Виртуальная процедура п
   gluPerspective( 15,Real(Width)/Height,-1e6,1e1 ); // к перспективной проекции
   gluLookAt( 0,0,Distance,look.x,look.y,look.z,0,1,0 ); // позиция точки обзора
   glMatrixMode( GL_MODELVIEW ); glLoadIdentity();         // исходное состояние
-  glRotated( eye.y-90,1,0,0 );                            // поставить на киль
-  glRotated( eye.x+atan2(x.x,x.y)*_Rd,0,0,1 );            // рыскание
-  glRotated( eye.z,0,1,0 );                               // дифферент
-//axis(*this,Length/1.8,Breadth/1.8,Draught,"X","Y","Z"); // Координатные оси
-  Drawing(); color( blue );                               // и рисунок в памяти
+  glRotated( eye.y-90,1,0,0 );                            //  поставить на киль
+  glRotated( eye.x+atan2(x.x,x.y)*_Rd,0,0,1 );            //           рыскание
+  glRotated( eye.z,0,1,0 );                               //          дифферент
+//axis(*this,Length/1.8,Breadth/1.8,Draught,"X","Y","Z"); // Координатные оси и
+  Drawing(); color( blue );                               //   рисунок в памяти
   Print( 2,1,"%s\n { %s }\n %s",sname( FileName ),ShipName,Model[Statum] );
   Save().Refresh(); Recurse=false; return false;
 }

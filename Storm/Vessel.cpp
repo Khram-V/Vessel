@@ -137,13 +137,16 @@ Field(_Real L,_Real W,_Real T,     // длина, ширина бассейна,
     { if( VIL ){ fclose( VIL ); ++i; }               //++ с отметкой её наличия
       VIL=_wfopen( U2W( fext( V.FileName,"vil" ) ),L"rb+" ); // файл для модели
       if( VIL && i<2 )       // без общей настройки волны в долях длины корабля
-        { Lw*=V.Length/36; Ls*=V.Length/36; Lr*=V.Length/36; } // не мудрёно
+        { Lw*=V.Length/36; Ls*=V.Length/36; Lr*=V.Length/36; }    // не мудрёно
     }
     if( VIL )while( !feof( VIL ) )                        // к настройке модели
     { char *s=getString( VIL );
       if( !(l=strcut( s )) )break;
       if( s[0]==';' || !memcmp( s,"//",2 ) )continue;
       while( *s && *s<=' ' )s++;
+      //  настройка вычислительной акватории и условий генерации штормовых волн
+      if( !memcmp( s,"Море:",l=strlen( "Море:" ) ) )Get( s+l );
+      if( !memcmp( s,"Sea:",4 ) )Get( s+4 );
       //  подстройка трёх групповых структур штормового морского волнения
       if( !memcmp(s,Wind.Title,l=strlen(Wind.Title) ))Wind.Get( s+l,Lw,Hw,Dw );
       if( !memcmp(s,Swell.Title,l=strlen(Swell.Title)))Swell.Get(s+l,Ls,Hs,Ds);
@@ -154,9 +157,10 @@ Field(_Real L,_Real W,_Real T,     // длина, ширина бассейна,
       // изменение посадки с назначением курса и заданной скорости хода корабля
       if( !memcmp( s,"Корабль:",l=strlen( "Корабль:" ) ) )V.Get( s+l );
       if( !memcmp( s,"Ship:",5 ) )V.Get( s+5 );
-      //  настройка вычислительной акватории и условий генерации штормовых волн
-      if( !memcmp( s,"Море:",l=strlen( "Море:" ) ) )Get( s+l );
-      if( !memcmp( s,"Sea:",4 ) )Get( s+4 );
+      // факторы демпфирования поступательных и угловых колебаний корпуса
+      if( !memcmp( s,"Демпфирование:",
+                   l=strlen( "Демпфирование:" ) ) )V.GetDam( s+l );
+      if( !memcmp( s,"Damp:",5 ) )V.GetDam( s+5 );
   } }
   Wind.Initial( Lw,Hw,Dw );  // ветровые волны с обрушающимися гребнями [м,%,°]
   Swell.Initial( Ls,Hs,Ds ); // свежая морская зыбь недавно прошумевших штормов
