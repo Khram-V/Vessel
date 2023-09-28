@@ -90,10 +90,16 @@ Hull& Hull::Naviga_Inform( Window *Win )
   glTranslated( 0,-0.1,0 );
   glScaled( 0.9*L,0.9*L,1 );
   color( white,0,.33 ),circle( (Point){0},1/L );  // круг картушки 110% корпуса
- bool left=int( 2+Course/_Ph )&1; Compass.Print( left?-1:1,1,"" ); color(navy);
+ bool left=int( 2+Course/_Ph )&1; color(navy);
+  Compass
+  .Print( left?-1:1,1,S.Wind.Height||S.Wind.Height||S.Wind.Height?"":"Штиль" );
   if( S.Exp.wave&3 )DirWave( S.Wind,green,Compass ),        // ветровая волна
                     DirWave( S.Swell,blue,Compass ),        // свежая зыбь
-                    DirWave( S.Surge,cyan,Compass );        // реликтовый накат
+                    DirWave( S.Surge,cyan,Compass ); else   // реликтовый накат
+  Compass.Print( "Заштилело" );
+
+  if( !(S.Exp.wave&&3) || !S.Wind.Height )
+
   //
   //  стрелка-указатель заданного курса корабля
   //

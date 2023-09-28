@@ -15,18 +15,16 @@ Vector& Flex::Insert( int k )                   // вставка точки п�
   if( l<=len )P=(Vector*)Allocate( (len+120)*sizeof(Vector),P );          //+48
   for( l=len-1; l>k; l-- )P[l]=P[l-1]; return P[k];
 }                                 // одна точка вытаскивается и векторного ряда
-void Flex::Delete( int k )         // без укорочения числового массива в памяти
+void Flex::Delete( int k )        // без укорочения числового массива в памяти
    { if( k>=0 && k<len )for( --len; k<len; k++ )P[k]=P[k+1];
    }
-Vector& Flex::operator+=(_Vector R){ return Insert(len)=R;}// в конце списка
+Vector& Flex::operator+=(_Vector R){ return Insert(len)=R;} // оконечный вектор
 Vector& Flex::operator/=(_Vector R){ return Insert(0)=R;} // замещение в начале
 
-Vector e5( _Vector W )        // округление записи для точных сравнений 0.01 мм
-{ return (Vector){ round( W.x*1e5 )/1e5,
-      W.y<=eps?0.0:round( W.y*1e5 )/1e5,
-                   round( W.z*1e5 )/1e5 };
+Real e5( _Real R ){ return round( R*1e5 )/1e5; }
+Vector e5( Vector W )        // округление записи для точных сравнений 0.01 мм
+{ W.x=e5( W.x ); W.y=W.y<=eps?0.0:e5( W.y ); W.z=e5( W.z ); return W;
 }
-
 #if 0                                 /// -- временно  исключено
 operator Flex::Vector*(){ return P; } // адресный доступ ко всему вектору точек
 Vector Flex::Get( int k )         // выборка с изъятием из существующего списка

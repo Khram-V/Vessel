@@ -75,7 +75,7 @@ Place& Place::Show()                     //! прорисовка растров
     glCopyPixels( pX,pY,Width,Height,GL_COLOR ); glDrawBuffer( GL_BACK );
   //if( Site->Up==this )Site->Save();      // первая площадка сохраняет фоновую
     if( Signs&PlaceAbove && Site!=this )Save();// на фоне идёт сборная картинка
-  //WinExecute( Site->hWnd );
+    WinExecute( Site->hWnd ); glFinish();
   } return *this;
 }
 //!    сохранение текущего изображения/фрагмента в буфере оперативной памяти
@@ -160,10 +160,11 @@ Place& Place::String( const char *T )  // исходная строка реал
       glRasterPos2i( chX,chY ); _OutBitText( str,AF.Bit,chX,chY,cbX ); } else
 #if 0                         /// так должно быть, но работает только в Intel
     { if( cbX<=0 )chX-=AlfaRect( str,true ).cx;
-      glRasterPos2i(chX,chY); _OutText( str,AF.Base,chX,chY,cbX,pX );
+      glRasterPos2i( chX,chY ); _OutText( str,AF.Base,chX,chY,cbX,pX );
 #else                         // небольшая перепутаница в AMD-OpenGL - что жаль
-    { long l=AlfaRect( str,true ).cx;  if( cbX<=0 )chX-=l;
-      glRasterPos2i(chX,chY); _OutText( str,AF.Base,chX,chY,cbX,pX ); chX+=l+1;
+    { long l=AlfaRect( str,true ).cx;  if( cbX<=0 )chX-=l; int hk=chX;
+      glRasterPos2i(chX,chY); _OutText( str,AF.Base,chX,chY,cbX,pX );
+      if( chX==hk )chX+=l+1; //
 #endif
     }
     if( !w )break; w[0]='\n'; chY-=AF.H; str=w+1;     //  будет еще одна строка

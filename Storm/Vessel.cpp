@@ -57,7 +57,7 @@ Hull::Hull():View      // в прицепе View окошко графическ
   hX( 1.0 ),                     // поперечная метацентрическая высота      [м]
   sT( 30.0 ),                    // интервал кинематической визуализации  [сек]
   Trim( 0.0 ),                   // дифферент по смещению центра величины [рад]
-  Course( 0.0 ),dCs( _Ph/60.0 ), // курс, руль на борт(1мин), полборта(2) [рад]
+  Course( _Ph ),dCs( _Ph/60.0 ), // курс, руль на борт(1мин), полборта(2) [рад]
   Speed( 0.0 ),cSp( 0.0 ),       // скорость погашена, машины остановлены [м/с]
   Locate( Zero ),                // прямая ссылка на текущее местоположение [м]
   Route(),Rate(),Swing(),Whirl() // конструкторы кинематики во времени
@@ -68,19 +68,20 @@ Hull::Hull():View      // в прицепе View окошко графическ
   Ofs=Zero; mx=my=0;              // и мышку тоже в исходное
   Activate();                     // привязка к Window::Place, и первый рисунок
   glPolygonMode( GL_FRONT_AND_BACK,GL_FILL );
-  color( navy ); Alfabet(22,"Arial",  800).Print( 2,1," Vessel  -  " );
-  color( blue ); Alfabet(20,"Courier",800).Print("штормовая гидромеханика\n");
-  color( cyan ); Alfabet(19,"Lucida", 600).Print
-                 ( "     Мореходные качества корабля -\n"
-                   "        вычислительный эксперимент\n" );
+  color(navy); Alfabet(22,"Courier",800).Print( 2,1,"Vessel~" );
+  color(blue); Alfabet(20,"Courier",800).Print(-2,1,"штормовая гидромеханика");
+  color(cyan); Alfabet(19,"Lucida", 600).Print(12,2,
+                   "Мореходные качества корабля -\n"
+                   "   вычислительный эксперимент\n" );
   color(green ); Alfabet( 18,"Times",1,1 ).Print
-                 ( "©1975-2023  Калининград - Сахалин - יְרוּשָׁלַיִם\n\n" );
+                 ( "       ©1975-2023  Калининград - Сахалин - יְרוּשָׁלַיִם\n\n" );
   color(black ); Alfabet( 20,"Times",1,1 ).Print( -2,-2,
                    "Сообразованные архитектура и обводы корпуса\n"
                    " - эффективность всепогодного мореплавания" );
   color(yellow); Alfabet( 12,"Times",1,1 )
                 .Print( -3,0,"© Василий Храмушин" ).Save().Show();
-  // WaitTime( 500 );
+  //glFinish();
+  //WaitTime( 500 );
  int Ac; WCHAR **Av=CommandLineToArgvW( GetCommandLineW(),&Ac );
   if( !Read(  Ac>1 ? W2U( Av[1] ) : "*.vsl" ) )
        Break( "Ошибка чтения корпуса %s -> %s",W2U( Av[1] ),FileName );

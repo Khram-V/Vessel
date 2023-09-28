@@ -104,13 +104,14 @@ bool View::KeyBoard( byte key )   // к спуску из внешних вир�
    glEnable( GL_DITHER );               // Предопределение графической среды
    glEnable( GL_ALPHA_TEST );
    glEnable( GL_BLEND );
-   glFogi( GL_FOG_MODE,GL_EXP2 );   glFogf( GL_FOG_DENSITY,0.0016 );// glFogf( GL_FOG_START,-Distance );// glFogf( GL_FOG_END,Distance );   glHint( GL_FOG_HINT,GL_NICEST );   glEnable( GL_FOG );// glEnable( GL_STENCIL_TEST );#if 1   glLightModelfv( GL_LIGHT_MODEL_AMBIENT,(const float[]){ 0.8,1,0.9,0.75 } );
+   glFogi( GL_FOG_MODE,GL_EXP2 );   glFogf( GL_FOG_DENSITY,0.0016 );// glFogf( GL_FOG_START,-Distance );// glFogf( GL_FOG_END,Distance );   glHint( GL_FOG_HINT,GL_NICEST );   glEnable( GL_FOG );// glEnable( GL_STENCIL_TEST );#if 1   glLightModelfv( GL_LIGHT_MODEL_AMBIENT,(const float[]){ 0.5,0.7,0.6,0.75 } );
+// glLightModeli( GL_LIGHT_MODEL_COLOR_CONTROL,GL_SEPARATE_SPECULAR_COLOR );
    glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER,true );
    glLightModeli( GL_LIGHT_MODEL_TWO_SIDE,true );
    glMaterialfv( GL_FRONT_AND_BACK,GL_AMBIENT, (const float[]){.2,.2,.2,1.} );
    glMaterialfv( GL_FRONT_AND_BACK,GL_DIFFUSE, (const float[]){.8,.8,.8,1.} );
    glMaterialfv( GL_FRONT_AND_BACK,GL_SPECULAR,(const float[]){.5,.5,.5,.5} );
-   glMaterialfv( GL_FRONT_AND_BACK,GL_EMISSION,(const float[]){.0,.0,.0,1.} );
+   glMaterialfv( GL_FRONT_AND_BACK,GL_EMISSION,(const float[]){.1,.1,.1,.1} );
    glMateriali( GL_FRONT_AND_BACK,GL_SHININESS,127 ); // степень отсветки
    glLightfv( GL_LIGHT0,GL_AMBIENT, (const float[]){.1,.3,.2,.6}); // окружение
    glLightfv( GL_LIGHT0,GL_DIFFUSE, (const float[]){.6,.8, 1, 1}); // рассеяние
@@ -124,9 +125,9 @@ bool View::KeyBoard( byte key )   // к спуску из внешних вир�
    glLightfv( GL_LIGHT1,GL_POSITION,(const float[]){2000,100,10,1});
 #endif   glColorMaterial( GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE );
    glEnable( GL_COLOR_MATERIAL );
+   glEnable( GL_LIGHTING );
    glEnable( GL_LIGHT0 );
    glEnable( GL_LIGHT1 );
-   glEnable( GL_LIGHTING );
    glDepthRange( 1,-1 );             // ( 0,1 )
    glDepthMask( GL_TRUE );   glClearDepth( 2000.0 );           // Enables Clearing Of The Depth Buffer
    glDepthFunc( GL_LEQUAL );         // LESS ALWAYS взаимное накрытие объектов

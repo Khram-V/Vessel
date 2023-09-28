@@ -178,7 +178,7 @@ public:                           // конструктор, авторская 
   //
   //  локальные процедуры разделения геометрических операций с обшивкой корпуса
   //
-  void Triangle( _Vertex,_Vertex,_Vertex c );// обработка одного треугольника
+  void Triangle( Vertex,Vertex,Vertex );       // обработка одного треугольника
   void divideTriangle( _Vertex,_Real,_Vertex,_Real,_Vertex,_Real );
   void drawTriangle( _Vertex,_Vertex,_Vertex ); //! элементарные треугольничики
   void waterPoints( _Vector,_Vector,_Vector );  // нормали и отрезки ватерлинии
@@ -313,7 +313,8 @@ inline Real& angle( Real &A ){ return A=remainder( A,_Pd  ); }    // -180°÷180
 inline Real angle(_Real A,_Real B ){ return remainder( A-B,_Pd ); } // { -п÷п }
 inline Vector& angle( Vector &A){ angle(A.x),angle(A.y),angle(A.z); return A; }
 inline Vector operator ~( Vector v ){ v.y=-v.y; return v; }// для другого борта
-Vector e5( _Vector W );       // округление записи для точных сравнений 0.01 мм
+Vector e5( Vector W );
+  Real e5( _Real R );       // округление записи для точных сравнений 0.01 мм
 
 inline bool intor( _Real F,_Real S,_Real G )    // с включением базовой точки G
                  { return G>F ? F<S^S>G :            // S>F && S<=G == ]F<S<=G]

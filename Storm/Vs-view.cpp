@@ -9,8 +9,8 @@
 #include "Vessel.h"       // объекты и производные операции с корпусом на волне
                           // + дополнения графической среды OpenGL-Window:Place
 static int //Board=0,       // 'о' штевни; '-' левый и '+' правый борт
-           Level=-2;        // -2-днище -1-вода 0-ватерлиния 1-смочен 2-сухой
-//         wLine=1;         // -1-ниже; +1-выше цвета конструктивной ватерлинии
+           Level=-2,        // -2-днище -1-вода 0-ватерлиния 1-смочен 2-сухой
+           wLine=1;         // -1-ниже; +1-выше цвета конструктивной ватерлинии
 //atic Flex wL;             // изменчивые отрезки фрагментов ватерлинии
                             // по уровню воды в шпациях левого/правого борта
 static bool drawHull=false, // прорисовка корпуса | гидродинамический процесс
@@ -25,11 +25,10 @@ void Hull::drawTriangle(_Vertex a,_Vertex b,_Vertex c ) // отработка т
 { if( !drawHull )Three( Level,a,b,c );    // единожды производится динамический
   else                                    //  перерасчет характеристик обводов
   { const byte Mode=DrawMode&3;           //  для полупрозрачной картинки нужна
-    if( !Part && Level>0 || Part && Level<=0 )return; // двухэтапная прорисовка
-    if( !Level && Mode>2 )return;
-    int wLine //= a.z+b.z+c.z<=0.0 ? -1:1;
-          = a.z<=0.0 && b.z<=0.0 && c.z<=0.0 ? -1:1; //  действующая ватерлиния
-    color( !Level?lightblue : (wLine<0?green:dimgray),             // расцветка
+    if( !Part && Level>0 || Part && Level<=0 || !Level && Mode>2 )return;
+//  int wLine = a.z>0 && b.z>0 && c.z>0 ? 1:-1;   // двухэтапная перепрорисовка
+    color( !Level?lightblue               // поверхность действующей ватерлинии
+           : (wLine<0?green:dimgray),     // подводные обводы и надводный борт
          ( abs( Level )<2?0.75:1.0 )*( Level>0&&wLine<0?-0.25:     // затенение
                                        Level<0&&wLine>0?-0.15:0.0 ), //    воды
                !Level ? (Mode&&Mode<3?0.7:0.2 ) :        // прозрачность борта
@@ -40,8 +39,7 @@ void Hull::drawTriangle(_Vertex a,_Vertex b,_Vertex c ) // отработка т
     glVertex3dv( (Real*)( &A ) ),                       // dir ( ?? )
     glVertex3dv( (Real*)( &B ) ),
     glVertex3dv( (Real*)( &C ) ); glEnd();
-#if 0
-             // отладочная визуализация скоростей на элементарных треугольниках
+#if 0  // здесь отладочная визуализация скоростей на элементарных треугольниках
 #define _(P) (*((Vector*)(&P)))                      // это стрелки ВЛ-нормалей
 /*if( !Level )
 { Vector W=( _(A)+_(B)+_(C) )/3.0; arrow( W,W+dir( (A-B)*(A-C) )*5,1,red );
@@ -77,14 +75,14 @@ void Hull::divideTriangle
   if( fabs( r )>fabs( l ) )drawTriangle( R,L,lL ),drawTriangle( R,lL,rR );
                       else drawTriangle( L,lL,rR ),drawTriangle( L,rR,R );
 }
-void Hull::Triangle( _Vertex a,_Vertex b,_Vertex c )  // обработка треугольника
+void Hull::Triangle( Vertex a,Vertex b,Vertex c )     // обработка треугольника
 { if( a.y || b.y || c.y )            // ~~ далее точки на базисе открытого моря
   { Real aZ=a.w-a.Z,                 // (+)погружение (-)борт над водой = метка
          bZ=b.w-b.Z,                 // обшивке под/над действующей ватерлинией
          cZ=c.w-c.Z;                 // WL на подъем или спуск?
 //  if( aZ==0.0 && bZ==0.0 && cZ==0.0 )return;       // значит будут повторения
-//  wLine = a.z<=0.0 && b.z<=0.0 && c.z<=0.0 ? -1:1; //  действующая ватерлиния
-//  wLine = a.z+b.z+c.z<0.0 ? -1:1;
+//  wLine = a.z>=0.0 && b.z>=0.0 && c.z>=0.0 ? 1:-1; //  действующая ватерлиния
+    wLine = a.z+b.z+c.z>=0 ? 1:-1; // здесь пересечений ватерлинии не ожидается
     Level = -2; //wLine*2; //-2;
     if( aZ==0&&bZ==0 ){ if( cZ>0 )waterPoints( dir((b-c)*(c-a)),b,a ); else Level=2; } else
     if( bZ==0&&cZ==0 ){ if( aZ>0 )waterPoints( dir((c-a)*(a-b)),c,b ); else Level=2; } else
@@ -137,8 +135,9 @@ Part_of_hull:    // разделение корпуса по уровням на
               // без ватерлинии будет теоретический центр => ноль на ватерлинии
   if( !Part ) //   теоретическая и действующая ватерлиния готовятся с нормалями
   { Vector wM={ 0,0,0 }; Real l,L=0.0; Level=0;
-    for( i=0; i<wL.len; i+=3 ){ l=abs( wL[i+2]-wL[i+1] ); L+=l;
-                            wM += 0.5*l*( wL[i+1]+wL[i+2] );} if( L>eps )wM/=L;
+    for( i=0; i<wL.len; i+=3 )
+      { l=abs( wL[i+2]-wL[i+1] ); L+=l; wM += 0.5*l*( wL[i+1]+wL[i+2] ); }
+    if( L>eps )wM/=L;
     for( i=0; i<wL.len; i+=3 )drawTriangle( wL[i+1],wL[i+2],wM );
     if( !Storm->Kt )             // конструктивная или теоретическая ватерлиния
       for( WaterLine.len=i=0; i<wL.len; i++ )WaterLine += wL[i];
