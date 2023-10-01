@@ -87,6 +87,8 @@ struct Point     // Координатная точка в масштабах а
 //
 inline Real   sqr( _Real a ){ return a*a; }
 inline Real   abs( _Real a ){ return fabs( a ); }
+inline Real  norm( _Real a,_Real b ){ return a*a + b*b; }
+inline Real  norm( _Real a,_Real b,_Real c ){ return a*a + b*b + c*c; }
 inline Real  norm( _Vector a ){ return a.x*a.x + a.y*a.y + a.z*a.z; }
 inline Real   abs( _Vector a ){ Real n=norm( a ); return n>0.0?sqrt( n ):0.0; }
 inline Vector dir( _Vector a ){ Real n=norm( a ); return n>0.0?a/sqrt( n )

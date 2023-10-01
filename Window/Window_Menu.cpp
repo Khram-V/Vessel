@@ -32,7 +32,7 @@ TextMenu::TextMenu( const Mlist *m,const int n, Window* Win, int x,int y ):
   Place( Win,PlaceAbove ),
   Up( false ),M( m ),Num( n ),Y( y ),X( x ),Lx( 1 ),Ly( 1 ),K( 0 ) //,Hl( NULL )
 { Activate().Alfabet( 20,"Courier New",550 ); // с подстройкой на текущий шрифт
-          // AlfaBit( _8x16 );        // Простой растровый шрифт русского языка
+            //.AlfaBit( _8x16 );      // Простой растровый шрифт русского языка
   if( !Str )StK=( Str=(char*)malloc( 512 ) )+256;  // заведомо избыточная длина
 }
 static int Mestr( mlist *Ls )

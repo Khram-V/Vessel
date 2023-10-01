@@ -97,9 +97,6 @@ Hull& Hull::Naviga_Inform( Window *Win )
                     DirWave( S.Swell,blue,Compass ),        // свежая зыбь
                     DirWave( S.Surge,cyan,Compass ); else   // реликтовый накат
   Compass.Print( "Заштилело" );
-
-  if( !(S.Exp.wave&&3) || !S.Wind.Height )
-
   //
   //  стрелка-указатель заданного курса корабля
   //
