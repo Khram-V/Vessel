@@ -36,7 +36,8 @@ Waves::iWave( _Real Xdis, // сдвиг-распространение в баз
     if( xW<_Pd )R *= 0.5-0.5*cos( xW/2 );  // сглаживание первого вступления
         P.z -= ( V.x = -xG*R ); V.y=0.0;   // от исходной прямоугольной сетки
         P.x += ( V.z = -yG*R ); V *= Ow;   // радиус ++Z ? == смещение узлов
-} }
+  } else V=0.0;
+}
 Vector Waves::Wave( _Real T,_Vector R )    // на текущее время и местоположение
 { Vector l=Vessel->Locate,w,r; l.z=R.z;    // сводится к повороту в плоскости Z
          iWave( T*Cw-Diagonal,r=( R+l )/Tensor(*this),w );
@@ -55,9 +56,9 @@ Vector Field::Wave( _Real T, _Vector R )        // новое местополо
 { Vector W=Wind.Wave( T,R )+Swell.Wave( T,R )+Surge.Wave( T,R )-R*2; return W;
 }
 Vector Field::WaveV( _Real T,_Vector R,Vector &W ) // местоположение и скорость
-{ Vector P=R;
-  if( !Exp.wave )W=0; else
-  { Vector p,v; Wind.Wave( T,P,W );
+{ Vector P=R; W=0;
+  if( Exp.wave )
+  { Vector p,v; Wind.Wave( T,P,  W );
                Swell.Wave( T,p=R,v ); P+=p-R; W+=v;
                Surge.Wave( T,p=R,v ); P+=p-R; W+=v;
   } return P;
@@ -150,7 +151,8 @@ Field& Field::Simulation()  // моделирование волнения в и
         } }
       }
       Vessel->Floating()     // наложение уровня + расчёт воздействия на корпус
-             .Moving();      // моделирование гидродинамики корабля на волнении
+             .Movement()     // моделирование гидродинамики корабля на волнении
+             .Protocol();
             ++Kt;                // счётчик циклов вычислительного эксперимента
       if( !WinReady(this) )break;// переисполнение очереди посторонних запросов
   } } else WinReady(); return *this;

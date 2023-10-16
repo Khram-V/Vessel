@@ -75,7 +75,7 @@ static void DirWave( const Waves &W, colors C, Place &D )
     if( s=strchr( S,'.' ) ){ *s=',';
       if( s=strchr( s,'.' ) )*s='\"'; } D.Print( S );
 } }
-Hull& Hull::Naviga_Inform( Window *Win )
+Hull& Hull::NavigaInform( Window *Win )
 { Field &S=*Storm; Tensor B;     // единичный масштаб пространственного тензора
  Vector C=Swing[-1]; C.z+=_Ph;   // крен, дифферент и курс корабля(в геобазисе)
  int i,l=-0.18*hypot( Win->Width,Win->Height );       // размер из аксонометрии
@@ -291,7 +291,7 @@ Hull& Hull::Naviga_Inform( Window *Win )
     Compass.Print( -1,0,"%+3.1f/%+3.1f",maxA+1,minA+1 );
     U=60.0*Lp/Real(Compass.Width);
     H=55.0/Real(Compass.Height);
-    line( (Point){-Lp},(Point){Lp-Lt},cyan );         // уровень среднего
+    line( (Point){-Lp},(Point){Lp-Lt},cyan );               // уровень среднего
     glColor3f( BkColor );
     rectangle( (Point){-Lp,1-H},      (Point){-Lp+U,1-H/4} ); // сверху
     rectangle( (Point){-Lp,-H/2.2},   (Point){-Lp+U,H/3}   ); // в центре

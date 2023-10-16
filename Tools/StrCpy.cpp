@@ -31,11 +31,15 @@ char* sname( char *S )          // фактически то же, но с от�
 //    Принудительная замена расширения имени файла
 //
 char* fext( char* Name, const char* Ext )
+{ char *S=sname( Name ); if( Ext )if( *Ext )
+     { if( *Ext!='.' )strcat( S,"." ); strcat( S,Ext ); } return Name;
+}
+#if 0
+char* fext( char* Name, const char* Ext )
 { if( Ext )if( *Ext )
     { char *S=sname( Name ); if( *Ext!='.' )strcat( S,"." );
                                             strcat( S,Ext ); } return Name;
 }
-#if 0
 inline char* memmove( char *A, char *B, size_t L )   //! странности из GCC-10.1
 { char *res=A; if( A<B )while( L-- > 0 )*A++=*B++; else
                  { A+=L; B+=L; while( L-- > 0 )*--A=*--B; } return res;
