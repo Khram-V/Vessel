@@ -82,7 +82,7 @@ Hull& Hull::Protocol()
                  ev&8?"•":"·",Course*_Rd,-w*_Rd ); PtoG( str+20 );
         fprintf( VIL,str );// Б-〈П÷Л〉на борт; Р-руль〈П÷Л〉 полборта; М-помалу〈П÷Л〉
         if( fabs( w )<_Pi/32.0 )fprintf( VIL," " ); else
-        { fprintf( VIL,w>0?"П":"Л" );
+        { fprintf( VIL,w>0?"п":"л" );
           fprintf( VIL, dCs>_Pi/59?"Б" : dCs<_Pi/61?"M":"P" );
         }
         sprintf( str," %sζ%+4.1f∫%-+4.1f ",  // вертикальная качка и уровень
@@ -177,19 +177,19 @@ Hull& Hull::wPrint( bool log ) // информация по смоченному
               cprint( 55,24,"vR:{%6.1f,%.1f,%-6.1f}  ",vR.x,vR.y,vR.z );
   if( log )
   { textcolor( WHITE ); cprint( 1,7,"  >>> %s \n"
-      "  >>> { L=%g, B=%g, T=%g, Ψ=%s\\δd=%.0fсм }^%g  №[A.%d<%+d+>%d.Ф] ",
+      "  >>> { L=%g, B=%g, T=%g, Ψ=%s\\δd=%.0fсм }^%g  №〈A.%d<%+d+>%d.Ф 〉 ",
       ShipName,Length,Breadth,Draught,DtoA(Trim*_Rd,2),asin(Trim)*Length*50,
-      Ofs.z,Stern.len,Nframes,Stem.len );
+      Ofs.z-Draught,Stern.len,Nframes,Stem.len );
                 textcolor( CYAN ); cprint( 1,36,fname( fext( FileName ) ) );
     if( !VIL ){ textcolor( MAGENTA ); printf( " <= без протокола" ); } else
     { logTime(); fprintf( VIL,"\n\n  ⇒ %s \n"
-      "  ⇒ { L=%g, B=%g, T=%g, Ψ=%s\\δd=%.0fсм }^%g  К(а.%d<шп[%d]>%d.ф)\n"
+      "  ⇒ { L=%g, B=%g, T=%g, Ψ=%s\\δd=%.0fсм }^%g  №〈а.%d<шп[%d]>%d.ф〉\n"
       "  ⇒ { δ=%.2f, W=%.1f m³, S=%.1f m², F=%.1f m² }\n"
       "  ⇒ С{ x=%.1f, z=%.2f }, zG=%.2f, r=%.2f, h=%.2f [м]",
       ShipName,Length,Breadth,Draught,DtoA(Trim*_Rd,2),asin(Trim)*Length*50,
-      Ofs.z,Stern.len,Nframes,Stem.len,Volume/Length/Breadth/Draught,
+      Ofs.z-Draught,Stern.len,Nframes,Stem.len,Volume/Length/Breadth/Draught,
       Volume,Surface,Floatage,Buoyancy.x,Buoyancy.z,Gravity.z,
-                              Metacenter.z-Buoyancy.z,hX );
+      Metacenter.z-Buoyancy.z,hX );
       if( F.Kt<2 )logHydro(),logMdemp(),logAdemp(); fprintf( VIL,"\n" );
     }
   } return *this;
