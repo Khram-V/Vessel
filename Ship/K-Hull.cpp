@@ -24,6 +24,9 @@ static void FPutS( const char _Comm[], const char fmt[], ... );
 //     { Real Y=F[0]; for( int i=1; i<=F.N; i++ )if( Y<F[i] )Y=F[i]; return Y; }
 //static Real minY( Frame &F )
 //     { Real Y=F[0]; for( int i=1; i<=F.N; i++ )if( Y>F[i] )Y=F[i]; return Y; }
+
+Hull::Hull(): Ns( 0 ),Ms( 1 ),Nstem( 2 ),F( 0 )
+          { ( Name=(char*)malloc( MAX_PATH*4 ) )[0]=0; }
 //
 //      Считывание/запись численного описания формы корпуса
 //        (при первом обращении возвращается корпус МИДВ)
@@ -84,10 +87,10 @@ int Hull::Read_from_Frames()          // Здесь продолжается
         { Frame &W=F[k];
           FGetS(); W.allocate( n=strtol( Str,&s,0 ) ); W.X=strtod( s,&s );
           for( i=0;i<n;i++ ){ W.z[i]=MZ(strtod(s,&s)-o); W.y[i]=strtod(s,&s); }
-//          { W.z[i]=w=strtod( s,&s )-o; W.y[i]=strtod( s,&s );
-//            if( !i && !k )Do=Depth=w; else
-//              { if( Depth<w )Depth=w; if( Do>w )Do=w; } }
-        }   //Height-=Do;
+/*        { Real w; W.z[i]=w=strtod( s,&s )-o; W.y[i]=strtod( s,&s );
+            if( !i && !k )Do=Depth=w; else
+              { if( Depth<w )Depth=w; if( Do>w )Do=w; } }
+*/      }   //Height-=Do;
         //
         // Форштевень (табличные данные здесь заканчиваются, далее - строки)
         //
@@ -99,11 +102,19 @@ int Hull::Read_from_Frames()          // Здесь продолжается
         // ...по необходимости лучше дополнить описание штевней
         //    нежели решать ротозейские проблемы из за их отсутствия
         n=Ns-1;
+#if 0
         if( !Asx.N ){ Asx.allocate(2); if( !Asx(0) )Asx(0)=F[0](0); Asx[0]=Asx[1]=Asx[0]?Asx[0]:F[0].X; Asx(1)=F[0](F[0].N); }
         if( !Stx.N ){ Stx.allocate(2); if( !Stx(0) )Stx(0)=F[n](0); Stx[0]=Stx[1]=Stx[0]?Stx[0]:F[n].X; Stx(1)=F[n](F[n].N); }
 
         if( !Asy.N ){ Asy.allocate(2); if( !Asy(0) )Asy(0)=Asx(0); Asy[1]=Asy[0]; Asy(1)=Asx(1); }
         if( !Sty.N ){ Sty.allocate(2); if( !Sty(0) )Sty(0)=Stx(0); Sty[1]=Sty[0]; Sty(1)=Stx(1); }
+#else
+        if( !Asx.N ){ Asx.allocate( 1 ); Asx( 0 )=F[0]( 0 ); Asx[ 0 ]=F[0].X; }
+        if( !Stx.N ){ Stx.allocate( 1 ); Stx( 0 )=F[n]( 0 ); Stx[ 0 ]=F[n].X; }
+
+        if( !Asy.N ){ Asy.allocate( 1 ); Asy( 0 )=Asx( 0 ); }
+        if( !Sty.N ){ Sty.allocate( 1 ); Sty( 0 )=Stx( 0 ); }
+#endif
         //
         //  Уточнение основных параметров нового корпуса
         //

@@ -66,7 +66,7 @@ Hydrostatic::Hydrostatic(): Lmax( Depth ),Lmin( Do )
 { int i,k; Real x,z;
   EpsV=Volume/1000;
   dX=Lmx/(nX-1);
-  dZ=(Depth-Do)/(nZ-1);               // Do - предустанавливается при вызове
+  dZ=(Depth-Do)/(nZ-1);                  // Do - предустанавливается при вызове
   for( z=Do,k=0; k<nZ; k++,z+=dZ )
   for( x=Xo,i=0; i<nX; i++,x+=dX )Y[k][i]=Kh.Y( x,z );
   for( k=0; k<nZ; k++ )

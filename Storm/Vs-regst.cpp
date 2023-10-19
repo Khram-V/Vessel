@@ -75,7 +75,7 @@ Hull& Hull::Protocol()
       if( extFix( wF[0],wF[1],m ) )ev|=64;  // вертикальные ускорения форштевня
       if( extFix( wV[0],wV[1],v ) )ev|=128; // последние будут первыми/наоборот
       if( ev )
-      { static char str[120]; char *s=str;
+      { static char str[64];
         logTime();                              // сначала время, отсчеты шагов
         sprintf( str,"  ⇒ %s±ξ%5.1f%-+5.1f %s±χ%6.1f%-+6.1f",
                  ev&128?"•":"·",Speed*3600.0/_Mile,v,

@@ -136,8 +136,8 @@ bool MainDraw::Draw()               // Здесь также будет прив
 static bool Win_Timer() // Регулярное обновление картинки делается в вызывающей
 { if( Active&2 )        // процедуре обработки прерываний от таймера
   { Event T; int M,D,Y; T.UnPack( M,D,Y ); TPL.Activate().Clear(); gl_GREEN;
-          TPL.Print( 0,0,"  %04d %s %02d, %s%-10s  ",
-              Y,_Mnt[M-1],D,_Day[int( T.D%7 )],DtoA( T.T,3 ) ).Show();
+    TPL.Print( 0,0,"  %04d %s %02d, %s%-10s  ",
+                   Y,_Mnt[M-1],D,_Day[int( T.D%7 )],DtoA( T.T,3 ) ).Show();
   } return false;       // все уже на экране
 }
 //     Информационные процедуры для активного окна
@@ -156,8 +156,8 @@ static bool Mouse_in_Window( int x,int y )
 }
 void glInitial()
 { glShadeModel( GL_SMOOTH );
-  glHint  ( GL_LINE_SMOOTH_HINT,GL_NICEST );  glEnable( GL_LINE_SMOOTH );
-  glHint  ( GL_POINT_SMOOTH_HINT,GL_NICEST ); glEnable( GL_POINT_SMOOTH );
+  glHint( GL_LINE_SMOOTH_HINT,GL_NICEST );  glEnable( GL_LINE_SMOOTH );
+  glHint( GL_POINT_SMOOTH_HINT,GL_NICEST ); glEnable( GL_POINT_SMOOTH );
   glEnable( GL_DITHER );                  // Предопределение графической среды
   glEnable( GL_BLEND );
   glBlendFunc( GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA );

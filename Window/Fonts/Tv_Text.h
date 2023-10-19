@@ -24,7 +24,8 @@ int Height( const int _Height );       //  0 - взять равным Tv.Th
   int OutText( Point,Point,Point,      char* ); // --//-- с наклоном
   int OutText( Point,Point,Point,Point,char* ); // -- по паре точек в основании
                                                 // и покрытии четырехугольника
-};                      //
+};
+                        //
 struct  TvMode: Bfont   // Структура базисных параметров
 { short Color,          // Текущий цвет для текстов и рисунков
         BkColor,FColor, // Цвета фона pattern и его штриховки
@@ -32,5 +33,6 @@ struct  TvMode: Bfont   // Структура базисных параметр�
         mX,mY;          // Экстремумы размеров X-width и Y-height для терминала
   TvMode();             // Constructor
 };                      // ~~~~~~~~//
+
 extern unsigned char _Small_font[];
 extern unsigned char _Simplex_font[];

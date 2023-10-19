@@ -145,9 +145,8 @@ void Frame::YaZ( Real A, Real &Y,Real &Z )           // Аргумент: 0.0<=A
 #endif
 Real Frame::G( _Real az, bool bound )            // эмуляция плазовой ординаты
 { if( N<1 )return y[0];                          // одна точка на другие случаи
-//if( az<min )return bound?y[0]:0.0;             // точка лежит ниже шпангоута
-//if( az>max )return bound?y[N]:0.0;             // точка лежит выше шпангоута
-  if( az<z[0] )return bound?y[0]:0.0;            // точка лежит ниже шпангоута
+  if( az<min )return bound?y[0]:0.0;             // точка лежит ниже шпангоута
+  if( az>max )return bound?y[N]:0.0;             // точка лежит выше шпангоута
   for( int k=0; ; k++ )                          // где Y - однозначная функция
   { if( k>=N )return bound?y[N]:0.0;             // теперь точка выше шпангоута
     if( az<=z[k+1] && z[k+1]>z[k] || k==N-1)     //       линейная интерполяция
