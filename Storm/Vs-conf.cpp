@@ -62,9 +62,9 @@ Hull& Hull::Config()
       Initial().Floating(); //Storm->Kt=sKt;
       wPrint( true );
     }
-    if( DF!=muF ){ DF=muF; logMdemp(); }          // коэффициенты демпфирования
-    if( DM!=muM ){ DM=muM; logAdemp(); } DampInit();
-    sT=max( 0.5,sTime )*60; sTime=sT/60.0;      // протяжённость графиков качки
+    if( DM!=muM || DF!=muF ){ DM=muM; DF=muF; logDamp(); }
+    DampInit();                                // факторы демпфирования сдвигов
+    sT=max( 0.5,sTime )*60; sTime=sT/60.0;     // протяжённость графиков качки
   } while( ans!=_Esc );
   return *this;
 }
@@ -210,6 +210,20 @@ Hull& Hull::GetDam( char *s )
   if( z=strchr( s,',' ) )*z++=0;  //! ограничение поля новой числовой величины
   sscanf( s,"%lg%lg%lg",&muF.x,&muF.y,&muF.z ); s=z;
   sscanf( s,"%lg%lg%lg",&muM.x,&muM.y,&muM.z ); DampInit(); return *this;
+}
+Hull& Hull::GetExp( char *s )  // выборка ключевых слов с произвольным порядком
+{ bool All=false; Educt=0xFF;  // и остаётся только то, что выбирается из файла
+  if( strstr( s,"больш"))Educt|=0x200;  // протокол только наи<больш>их величин
+  if( strstr( s,"всё" ) ){ Educt|=0xFF; All=true; } // <всё> станет исключением
+  if( strstr( s,"ход" ) )Educt=All? Educt&~1 : Educt|1; // скорость <ход>а
+  if( strstr( s,"рыск") )Educt=All? Educt&~2 : Educt|2; // <рыск>ание на курсе
+  if( strstr( s,"верт") )Educt=All? Educt&~4 : Educt|4; // <верт>икальная качка
+  if( strstr( s,"борт") )Educt=All? Educt&~8 : Educt|8; // <борт>овая качка
+  if( strstr( s,"кил" ) )Educt=All? Educt&~16: Educt|16;// <кил>евая качка
+  if( strstr( s,"корм") )Educt=All? Educt&~32: Educt|32; // ускорения в <корм>е
+  if( strstr( s,"мид" ) )Educt=All? Educt&~64: Educt|64;  // --//-- на <мид>еле
+  if( strstr( s,"нос" ) )Educt=All? Educt&~128:Educt|128;  // в <нос>овой части
+  return *this;
 }
 //     настройка вычислительной акватории и условий генерации штормовых волн
 //

@@ -405,7 +405,7 @@ Plaze::Plaze( int nz, int nx, _Real Board ): Nz( nz ),Nx( nx )
     for( i=1; i<Nx; i++ )
     if( Y[j+1][i]>0.0 )
     { y=Y[j][i];
-      S+=sqrt( 1+sqr( ( Y[j][i-1]-y )/dX )+sqr( ( Y[j+1][i]-y )/dZ ) )*dX*dZ*2;
+      S+=sqrt( 1.0+norm( ( Y[j][i-1]-y )/dX,( Y[j+1][i]-y )/dZ ) )*dX*dZ*2;
   } }
   for( j=0; j<Nz; j++ )                             // распределённые источники
   { for( i=1; i<Nx-1; i++ )QV[j][i]=(Y[j][i+1]-Y[j][i-1] )*dZ/-2.0;

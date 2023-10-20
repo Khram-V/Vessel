@@ -17,7 +17,6 @@
 				<Option projectCompilerOptionsRelation="0" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Linker>
-					<Add option="-static-libstdc++" />
 					<Add option="-static-libgcc" />
 					<Add option="-static" />
 				</Linker>

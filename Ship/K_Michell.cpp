@@ -5,13 +5,13 @@ const  Real g=9.8106,  // Ускорение свободного падения
 static Real WL=0.0;    // Длина поперечной волны
                        //
 Real Plaze::Amplint( _Real La )
-{ int i,j;                  //
- Real X,Z,Wk=2.0*M_PI/La,   // Волновое число
-          Mw=sqrt( WL/La ); // Число Маха
- complex A={ 0,0 },W;       // Интегральная амплитуда
-  for( i=Nx-1; i>=0; i-- )  //
+{ int i,j;
+ Real X,Z,Wk=2.0*M_PI/La,       // Волновое число
+          Mw=sqrt( WL/La );     // Число Маха
+ complex A={ 0,0 },W;           // Интегральная амплитуда
+  for( i=Nx-1; i>=0; i-- )
   { Z=0;
-    W=0;
+    W.x=W.y=0;
     X=Wk*dX*(Nx-1-i)/Mw;
     for( j=Nz-1; j>=0; j-- )
     { W += exp( (complex){ -Z,X } )*QV[j][i];

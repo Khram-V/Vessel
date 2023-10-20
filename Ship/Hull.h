@@ -10,7 +10,7 @@
 //              факультет Прикладной математики - процессов управления
 //              Санкт-Петербургский государственный университет
 //                                        ©75 Калининград-Сахалин-‏יְרוּשָׁלַיִם
-#include "../Math/Complex.h"
+#include <Math.h>
 #include "../Window/Window.h"
 
 extern const char *_Mnt[],*_Day[];       // названия месяцев и дней недели
@@ -47,9 +47,7 @@ struct Frame
    *y,*z,        // аппликаты и ординаты точек сплайна шпангоутов
    *_x,          // индексный массив 0..N или длина кривой по сплайну
    *_y,*_z;      // вторая производная в узлах сплайн-функции
-  Frame( int l=0 ){ y=z=_x=_z=_y=0; N=0; X=min=max=0; if( l>0 )allocate( l ); }
-  void allocate( int ); void free();
- ~Frame(){ free(); }
+  Frame( int l=0 ); void allocate( int ); void free(); ~Frame();
   Real G( _Real Z, bool=false );     // эмуляция плазовой ординаты по аппликате
   Real operator()(_Real A ){ return G( A ); }
   Real& operator[]( int k ){ return y[k]; };  // In/Out доступ к функции
@@ -62,12 +60,10 @@ struct Frame
 //
 class Hull{ public:
  int  Ns,Ms,Nstem;         // Общее количество, номер миделя и нулевой шпангоут
- char *Name;                              // [MAX_PATH*4];  // Название модели
- Frame *F,                                // Ряд Ns\Ms теоретических шпангоутов
-       Stx,Sty,Asx,Asy;                   // Форштевень и ахтерштевень, нос\корма
-  Hull(); //: Ns( 0 ),Ms( 1 ),Nstem( 2 ),F( 0 ) // { Name[0]=0; }
-          //  { (Name=(char*)malloc( MAX_PATH*4 ))[0]=0; } }
-          // ~Hull(){ allocate( 0 ); free( Name ); }
+ char *Name;                            // [MAX_PATH*4];  // Название модели
+ Frame *F,                              // Ряд Ns\Ms теоретических шпангоутов
+       Stx,Sty,Asx,Asy;                 // Форштевень и ахтерштевень, нос\корма
+  Hull(); // ~Hull();
   void allocate( int N );                     // вектор адресов для шпангоутов
   void Analytics();                           // варианты аналитических обводов
   void Init();                                // водоизмещение, площади и др.
@@ -140,6 +136,19 @@ extern Hull  Kh;          // Собственно корпус, заданный
 extern Plane wH,wM,wW;    // Окно проекции корпус, бок и полуширота
 void Draw_Hull( int id, Plane &_W=wH );    // Проекция корпус в заданном окошке
 void line( _Real x1,_Real z1,_Real x2,_Real z2 );
+
+struct complex
+{ double x,y;                                         // real & imaginary part
+  complex& operator=( const double& r ){ x=r,y=0.0; return *this; }
+  complex& operator+=( const complex& c ){ x+=c.x; y+=c.y; return *this; }
+  complex& operator*=( const complex& c ){ double w=(x*c.x)-(y*c.y); y=(x*c.y)+(y*c.x); x=w; return *this; }
+};
+inline double norm( const double& x, const double& y ){ return x*x+y*y; }
+inline double norm( const complex& c ){ return norm( c.x,c.y ); }
+inline complex operator * ( complex c,const double& r ){ c.x*=r; c.y*=r; return c; }
+inline complex operator + ( complex c,const complex& e ){ c.x+=e.x; c.y+=e.y; return c; }
+inline complex polar( const double& a ){ return (complex){ cos( a ),sin( a ) }; }
+inline complex exp( const complex& c ){ return polar( c.y )*exp( c.x ); }
 //
 //  ... и все-таки нужна подборка стандартных цветов (без перевыбора)...
 //

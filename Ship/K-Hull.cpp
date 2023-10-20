@@ -27,6 +27,7 @@ static void FPutS( const char _Comm[], const char fmt[], ... );
 
 Hull::Hull(): Ns( 0 ),Ms( 1 ),Nstem( 2 ),F( 0 )
           { ( Name=(char*)malloc( MAX_PATH*4 ) )[0]=0; }
+// Hull::~Hull(){ allocate( 0 ); free( Name ); }
 //
 //      Считывание/запись численного описания формы корпуса
 //        (при первом обращении возвращается корпус МИДВ)
@@ -128,8 +129,9 @@ int Hull::Read_from_Frames()          // Здесь продолжается
           for( int i=1; i<W.N; i++ )   // только внутренние точки на шпангоутах
           { complex A={ W.z[i]-W.z[i-1],W.y[i]-W.y[i-1] },
                     B={ W.z[i+1]-W.z[i],W.y[i+1]-W.y[i] };
-            if( norm( A*B )>1e-6 )     // если слом существует
-            if( ( A%B )/abs( A )/abs( B )<0.71 )W.Double( i++ );  // больше 45°
+            if( norm( A )>1e-6 && norm( B )>1e-6 )// существует слом больше 45°
+            if( ( A.x*B.x+A.y*B.y )/hypot( A.x,A.y )/hypot( B.x,B.y )<0.71 )
+                W.Double(i++);
           } if( Hull_Keys&1 )W.SpLine();          // здесь это так, для образца
         }
         Init(); return 0;
