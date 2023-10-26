@@ -55,6 +55,80 @@ void Hull::Aphines( _Real cX,_Real cY,_Real cZ )
   MinMax();
   Init();
 }
+static void Free( Frame &F ){ int i,j;
+  for( i=1,j=0; i<=F.N; i++ )
+  { if( fabs( F(j)-F(i) )>1e-12 || fabs( F[j]-F[i] )>1e-12 )j++;
+    if( i!=j ){ F(i)=F(j); F[i]=F[j]; }
+  } F.N=j;
+}
+inline void Add( Frame &F,_Real z,_Real f,int k ){ F(k)=z; F[k]=f; }
+
+void Hull::ModelEx( Real &cL, Real &cB, int cN, int cM )
+{ int i,j;
+  cN = 2*( abs( cN )/2 )+1; // будет нечетное число для миделя в центре корпуса
+  if( cN<3 )cN=3; Simple_Hull(cN,cN,cN); // всем всё поровну со старыми числами
+  if( cL<1 )cL=1;
+  if( cB<1 )cB=1;
+  Xm=0; Xo=cL/-2; Length=Lmx=Lwl=cL; Ms=cN/2; Nstem=cN-1;
+                 Breadth=Bmx=Bwl=cB;
+  Do=0; Draught=cB/2; Depth=cB; Volume=cL*cB*cB; Surface=cB*(2*cL+cB);
+ const Real dx=cL/Real(cN-1),dz=cB/Real(cN-1),da=_Pi/Real(cN-1);
+  if( !cM )                                   // Кубик
+  { for( i=0; i<cN; i++ )
+    { F[i].X=Xo+i*dx;
+      for( j=0; j<cN; j++ )Add( F[i],j*dz,Draught,j ); F[i].Easy();
+      Add( Stx,i*dz,-Xo,i ); Add( Sty,i*dz,Draught,i );
+      Add( Asx,i*dz, Xo,i ); Add( Asy,i*dz,Draught,i );
+    } strcpy( Name,"Кирпич - прямоугольный параллелепипед" );
+  } else
+  { for( i=0; i<cN; i++ )
+    { Real si=sin( i*da ),ci=cos( i*da ),R=Draught*si;
+      F[i].X=ci*Xo;
+      for( j=0; j<cN; j++ )Add( F[i],Draught-cos( j*da )*R,sin( j*da )*R,j );
+      Add( Stx,Draught*( 1-ci ),-si*Xo,i); Add( Sty,Draught*( 1-ci ),0,i );
+      Add( Asx,Draught*( 1-ci ),si*Xo,i ); Add( Asy,Draught*( 1-ci ),0,i );
+      F[i].Easy();
+    }
+    if( cM==1 )strcpy( Name,"Эллипс - удлинённый шарик" );
+    else
+    { for( i=0; i<cN; i++ )
+      { for( j=0; j<cN/2; j++ )F[i](j)=F[cN/2](j);
+        if( i<cN/2 ){ Stx[i]=-Xo; Stx(i)=i*dz;
+                      Asx[i]=Xo;  Asx(i)=i*dz; }
+      }
+      if( cM==2 )
+        strcpy( Name,"Шлюпка - эллипсоид с равноудалёнными ватерлиниями" );
+      else
+      { strcpy( Name,"Корпус - эллипсоид с обводами кубической полноты" );
+        for( i=0; i<cN; i++ )
+        for( j=0; j<cN/2; j++ )
+          F[i][j]=F[i][cN/2]*( 1-pow( Real( cN/2-j )*2.0/cN,3 ) );
+  } } }
+  Free( F[0] );
+  Free( F[cN-1] );
+
+  Stx.Easy(); Sty.Easy(); Asx.Easy(); Asy.Easy(); MinMax(); Init(); //BilgeEx()
+}
+//!  Это будет скуловой обвод - отдельной повторяемой командой
+//                               чтоб без алымов-щины "струйных" систем обводов
+static Real Bilge( _Real _x,_Real p=(5.0/3.0) )
+{ return 0.5*( 1 + sin( ( pow( fabs( _x-0.5 )*2,p )/2+0.5 )*_Pd*1.5 ) );
+}
+void Hull::BilgeEx()
+{ Real cz,cx=F[0].X,cl=F[Nstem].X-cx;  // разметка длины между перпендикулярами
+  for( int i=0; i<Ns; i++ )
+  { cz=Bilge( (F[i].X-cx)/cl );                           // аргумент от 0 до 1
+    for( int j=0; j<F[i].N && F[i](j)<Draught; j++ )
+      F[i][j] *= 1-cz*pow( ( Draught-F[i](j) )/Draught,3 ); }
+  for( int i=0; i<=Asy.N; i++ )               // As-ахтерштевень, St-форштевень
+   if( ( cz=Asy( i ) )<Draught )
+    Asy[i] *= 1-Bilge( (Asx(cz)-cx)/cl )*pow( (Draught-cz)/Draught,3 );
+  for( int i=0; i<=Sty.N; i++ )
+   if( ( cz=Sty( i ) )<Draught )
+    Sty[i] *= 1-Bilge( (Stx(cz)-cx)/cl )*pow((Draught-cz)/Draught,3);
+  MinMax();
+  Init();
+}
 ///      Считывание корпуса "по контурам штевней и шпангоутов"
 //                                                    01-12-01
 Real MZ( _Real Z ){ if( Do>Z )Do=Z; if( Depth<Z )Depth=Z; return Z; }
@@ -139,9 +213,9 @@ int Hull::Read_from_Frames()          // Здесь продолжается
 }
 //        Запись корпуса в формате "по контурам штевней и шпангоутов"
 //                                                        2001-11-30
+static Real e6( _Real R ){ return round( R*1e6 )/1e6; }
 int Hull::Write()
-{
- const Real g5=1.000001; Real T; long D;
+{ Real T; long D;
  int i,k,m,d,y; julday( D=julday(),m,d,y ); T=onetime();
  char Str[MAX_PATH*2];
   sprintf( Str,"%02d%02d%02d-%02d%02d",y%100,m,d,int( T ),int( T*60 )%60 );
@@ -156,25 +230,25 @@ int Hull::Write()
     FPutS( " признак и название","\x1E < %s >",Name );
     FPutS( " количество шпангоутов и номер миделя"," %d %d",Ns,Ms );
     FPutS( " длина ширина осадка [загрузка]"," %.5lg %.5lg %.5lg",
-                                  Length*g5,Breadth*g5,Draught*g5 );
+                                  e6(Length),e6(Breadth),e6(Draught) );
     //! Ахтерштевень
                              fprintf( Fh,"\n%3d",Asx.N+1 );
-    for( i=0; i<=Asx.N; i++ )fprintf( Fh," %.5lg %.5lg",Asx(i)*g5,Asx[i]*g5 );
+    for( i=0; i<=Asx.N; i++ )fprintf( Fh," %.5lg %.5lg",e6(Asx(i)),e6(Asx[i]) );
                              fprintf( Fh,"\n%3d",Asy.N+1 );
-    for( i=0; i<=Asy.N; i++ )fprintf( Fh," %.5lg %.5lg",Asy(i)*g5,Asy[i]*g5 );
+    for( i=0; i<=Asy.N; i++ )fprintf( Fh," %.5lg %.5lg",e6(Asy(i)),e6(Asy[i]) );
                              fprintf( Fh,"\n" );
     //! Шпангоуты
     //
     for( k=0; k<Ns; k++ )
-    {                           fprintf( Fh,"\n%3d %-4.5lg",F[k].N+1,F[k].X*g5 );
-      for( i=0; i<=F[k].N; i++ )fprintf( Fh," %.5lg %.5lg",F[k].z[i]*g5,F[k].y[i]*g5 );
+    {                           fprintf( Fh,"\n%3d %-4.5lg",F[k].N+1,e6(F[k].X) );
+      for( i=0; i<=F[k].N; i++ )fprintf( Fh," %.5lg %.5lg",e6(F[k].z[i]),e6(F[k].y[i]) );
     }                           fprintf( Fh,"\n" );
     //
     //! Форштевень
                              fprintf( Fh,"\n%3d",Sty.N+1 );
-    for( i=0; i<=Sty.N; i++ )fprintf( Fh," %.5lg %.5lg",Sty(i)*g5,Sty[i]*g5 );
+    for( i=0; i<=Sty.N; i++ )fprintf( Fh," %.5lg %.5lg",e6(Sty(i)),e6(Sty[i]) );
                              fprintf( Fh,"\n%3d",Stx.N+1 );
-    for( i=0; i<=Stx.N; i++ )fprintf( Fh," %.5lg %.5lg",Stx(i)*g5,Stx[i]*g5 );
+    for( i=0; i<=Stx.N; i++ )fprintf( Fh," %.5lg %.5lg",e6(Stx(i)),e6(Stx[i]) );
                              fprintf( Fh,"\n\n" );
     FPutS( "водоизмещение",            ";  W=%.5lg",Volume );
     FPutS( "смоченная поверхность",    ";  S=%.5lg",Surface );

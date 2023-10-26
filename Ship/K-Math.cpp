@@ -396,16 +396,16 @@ Plaze::Plaze( int nz, int nx, _Real Board ): Nz( nz ),Nx( nx )
   }
   V=S=0.0;
   dX=(xS-xA)/(Nx-1);
-  for( z=Do,j=0; j<Nz; j++,z+=dZ )
-  for( x=xA,i=0; i<Nx; i++,x+=dX )V+=Y[j][i]=Kh.Y( x,z );    //++ водоизмещение
-  V*=dX*dZ*2.0;
+  for( z=Do,j=0; j<Nz; j++,z+=dZ )                           //++ водоизмещение
+  for( x=xA,i=0; i<Nx; i++,x+=dX )
+  { Y[j][i]=y=Kh.Y( x,z ); if( !i || !j || i==Nx-1 || j==Nz-1 )y/=2; V+=y;
+  } V*=dX*dZ*2.0;
   for( i=1; i<Nx-1; i++ )S+=Y[1][i]*2; S+=Y[1][0]+Y[1][Nx-1]; S*=dX;   // днище
   for( j=0; j<Nz-1; j++ )                      // смоченная поверхность корпуса
   { S+=(Y[j][0]+Y[j+1][0]+Y[j][Nx-1]+Y[j+1][Nx-1])*dZ;  // без двойки два борта
     for( i=1; i<Nx; i++ )
     if( Y[j+1][i]>0.0 )
-    { y=Y[j][i];
-      S+=sqrt( 1.0+norm( ( Y[j][i-1]-y )/dX,( Y[j+1][i]-y )/dZ ) )*dX*dZ*2;
+    { y=Y[j][i]; S+=sqrt( 1+norm((Y[j][i-1]-y)/dX,(Y[j+1][i]-y)/dZ) )*dX*dZ*2;
   } }
   for( j=0; j<Nz; j++ )                             // распределённые источники
   { for( i=1; i<Nx-1; i++ )QV[j][i]=(Y[j][i+1]-Y[j][i-1] )*dZ/-2.0;

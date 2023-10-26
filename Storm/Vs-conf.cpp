@@ -212,7 +212,7 @@ Hull& Hull::GetDam( char *s )
   sscanf( s,"%lg%lg%lg",&muM.x,&muM.y,&muM.z ); DampInit(); return *this;
 }
 Hull& Hull::GetExp( char *s )  // выборка ключевых слов с произвольным порядком
-{ bool All=false; Educt=0xFF;  // и остаётся только то, что выбирается из файла
+{ bool All=false; Educt=0;     // и остаётся только то, что выбирается из файла
   if( strstr( s,"больш"))Educt|=0x200;  // протокол только наи<больш>их величин
   if( strstr( s,"всё" ) ){ Educt|=0xFF; All=true; } // <всё> станет исключением
   if( strstr( s,"ход" ) )Educt=All? Educt&~1 : Educt|1; // скорость <ход>а

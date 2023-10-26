@@ -79,16 +79,17 @@ Hydrostatic::Hydrostatic(): Lmax( Depth ),Lmin( Do )
 //
 void Hydrostatic::Initial()     // Процедура предварительного перерасчета всех
 { int i,k;                      //  массив и характеристик, необходимых для
-  Real R,r,sX,S, x,y,z;         //  построения кривых элементов теоретического
+  Real R,r,sX,S, y,z;           //  построения кривых элементов теоретического
   for( k=0; k<nZ; k++ )         //  чертежа судна по массивам плазовых ординат
-  { R=r=sX=S=0.0;               // Первый прогон интегрирования, нулевая ширина
-    x=Xo; //-dX/2;              //  для вычисления площадей, объемов
+  { Real x=Xo; //-dX/2;         //  для вычисления площадей, объемов
     z=dZ*( Real( k )+0.5 );     //  их моментов инерции (z+1/2 - центр объема)
+    R=r=sX=S=0.0;               // Первый прогон интегрирования, нулевая ширина
     for( i=0; i<nX; i++,x+=dX ) //  и метацентрических радиусов
-    {  S+=( y=Y[k][i] );        //
-       r+=y*y*y;                // стр.61 у Владимира Вениаминовича С-Т-Ш
-       R+=y*x*x;                //
-      sX+=y*x;                  //
+    { y=Y[k][i];
+      S+=y;                     //
+      if( i && i<nX-1 )sX+=y*x; //        , S += y;
+      r+=y*y*y;                 // стр.61 у Владимира Вениаминовича С-Т-Ш
+      R+=y*x*x;                 //
     }                           //
     Swl[k]=( S*=2*dX );         // Площадь ватерлинии
             sX*=2*dX;           // Момент площади ватерлинии
@@ -102,15 +103,15 @@ void Hydrostatic::Initial()     // Процедура предварительн
     { xCW[k]=sX/S; //+Xo;       // Центр площади ватерлинии
       Jy[k]=(R*2*dX-sX*sX/S);   // /Vol[k]->Продольный метацентрический радиус
       Jx[k]= r*2*dX/3;          // /Vol[k]->Поперечный --//--
-  } }                           //
+    }
+  }                             //
   xCV[0]=xCW[0];                //
   Srf[0]=S=Swl[0];              // Площадь смоченной поверхности
   for( k=1; k<nZ; k++ )         //
   { S+=(Y[k][0]+Y[k-1][0]+Y[k][nX-1]+Y[k-1][nX-1])*dZ;  // без двойки два борта
     for( i=1; i<nX; i++ )
     { y=Y[k][i]; Real yx=Y[k][i-1],yz=Y[k-1][i];
-      if( y>0&&yx>0&&yz>0 )S+=sqrt( 1.0+norm( (yx-y)/dX,(yz-y)/dZ ) )*dX*dZ*2;
-      //       S+=sqrt( 1+norm( (Y[k][i-1]-y)/dX,(Y[k-1][i]-y)/dZ ) )*dX*dZ*2;
+      if( y>0||yx>0||yz>0 )S+=sqrt( 1.0+norm( (yx-y)/dX,(yz-y)/dZ ) )*dX*dZ*2;
     } Srf[k]=S;
     if( Vol[k]<EpsV )zCV[k]=dZ*( Real( k )+0.5 ),xCV[k]=xCV[k-1]; else
     { zCV[k]=zCV[k]*2/(Vol[k]+Vol[k-1]);
@@ -186,7 +187,7 @@ void Hydrostatic::Graphics()
     MinMax( rx,nZ,mn,mx );
     Graphic_for_Element( rx,-120,0,min(mx,Breadth ),-4,k++,"r" );
     MinMax( Ry,nZ,mn,mx );
-    Graphic_for_Element( Ry,-120,0,min(mx,Length*2),+4,k++,"R" );
+    Graphic_for_Element( Ry,-120,0,min(mx,Length),+4,k++,"R" );
   gl_MAGENTA;
     Graphic_for_Element( Jx,-160,0,0,-4,k++,"Jx" );   // Инерция
     Graphic_for_Element( Jy,-160,0,0,+4,k++,"Jy" );   // ватерлинии

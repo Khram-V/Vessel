@@ -30,10 +30,10 @@ void Model_Config( Window* Win ){ byte &St=Vessel->Statum,ans=St;
 //  блок протокола по экстремальным событиям в параметрах качки корпуса корабля
 //
 static bool shortEx=false;
-static bool extFix( Real *W, _Real c ){ bool ret=false;
-  if( W[0]!=W[1] )if( W[1]==c || (W[1]-W[0])*(c-W[1])<0.0 ) // экстремум вперёд
+static bool extFix( Real *W, Real c ){ bool ret=false; c=e5( c );
+  if( W[0]!=W[1] )if( W[1]==c || (c-W[1])*(W[1]-W[0])<0.0 ) // экстремум вперёд
   { if( !shortEx )ret=true; else
-    if( fabs( c )>=fabs( W[3] ) ){ W[3]=c; ret=true; }
+    if( fabs( c )>fabs( W[3] ) ){ W[3]=c; ret=true; }
   } W[0]=W[1]; W[1]=c; return ret;
 }
 static void PtoG( char *s )
@@ -170,6 +170,7 @@ Hull& Hull::wPrint( bool log ) // информация по смоченному
       Ofs.z-Draught,Stern.len,Nframes,Stem.len );
                 textcolor( CYAN ); cprint( 1,36,fname( fext( FileName ) ) );
     if( !VIL ){ textcolor( MAGENTA ); printf( " <= без протокола" ); } else
+    if( Educt&0xFF )
     { textcolor( GREEN ); printf( " <=%s: %s%s; %s%s%s{%s%s%s}",
       Educt&0x200?"кратко":"полно",Educt&1?" ход,":"",Educt&2?" курс":"",
       Educt&4?" вертикаль,":"",Educt&8?" борт,":"",Educt&16?" киль ":"",

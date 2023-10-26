@@ -68,6 +68,8 @@ class Hull{ public:
   void Analytics();                           // варианты аналитических обводов
   void Init();                                // водоизмещение, площади и др.
   void Aphines( _Real cX,_Real cY,_Real cZ ); // абсциссы, ординаты, аппликаты
+  void ModelEx( Real &L,Real &B,int N,int M ); // Кубик, Эллипс, Шлюпка, Шлюпик
+  void BilgeEx();                             // скуловые формирования в обводы
   void Simple_Hull( int Nx, int Nz, int Ns ); // шпангоуты, ватерлинии, штевни
   Real Y( _Real X,_Real Z ); // ордината-Y корпуса по абсциссе-X и аппликате-Z
   int Write();          // запись таблицы ординат корпуса в обновлённом формате

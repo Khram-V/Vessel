@@ -38,7 +38,7 @@ void Hull::MinMax()
   MM( Asy ); MM( Asx ); for( int i=0; i<=Asx.N; i++ )Xo=min( Xo,Asx[i] );
   for( int j=0; j<Ns; j++ )        // поиск-выборка максимальной ширины корпуса
   for( int i=0; i<=F[j].N; i++ ){ MM( F[j] ); Bmx=max( Bmx,F[j][i] ); }
-  Lmx-=Xo; Bmx*=2.0;                     // максимальные длина и ширина корпуса
+  Lmx-=Xo; Bmx*=2.0; Nstem=Ns-1;         // максимальные длина и ширина корпуса
   Lwl=Stx.G( Draught,true )-Asx.G( Draught,true );       // длина по ватерлинии
   if( Ns<3 )Xm=( F[0].X+F[1].X )/2; else Xm=F[Ms].X;     // абсцисса для миделя
   Bwl=Y( Xm,Draught )*2.0;                       // ширина ватерлинии на миделе
@@ -128,37 +128,42 @@ Real Hull::Y( _Real x,_Real z )                       // за пределами
 //    Водоизмещение и площадь смоченной поверхности корпуса
 //
 void Hull::Init()
-{ const int mZ=196;            // простой расчет полного объема корпуса
- Real x,Dx,dx,                 //      (по внутренним трапециям)
+{ const int mZ=196,mX=720;     // простой расчет полного объема корпуса
+ Real x,Dx,dx=Lmx/mX,          //      (по внутренним трапециям)
       z,Dz,dz=(Draught-Do)/mZ, // шаг по аппликате с учетом заглубления бульба
-      y,ds,                    // ордината с элементарной площадкой обшивки
+      y,      ds=dx*dz,        // ордината с элементарной площадкой обшивки
       Vs,Vm;                   // площадь шпангоута
       Vm=Volume=Surface=0;     // водоизмещение и смоченная поверхность корпуса
+ int i,j;
 //pragma omp parallel for reduction(+: Volume,Surface )
-  for( int i=0; i<Ns; i++ )
-  { Vs=0.0;
-    x=F[i].X;
+  for( j=0,z=Do;        j<=mZ; j++,z+=dz )    // Водоизмещение
+  { for( i=0,x=Xo,Vs=0; i<=mX; i++,x+=dx )
+    { Vs += y=Y( x,z );                       // Объем корпуса...метод трапеций
+      if( !j )Surface += y*dx*2; else         // площадь плоского днища
+      if( !i || i==mX )Surface += y*dz*2;     // площадь транцев в оконечностях
+      Dx = Y( x+dx,z );
+      Dz = Y( x,z+dz );                       // Смоченная поверхность корпуса
+      if( y>0 || Dz>=0 || Dz>0 )
+          Surface+=y=sqrt( 1+norm( ( y-Dx )/dx,( y-Dz )/dz ) )*ds*2;
+      if( !j || j==mZ )Surface-=y/2;          // ... снова к методу трапеций
+    } Volume += Vs*ds*2;
+    if( !j || j==mZ )Volume -= Vs*ds;
+  }
+  for( i=0; i<Ns; i++ )           // ??? поиск наибольшего по площади шпангоута
+  { x=F[i].X;
     if( i==Ns-1 )dx=x; else dx=F[i+1].X;    // правая отсечка для ширины шпации
     if( !i     )dx-=x; else dx-=F[i-1].X;   // левая отсечка под метод трапеций
-    z=Do; ds=dx*dz;                         // ds здесь удвоено в средней части
-    for( int j=0; j<=mZ; z+=dz,j++ )        // Водоизмещение
-    { Vs+=y=Y( x,z )*ds;                    // Объем корпуса
-      if( !j || j==mZ )Vs-=y/2;             // ... под метод трапеций
-      if( y>0 )
-      { if( !j )Surface+=y*dx;                // площадь плоского днища
-        if( !i || i==Ns-1 )Surface+=y*dz*2;   // площадь транцев в оконечностях
-        Dx=( Y( i<Ns-1?x+dx/2:x,z )-Y( i?x-dx/2:x,z ) )/dx;
-        Dz=( Y( x,z+dz/2 )-Y( x,z-dz/2 ) )/dz;
-        if( !i || i==Ns-1 )Dx*=2;               // ... снова к методу трапеций
-        Surface+=sqrt( 1+norm( Dx,Dz ) )*ds;    // Смоченная поверхность корпуса
-      }
-    } Volume+=Vs;
-    if( Vs>Vm ){ Vm=Vs; if( Ms<0 )Ms=-1-i; }  // небольшая подработка для
-  }                     if( Ms<0 )Ms=-1-Ms;   // нового местоположения миделя
-  for( int i=Ms; i<Ns; i++ )               // номер нулевого шпангоута к началу
-  { for( int j=0; j<=F[i].N; j++ )           // поиска также ставится на мидель
-    { x=norm( y=F[i][j],ds=F[i](j)-Draught );
-      if( ((!j)&&(i==Ms)) || (y>=0 && x<z) )Nstem=i,z=x;
-      if( ds>0 )break;
-  } }
+         z=Do; ds=dx*dz;                    // ds здесь удвоено в средней части
+    for( j=0,Vs=0; j<=mZ; z+=dz,j++ )       // Водоизмещение
+    { Vs += y=Y( x,z )*ds;                  // Объем корпуса
+      if( !j || j==mZ )Vs -= y/2;           //   ... под метод трапеций
+    }
+    if( Vs>Vm ){ Vm=Vs; if( Ms<0 )Ms=-1-i;} // небольшая подработка для
+  }                     if( Ms<0 )Ms=-1-Ms; // нового местоположения миделя
+  Nstem=Ns-1; Dx=-1;                       // номер нулевого шпангоута к началу
+  for( i=Nstem; i>=Ns/2; i-- )            // поиска ставится на первый шпангоут
+  for( j=0; j<=F[i].N; j++ )
+  { x=norm( F[i](j)-Draught,F[i][j] );
+    if( Dx<0 )Dx=x; else if( x<Dx ){ Nstem=i; Dx=x; }
+  }
 }
