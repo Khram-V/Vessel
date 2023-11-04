@@ -16,8 +16,8 @@
 ; LCB                LCB(m) aft of FP 1.625 NA
 ; Vertical Center of Gravity(from keel) KG(m) 0.156 NA
 ; Metacentric height           GM(m) 0.0422 NA
-; Moment of Inertia Kxx/B            0.444  0.444
-; Moment of Inertia Kyy/LWL, Kzz/LWL 0.246  0.25
+; Moment of Inertia Kxx/B            0.444 0.444
+; Moment of Inertia Kyy/LWL, Kzz/LWL 0.246 0.25
 ; Model speed:
 ; U (m/s) 1.11
 ; Fn 0.20
