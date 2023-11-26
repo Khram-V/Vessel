@@ -23,7 +23,9 @@ Vector& Flex::operator/=(_Vector R){ return Insert(0)=R;} // замещение 
 
 Real e5( _Real R ){ return round( R*1e5 )/1e5; }
 Vector e5( Vector W )        // округление записи для точных сравнений 0.01 мм
-{ W.x=e5( W.x ); W.y=W.y<=eps?0.0:e5( W.y ); W.z=e5( W.z ); return W;
+{ W.x=e5( W.x );
+  W.y=e5( W.y ); //W.y<=eps?0.0:e5( W.y );
+  W.z=e5( W.z ); return W;
 }
 #if 0                                 /// -- временно  исключено
 operator Flex::Vector*(){ return P; } // адресный доступ ко всему вектору точек

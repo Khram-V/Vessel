@@ -140,8 +140,8 @@ public:                           // конструктор, авторская 
   Hull& GetDam( char* );// факторы демпфирования поступательной и угловой качки
   Hull& GetExp( char* ); // управление экспериментом и ключи вывода результатов
   Hull& Protocol();
-                                  // true графика или включение перерасчетов
-  Hull& Write();   // запись в obj - Wavefront Technologies Advanced Visualizer
+                         // true графика или включение перерасчетов
+  Hull& Write( int );    // запись + Wavefront Technologies Advanced Visualizer
   char *FileName,*ShipName; // Имя корабля или название исходного проекта UTF-8
   Vector nF,nM, // относительные коэффициенты угловых и поступательных движений
        muF,muM; // обобщённые параметры демпфирования - задаваемые извне

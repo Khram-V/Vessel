@@ -337,6 +337,15 @@ static bool AllKeyb( byte Keyb )
 //  case _Esc: return false;
   } return true;                  // и все иные запросы клавиатуры сбрасываются
 }
+static int Write_choice( Window* Win )
+{ byte ans=1;
+  Mlist Menu[]={ { 1,0," Выходной формат модели корпуса корабля" },
+                 { 2,47,"Wavefront Technologies Advanced Visualizer .obj" },
+                 { 1,47,"Шпангоуты и контуры диаметральной плоскости.dc2" },
+                 { 1,47,"Контурная модель в трёхмерной проекции     .dc3" },
+                 { 1,47,"Корабль с контурами и обшивкой корпуса     .dc3" } };
+  TextMenu T( Mlist( Menu ),Win,6,5 ); return ans=T.Answer( ans );
+}
 //     ... и далее раздельно для каждого окна
 //
 static const char
@@ -362,13 +371,13 @@ bool Hull::KeyBoard( byte Keyb )                     // С краткой под
                    "   теория и штормовая",          // всего вычислительного
                    "    мореходность корабля",0 },   // эксперимента
      *Cmds[]={ "F1 ","- краткая справка",
-               "F2 ","запись в формате «Vessel».obj",
+               "F2 ","запись модели в CAD-формате",
                "F3 ","выбор и чтение иного корпуса",
                "F4 ","параметры корпуса/картинки",
                "F8 ","гидромеханика штормования",0 };     // Activate();
   switch( Keyb )
   { case _F1: Help( Id,Cmds,Plus,1,1 ); break;            // справка с корпусом
-    case _F2: Write(); break;                 // запись 3D-модели в формате.obj
+    case _F2: Write( Write_choice( this ) ); break;       // запись 3D-модели
     case _F3: if( !Read( "*.vsl" ) )
               Break( "Ошибка повторного чтения корпуса %s",FileName );
           Storm->Original( false ); break;    // очистка волнового поля
@@ -423,8 +432,8 @@ static bool Hull_and_Waves_Draw()        // вся графика исполня
     recurse=0;         // при возникновении рекурсии новые рисунки пропускаются
   } return false;
 }
-//!    Главная процедура запускает процессы реального времени
-///                     и зацикливается на опросах клавиатуры
+//!                      Главная процедура запускает процессы реального времени
+///                                       и зацикливается на опросах клавиатуры
 //#include <Fenv.h>
 //#include <Float.h>
 //#include <locale.h>

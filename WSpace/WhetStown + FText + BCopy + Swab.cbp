@@ -68,7 +68,7 @@
 				<Option object_output="Dev/Obj/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters='&quot;JAPAN Bulk Carrier (vsl).dc3&quot;' />
+				<Option parameters='&quot;ONR5613(vsl).dc3&quot; &quot;5415-hull.dc3&quot; &quot;JAPAN Bulk Carrier (vsl).dc3&quot;' />
 				<Linker>
 					<Add library="comdlg32" />
 				</Linker>
@@ -112,8 +112,11 @@
 		<Unit filename="../Math/Gsl/complex_math.h">
 			<Option target="Complex" />
 		</Unit>
+		<Unit filename="../Math/Tensor.cpp">
+			<Option target="DC3-Interpolation-Extrapolation" />
+		</Unit>
 		<Unit filename="../Math/Vector.h">
-			<Option target="&lt;{~None~}&gt;" />
+			<Option target="DC3-Interpolation-Extrapolation" />
 		</Unit>
 		<Unit filename="../Tools/Allocate.cpp">
 			<Option target="DC3-Interpolation-Extrapolation" />
@@ -129,7 +132,7 @@
 			<Option target="DC3-Interpolation-Extrapolation" />
 		</Unit>
 		<Unit filename="../Type.h">
-			<Option target="&lt;{~None~}&gt;" />
+			<Option target="DC3-Interpolation-Extrapolation" />
 		</Unit>
 		<Unit filename="../Window/UniCode.cpp">
 			<Option target="DC3-Interpolation-Extrapolation" />
@@ -138,7 +141,7 @@
 			<Option target="DC3-Interpolation-Extrapolation" />
 		</Unit>
 		<Unit filename="../Working/Contour.h">
-			<Option target="&lt;{~None~}&gt;" />
+			<Option target="DC3-Interpolation-Extrapolation" />
 		</Unit>
 		<Unit filename="../Working/FText.c">
 			<Option compilerVar="CC" />

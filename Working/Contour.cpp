@@ -17,23 +17,23 @@ inline Point W( _Vector V ){ return (Point){V.x,V.y,V.z}; }
 inline Point V( _Real R ){ return (Point){R,R,R}; }
 
 Contour::Contour( size_t L ):
-         P(0),C(0),A(0),met(easy),ext(false),length(L)
+         P(0),C(0),A(0),met(easy),ext(false),len(L)
          { if( L )P=(Point*)Allocate( L*sizeof( Point ) ); }
 Contour::Contour( Point *p, size_t L ):
-         P(p),C(0),A(0),met(easy),ext(true),length(L)
-         { if( !L )length=isAlloc( p )/sizeof( Point ); }      // длина изнутри
+         P(p),C(0),A(0),met(easy),ext(true),len(L)
+         { if( !L )len=isAlloc( p )/sizeof( Point ); }      // длина изнутри
 Contour::~Contour()        // + надо быть осторожным и не удалять чужие массивы
 { if( !ext )if( P )Allocate( 0,P ); if( C )Allocate( 0,C );
                                     if( A )Allocate( 0,A );
 }
-Point& Contour::operator[]( int k ){ return P[minmax( 0,k,(int)length-1 )]; }
-//Real Contour::operator()( int k ){ k=minmax( 0,k,(int)length-1 );
+Point& Contour::operator[]( int k ){ return P[minmax( 0,k,(int)len-1 )]; }
+//Real Contour::operator()( int k ){ k=minmax( 0,k,(int)len-1 );
 //                                   if( !A )return k; else return A[k];
 //                                 }
 Point Contour::operator()( _Real R )
 { Real a,h=1.0; int k;
-   if( A ){ k=find( A,R,length ); a=R-A[k]; h=A[k+1]-A[k]; }
-      else{ k=minmax( 0,int( R ),int(length-2) ); a=R-k; }
+   if( A ){ k=find( A,R,len ); a=R-A[k]; h=A[k+1]-A[k]; }
+      else{ k=minmax( 0,int( R ),int(len-2) ); a=R-k; }
    if( !a || !h )return P[k]; else
    if( C )
    { if( met==spline )
@@ -51,14 +51,14 @@ Contour& Contour::Mode              // переопределение всех �
          )                          // наклон или 1е6-точка перегиба
 { met=Mr; //! - заглушка ...
   if( arg )
-  { (A=(Real*)Allocate( sizeof(Point)*length,A ))[0]=0.0;
-    for( int i=1; i<length; i++ )A[i]=A[i-1]+abs( P[i]-P[i-1] );
+  { (A=(Real*)Allocate( sizeof(Point)*len,A ))[0]=0.0;
+    for( int i=1; i<len; i++ )A[i]=A[i-1]+abs( P[i]-P[i-1] );
   }
 //if( met==first  )return First(); else
   if( met==spline )return SpLine( a1,an ); else return *this;
 }
 Point Contour::forX( _Real X ) // выбор первого вхождения точки с координатой Х
-{ int k=find( P,X,length );
+{ int k=find( P,X,len );
   Real a=X-P[k].X,h=P[k+1].X-P[k].X; if( !a || !h )return P[k]; else
   if( met==easy )return P[k]+ (P[k+1]-P[k])*a/h;
            else  return operator()( A[k]+(A[k+1]-A[k])*a/h );
@@ -67,10 +67,10 @@ Point Contour::forX( _Real X ) // выбор первого вхождения �
 //
 Contour& Contour::SpLine( _Real p1,  // Активизация Сплайн-интерполяции
                           _Real pn ) // Производная в начале и конце отрезка
-{ if( length>=3 )                    // если нет 4 точек, то - выход
-  { int  i,n=length-1; Real qn;
+{ if( len>=3 )                       // если нет 4 точек, то - выход
+  { int  i,n=len-1; Real qn;
         Point b,un,*U=(Point*)Allocate( n*sizeof( Point ) );
-             C=(Point*)Allocate( length*sizeof( Point ),C );
+             C=(Point*)Allocate( len*sizeof( Point ),C );
     if( A )                          // метод прогонки для трехлинейной матрицы
     { Real a,sig;                    // вариант с неравномерным шагом аргумента
       if( p1>0.99e6 )C[0]=0.0,U[0]=0.0; else

@@ -18,8 +18,8 @@ class Contour
   Real *A;                // скалярный аргумент - дистанция по точкам от начала
   metaLine met;           // easy-ломаная; first-эрмит по узлам; spline-сплайн
   bool ext;               // признак включения внешней последовательности точек
-  size_t length;          // Индексная длина линейного массива чисел
 public:
+  size_t len;             // Индексная длина линейного массива чисел
   Contour( size_t l=0 );      // создание нового контура c индексным аргументом
   Contour( Point*,size_t=0 ); // c вовлечением внешней последовательности точек
  ~Contour();
@@ -42,4 +42,9 @@ private:
   Contour& SpLine( _Real a1=1e6,     // активизация простой сплайн-интерполяции
                    _Real aN=1e6 );   // производная в начале и в конце отрезка
 };                                   // если≥1e6 - на концах ≡0 точка перегиба
+
+//Point Point::operator /= ( Real e ){ X/=e; Y/=e; Z/=e; return *this; }
+inline Point operator * ( Point c,Real e ){ c.X*=e; c.Y*=e; c.Z*=e; return c; }
+inline Point operator / ( Point c,Real e ){ c.X/=e; c.Y/=e; c.Z/=e; return c; }
+
 #endif
