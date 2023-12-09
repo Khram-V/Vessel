@@ -5,6 +5,7 @@
 //                                                   2019-02-07 Старый Петергоф
 //
 #include "Vessel.h"
+#include <ctype.h>
 /* Statum: Выбор и установка моделей гидромеханики корабля в штормовом море
               --   0 - кинематическое позиционирование(не скольжение) корпуса
               --       над волнением по хордам четырёх точек склона, иначе:
@@ -185,8 +186,13 @@ Hull& Hull::Get( char *s )
       if( z && *z )            //! установка дифферента по динамической статике
       { if( z=strchr( s=z,',' ) )*z++=0;
         if( strcut( s ) )
-        { if( strpbrk( s,"°'\"") ){ AtoD( s,Trim ); Trim*=_dR; } else
-          { Trim=strtod( s,&s ); AtoM( s,Trim ); Trim=asin(-2*Trim/Length ); }
+        { if( strstr( s,"°" ) || strpbrk( s,"\"'") )
+          { AtoD( s,Trim ); Trim*=_dR; } else       // сходу в угловой мере или
+          { Trim=strtod( s,&s );                    // по окончанию в остатках
+            if( !AtoM( s,Trim ) )                   // с дифферентом в метрах
+            { AtoA( s,Trim ); Trim*=Draught;        // или относительно осадки
+            } Trim=asin( 2.0*Trim/Length );         // к полудлине корпуса
+          }
           if( sin( fabs( Trim )*Length/2.0>Draught ) )       // ограничение
             Trim=asin( 2*copysign( Draught,Trim )/Length );  // макс.дифферента
         }
@@ -223,7 +229,13 @@ Hull& Hull::GetExp( char *s )  // выборка ключевых слов с п
   if( strstr( s,"корм") )Educt=All? Educt&~32: Educt|32; // ускорения в <корм>е
   if( strstr( s,"мид" ) )Educt=All? Educt&~64: Educt|64;  // --//-- на <мид>еле
   if( strstr( s,"нос" ) )Educt=All? Educt&~128:Educt|128;  // в <нос>овой части
-  return *this;
+ char *z=strpbrk( s,"\"'" );
+  if( z )
+  { Real c = z[0]=='\''?60:1;
+    while( z>s && z[-1]==' ' )--z;
+    while( z>s && isdigit( z[-1] ) )--z;
+    if( isdigit( z[0] ) )sT=c*strtod( z,&z ); sT=max( 12,sT );         // 1 час
+  } return *this;
 }
 //     настройка вычислительной акватории и условий генерации штормовых волн
 //

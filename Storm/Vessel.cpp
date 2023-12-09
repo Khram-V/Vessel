@@ -445,7 +445,7 @@ int main() // int ans, char **av )
  //feclear{raise}except( FE_ALL_EXCEPT );
  //    setlocale( LC_ALL,".UTF8" );
  //    setlocale( LC_CTYPE,".UTF8" );
-  textsize( 92,36 ),
+  textsize( 94,40 ),
   texttitle( Title ),
   textcolor( WHITE ),cprint( 2,1,Title ),
   textcolor( LIGHTCYAN ),printf( SubTitle ),

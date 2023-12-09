@@ -33,7 +33,7 @@ static bool shortEx=false;
 static bool extFix( Real *W, Real c ){ bool ret=false; c=e5( c );
   if( W[0]!=W[1] )if( W[1]==c || (c-W[1])*(W[1]-W[0])<0.0 ) // экстремум вперёд
   { if( !shortEx )ret=true; else
-    if( fabs( c )>fabs( W[3] ) ){ W[3]=c; ret=true; }
+    if( fabs( c )>fabs( W[2] ) ){ W[2]=c; ret=true; }
   } W[0]=W[1]; W[1]=c; return ret;
 }
 static void PtoG( char *s )
@@ -47,7 +47,7 @@ static void PtoG( char *s )
 //
 Hull& Hull::Protocol()
 { if( VIL && Educt&0xFF )
-  { Field &S=*Storm;                         //  4       32       64      128
+  { Field &S=*Storm;                                      // 4 32 64 128
    static Real wV[24],                                    // W{ x=8 y=16 z=2 }
           *wZ=wV+3,*wA=wV+6,*wM=wV+9,*wF=wV+12,*wC=wV+15,*wX=wV+18,*wY=wV+21; //
    Vector Dir=Swing[-1];                           // в третьей точке экстремум
@@ -66,17 +66,16 @@ Hull& Hull::Protocol()
       a = ( w1+s1 -2*(w2+s2) + w3+s3 )/d;
       f = ( w1-s1 -2*(w2-s2) + w3-s3 )/d;
       shortEx = (Educt&0x200)!=0;    // режим записи только превышающих величин
-      if( Educt&1  )if( extFix( wV,v ) )ev|=1; // потеря скорости хода
-      if( Educt&2  )if( extFix( wC,angle( w ) ) )ev|=2; // рыскание
-      if( Educt&4  )if( extFix( wZ,Z     ) )ev|=4;      // вертикальная
-      if( Educt&8  )if( extFix( wX,Dir.x ) )ev|=8;      // бортовая
-      if( Educt&16 )if( extFix( wY,Dir.y ) )ev|=16;     // килевая качка
-      if( Educt&32 )if( extFix( wA,a ) )ev|=32;      // ускорения у ахтерштевня
-      if( Educt&64 )if( extFix( wM,m ) )ev|=64;          // ускорение на миделе
-      if( Educt&128)if( extFix( wF,f ) )ev|=128;           // и близи форштевня
+      if( Educt&1  )if( extFix( wV,v ) )ev|=1;         // потеря скорости хода
+      if( Educt&2  )if( extFix( wC,angle( w ) ))ev|=2; // рыскание
+      if( Educt&4  )if( extFix( wZ,Z     ) )ev|=4;     // вертикальная,
+      if( Educt&8  )if( extFix( wX,Dir.x ) )ev|=8;     // бортовая и
+      if( Educt&16 )if( extFix( wY,Dir.y ) )ev|=16;    // килевая качка
+      if( Educt&32 )if( extFix( wA,a )     )ev|=32;    // ускорение ахтерштевня
+      if( Educt&64 )if( extFix( wM,m )     )ev|=64;    // ускорение на миделе
+      if( Educt&128)if( extFix( wF,f )     )ev|=128;   // и вблизи форштевня
       if( ev )
-      { static char str[64]; int i;
-        logTime();                              // сначала время, отсчеты шагов
+      { static char str[64]; int i; logTime();  // сначала время, отсчеты шагов
         sprintf( str,"  ⇒ %s±ξ%5.1f%-+5.1f %s±χ%6.1f%-+6.1f",
                  ev&1?"•":"·",Speed*3600.0/_Mile,v,
                  ev&2?"•":"·",Course*_Rd,-w*_Rd ); PtoG( str+24 );
@@ -168,7 +167,7 @@ Hull& Hull::wPrint( bool log ) // информация по смоченному
       "  >>> { L=%g, B=%g, T=%g, Ψ=%s\\δd=%.0fсм }^%g  №〈A.%d<%+d+>%d.Ф 〉 ",
       ShipName,Length,Breadth,Draught,DtoA(Trim*_Rd,2),asin(Trim)*Length*50,
       Ofs.z-Draught,Stern.len,Nframes,Stem.len );
-                textcolor( CYAN ); cprint( 1,36,fname( fext( FileName ) ) );
+                textcolor( CYAN ); cprint( 1,38,fname( fext( FileName ) ) );
     if( !VIL ){ textcolor( MAGENTA ); printf( " <= без протокола" ); } else
     if( Educt&0xFF )
     { textcolor( GREEN ); printf( " <=%s: %s%s; %s%s%s{%s%s%s}",
