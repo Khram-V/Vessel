@@ -1,5 +1,5 @@
 //!
-//! проект Vessel - штормовой и экстремальный ход корабля
+//! проект Aurora - штормовой и экстремальный ход корабля
 //   ┌───────────────────────────────────────────────╖
 //   │  ↓  корпус ─> волны ─> графика                ║
 //   │  ↓  статика ─> динамика ─> реакции            ║
@@ -7,7 +7,7 @@
 //   ╞═══════════════════════════════════════════════╝
 //   └── ©2018-23 Санкт-Петербург — Южно-Сахалинск — Могилев — Друть — ‏יְרוּשָׁלַיִם
 //
-#include "Vessel.h"
+#include "Aurora.h"
 
 bool logTime(){ const Field &S=*Storm; if( !VIL || S.Kt<2 )return false; else
  return 0<fprintf( VIL,"\n%9s/%-4d",DtoA(Storm->Trun/3600,-3),Storm->Kt ); }
@@ -39,18 +39,27 @@ static bool extFix( Real *W, Real c ){ bool ret=false; c=e5( c );
 static void PtoG( char *s )
 { for( int i=0; s[i]; i++ )if( s[i]=='.' )Uset( s+i,0,"°" );        // градусы°
 }
+#include <unistd.h>
+void logStop();
 //!   регистрация экстремальных событий в ходе вычислительно эксперимента
 //    смещение { ξ η ζ }м, углы поворота { ϑ ψ χ }°
 //    〈•〉-экстремум;  〈·〉-сопутствующие отсчеты
 //    〈П÷Л〉 Б-〈П÷Л〉на борт (π/30); Р-руль〈П÷Л〉 полборта (π/60);
 //         М-помалу〈П÷Л〉=авторулевой (π/120)
-//
+//                                                              4 32 64 128
+static Real wV[24],                                       // W{ x=8 y=16 z=2 }
+           *wZ=wV+3,*wA=wV+6,*wM=wV+9,*wF=wV+12,*wC=wV+15,*wX=wV+18,*wY=wV+21;
+void logStop()
+{ if( !VIL )return;
+  fprintf( VIL,"\n\n << успешное завершение >>" ); logTime();
+  fprintf( VIL,"  ⇒ ±ξ%+3.1f χ%+3.1f ζ%+3.1f ϑ%+3.1f ψ%+3.1f"
+               " « %+3.1f %+3.1f %+3.1f »\n",
+             wV[2],-wC[2]*_Rd,wZ[2],wX[2],wY[2],wA[2],wM[2],wF[2] );
+  ftruncate( fileno(VIL),ftell( VIL ) ); fclose( VIL ); VIL=0;   // отсечение
+}
 Hull& Hull::Protocol()
 { if( VIL && Educt&0xFF )
-  { Field &S=*Storm;                                      // 4 32 64 128
-   static Real wV[24],                                    // W{ x=8 y=16 z=2 }
-          *wZ=wV+3,*wA=wV+6,*wM=wV+9,*wF=wV+12,*wC=wV+15,*wX=wV+18,*wY=wV+21; //
-   Vector Dir=Swing[-1];                           // в третьей точке экстремум
+  { Field &S=*Storm; Vector Dir=Swing[-1];         // в третьей точке экстремум
     if( S.Kt<2 )                                   // ... { ξ η ζ }м,{ ϑ ψ χ }°
     { fprintf( VIL,
       "\n  ⇒ Время Kt      скорость,узл. курс±рыскание руль"
@@ -91,8 +100,7 @@ Hull& Hull::Protocol()
                  ev&8?"•":"·",Dir.x*_Rd,ev&16?"•":"·",Dir.y*_Rd ); PtoG( str );
         fprintf( VIL,"%s« %s%+4.1f %s%+4.1f %s%-+5.1f »",str,
                  ev&32?"•":"·",a,ev&64?"•":"·",m,ev&128?"•":"·",f );
-      }
-  } } return *this;
+  } } } return *this;
 }
 //  Блок текущей консольной текстовой информации о штормовом море и корабле
 //

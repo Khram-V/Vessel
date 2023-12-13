@@ -1,5 +1,5 @@
 //!
-//! проект Vessel - штормовой и экстремальный ход корабля
+//! проект Aurora - штормовой и экстремальный ход корабля
 //   ┌───────────────────────────────────────────────╖
 //   │  ↓  корпус ─> волны ─> графика                ║
 //   │  ↓  статика ─> динамика ─> реакции            ║
@@ -29,8 +29,7 @@ const char
                 " моделирование гидродинамики на теоретическом волнении",
                 " вычислительный эксперимент с отражением волн от корпуса",
                 " эксперимент с учётом скоростей течений и дисперсией волн" };
-#include <unistd.h>
-#include "Vessel.h"
+#include "Aurora.h"
 //#include "../Window/Sym_CCCP.c"
 Field *Storm=0; /// адресная ссылка для доступа к акватории с морским волнением
 Hull *Vessel=0; /// теоретический корпус корабля в собственном тензорном базисе
@@ -71,7 +70,7 @@ Hull::Hull():View      // в прицепе View окошко графическ
   Activate();                     // привязка к Window::Place, и первый рисунок
   glPolygonMode( GL_FRONT_AND_BACK,GL_FILL );
 #if 1
-  color(navy); Alfabet(22,"Courier",800).Print( 2,1,"Vessel ~ " );
+  color(navy); Alfabet(22,"Courier",800).Print( 2,1,"Aurora ~ " );
   color(blue); Alfabet(18,"Courier",600).Print( "штормовая гидромеханика");
   color(cyan); Alfabet(19,"Lucida", 600).Print( 8,2,
                    "Мореходные качества корабля -\n"
@@ -84,7 +83,7 @@ Hull::Hull():View      // в прицепе View окошко графическ
   color(yellow); Alfabet( 12,"Times",1,1 )
                 .Print( -3,0,"© Василий Храмушин" ).Save().Show();
 #else
-  color( navy ); AlfaBit( _8x16 ).Print( 2,1,"Vessel  ~  " );
+  color( navy ); AlfaBit( _8x16 ).Print( 2,1,"Aurora  ~  " );
   color( blue ); Print( "штормовая гидромеханика°\n");
   color( cyan ); Print( 10,2,"Мореходные качества корабля -\n"
                              "   вычислительный эксперимент\n" );
@@ -147,8 +146,8 @@ Field(_Real L,_Real W,_Real T,     // длина, ширина бассейна,
   //!  все начальные установки считаны, и теперь можно их заново корректировать
   //                            из файлов начальной инициализации эксперимента
        int l=1;
-  for( int i=0; i<2; i++ )   // повторение выборки для Vessel.vil и <Model>.vil
-  { strcpy( fname( strcpy( Lst,V.FileName ) ),"Vessel.vil" );
+  for( int i=0; i<2; i++ )   // повторение выборки для Aurora.vil и <Model>.vil
+  { strcpy( fname( strcpy( Lst,V.FileName ) ),"Aurora.vil" );
     if( !i )VIL=_wfopen( U2W( Lst ),L"rt" ); else    // настройка по директории
     { if( VIL ){ fclose( VIL ); VIL=NULL; ++i; }     //++ с отметкой её наличия
       if( strcmp( fext( V.FileName,"vil" ),Lst ) )   //= без повторения и порчи
@@ -203,8 +202,8 @@ Field(_Real L,_Real W,_Real T,     // длина, ширина бассейна,
     fseek( VIL,ftell( VIL ),SEEK_SET );
     fprintf( VIL,"\n\n %s\n %s\n"+(l?0:2),::Title,
              "≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈" );
-    fprintf( VIL," %s %04d %s %02d,%s\n %s\n",
-     _Day[int(Instant.D%7)],Y,_Mnt[M-1],D,DtoA( Instant.T,3,"ⁿ" ),V.ShipName );
+    fprintf( VIL," %04d %s %02d %s %s\n %s\n",
+     Y,_Mnt[M-1],D,_Day[int(Instant.D%7)],DtoA( Instant.T,3,"ⁿ" ),V.ShipName );
     if( V.Educt&0xFF )             // если есть что писать в протокол испытаний
     { fprintf( VIL," эксперимент, в записях %s:",
                  V.Educt&0x200?"только превышение экстремальных событий"
@@ -391,7 +390,7 @@ bool Hull::KeyBoard( byte Keyb )                     // С краткой под
     } Distance=-2.4*sqrt(sqr(Length)+sqr(Breadth*2)+sqr(Draught*4));//дальность
       eye=(Vector){45,-15,0},look=(Vector){-5,0,0}; break;// векторы ориентации
     case _Esc:
-     if( MessageBox( hWnd,UtA("Завершение вычислений")," Vessel :: Ship",
+     if( MessageBox( hWnd,UtA("Завершение вычислений")," Aurora :: Ship",
        MB_APPLMODAL|MB_ICONQUESTION|MB_OKCANCEL|MB_DEFBUTTON1 )==IDOK )Close();
             return true;                               // ~Window(); ~Hull()
    default: return View::KeyBoard( Keyb );             // и направления взгляда
@@ -462,7 +461,7 @@ int main() // int ans, char **av )
     " inMass  - исходные моменты инерции корпуса\n" );
   //
   // конструктор выбора корпуса - открывает и настраивает графику с чтением
-  // из файла и формирование представления корпуса Vessel в оперативной памяти
+  // из файла и формирование представления корпуса Aurora в оперативной памяти
   // с построением независимой прорисовки 3D корпуса под мышкой и таймером
   //
  Hull Ship;
@@ -519,8 +518,10 @@ int main() // int ans, char **av )
   if( Ship.Ready() )Ship.Close();
   if( Sea.Ready() )Sea.Close();
   textcolor( LIGHTMAGENTA ); cprint( 1,24,"\n << успешное завершение >> " );
-  if( VIL )
-  { fprintf( VIL,"\n\n <<%s успешное завершение >>\n",DtoA(Sea.Trun/3600,3) );
-    ftruncate( fileno(VIL),ftell( VIL ) ); fclose( VIL ); VIL=0; // отсечение
-  } return EXIT_SUCCESS;
+  void logStop(); logStop();
+//  if( VIL )
+//  { fprintf( VIL,"\n\n <<%s успешное завершение >>\n",DtoA(Sea.Trun/3600,3) );
+//    ftruncate( fileno(VIL),ftell( VIL ) ); fclose( VIL ); VIL=0; // отсечение
+//  }
+  return EXIT_SUCCESS;
 }

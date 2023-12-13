@@ -1,6 +1,6 @@
 [Project]
-FileName=Vessel.dev
-Name=Vessel
+FileName=Aurora.dev
+Name=Aurora
 UnitCount=28
 Type=0
 Ver=2
@@ -20,7 +20,7 @@ ObjectOutput=Dev\Obj
 LogOutput=Dev
 LogOutputEnabled=1
 OverrideOutput=1
-OverrideOutputName=Vessel-dev.exe
+OverrideOutputName=Aurora-dev.exe
 HostApplication=
 UseCustomMakefile=0
 CustomMakefile=
@@ -56,7 +56,7 @@ AutoIncBuildNr=0
 SyncProduct=1
 
 [Unit1]
-FileName=..\Storm\Vessel.cpp
+FileName=..\Storm\Aurora.cpp
 CompileCpp=1
 Folder=
 Compile=1
@@ -176,7 +176,7 @@ DetectEncoding=3
 Encoding=3
 
 [Unit11]
-FileName=..\Storm\Vessel.h
+FileName=..\Storm\Aurora.h
 CompileCpp=1
 Folder=
 Compile=1

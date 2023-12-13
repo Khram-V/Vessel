@@ -3,7 +3,7 @@
 //      в стандартных трёхмерных графических форматах
 //                                                         2019-08-22 Иерусалим
 //
-#include "Vessel.h"       // объекты и производные операции с корпусом на волне
+#include "Aurora.h"       // объекты и производные операции с корпусом на волне
 static int fColor=-1;
 static FILE *F=NULL;
 static void printF( Vector V )
@@ -31,7 +31,7 @@ Hull& Hull::Write( int format ) // Wavefront Technologies 4 Advanced Visualizer
     //
     //     последовательная запись всего массива опорных точек в текстовый файл
     //
-    fprintf( F,"# < %s >\nmtllib Vessel.mtl\n# Stern[%d]\n",
+    fprintf( F,"# < %s >\nmtllib Aurora.mtl\n# Stern[%d]\n",
                       ShipName,n=Stern.len );                   // заголовок
     for( i=0; i<n; i++ )printF( Stern[i] ); L[0]=n*2;           // ахтерштевень
     for( k=0; k<=Nframes+1; k++ )                               // и следом все
@@ -177,7 +177,7 @@ Hull& Hull::Write( int format ) // Wavefront Technologies 4 Advanced Visualizer
   } } } } }                                                  // перпендикуляром
   { int D,m,d,y; julday( D=julday(),m,d,y ); char c=format==1?'#':';';
     fprintf( F,"%c\n%c %s\n%c %04d.%s.%02d %s%s\n",
-       c,c,UtA( FileName ),c,y,_Mnt[m-1],d,_Day[D%7],DtoA( onetime(),3 ) );
+           c,c,UtA( FileName ),c,y,_Mnt[m-1],d,_Day[D%7],DtoA( onetime(),3 ) );
   } fclose( F ); return *this;
 }
 /*      &Entity_Type,       Собственно тип объекта

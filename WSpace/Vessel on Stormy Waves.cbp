@@ -8,7 +8,7 @@
 		<Build>
 			<Target title="Vessel on Stormy Waves">
 				<Option platforms="Windows;" />
-				<Option output="../../Work/Vessel" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/Aurora" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../Vessel" />
 				<Option object_output="Dev/Obj" />
 				<Option type="0" />
@@ -22,7 +22,7 @@
 				</Linker>
 			</Target>
 			<Target title="Vessel-32">
-				<Option output="../../Work/Vessel-32" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/Aurora-32" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../Vessel" />
 				<Option object_output="Dev/Obj/64/" />
 				<Option type="0" />
@@ -39,7 +39,7 @@
 				</Linker>
 			</Target>
 			<Target title="Vessel-64">
-				<Option output="../../Work/Vessel-64" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/Aurora-64" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../Vessel" />
 				<Option object_output="Dev/Obj/64/" />
 				<Option type="0" />
@@ -56,7 +56,7 @@
 				</Linker>
 			</Target>
 			<Target title="Vessel-night">
-				<Option output="Dev/Vessel-night" prefix_auto="1" extension_auto="1" />
+				<Option output="Dev/Aurora-night" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../Vessel" />
 				<Option object_output="Dev/Obj/night/" />
 				<Option type="0" />
@@ -124,13 +124,13 @@
 			<Option target="Vessel-night" />
 			<Option target="Vessel-32" />
 		</Unit>
-		<Unit filename="../Storm/Vessel.cpp">
+		<Unit filename="../Storm/Aurora.cpp">
 			<Option target="Vessel on Stormy Waves" />
 			<Option target="Vessel-64" />
 			<Option target="Vessel-night" />
 			<Option target="Vessel-32" />
 		</Unit>
-		<Unit filename="../Storm/Vessel.h">
+		<Unit filename="../Storm/Aurora.h">
 			<Option target="Vessel on Stormy Waves" />
 			<Option target="Vessel-64" />
 			<Option target="Vessel-night" />

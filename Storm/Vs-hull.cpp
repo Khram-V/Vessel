@@ -1,7 +1,7 @@
 //
 //    Исходный вариант корпуса корабля в соответствии форматом записи в файле
 //
-#include "Vessel.h"
+#include "Aurora.h"
 #include "Aurora.inc"
 //
 //    Contour (centerline+wide) - контур диаметральной плоскости { x,y,z }
@@ -199,7 +199,7 @@ Ok: Str=stringData( Fh );            // Длинная строка в буфе�
     { *s=0; while( *Str<=' ' )++Str;
       free( ShipName ); ShipName=strdup( strcut( Str )?Str:FileName );
     }
-    sscanf( stringData( Fh ),"%d%d",&Nframes,&Mid );
+    sscanf( stringData( Fh ),"%d%d",&Nframes,&Mid ); ++Mid;
     sscanf( stringData( Fh ),"%lf%lf%lf%lf",&Length,&Breadth,&Draught,&Ofs.z );
     Keel=(Real*)Allocate( (Nframes+2)*sizeof(Real),Keel );  // килевая разметка
     Frame=(Flex*)Allocate( (Nframes+2)*sizeof(Flex),Frame );// точки шпангоутов
@@ -261,8 +261,8 @@ Ok: Str=stringData( Fh );            // Длинная строка в буфе�
     //    плоскость, то необходим проход по всем точкам плазовых аппликат
     //
     Ofs.z+=Draught; // все отсчёты аппликат приводятся к действующей ватерлинии
-    Ofs.x=Nframes>2?minmax( Keel[1],Keel[Mid],Keel[Nframes] )
-                         :( Keel[1]+Keel[Nframes] )/2;      // крайние пополам
+    Ofs.x=Nframes>2?minmax( Keel[0],Keel[Mid],Keel[n+1] )
+                         :( Keel[0]+Keel[n+1] )/2;      // крайние пополам
                          Control( Stern,Ofs,true );         // контроль и сдвиг
     for( n=0; n<=Nframes+1; n++ )                           // для новой точки
        { Keel[n]-=Ofs.x; Control( Frame[n],Ofs ); }         // пересечения

@@ -4,7 +4,7 @@
 //
 //                                                           2021-03-23 יְרוּשָׁלַיִם
 //
-#include "Vessel.h"       // объекты и производные операции с корпусом на волне
+#include "Aurora.h"       // объекты и производные операции с корпусом на волне
 
 Hull& Hull::Contour_Lines()      // рисуем контуры габаритного прямоугольного
 { glLineWidth( 0.05 );           // параллелепипеда по заданным размерениям
@@ -90,13 +90,13 @@ Hull& Hull::NavigaInform( Window *Win )
   glTranslated( 0,-0.1,0 );
   glScaled( 0.9*L,0.9*L,1 );
   color( white,0,.33 ),circle( (Point){0},1/L );  // круг картушки 110% корпуса
- bool left=int( 2+Course/_Ph )&1; color(navy);
-  Compass
-  .Print( left?-1:1,1,S.Wind.Height||S.Wind.Height||S.Wind.Height?"":"Штиль" );
+ bool left=int( 2+Course/_Ph )&1,
+      right=S.Wind.Height||S.Swell.Height||S.Surge.Height;
+  color(navy); Compass.Print( left?-1:1,1,right?"":"Штиль" );
   if( S.Exp.wave&3 )DirWave( S.Wind,green,Compass ),        // ветровая волна
                     DirWave( S.Swell,blue,Compass ),        // свежая зыбь
                     DirWave( S.Surge,cyan,Compass ); else   // реликтовый накат
-  Compass.Print( "Заштилело" );
+  if( right )Compass.Print( "Заштилело" );
   //
   //  стрелка-указатель заданного курса корабля
   //

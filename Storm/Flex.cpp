@@ -5,7 +5,7 @@
 //         k>=0 є { 0÷len-1 } — положительные индексы с прямым отсчётом P[k]
 //         k<0  є { len+k÷0 } — отрицательные ≡ обратный отсчёт  P[len-k]
 //
-#include "Vessel.h"
+#include "Aurora.h"
         Flex:: Flex(): len( 0 ),P( NULL ){}
         Flex::~Flex(){ if( len ){ Allocate( 0,P ); len=0; P=NULL; } }
 Vector& Flex:: operator[]( int k ){ return P[minmax(0,k>=0?k:k+len,len-1)]; } // выборка внутренней точки [k]

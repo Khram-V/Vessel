@@ -1,7 +1,7 @@
 //
 //    Исходный вариант корпуса корабля в соответствии форматом записи в файле
 //
-#include "Vessel.h"
+#include "Aurora.h"
 #include "Aurora.inc"
 //
 //    Contour (centerline+wide) - контур диаметральной плоскости { x,y,z }
