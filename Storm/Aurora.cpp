@@ -58,6 +58,7 @@ Hull::Hull():View      // в прицепе View окошко графическ
   hX( 1.0 ),                     // поперечная метацентрическая высота      [м]
   sT( 30.0 ),                    // интервал кинематической визуализации  [сек]
   Trim( 0.0 ),                   // дифферент по смещению центра величины [рад]
+  Kv( 0.5 ),                     // 1-без давления; 0-учёт парадокса Даламбера
   Course( _Ph ),dCs( _Ph/60.0 ), // курс, руль на борт(1мин), полборта(2) [рад]
   Speed( 0.0 ),cSp( 0.0 ),       // скорость погашена, машины остановлены [м/с]
   Locate( Zero ),                // прямая ссылка на текущее местоположение [м]
@@ -444,7 +445,7 @@ int main() // int ans, char **av )
  //feclear{raise}except( FE_ALL_EXCEPT );
  //    setlocale( LC_ALL,".UTF8" );
  //    setlocale( LC_CTYPE,".UTF8" );
-  textsize( 94,40 ),
+  textsize( 92,40 ),
   texttitle( Title ),
   textcolor( WHITE ),cprint( 2,1,Title ),
   textcolor( LIGHTCYAN ),printf( SubTitle ),
@@ -475,7 +476,7 @@ int main() // int ans, char **av )
          100,0.44,160,   //-20 свежая морская зыбь неподалёку прошедших штормов
          160,0.2,-130 ); //+50 пологие реликтовые волны от удаленных ураганов
 
-//Start_Experiment();    ///   !!! - считывание конфигурационного файла !!!
+//Start_Experiment();    /// !!! - считывание конфигурационного файла !!!
 
   Sea.Original( true );   // конструктор перенастройки волнения и гидромеханики
                           //  с подготовкой корпуса для начальной инициализации
@@ -501,14 +502,13 @@ int main() // int ans, char **av )
 //#pragma omp section
 //{
 //do{ Sea.Simulation(); WaitTime( 100 ); }while( Ship.asYet() && Sea.asYet() );
-
 //#pragma omp task
 {
   do                                            // -=+*&#
   { static int i=0; cprint( 1,22,"%c",( "0123456789ABCDEF" )[++i%=16] );
     WaitTime( 250 );    // приостановка без снижения производительности Windows
-  //  Sleep( 25 );      // или варианты полной задержки по блокирующему таймеру
-  //  while( Ship.GetKey()||Sea.GetKey() ); // где-то в прерываниях недовыборка
+    //Sleep( 25 );      // или варианты полной задержки по блокирующему таймеру
+    //while( Ship.GetKey()||Sea.GetKey() ); // где-то в прерываниях недовыборка
   } while( Ship.Ready() && Sea.Ready() );
 } // task
 //} // master
@@ -519,9 +519,5 @@ int main() // int ans, char **av )
   if( Sea.Ready() )Sea.Close();
   textcolor( LIGHTMAGENTA ); cprint( 1,24,"\n << успешное завершение >> " );
   void logStop(); logStop();
-//  if( VIL )
-//  { fprintf( VIL,"\n\n <<%s успешное завершение >>\n",DtoA(Sea.Trun/3600,3) );
-//    ftruncate( fileno(VIL),ftell( VIL ) ); fclose( VIL ); VIL=0; // отсечение
-//  }
   return EXIT_SUCCESS;
 }

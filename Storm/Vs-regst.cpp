@@ -19,7 +19,8 @@ void logHydro(){ if( VIL ){ const byte St=Vessel->Statum;
      fprintf(VIL,"\n  ⇒ Гидромеханика[%d]: %s"+logTime(),St,Model[St]); } }
 void logDamp(){ if( VIL ){ _Vector F=Vessel->muF,M=Vessel->muM;
 fprintf( VIL,"\n  ⇒ Демпфирование: μV{ ξ=%4.2lf, η=%4.2lf, ζ=%4.2lf };"
-  " μω{ θ=%4.2lf, ψ=%4.2lf, χ=%4.2lf }"+logTime(),F.x,F.y,F.z,M.x,M.y,M.z); } }
+  " μω{ θ=%4.2lf, ψ=%4.2lf, χ=%4.2lf }, Kv=%0.2lg"+logTime(),
+        F.x,F.y,F.z,M.x,M.y,M.z,Vessel->Kv ); } }
 void Model_Config( Window* Win ){ byte &St=Vessel->Statum,ans=St;
   Mlist Menu[]={ {1,0,"  Выбор модели гидромеханики корабля"},{2,45,Model[0]},
              {1,45,Model[1]},{1,45,Model[2]},{1,45,Model[3]},{1,45,Model[4]} };
@@ -32,8 +33,7 @@ void Model_Config( Window* Win ){ byte &St=Vessel->Statum,ans=St;
 static bool shortEx=false;
 static bool extFix( Real *W, Real c ){ bool ret=false; c=e5( c );
   if( W[0]!=W[1] )if( W[1]==c || (c-W[1])*(W[1]-W[0])<0.0 ) // экстремум вперёд
-  { if( !shortEx )ret=true; else
-    if( fabs( c )>fabs( W[2] ) ){ W[2]=c; ret=true; }
+  { if( fabs( c )>fabs( W[2] ) ){ W[2]=c; ret=true; } else ret=!shortEx;
   } W[0]=W[1]; W[1]=c; return ret;
 }
 static void PtoG( char *s )
@@ -52,10 +52,10 @@ static Real wV[24],                                       // W{ x=8 y=16 z=2 }
 void logStop()
 { if( !VIL )return;
   fprintf( VIL,"\n\n << успешное завершение >>" ); logTime();
-  fprintf( VIL,"  ⇒ ±ξ%+3.1f χ%+3.1f ζ%+3.1f ϑ%+3.1f ψ%+3.1f"
-               " « %+3.1f %+3.1f %+3.1f »\n",
-             wV[2],-wC[2]*_Rd,wZ[2],wX[2],wY[2],wA[2],wM[2],wF[2] );
-  ftruncate( fileno(VIL),ftell( VIL ) ); fclose( VIL ); VIL=0;   // отсечение
+  if( Vessel->Educt&0xFF )fprintf( VIL,
+       "  ⇒ ±ξ%+4.2f χ%+4.2f ζ%+4.2f ϑ%+4.2f ψ%+4.2f « %+4.2f %+4.2f %+4.2f »",
+                wV[2],-wC[2]*_Rd,wZ[2],wX[2]*_Rd,wY[2]*_Rd,wA[2],wM[2],wF[2] );
+  fprintf( VIL,"\n" ); ftruncate( fileno(VIL),ftell(VIL) ); fclose(VIL); VIL=0;
 }
 Hull& Hull::Protocol()
 { if( VIL && Educt&0xFF )
@@ -75,14 +75,14 @@ Hull& Hull::Protocol()
       a = ( w1+s1 -2*(w2+s2) + w3+s3 )/d;
       f = ( w1-s1 -2*(w2-s2) + w3-s3 )/d;
       shortEx = (Educt&0x200)!=0;    // режим записи только превышающих величин
-      if( Educt&1  )if( extFix( wV,v ) )ev|=1;         // потеря скорости хода
-      if( Educt&2  )if( extFix( wC,angle( w ) ))ev|=2; // рыскание
-      if( Educt&4  )if( extFix( wZ,Z     ) )ev|=4;     // вертикальная,
-      if( Educt&8  )if( extFix( wX,Dir.x ) )ev|=8;     // бортовая и
-      if( Educt&16 )if( extFix( wY,Dir.y ) )ev|=16;    // килевая качка
-      if( Educt&32 )if( extFix( wA,a )     )ev|=32;    // ускорение ахтерштевня
-      if( Educt&64 )if( extFix( wM,m )     )ev|=64;    // ускорение на миделе
-      if( Educt&128)if( extFix( wF,f )     )ev|=128;   // и вблизи форштевня
+      if( extFix( wV,v )       )if( Educt&1  )ev|=1;   // потеря скорости хода
+      if( extFix( wC,angle(w)) )if( Educt&2  )ev|=2;   // рыскание
+      if( extFix( wZ,Z )       )if( Educt&4  )ev|=4;   // вертикальная,
+      if( extFix( wX,Dir.x )   )if( Educt&8  )ev|=8;   // бортовая и
+      if( extFix( wY,Dir.y )   )if( Educt&16 )ev|=16;  // килевая качка
+      if( extFix( wA,a )       )if( Educt&32 )ev|=32;  // ускорение ахтерштевня
+      if( extFix( wM,m )       )if( Educt&64 )ev|=64;  // ускорение на миделе
+      if( extFix( wF,f )       )if( Educt&128)ev|=128; // и вблизи форштевня
       if( ev )
       { static char str[64]; int i; logTime();  // сначала время, отсчеты шагов
         sprintf( str,"  ⇒ %s±ξ%5.1f%-+5.1f %s±χ%6.1f%-+6.1f",
@@ -129,7 +129,7 @@ void logWave()
      W.Cw,(_Pi-atan2(W.x.y,W.x.x))*_Rd,W.Ds,W.Mx,W.My );
   }
   fprintf( VIL,"  ⇒ %s (%s)\n",ModelWave[S.Exp.wave],S.Exp.peak
-         ? "трохоидальный процесс":"поверхностный поток" );
+             ? "трохоидальный процесс" : "поверхностный поток" );
 }
 //inline void printB(unsigned B){ if(B>>1)printB(B>>1); putch((B&1)?'1':'0'); }
 
@@ -148,9 +148,9 @@ Hull& Hull::wPrint( bool log ) // информация по смоченному
         Floatage,iF,Metacenter.x,vM.x,Gravity.z,hX,vM.z,Metacenter.y,vM.y ),
   cprint( 80,8,"Statum{ %X } ",Statum ), // printB( Statum );
   textcolor( WHITE ),cprint( 28,14,"C:{%6.1f,%.1f,%-6.1f}  ",vB.x,vB.y,vB.z );
-  cprint( 55,14,"mC:| %5.2f %-5.2f %-5.2f | X %s  ",x.x,x.y,x.z,DtoA(atan2(-z.y,z.z )*_Rd,-1)),
-  cprint( 58,15,   "| %5.2f %-5.2f %-5.2f | Y %s  ",y.x,y.y,y.z,DtoA(atan2( x.z,x.x )*_Rd,-1)),
-  cprint( 58,16,   "| %5.2f %-5.2f %-5.2f | Z %s  ",z.x,z.y,z.z,DtoA(atan2(-x.y,x.x )*_Rd,-1));
+  cprint( 55,14,"mC:| %5.2f %-5.2f %-5.2f | X %s  ",x.x,x.y,x.z,DtoA(atan2(-z.y,z.z)*_Rd,-1)),
+  cprint( 58,15,   "| %5.2f %-5.2f %-5.2f | Y %s  ",y.x,y.y,y.z,DtoA(atan2( x.z,x.x)*_Rd,-1)),
+  cprint( 58,16,   "| %5.2f %-5.2f %-5.2f | Z %s  ",z.x,z.y,z.z,DtoA(atan2(-x.y,x.x)*_Rd,-1));
   textcolor( LIGHTCYAN ),
   cprint( 27,15,"vF:{%6.1f,%.1f,%-6.1f}  ", vF.x,vF.y,vF.z ),
   cprint( 27,16,"vW:{%6.1f,%.1f,%-6.1f}  ", vW.x,vW.y,vW.z ),
@@ -191,6 +191,5 @@ Hull& Hull::wPrint( bool log ) // информация по смоченному
       Volume,Surface,Floatage,Buoyancy.x,Buoyancy.z,Gravity.z,
       Metacenter.z-Buoyancy.z,hX );
       if( F.Kt<2 )logDamp(),logHydro(); fprintf( VIL,"\n" );
-    }
-  } return *this;
+  } } return *this;
 }

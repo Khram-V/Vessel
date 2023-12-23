@@ -213,9 +213,13 @@ Hull& Hull::Get( char *s )
 //
 Hull& Hull::GetDam( char *s )
 { char *z;                      // тройки числовых величины разделяются запятой
-  if( z=strchr( s,',' ) )*z++=0;  //! ограничение поля новой числовой величины
-  sscanf( s,"%lg%lg%lg",&muF.x,&muF.y,&muF.z ); s=z;
-  sscanf( s,"%lg%lg%lg",&muM.x,&muM.y,&muM.z ); DampInit(); return *this;
+  if( z=strchr( s,',' ) )*z++=0; //!   ограничение поля новой числовой величины
+  sscanf( s,"%lg%lg%lg",&muF.x,&muF.y,&muF.z );      // пустой строке числе нет
+  if( z )
+  { if( z=strchr( s=z,',' ) )*z++=0; // к фактору компенсации парадокса Даламбера
+    sscanf( s,"%lg%lg%lg",&muM.x,&muM.y,&muM.z );
+    if( z ){ sscanf( s=z,"%lg",&Kv ); Kv=minmax( 0.0,Kv,1.0 ); }
+  } DampInit(); return *this;
 }
 Hull& Hull::GetExp( char *s )  // выборка ключевых слов с произвольным порядком
 { bool All=false; Educt=0;     // и остаётся только то, что выбирается из файла
