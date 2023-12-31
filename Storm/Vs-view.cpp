@@ -192,18 +192,18 @@ Hull& Hull::Drawing( byte type )  // 0 - DrawMode; 1 - корпус; 2 + про�
   //
  Point P=out( Buoyancy ),Q=out( Gravity ),      // начальной величины и тяжести
        C=out( vB ),F=out( vF ),M=F,I=out(Zero), // центр объёма, ВЛ и метацентр
-       W=out( Floatable ),S=W; M.Z=I.Z+vM.x;       // исходные центры ВЛ и мета.
-                               S.Z=I.Z+Metacenter.x;
+       W=out( Floatable ),S=W; M.Z=I.Z+vM.x;    // исходные центры ВЛ и мета.
+ Point K=out( vC );       S.Z=I.Z+Metacenter.x;
 ///ctor R = Gravity-vB;   гидростатическое плечо
  colors c = vM.z>=hX ? green : ( vM.z<0 ? red:yellow );
   //
   //  оси корабельных координат - векторы локального базиса от центра величины
   //
- Vector R=Buoyancy; R.z=vB.z;
- Point O=out( R );
-  Text( _Up,arrow( O-z*Draught*2,O+z*Draught*3, ArLen,blue ),"z" );
-  Text( _Up,arrow( O+Breadth*y,  O-y*Breadth,   ArLen ),     "y" );
-  Text( _Up,arrow( O+x*Length*-.6,O+x*Length*.6,ArLen ),     "x" );
+// Vector R=Buoyancy; R.z=vB.z;
+// Point O=out( R );
+  Text( _Up,arrow( K-z*Draught*2, K+z*Draught*3,ArLen,blue ),"z" );
+  Text( _Up,arrow( K+Breadth*y,   K-y*Breadth,  ArLen ),     "y" );
+  Text( _Up,arrow( K+x*Length*-.6,K+x*Length*.6,ArLen ),     "x" );
   //
   //  метацентрический флажок из гидростатических центров
   //
@@ -244,7 +244,9 @@ Hull& Hull::Drawing( byte type )  // 0 - DrawMode; 1 - корпус; 2 + про�
   if( S!=M )arrow( spot( S,12 ),M,ArLen ); // начальный метацентр - тихой воды
   glLineWidth( 1 ); arrow( C,M,ArLen );    // метацентрический радиус вертикаль
   arrow                                    // центр гидродинамических пар сил
-    ( arrow( Q,spot( out( vD ),8,green ),ArLen ),F,ArLen );
+        ( arrow( Q,spot( out( vD ),8,green ),ArLen ),F,ArLen );
+
+               spot( out( vC ),24,gray );
   //
   //  маршрут корабля по поверхности взволнованного моря
   //

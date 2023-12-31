@@ -29,6 +29,8 @@ bool operator !=( _Vector a,_Vector b ){ return a.x!=b.x||a.y!=b.y||a.z!=b.z; }
 //                                или = скалярное произведение проекции вектора
 //
 Real operator % ( _Vector a,_Vector b ){ return a.x*b.x+a.y*b.y+a.z*b.z; }
+Vector operator & ( _Vector a,_Vector b )
+       { return (Vector){ a.x*b.x,a.y*b.y,a.z*b.z }; }
 Vector operator * ( _Vector a,_Vector b )
        { return (Vector){ a.y*b.z-a.z*b.y,a.z*b.x-a.x*b.z,a.x*b.y-a.y*b.x }; }
 Vector& Vector::operator*=( _Vector d )  // произведение ортогонального вектора

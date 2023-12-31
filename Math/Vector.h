@@ -56,7 +56,7 @@ Vector operator - ( _Vector ),
        operator / ( _Vector,_Real ),
        operator * ( _Vector,_Real ),   operator * ( _Real,_Vector ),
        operator + ( _Vector,_Vector ), operator - ( _Vector,_Vector ),
-       operator * ( _Vector,_Vector );
+       operator & ( _Vector,_Vector ), operator * ( _Vector,_Vector );
 //     { return (Vector){ a.y*b.z-a.z*b.y,a.z*b.x-a.x*b.z,a.x*b.y-a.y*b.x }; }
 //
 //   * - нормаль - векторное произведение для ориентированной площади основания
