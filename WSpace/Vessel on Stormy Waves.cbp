@@ -100,29 +100,12 @@
 			<Add library="comdlg32" />
 			<Add library="gomp" />
 		</Linker>
-		<Unit filename="../Math/Tensor.cpp">
-			<Option target="Vessel on Stormy Waves" />
-			<Option target="Vessel-64" />
-			<Option target="Vessel-night" />
-			<Option target="Vessel-32" />
-		</Unit>
+		<Unit filename="../Math/Tensor.cpp" />
 		<Unit filename="../Math/Tensor.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="../Math/Vector.h">
 			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
-		<Unit filename="../Storm/Aurora.inc">
-			<Option target="Vessel on Stormy Waves" />
-			<Option target="Vessel-64" />
-			<Option target="Vessel-night" />
-			<Option target="Vessel-32" />
-		</Unit>
-		<Unit filename="../Storm/Flex.cpp">
-			<Option target="Vessel on Stormy Waves" />
-			<Option target="Vessel-64" />
-			<Option target="Vessel-night" />
-			<Option target="Vessel-32" />
 		</Unit>
 		<Unit filename="../Storm/Aurora.cpp">
 			<Option target="Vessel on Stormy Waves" />
@@ -131,6 +114,18 @@
 			<Option target="Vessel-32" />
 		</Unit>
 		<Unit filename="../Storm/Aurora.h">
+			<Option target="Vessel on Stormy Waves" />
+			<Option target="Vessel-64" />
+			<Option target="Vessel-night" />
+			<Option target="Vessel-32" />
+		</Unit>
+		<Unit filename="../Storm/Aurora.inc">
+			<Option target="Vessel on Stormy Waves" />
+			<Option target="Vessel-64" />
+			<Option target="Vessel-night" />
+			<Option target="Vessel-32" />
+		</Unit>
+		<Unit filename="../Storm/Flex.cpp">
 			<Option target="Vessel on Stormy Waves" />
 			<Option target="Vessel-64" />
 			<Option target="Vessel-night" />

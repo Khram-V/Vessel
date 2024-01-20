@@ -41,20 +41,23 @@ int  Set_Power();        // Корпус из степенных (парабол
 //               X(0), Y(0) - точка киля
 //               X(1), Y(1) - точка на сломе борта к палубе (ширстрек)
 //               X(-1),Y... -//- то же - левого борта
-struct Frame
-{ int  N;        // количество интервалов в узловых интерполяционных точках{-1}
-  Real X,min,max,// абсцисса и границы аппликаты теоретического шпангоута
-   *y,*z,        // аппликаты и ординаты точек сплайна шпангоутов
-   *_x,          // индексный массив 0..N или длина кривой по сплайну
-   *_y,*_z;      // вторая производная в узлах сплайн-функции
-  Frame( int l=0 ); void allocate( int ); void free(); ~Frame();
-  Real G( _Real Z, bool=false );     // эмуляция плазовой ординаты по аппликате
-  Real operator()(_Real A ){ return G( A ); }
-  Real& operator[]( int k ){ return y[k]; };  // In/Out доступ к функции
-  Real& operator()( int k ){ return z[k]; }; // аргументу по индексному отсчету
-  void SpLine(); void Easy();     // подготовка к работе и сброс сплайн-функции
-  void YaZ( Real A, Real &Y,Real &Z ); // и, - не совсем последовательный поиск
-  void Double( int k );                // вставка сломанной точки на шпангоуте
+class Frame
+{ Real *_x,      // индексный массив 0..N или длина кривой по сплайну
+       *_y;      // вторая производная в узлах сплайн-функции
+  bool Spl;      // признак включения сплайн-функции
+public: Frame( int l=0 ); ~Frame();
+ int  N;         // количество интервалов в узловых интерполяционных точках{-1}
+ Real X,min,max, // абсцисса и границы аппликаты теоретического шпангоута
+     *y,*z;      // аппликаты и ординаты точек сплайна шпангоутов
+ Real& operator()( int k ){ return z[k]; };  // аргументу по индексному отсчету
+ Real& operator[]( int k ){ return y[k]; };  // In/Out доступ к функции
+ Real G( _Real Z, bool=false );      // эмуляция плазовой ординаты по аппликате
+ void SpLine( bool old=false );      // включение и ...
+ void Easy(){ Spl=false; }           //       ... и сброс сплайн-функции
+ void allocate( int ); //void free();
+ Real operator()(_Real A ){ return G( A ); }
+ void Double( int k );                // вставка сломанной точки на шпангоуте
+ void YaZ( Real A, Real &Y,Real &Z ); // и, - не совсем последовательный поиск
 };
 ///   Уточненный вариант корпуса, разделенного на шпангоуты
 //
@@ -64,20 +67,20 @@ class Hull{ public:
  Frame *F,                              // Ряд Ns\Ms теоретических шпангоутов
        Stx,Sty,Asx,Asy;                 // Форштевень и ахтерштевень, нос\корма
   Hull(); // ~Hull();
-  void allocate( int N );                     // вектор адресов для шпангоутов
   void Analytics();                           // варианты аналитических обводов
+  void allocate( int N );                     // вектор адресов для шпангоутов
   void Init();                                // водоизмещение, площади и др.
   void Aphines( _Real cX,_Real cY,_Real cZ ); // абсциссы, ординаты, аппликаты
   void ModelEx( Real &L,Real &B,int N,int M ); // Кубик, Эллипс, Шлюпка, Шлюпик
   void BilgeEx();                             // скуловые формирования в обводы
-  void Simple_Hull( int Nx, int Nz, int Ns ); // шпангоуты, ватерлинии, штевни
   Real Y( _Real X,_Real Z ); // ордината-Y корпуса по абсциссе-X и аппликате-Z
   int Write();          // запись таблицы ординат корпуса в обновлённом формате
   bool Read();          // чтение корпуса: <имя> - новый; * ЛКИ; ' ' - Польша
-  void MinMax();
 private:// исходный корпус Игоря Степанова кафедры конструкции судов КорФак ЛКИ
   int Read_from_Polland();// польский теоретический чертёж Александра Дегтярева
   int Read_from_Frames(); // и обновлённая талица плазовых ординат со штевнями
+  void Simple_Hull( int Nx, int Nz, int Ns ); // шпангоуты, ватерлинии, штевни
+  void MinMax();
 };
 //!   Рабочее описание корпуса в виде простого массива плазовых координат
 //
@@ -158,7 +161,7 @@ inline complex exp( const complex& c ){ return polar( c.y )*exp( c.x ); }
 //efine gl_WHITE        glColor3f( 1,1,1 )              // белый
 #define gl_YELLOW       glColor3f( 1,1,0 )              // желтый
 #define gl_LIGHTRED     glColor3f( 1,0,0 )              // красный
-//efine gl_LIGHTBLUE    glColor3f( 0,0,1 )              // синий
+#define gl_LIGHTBLUE    glColor3f( .5,.5,1 )            // синий
 #define gl_LIGHTCYAN    glColor3f( 0,1,1 )              // голубой
 #define gl_LIGHTGREEN   glColor3f( 0,1,0 )              // зеленый
 #define gl_LIGHTMAGENTA glColor3f( 1,0,1 )              // фиолетовый

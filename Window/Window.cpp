@@ -493,7 +493,7 @@ DWORD WaitTime( DWORD Wait,        // активная задержка для �
 // #include "Sym_CCCP.c"
 void Break( const char Msg[],... )    // Случай аварийного завершения программы
 { va_list V; va_start( V,Msg );       // или приостановка с первым символом "~"
- char str[vsprintf( 0,UtA(Msg),V )+1]; vsprintf( str,UtA(Msg),V ); va_end( V );
+ char str[vsprintf( 0,UtA(Msg),V )+4]; vsprintf( str,UtA(Msg),V ); va_end( V );
   MessageBox( NULL,str,*Msg=='~'?"Info":"Break",MB_ICONASTERISK|MB_OK );
   if( *Msg!='~' )exit( MB_OK );
 }

@@ -13,7 +13,7 @@
 
 short Active=0;                   // 0x01 файл считанн и подготовлен к работе
                                   // 0x02 полностью выполнена первая прорисовка
-unsigned Hull_Keys=0x01;          // Набор ключей - параметров
+unsigned Hull_Keys=0x00;          // Набор ключей - параметров
                                   // 0x01 - задействовать сплайн-интерполяцию
 Real Xo=0,Xm=1,Length=2,Lmx=2,Lwl=2,   // Длина и длина по ватерлинии
           Breadth=0.2,Bmx=0.2,Bwl=0.2, // Ширина и ширина по ватерлинии
@@ -228,15 +228,16 @@ MainLoop: if( ans )Win.Draw(); Wid=false;        //  и - главный цик�
               if( ans==12 ){ Kh.BilgeEx(); break; }   // скуловые обводы
               if( ans==8 )Menu_p[8].Msg=cU[++cM%=4];  // ключи выбора модели
               if( ans==_Esc )break;                   // аналитического корпуса
-            }
-          } if( ans==1 )ans=Set_Power(); else
-            if( ans==2 )ans=Set_Sinus();                 // ==> ans=Set_Stem();
-            if( ans )Win.Loft( Active=true ); break;
+          } } if( ans==1 )ans=Set_Power(); else
+              if( ans==2 )ans=Set_Sinus();               // ==> ans=Set_Stem();
+              if( ans )Win.Loft( Active=true ); break;
     case _F5: Hull_Statics(); ans=0; break; // Гидростатика и остойчивость
     case _F7: Hull_Wave( 1 ); ans=0; break; // адаптированный к корпусу Мичелл
     case _F8: Hull_Wave( 2 ); ans=0; break; // контроль по Шебалову-Атанасову
     case _F9: Hull_Wave( 3 ); ans=0; break; // модель Ады Шоломовны Готман
-    case _Blank: Hull_Keys^=1; break;       // 1 - сплайны 0 - прямые линии
+    case _Blank: //Hull_Keys^=1; //reak;       // 1 - сплайны 0 - прямые линии
+     if( Hull_Keys^=1 )for( int i=0; i<Kh.Ns; i++ )Kh.F[i].SpLine();
+                 else  for( int i=0; i<Kh.Ns; i++ )Kh.F[i].Easy(); break;
     case _Enter: Wid=true; break;           // безусловная перерисовка в окне
     case _Esc: Win.Close();
   }

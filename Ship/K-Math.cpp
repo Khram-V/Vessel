@@ -97,18 +97,19 @@ void Hull::Analytics()
   }
   // Производится перестроение аналитического корпуса к обычному виду
   //
- Real Dx=(m_Stem(Draught)-m_Stern(Draught))/(Nx-1),Dz,x,z;
+ Real Dx=(m_Stem(Draught)-m_Stern(Draught))/(Nx+1),Dz,x,z;
       Jx=0.04-Xo/Dx;
       Nx=Jx + int( 0.96+Lmx/Dx );
-      Simple_Hull( Nx,Nz,Nz*2 ); W=m_Stem( Depth ); Ms=12+Jx;
- static Frame Deck( 6 ); Deck[0]=Depth*0.9,Deck(0)=Xo;
+      Simple_Hull( Nx,Nz,Nz*2 );  Ms=12+Jx; W=Lmx-Xo;     // W=m_Stem( Depth );
+ static Frame Deck( 6 ); Deck[0]=Depth*0.9,Deck(0)=Deck.min=Xo;
                          Deck[1]=Depth*0.9,Deck(1)=Xo+Dx/2;
-                         Deck[2]=Depth*0.8,Deck(2)=W/2;
-                         Deck[3]=Depth,    Deck(3)=W-Dx;
-                         Deck[4]=Depth,    Deck(4)=W;
-                         Deck[5]=Depth,    Deck(5)=Lmx; Deck.SpLine();
+                         Deck[2]=Depth*0.8,Deck(2)=Xo+W*0.3;          // W/2;
+                         Deck[3]=Depth,    Deck(3)=Xo+W*0.75;         // W-Dx;
+                         Deck[4]=Depth*1.1,Deck(4)=Lmx-Dx;            // W;
+                         Deck[5]=Depth*1.1,Deck(5)=Deck.max=Lmx; Deck.SpLine();
   for( int i=0; i<Nx; i++ )
-  { F[i].X=x=Dx*(i-Jx); Dz=Deck.G( x,true )/pow( Nz-1,1.543080635 ); Y=1.0; b=1;
+  { F[i].X=x=Dx*(i-Jx)+Dx/4;
+    Dz=Deck.G( x,true )/pow( Nz-1,1.543080635 ); Y=1.0; b=1;
     for( int j=0; j<Nz; j++ ){ z=Dz*pow( j,1.543080635 );
      int &N=F[i].N;                   // изменяемая длина контура шпангоута
      int k=j+N+1-Nz;                  // отсчёт с учётом сброса лишних ординат
@@ -116,11 +117,12 @@ void Hull::Analytics()
       if( j>0 )                       // киль остается как есть
       { if( Y && !y )b=0;             // для отскока на один ноль вверх
         if( !y && !Y )                // два нуля к пропуску ординат шпангоута
-          { if( !b )b=1; else --N,--k; }
-      } F[i][k]=Y=y;                  // под запись всё подряд и без разбора
-        F[i](k)=z;                    // гашение двойных нулей сверху-вниз
-      if( j==Nz-1 )while( N>0 && !(F[i][N-1]) && !(F[i][N]) )N--;
-  } }
+          { if( !b )b=1; else --N,--k; } }
+      F[i][k]=Y=y;                    // под запись всё подряд и без разбора
+      F[i](k)=z;                      // гашение двойных нулей сверху-вниз
+//    if( j==Nz-1 )while( N>0 && !(F[i][N-1]) && !(F[i][N]) )N--;
+    }
+  }
   Nz*=2;
   for( int i=0; i<2; i++ )            // штевни с удвоенным количеством точек
   for( int j=0; j<Nz; j++ )
@@ -205,8 +207,8 @@ void Building()                       //       ___\│ г--+-┼--°°L¬\+/
   { d=Lmx*0.0002; x=Kh.Asx.G( z,true )-d; y=Kh.Stx.G( z,true )+2*d; // 5000тч
     if( k>5 )__Board else
     if( k<5 )__Water else __Deck
-    glBegin( GL_LINE_STRIP ); for( ; x<y; x+=d )glVertex2d( x,Kh.Y( x,z ) );
-    glEnd();
+    glBegin( GL_LINE_STRIP );
+    for( ; x<y; x+=d )glVertex2d( x,Kh.Y( x,z ) ); glEnd();
   } __Deck
   glBegin( GL_LINE_STRIP );
   glVertex2d( x=Kh.Asx[Kh.Asx.N],0.0 ); // Прорисовка линии палубы
@@ -319,7 +321,7 @@ void Draw_Hull( int ids, Plane &_W )                         // Проекция
     { x=Breadth/2;
       for( k=0,z=0.0; k<=10 && z<Depth; z+=Draught/5,k++ )
       { if( k%5 )glEnable( GL_LINE_STIPPLE ); else glDisable( GL_LINE_STIPPLE );
-        if( k==5 )__Deck else __Grid
+        if( k==5 )__Deck else if( k>5 )gl_LIGHTBLUE; else gl_LIGHTGREEN; //__Grid
         line( -x,z,x,z );
         glDisable( GL_LINE_STIPPLE );
         if( k>0 && z<Draught*2 )
@@ -329,7 +331,13 @@ void Draw_Hull( int ids, Plane &_W )                         // Проекция
   } }
   glEnable( GL_LINE_SMOOTH );
   for( k=m=0; k<Kh.Ns; k++ )             // Прорисовка теоретических шпангоутов
-  { if( !m && k==Kh.Ms+1 ){ m=1; k=Kh.Ms; }
+  { if( !m && k==Kh.Ms+1 ){ m=1; k=Kh.Ms; } // если нет сплайнового сглаживания
+    if( Hull_Keys&1 )                      //  то отмечаются шпангоутные точки
+    { Frame &W=Kh.F[k];             // if( W.z[i]>Draught )__Board else __Water
+      glPointSize( 3 ); gl_CYAN; glBegin( GL_POINTS );
+      for( i=0; i<=W.N; i++ )glVertex2d( m?W.y[i]:-W.y[i],W.z[i] );
+      glEnd(); glPointSize( 1 );
+    }
     glBegin( GL_LINE_STRIP );
     if( Hull_Keys&1 )
     for( Real a=0; a<=1.0005; a+=0.001 )    //! 1000 точек по контуру шпангоута
@@ -342,15 +350,12 @@ void Draw_Hull( int ids, Plane &_W )                         // Проекция
       { z=W.z[i],y=W.y[i];
         if( !m )y=-y;                    // пересчёт смоченной точки на контуре
         if( i>0 && wz<Draught && z>Draught )
-          { y=wy+(Draught-wz)*(y-wy)/(z-wz); z=Draught; --i; }
-        if( z>Draught )__Board
+          { y=wy+(Draught-wz)*(y-wy)/(z-wz); z=Draught; --i; }    // ватерлиния
+        if( i>0 && i==W.N && y==0 && wz==z )gl_LIGHTGRAY; // без плоской палубы
+        else if( z>Draught )__Board
         glVertex2d( wy=y,wz=z );
-    } } glEnd();                           // если нет сплайнового сглаживания,
-    if( !(Hull_Keys&1 ) )                  //  то отмечаются шпангоутные точки
-    { Frame &W=Kh.F[k]; glPointSize( 3 ); gl_GRAY; glBegin( GL_POINTS );
-      for( i=0; i<=W.N; i++ )glVertex2d( m?W.y[i]:-W.y[i],W.z[i] );
-      glEnd(); glPointSize( 1 );
-    }
+      }
+    } glEnd();
   } __Deck
   glBegin( GL_LINE_STRIP );  glVertex2d( -Kh.Asy[0],Kh.Asy(0) );
   for( k=1; k<=Kh.Asy.N; k++)glVertex2d( -Kh.Asy[k],Kh.Asy(k) );

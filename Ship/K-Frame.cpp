@@ -10,19 +10,15 @@
 #include "Hull.h"
 #define eps 1.0e-12
 
-Frame::Frame( int l ){ y=z=_x=_z=_y=0; N=0; X=min=max=0; if(l>0)allocate(l); }
-Frame::~Frame(){ free(); }
-
-void Frame::Easy(){ if( _y )Allocate( 0,_z ),Allocate( 0,_y ); _y=_z=NULL; }
+Frame::Frame( int l )
+     { Spl=false; y=z=_x=_y=0; N=0; X=min=max=0; if( l>0 )allocate( l ); }
+Frame::~Frame(){ allocate( 0 ); }
 void Frame::allocate( int l )
-{ Easy(); if( l<=0 )free(); else                //! N-1 - количество интервалов
-          { _x=(Real*)Allocate( l*sizeof(Real),_x );
-             y=(Real*)Allocate( l*sizeof(Real),y );
-             z=(Real*)Allocate( l*sizeof(Real),z ); N=l-1;
-             for( l=0; l<=N; l++ )_x[l]=l;
-}         }
-void Frame::free()
-{ if( _x )Allocate(0,_x),Allocate(0,y),Allocate(0,z),Easy(); _x=y=z=NULL; N=0;
+{ Easy(); y=(Real*)Allocate( l*sizeof(Real),y );
+  N=l-1;  z=(Real*)Allocate( l*sizeof(Real),z );  //! N-1 количество интервалов
+         _x=(Real*)Allocate( l*sizeof(Real),_x );
+         _y=(Real*)Allocate( l*sizeof(Real)*2,_y );
+  if( l>0 ){ for( l=0; l<=N; l++ )_x[l]=l; memset( _y,0,sizeof( Real )*l*2 ); }
 }
 void Frame::Double( int k )
 { ++N; allocate( N+1 ); for( int i=N; i>k; i-- )z[i]=z[i-1],y[i]=y[i-1];
@@ -46,19 +42,14 @@ void Hull::MinMax()
 //!   Предварительный расчет для построения сплайн-функции
 //!   с аргументом-параметром по реальному расстоянию между точками
 //
-void Frame::SpLine()
-{ if( N<3 ){ if( _y )Allocate( 0,_y ),Allocate( 0,_z ); _y=_z=0; return; }
- const Real yp1=1e6,ypn=1e6;         // граничные условия из параметров
- Real *xi=_x,*zi=z,*u,               // вариант с неравномерным шагом аргумента
-             *yi=y,*v;
-    u=(Real*)Allocate(  N*sizeof(Real)*2 ); v=u+N; u[0]=v[0]=0; xi[0]=0;
-  (_y=(Real*)Allocate( (N+1)*sizeof(Real),_y ))[N]=0.0; *_y=0.0;
-  (_z=(Real*)Allocate( (N+1)*sizeof(Real),_z ))[N]=0.0; *_z=0.0;
+void Frame::SpLine( bool old )
+{ if( N<3 ){ Easy(); return; } Spl=true; if( old )return;
+ Real *xi=_x,*zi=z+1,*u,               // вариант с неравномерным шагом аргумента
+      *_z,   *yi=y+1,*v;
+  v=( u=(Real*)Allocate( N*sizeof(Real)*2 ) )+N; xi[0]=0.0; ++xi;
+  (_z=_y+(N+1))[N]=0.0; _z[0]=0.0;
+             _y[N]=0.0; _y[0]=0.0;
   for( int i=1; i<=N; i++ )_x[i]=_x[i-1]+hypot( y[i]-y[i-1],z[i]-z[i-1] );
-  if( yp1>0.99e6 )_y[0]=_z[0]=u[0]=v[0]=0.0; else
-  { Real h=xi[1]-xi[0]; u[0]=3*( (zi[1]-zi[0])/h-yp1 )/h;
-      _y[0]=_z[0]=-0.5; v[0]=3*( (yi[1]-yi[0])/h-yp1 )/h;
-  } ++xi,++yi,++zi;
   for( int i=1; i<N; i++,xi++,yi++,zi++ )
   if( (xi[1]-xi[0])<eps || (xi[0]-xi[-1])<eps )u[i-1]=v[i-1]=u[i]=v[i]=0.0; else // _zi всё-таки аргумент
   { Real h=xi[1]-xi[-1],sig=( xi[0]-xi[-1] )/h,
@@ -68,15 +59,11 @@ void Frame::SpLine()
     p=sig*_z[i-1]+2;
     w=(zi[1]-zi[0])/(xi[1]-xi[0])-(zi[0]-zi[-1])/(xi[0]-xi[-1]);
     u[i]=(6*w/h-sig*u[i-1])/p; _z[i]=(sig-1)/p;
-  }
-  if( ypn>0.99e6 )_y[N]=_z[N]=0.0; else
-  { Real h=xi[0]-xi[-1];
-    _y[N]=( 3*(ypn-(yi[0]-yi[-1])/h)/h-v[N-1]/2 )/( _y[N-1]/2+1.0 );
-    _z[N]=( 3*(ypn-(zi[0]-zi[-1])/h)/h-u[N-1]/2 )/( _z[N-1]/2+1.0 );
-  }
+  } _y[N]=_z[N]=0.0;
   for( int i=N-1; i>=0; i-- )_y[i]=_y[i]*_y[i+1]+v[i],
                              _z[i]=_z[i]*_z[i+1]+u[i]; Allocate( 0,u );
-}/*
+}
+/*
 static int find( Real *A,_Real Ar,int N )   // Двоичный поиск ближайшего левого
 { int k,i=0; bool d=A[N]>A[0];              //  индекса для заданного аргумента
   if( Ar<=A[0] )return d?0:N-1;             //   с учетом знака его прироста
@@ -89,16 +76,16 @@ void Frame::YaZ( Real A, Real &Y,Real &Z )           // Аргумент: 0.0<=A
 { if( A<0.0 ){ Y=0.0; Z=z[0]; return; }
   if( A>1.0 ){ Y=0.0; Z=z[N]; return; } A*=_x[N];  // индексно-сплайновый
  int k=N-1; while( k>0 && A<_x[k] )k--; A-=_x[k]; // первый из неоднозначных
-  if( _y  )                                      // сплайн без сломанной кривой
-  { Real h=_x[k+1]-_x[k]; if( fabs( h )<eps ){ Y=(y[k+1]+y[k])/2;
-                                               Z=(z[k+1]+z[k])/2; return; }
-    Real B=1.0-(A/=h),b=( B*B-1.0 )*B,
-                      a=( A*A-1.0 )*A;
+ Real h=_x[k+1]-_x[k]; if( fabs( h )<eps ){ Y=(y[k+1]+y[k])/2;
+                                            Z=(z[k+1]+z[k])/2; return; }
+  if( Spl )                                      // сплайн без сломанной кривой
+  { Real B=1.0-(A/=h),b=( B*B-1.0 )*B,
+         *_z=_y+(N+1),a=( A*A-1.0 )*A;
     Y = B*y[k]+A*y[k+1] + ( b*_y[k]+a*_y[k+1] )*h*h/6;
     Z = B*z[k]+A*z[k+1] + ( b*_z[k]+a*_z[k+1] )*h*h/6;
   } else
-  { Y = y[k] + A*( y[k+1]-y[k] );              // простая линейная интерполяция
-    Z = z[k] + A*( z[k+1]-z[k] );
+  { A/=h; Y = y[k] + A*( y[k+1]-y[k] );        // простая линейная интерполяция
+          Z = z[k] + A*( z[k+1]-z[k] );
 } }
 Real Frame::G( _Real az, bool bound )            // эмуляция плазовой ординаты
 { if( N<1 )return y[0];                          // одна точка на другие случаи

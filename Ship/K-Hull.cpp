@@ -14,17 +14,18 @@
 #include <stdio.h>
 #include "Hull.h"
 
-static char *Str=(char*)"\0\n<<МИДВ-85>>\n©1975-2020, В.Храмушин,"
-                      " Сахалин - Санкт-Петербург  - ‏יְרוּשָׁלַיִם‏‎ - \n";
+static char *Str=(char*)"\0\n<<МИДВ-85>>\n©1975-2024, В.Храмушин,"
+                      " Сахалин - Санкт-Петербург  - ‏יְרוּשָׁלַיִם‏‎ - \n",
+            *FileName=0;
 static FILE *Fh=NULL;       // файл исходных данных по таблице плазовых ординат
 static void FGetS();        // чтение строки с переадресацией на внешнюю память
 static void FPutS( const char _Comm[], const char fmt[], ... );
-
-//static Real maxY( Frame &F )         // экстремумы функции от исходных точек
-//     { Real Y=F[0]; for( int i=1; i<=F.N; i++ )if( Y<F[i] )Y=F[i]; return Y; }
-//static Real minY( Frame &F )
-//     { Real Y=F[0]; for( int i=1; i<=F.N; i++ )if( Y>F[i] )Y=F[i]; return Y; }
-
+/*
+static Real maxY( Frame &F )           // экстремумы функции от исходных точек
+     { Real Y=F[0]; for( int i=1; i<=F.N; i++ )if( Y<F[i] )Y=F[i]; return Y; }
+static Real minY( Frame &F )
+     { Real Y=F[0]; for( int i=1; i<=F.N; i++ )if( Y>F[i] )Y=F[i]; return Y; }
+*/
 Hull::Hull(): Ns( 0 ),Ms( 1 ),Nstem( 2 ),F( 0 )
           { ( Name=(char*)malloc( MAX_PATH*4 ) )[0]=0; }
 // Hull::~Hull(){ allocate( 0 ); free( Name ); }
@@ -32,11 +33,14 @@ Hull::Hull(): Ns( 0 ),Ms( 1 ),Nstem( 2 ),F( 0 )
 //      Считывание/запись численного описания формы корпуса
 //        (при первом обращении возвращается корпус МИДВ)
 //
-void Hull::allocate(int N){ F=(Frame*)Allocate((Ns=N)*sizeof(Frame),F); Ms=-1;}
+void Hull::allocate( int N )
+   { F=(Frame*)Allocate( (Ns=N)*sizeof(Frame),F ); Ms=Ns/2;
+   }
 void Hull::Simple_Hull( int Nx, int Nz, int Nf )
-{ for( int i=Nx; i<Ns; i++ )F[i].free(); allocate( Nx );
-  for( int i=0; i<Nx; i++ )F[i].allocate( Nz );  Ms=Ns/2;
-  Stx.allocate( Nf ),Sty.allocate( Nf ),Asx.allocate( Nf ),Asy.allocate( Nf );
+{ for( int i=Nx; i<Ns; i++ )F[i].allocate( 0 ); allocate( Nx );
+  for( int i=0; i<Ns; i++ )F[i].allocate( Nz ); Ms=Ns/2;
+  Stx.allocate( Nf ),Sty.allocate( Nf ),
+  Asx.allocate( Nf ),Asy.allocate( Nf );
 }
 void Hull::Aphines( _Real cX,_Real cY,_Real cZ )
 { Xo*=cX; Xm*=cX; Length*=cX;  Lwl*=cX; Lmx*=cY;
@@ -48,10 +52,10 @@ void Hull::Aphines( _Real cX,_Real cY,_Real cZ )
   { for( int i=0; i<=F[k].N; i++ )F[k].z[i]*=cZ,F[k].y[i]*=cY;
     F[k].X*=cX; F[k].SpLine();
   }
-  for( int i=0; i<=Stx.N; i++ )Stx[i]*=cX,Stx(i)*=cZ; Stx.Easy();
-  for( int i=0; i<=Asx.N; i++ )Asx[i]*=cX,Asx(i)*=cZ; Asx.Easy();
-  for( int i=0; i<=Sty.N; i++ )Sty[i]*=cY,Sty(i)*=cZ; Sty.Easy();
-  for( int i=0; i<=Asy.N; i++ )Asy[i]*=cY,Asy(i)*=cZ; Asy.Easy();
+  for( int i=0; i<=Stx.N; i++ )Stx[i]*=cX,Stx(i)*=cZ; //Stx.Easy();
+  for( int i=0; i<=Asx.N; i++ )Asx[i]*=cX,Asx(i)*=cZ; //Asx.Easy();
+  for( int i=0; i<=Sty.N; i++ )Sty[i]*=cY,Sty(i)*=cZ; //Sty.Easy();
+  for( int i=0; i<=Asy.N; i++ )Asy[i]*=cY,Asy(i)*=cZ; //Asy.Easy();
   MinMax();
   Init();
 }
@@ -106,7 +110,6 @@ void Hull::ModelEx( Real &cL, Real &cB, int cN, int cM )
   } } }
   Free( F[0] );
   Free( F[cN-1] );
-
   Stx.Easy(); Sty.Easy(); Asx.Easy(); Asy.Easy(); MinMax(); Init(); //BilgeEx()
 }
 //!  Это будет скуловой обвод - отдельной повторяемой командой
@@ -144,7 +147,7 @@ int Hull::Read_from_Frames()          // Здесь продолжается
       strcpy( Name,s );  FGetS();
       sscanf( Str,"%d%d",&n,&k );     //
       if( n>1 && k>0 && k<=n )        // 4. количество шпангоутов >1
-      { allocate( n );                //    и мидель не скраю
+      { allocate( n );                //    и мидель не с краю
         Ms=k;                         // для повторного чтения
         FGetS(); o=0.0;               // сдвиг ОЛ-основной линии
         sscanf( Str,"%lf%lf%lf%lf",&Length,&Breadth,&Draught,&o ); Depth=Do=0;
@@ -160,13 +163,16 @@ int Hull::Read_from_Frames()          // Здесь продолжается
         //
         for( k=0; k<Ns; k++ )
         { Frame &W=F[k];
-          FGetS(); W.allocate( n=strtol( Str,&s,0 ) ); W.X=strtod( s,&s );
-          for( i=0;i<n;i++ ){ W.z[i]=MZ(strtod(s,&s)-o); W.y[i]=strtod(s,&s); }
-/*        { Real w; W.z[i]=w=strtod( s,&s )-o; W.y[i]=strtod( s,&s );
-            if( !i && !k )Do=Depth=w; else
-              { if( Depth<w )Depth=w; if( Do>w )Do=w; } }
-*/      }   //Height-=Do;
-        //
+          FGetS(); W.allocate( (n=strtol( Str,&s,0 ))+2 ); W.X=strtod( s,&s );
+          for( i=0;; )  // { W.z[i]=MZ(strtod(s,&s)-o); W.y[i]=strtod(s,&s); }
+          { W.z[i]=MZ( strtod( s,&s )-o ); W.y[i]=strtod( s,&s );
+            if( i==0 )
+            { if( W.y[0]>0 ){ W.z[1]=W.z[0],W.y[1]=W.y[0],W.y[0]=0; i=1; n++; }
+            }
+            if( ++i==n )
+            { if( W.y[i-1]>0 ){ W.z[i]=W.z[i-1]; W.y[i]=0; n++; } break; }
+          } W.N=n-1;
+        }
         // Форштевень (табличные данные здесь заканчиваются, далее - строки)
         //
         FGetS(); n=strtol( Str,&s,0 ); Sty.allocate( n );
@@ -174,21 +180,19 @@ int Hull::Read_from_Frames()          // Здесь продолжается
         FGetS(); n=strtol( Str,&s,0 ); Stx.allocate( n );
         for( i=0; i<n; i++ )Stx(i)=MZ( strtod( s,&s )-o ),Stx[i]=strtod( s,&s );
         //
-        // ...по необходимости лучше дополнить описание штевней
-        //    нежели решать ротозейские проблемы из за их отсутствия
+        //  ... по необходимости лучше дополнить описание штевней
+        //      нежели решать ротозейские проблемы из за их отсутствия
         n=Ns-1;
 #if 0
         if( !Asx.N ){ Asx.allocate(2); if( !Asx(0) )Asx(0)=F[0](0); Asx[0]=Asx[1]=Asx[0]?Asx[0]:F[0].X; Asx(1)=F[0](F[0].N); }
         if( !Stx.N ){ Stx.allocate(2); if( !Stx(0) )Stx(0)=F[n](0); Stx[0]=Stx[1]=Stx[0]?Stx[0]:F[n].X; Stx(1)=F[n](F[n].N); }
-
         if( !Asy.N ){ Asy.allocate(2); if( !Asy(0) )Asy(0)=Asx(0); Asy[1]=Asy[0]; Asy(1)=Asx(1); }
         if( !Sty.N ){ Sty.allocate(2); if( !Sty(0) )Sty(0)=Stx(0); Sty[1]=Sty[0]; Sty(1)=Stx(1); }
 #else
-        if( !Asx.N ){ Asx.allocate( 1 ); Asx( 0 )=F[0]( 0 ); Asx[ 0 ]=F[0].X; }
-        if( !Stx.N ){ Stx.allocate( 1 ); Stx( 0 )=F[n]( 0 ); Stx[ 0 ]=F[n].X; }
-
-        if( !Asy.N ){ Asy.allocate( 1 ); Asy( 0 )=Asx( 0 ); }
-        if( !Sty.N ){ Sty.allocate( 1 ); Sty( 0 )=Stx( 0 ); }
+        if( Asx.N<0 ){ Asx.allocate( 1 ); Asx( 0 )=F[0]( 0 ); Asx[ 0 ]=F[0].X; }
+        if( Stx.N<0 ){ Stx.allocate( 1 ); Stx( 0 )=F[n]( 0 ); Stx[ 0 ]=F[n].X; }
+        if( Asy.N<0 ){ Asy.allocate( 1 ); Asy( 0 )=Asx( 0 ); }
+        if( Sty.N<0 ){ Sty.allocate( 1 ); Sty( 0 )=Stx( 0 ); }
 #endif
         //
         //  Уточнение основных параметров нового корпуса
@@ -205,31 +209,34 @@ int Hull::Read_from_Frames()          // Здесь продолжается
                     B={ W.z[i+1]-W.z[i],W.y[i+1]-W.y[i] };
             if( norm( A )>1e-6 && norm( B )>1e-6 )// существует слом больше 45°
             if( ( A.x*B.x+A.y*B.y )/hypot( A.x,A.y )/hypot( B.x,B.y )<0.71 )
-                W.Double(i++);
-          } if( Hull_Keys&1 )W.SpLine();          // здесь это так, для образца
-        }
-        Init(); return 0;
-  } } } return 1;
+               W.Double( i++ );
+          } // if( Hull_Keys&1 )
+            W.SpLine(); W.Easy();                      // поднастроить и забыть
+        } Init();
+        return 0;
+    } }
+  } return 1;
 }
 //        Запись корпуса в формате "по контурам штевней и шпангоутов"
 //                                                        2001-11-30
 static Real e6( _Real R ){ return round( R*1e6 )/1e6; }
+
 int Hull::Write()
 { Real T; long D;
  int i,k,m,d,y; julday( D=julday(),m,d,y ); T=onetime();
  char Str[MAX_PATH*2];
   sprintf( Str,"%02d%02d%02d-%02d%02d",y%100,m,d,int( T ),int( T*60 )%60 );
   if( (Fh=FileOpen( Str,"wb","vsl",
-      "Копия корпуса (*.vsl)\1*.vsl\1Все файлы (*.*)\1*.*\1\1",
-      "? Запись таблицы ординат во временный файл" ))!=NULL )
+                "Копия корпуса (*.vsl)\1*.vsl\1Все файлы (*.*)\1*.*\1\1",
+                "? Запись таблицы ординат во временный файл" ))!=NULL )
   { fprintf( Fh,";\n; Цифровой теоретический чертёж корпуса корабля,\n"
-                    ";   построенный на контурах штевней и шпангоутов\n" );
-    FPutS( "©75-22.Khram.Калининград",";" );
+                   ";   построенный на контурах штевней и шпангоутов\n" );
+    FPutS( "©~75\\24.Khram.Калининград",";" );
     FPutS( "·",";" );
 //  fprintf( Fh,"\x1E  < %s >\n",Name );
     FPutS( " признак и название","\x1E < %s >",Name );
     FPutS( " количество шпангоутов и номер миделя"," %d %d",Ns,Ms );
-    FPutS( " длина ширина осадка [загрузка]"," %.5lg %.5lg %.5lg",
+    FPutS( " длина ширина осадка [заглубление]"," %.5lg %.5lg %.5lg",
                                   e6(Length),e6(Breadth),e6(Draught) );
     //! Ахтерштевень
                              fprintf( Fh,"\n%3d",Asx.N+1 );
@@ -240,23 +247,25 @@ int Hull::Write()
     //! Шпангоуты
     //
     for( k=0; k<Ns; k++ )
-    {                           fprintf( Fh,"\n%3d %-4.5lg",F[k].N+1,e6(F[k].X) );
-      for( i=0; i<=F[k].N; i++ )fprintf( Fh," %.5lg %.5lg",e6(F[k].z[i]),e6(F[k].y[i]) );
-    }                           fprintf( Fh,"\n" );
-    //
+    { int n=F[k].N; i=0;
+      if( n>0 )
+      { if( F[k].y[n]<1e-6 && F[k].z[n]==F[k].z[n-1] )--n;
+        if( F[k].y[0]<1e-6 && F[k].z[0]==F[k].z[1] )i=1;
+      }                 fprintf( Fh,"\n%3d %-6.5lg",n+1-i,e6(F[k].X) );
+      for( ; i<=n; i++ )fprintf( Fh," %.5lg %.5lg",e6(F[k].z[i]),e6(F[k].y[i]));
+    }                   fprintf( Fh,"\n" );
     //! Форштевень
                              fprintf( Fh,"\n%3d",Sty.N+1 );
     for( i=0; i<=Sty.N; i++ )fprintf( Fh," %.5lg %.5lg",e6(Sty(i)),e6(Sty[i]) );
                              fprintf( Fh,"\n%3d",Stx.N+1 );
     for( i=0; i<=Stx.N; i++ )fprintf( Fh," %.5lg %.5lg",e6(Stx(i)),e6(Stx[i]) );
                              fprintf( Fh,"\n\n" );
-    FPutS( "водоизмещение",            ";  W=%.5lg",Volume );
-    FPutS( "смоченная поверхность",    ";  S=%.5lg",Surface );
-    FPutS( "коэффициент общей полноты",";  δ=%5.3lg",Volume/Bwl/Lwl/Draught );
-    fprintf( Fh,";\n" );
-    sprintf( Str+256,"%04d.%s.%02d %s%s",y,_Mnt[m-1],d,_Day[D%7],DtoA( T,3 ) );
-    FPutS( Str+256,";  %s",fname(Str) );
-    fclose( Fh ); Fh=0; return 0;
+    FPutS( "водоизмещение",            "; W=%.5lg м³",Volume );
+    FPutS( "смоченная поверхность",    "; S=%.5lg м²",Surface );
+    FPutS( "коэффициент общей полноты","; δ=%5.3lg",Volume/Bwl/Lwl/Draught );
+    fprintf( Fh,";\n; %s\n; © %04d.%s.%02d %s%s\n",
+         FileName,y,_Mnt[m-1],d,_Day[D%7],DtoA( T,3 ) ); fclose( Fh ); Fh=0;
+    return 0;
   } return 1;
 }
 static void FGetS() // чтение строки из файла с пропуском комментариев
@@ -313,8 +322,6 @@ int Hull::Read_from_Polland()
       for( l=i; l<k; l++ )
       { Real &y=F[m].y[l]; fscanf( Fh,"%lg",&y ); y/=1000.0;
   } } }
-  if( Hull_Keys&0x01 )for( i=0; i<Nx; i++ )F[i].SpLine();
-//
 //      Предварительная расчистка штевней
 //
   for( i=0; i<Nz; i++ ){ Asx[i]=F[0].X; Stx[i]=F[Nx-1].X; }
@@ -381,17 +388,17 @@ bool Hull::Read()              // Нормальный выход с новым 
 //
 //    Считывание заголовков и проверка наличия управляющих кодов
 //
- int i,j,k,Nx,Nz; Real w; bool hew=true;
+ int i,j,k,Nx,Nz; Real w; // bool hew=true;
  static char FileTitle[]="  Выбрать *.vsl или <Esc> к образцу МИДВ корпуса";
   if( !(Fh=FileOpen( Name,"rt","vsl","Корпус корабля (<плаз>.vsl)\1*.vsl\1"
                           "Все файлы (<плаз>.*)\1*.*\1\1",FileTitle ) ) )
   if( !(Fh=fopen( strcpy( Name,"Hull.vsl" ),"rt" ) ) )
   { if( (Fh=fopen( Name,"wb" ) )!=NULL )
-    { fputs( MIDV,Fh ); fclose( Fh ); hew=false;    // случай корпуса из памяти
+    { fputs( MIDV,Fh ); fclose( Fh ); // hew=false; // случай корпуса из памяти
       if( (Fh=fopen( Name,"rt" ) )!=NULL )goto Ok;  // теперь новый файл открыт
     } goto back;
   } FileTitle[0]='?';
-Ok: strcpy( Name,fname( Name ) );
+Ok: FileName=strdup( strcpy( Name,fname( Name ) ) );
       FGetS();        // чтение первой строки с переадресацией на Str=>Ls[2048]
   if( Str[0]==32 )    // '\32' - ' ' - пробел == польский формат от А.Дегтярёва
     { k=Read_from_Polland(); if( k )goto back; fclose( Fh ); return k;
@@ -438,9 +445,9 @@ Ok: strcpy( Name,fname( Name ) );
   { FGetS(); F[k].X=Fort_F( Str,6,2 );
     for( i=0; i<Nz; i++ )
     { F[k].y[i]=w=Fort_F( Str+i*4+6,4,2 ); if( Breadth<w )Breadth=w;
-    } if( Hull_Keys&0x01 )F[k].SpLine();
-  }
-  if( !hew )Hull_Keys &= ~1u; fclose( Fh ); Fh=NULL;
+    } //if( Hull_Keys&0x01 )F[k].SpLine();
+  }   //if( !hew )Hull_Keys &= ~1u;
+  fclose( Fh ); Fh=NULL;
 //
 //  Если таблица короткая (без описания штевней)
 //

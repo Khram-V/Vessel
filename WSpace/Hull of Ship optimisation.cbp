@@ -13,14 +13,8 @@
 				<Option object_output="Dev/Obj/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters='Examples\Куб-5 Examples\Шар-5 Examples\Шлюпка Examples\Эллипс &quot;A-1201 Корвет-А&quot; &quot;Буксир «Арктикаборг»&quot; &quot;A-1206 Cruise-2&quot;' />
+				<Option parameters='&quot;Сторожевой корабль «Буревестник»-1135&quot; Examples\Куб-5 Examples\Шар-5 Examples\Шлюпка Examples\Эллипс &quot;A-1201 Корвет-А&quot; &quot;Буксир «Арктикаборг»&quot; &quot;A-1206 Cruise-2&quot;' />
 				<Option projectLinkerOptionsRelation="2" />
-				<Compiler>
-					<Add option="-m32" />
-				</Compiler>
-				<Linker>
-					<Add option="-m32" />
-				</Linker>
 			</Target>
 			<Target title="Hull(64)">
 				<Option output="../../Work/Hull-64" prefix_auto="1" extension_auto="1" />
@@ -28,7 +22,11 @@
 				<Option object_output="Dev/Obj/" />
 				<Option type="0" />
 				<Option compiler="gnu_gcc_stable" />
+				<Compiler>
+					<Add option="-flto" />
+				</Compiler>
 				<Linker>
+					<Add option="-flto" />
 					<Add library="pthread" />
 					<Add library="dl" />
 				</Linker>
