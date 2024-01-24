@@ -13,6 +13,10 @@
 				<Option object_output="Dev/Obj" />
 				<Option type="1" />
 				<Option compiler="gfortran" />
+				<Compiler>
+					<Add option="-W" />
+					<Add option="-Wextra" />
+				</Compiler>
 			</Target>
 			<Target title="TransForm">
 				<Option output="Dev/TransForm" prefix_auto="1" extension_auto="1" />
