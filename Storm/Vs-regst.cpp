@@ -89,7 +89,7 @@ Hull& Hull::Protocol()
                  ev&1?"•":"·",Speed*3600.0/_Mile,v,
                  ev&2?"•":"·",Course*_Rd,-w*_Rd ); PtoG( str+24 );
         fprintf( VIL,str );// Б-〈П÷Л〉на борт; Р-руль〈П÷Л〉 полборта; М-помалу〈П÷Л〉
-        if( fabs( w )<_Pi/32.0 )fprintf( VIL," " ); else
+        if( fabs( w )<_Pi/32.0 )fprintf( VIL,"↨ " ); else
         { fprintf( VIL,w>0?"п":"л" );
           fprintf( VIL, dCs>_Pi/59?"Б" : dCs<_Pi/61?"M":"P" );
         }
