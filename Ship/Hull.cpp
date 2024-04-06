@@ -129,10 +129,8 @@ bool MainDraw::Draw()               // Здесь также будет прив
       Print(      " {¤%d }",Kh.Ms );
       Print( 5,-3,"T = %.3g",Draught );
   if( fabs( Do )>Draught/300 )Print( " / %.3g",Do );
-      Print( 5,-2,"V = %.5g  d = %.3g,%c",
-                   Volume,Volume/Bwl/Lwl/Draught,Hull_Keys&1?'s':'v' );    // δ
-      Print( 5,-1,"S = %.5g",Surface );
-
+      Print( 5,-2,"V = %.5g  d = %.3g",Volume,Volume/Bwl/Lwl/Draught );    // δ
+      Print( 5,-1,"S = %.5g, %s",Surface,Hull_Keys&1?"spline":"vector" );
       Save().Show(); First=true; return false;
 }
 static bool Win_Timer() // Регулярное обновление картинки делается в вызывающей
@@ -210,7 +208,7 @@ int main() // int ans, char *argv[], char *envp[] )
   int ans; WCHAR **argv=CommandLineToArgvW( GetCommandLineW(),&ans );
   if( ans>1 )strcpy( Kh.Name,W2U( argv[1] ) ),
              fext( strcpy( Kh.Name,W2U( argv[1] ) ),"vsl" );
-             else  strcpy( Kh.Name,"*.vsl" );
+             else  strcpy( Kh.Name,"Hull.vsl" );
           Win.SetTimer( 500,Win_Timer );         // запуск таймера миллисекунды
           Win.Mouse( Mouse_in_Window );          // запуск указателя "мышка"
           First=true;

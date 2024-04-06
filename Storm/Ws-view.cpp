@@ -70,7 +70,7 @@ bool Field::Draw()
 { static bool Recurse=false;
   if( Recurse || !Kt )return false; Recurse=true; Activate();
   glEnable( GL_LIGHTING );
-  glEnable( GL_CULL_FACE );
+//  glEnable( GL_CULL_FACE );
   glEnable( GL_DEPTH_TEST );
   glMatrixMode( GL_PROJECTION );     // размерах фрагмента экрана сброс текущих
   glLoadIdentity();                  // матричных координат, настройка обзора и
@@ -103,7 +103,7 @@ bool Field::Draw()
   //   собственно рисование для начала ведется в самом волновом объекте
   //
   glPolygonMode( GL_FRONT,Exp.draw?GL_LINE:GL_FILL );
-  glPolygonMode( GL_BACK,GL_POINT );
+  glPolygonMode( GL_BACK,GL_LINE ); // POINT );
   if( ( Exp.draw )!=3 )
   { int k=max( Exp.draw&2?mY/100:1,1 ); // поля волн надо для палитры раскраски
     if( Exp.wave==1)Wind.Ghost(Trun),Swell.Ghost(Trun),Surge.Ghost(Trun);

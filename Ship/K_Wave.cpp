@@ -20,7 +20,7 @@ static Plane *mHull=0,     // Окно проекции корпус
 static Plaze *PL=NULL;     // корпус корабля для расчётов волнообразования
 static Place *MPL=0;       // окошечко с подписью для мышки
 static int   W=1280,H=600, // Исходный размер графического окна
-             Type=0;       //  0 - мой Michel; 1 - старый вариант Шебалова
+             Type=0;       //  0 - мой Michel; 1 - старый вариант А.Н.Шебалова
                            //  2 - Ада Шоломовна Готман - наилучший алгоритм
                            // -1 - расчет занесен в числовые массивы
 static int  Nb=0;          // количество графиков
@@ -41,14 +41,14 @@ void Ada_Sholomovna_Gotman
      Real &RMichell, // ++ к собственно расчету на основе интеграла Мичелла
      Real &Residual  // ++ остаточное сопротивление с турбулентной вязкостью
 );
-Real WaveRes( Real **Hull,    // Корпус
-              Real Froud,     // Число Фруда
-              Real Length,    // Длина
-              Real Breadth,   // Ширина
-              Real Depth,     // Осадка
-              Real Surface,   // Смоченная поверхность корпуса
-               int Nx,        // Индексы по длине
-               int Nz         //  и по осадке
+Real WaveRes( Real **Hull,      // Корпус
+              Real Froud,       // Число Фруда
+              Real Length,      // Длина
+              Real Breadth,     // Ширина
+              Real Depth,       // Осадка
+              Real Surface,     // Смоченная поверхность корпуса
+               int Nx,          // Индексы по длине
+               int Nz           //       и по осадке
             );
 #define WaveResistance(_W )( _W/V ) // сопротивление относительно водоизмещения
 #define WaveCoefficient(_W )( _W*2.0/Lwl/Fn/Fn/Ro/_g/S ) // коэффициент: Cw
@@ -138,8 +138,8 @@ void Plaze::Drawing()
         if( Rr[i]>mr )mr=Rr[i];   // остаточное сопротивление с турбулентностью
       }                           // ,R[i]=W/(2.0*V/Fn/Fn/Surface/Ro/g/Length);
       if( !(i%(Nr/12)) )
-      { glColor3f( 0.9,0.9,0.9 );     // серые отметки процессов вычислений
-        glRectd( Fn-mFn/Nr,0.25,Fn,0.75 ); mResw->Show(); //,mcWin->ScanStatus();
+      { glColor3f( 0.9,0.9,0.9 );         // серые отметки процессов вычислений
+        glRectd( Fn-mFn/Nr,.25,Fn,.75 ); mResw->Show(); //,mcWin->ScanStatus();
       }
       if( !mcWin->Ready() )return;    // если в длинных расчетах закроется окно
     } Type=-Type;                     //! блокировка повторных перерасчётов
@@ -150,7 +150,7 @@ void Plaze::Drawing()
   mResw->Clear( false );              // графики кривых волнового сопротивления
   glBegin( GL_LINES ); gl_CYAN;       //     масштабная шкала (временная схема)
   for( Fn=0.1; Fn<mFn; Fn+=0.1 )glVertex2d( Fn,0  ),glVertex2d( Fn,.0625 );
-  gl_BLUE;                     glVertex2d( 0.5,0  ),glVertex2d( .5,.125 );
+  gl_BLUE;                      glVertex2d( .5,0  ),glVertex2d( .5,.125 );
   for( Fn=0.1,i=1; i<Nr; i++,Fn+=dFn ) // Расчет кривых волнового сопротивления
   { if(mv&&Rv[i])gl_MAGENTA,glVertex2d(Fn,Rv[i-1]/mv),glVertex2d(Fn+dFn,Rv[i]/mv);
     if(mm&&Rm[i])gl_GREEN,  glVertex2d(Fn,Rm[i-1]/mm),glVertex2d(Fn+dFn,Rm[i]/mm);
@@ -169,7 +169,7 @@ void Plaze::Drawing()
   for( Fn=0.1; Fn<mFn; Fn+=0.1 )
   mcWin->Text( Fn<0.15?_South_East:_South_West,Fn,0,0,"%3.1f",Fn );
   mResw->Print(-1,0,Type==-3?"Ада Готман":Type==-2?"А.Н.Шебалов"
-                                         :"Штормовая мореходность");
+                            :"Штормовая мореходность");
   if( Type>-3 )gl_MAGENTA,mResw->Print( 2,1,"R/D=%0.3g Н/кг",mv ),
                gl_GREEN,  mResw->Print(  "\n Cw =%0.3g",mm );
       else     gl_MAGENTA,mResw->Print( 2,1,"%0.3g главная часть ",mv ),
@@ -231,8 +231,8 @@ static bool FullDraw()
 }
 static void HelpWave()
 { const char *Name[]={ " Wave ","  Волнообразование и",
-                                  "сопротивление движению",
-                                  "корабля на тихой воде",0 },
+                                "сопротивление движению",
+                                "корабля на тихой воде",0 },
              *Cmds[]={ "F1 ","     краткая справка",
                        "F7 ","по \"Штормовой мореходности\"",
                        "F8 ","из Корабелки + А.Н.Шебалов",
@@ -253,11 +253,10 @@ void Hull_Wave( const int _Type )
  Plane Resw("Волновое сопротивление","Fn","Wr",mcWin ); mResw=&Resw; // Мичелл
  Plane Wave("Интенсивность излучения","X","Aw",mcWin ); mWave=&Wave; // и волны
  Place Mous( mcWin,PlaceAbove ); MPL=&Mous;    // красная строчка с информацией
- Plaze Ship(64,96,Draught);PL=&Ship;// Рабочая таблица плазовых ординат корпуса
-                                    //  для простых или ускоренных перерасчётов
+ Plaze Ship(64,96,Draught);         // Рабочая таблица плазовых ординат корпуса
+   PL=&Ship;                        //  для простых или ускоренных перерасчётов
 //V=PL.V/( Lwl*Draught*Bwl );                      == коэффициент общей полноты
-  glClearColor( 0.95,1,0.9,1 );
-  glInitial();
+  glClearColor( 0.95,1,0.9,1 ); glInitial();
   Win.Activate().Alfabet( 18,"Times" )    // привязанная к текущему окну
      .Mouse( Mouse_in_Window )            // графическое окно волнообразования
      .Mouse( Mouse_Click )

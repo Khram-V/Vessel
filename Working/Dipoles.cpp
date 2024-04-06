@@ -34,9 +34,11 @@ int main( int argc, char** argv )
   Dipoles_array =                 // для хранения динамики движения во времени
       (Dipoles*)Allocate( Dipole_route*sizeof( Dipoles ) );
 
-  ReInstall_TimeSpace( 1 );            // поначалу будет только одна корпускула
+  ReInstall_TimeSpace( 6 );            // поначалу будет только одна корпускула
                                        //  что не сильно перегрузит вычислители
-  while( VideoStage() )                // проверка, жива ли еще сама программа
+         VideoStage();                // проверка, жива ли еще сама программа
+
+//while( VideoStage() )                // проверка, жива ли еще сама программа
   {                                    // запускается интервальный таймер и
     WaitTime( Quantum_wait,            // время задержки для внешних операций
               One_Time_Step,           // собственно процедура расчётного цикла

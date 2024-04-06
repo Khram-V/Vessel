@@ -60,7 +60,7 @@
 				<Option working_dir="../Vessel" />
 				<Option object_output="Dev/Obj/night/" />
 				<Option type="0" />
-				<Option compiler="gnu_gcc_stable32" />
+				<Option compiler="gnu_gcc_nightly" />
 				<Option parameters='&quot;OSU Regional Class Research Vessel.vsl&quot;' />
 				<Option projectCompilerOptionsRelation="2" />
 				<Linker>

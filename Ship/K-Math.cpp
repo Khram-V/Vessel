@@ -332,7 +332,7 @@ void Draw_Hull( int ids, Plane &_W )                         // Проекция
   glEnable( GL_LINE_SMOOTH );
   for( k=m=0; k<Kh.Ns; k++ )             // Прорисовка теоретических шпангоутов
   { if( !m && k==Kh.Ms+1 ){ m=1; k=Kh.Ms; } // если нет сплайнового сглаживания
-    if( Hull_Keys&1 )                      //  то отмечаются шпангоутные точки
+    if( (Hull_Keys&1) )                    //  то отмечаются шпангоутные точки
     { Frame &W=Kh.F[k];             // if( W.z[i]>Draught )__Board else __Water
       glPointSize( 3 ); gl_CYAN; glBegin( GL_POINTS );
       for( i=0; i<=W.N; i++ )glVertex2d( m?W.y[i]:-W.y[i],W.z[i] );

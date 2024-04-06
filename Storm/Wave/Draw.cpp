@@ -108,8 +108,8 @@ Waves& Waves::Drawing()
   curve( x,0,Nx,1,(H[x]*abs(M[x].z)/4 + vX( 0,0.1,Depth/4 ) ) ); // (Vector){Long/-2+(x*Long)/Nx,.1,Depth/4}) ); //Rw+M[x].z/Rw+20}) );
 //curve( x,0,Nx,1,((H[x]+M[x])/2+(Vector){Long/-2+(x*Long)/Nx,.1,Depth/4}) ); //Rw+M[x].z/Rw+20}) );
   color( green );         // отметка величины и смещения вектора скорости
-  curve( x,0,Nx-1,1,hX(V,Ds/2,.1,Depth/6 ) );  //  //    отметка текущего времени вычислительного эксперимента  //  { Event T( Instant+Tcalc/3600.0 );                 // реальный отсчет времени
-    int M,D,Y; color( navy ); T.UnPack( M,D,Y );    Print( -12,-1,"%04d %s %02d, %s%-12s <= %d =>",           Y,_Mnt[M-1],D,_Day[int(T.D%7)],DtoA( T.T,-3 ),Kd );    Print( DtoA( Tlaps/3600,3 ) );  }
+  curve( x,0,Nx-1,1,hX(V,Ds/2,.1,Depth/6 ) );  //  //    отметка текущего времени вычислительного эксперимента  //  { Event T( Instant+Tcalc/3600.0 ); char S[24];     // реальный отсчет времени
+    int M,D,Y; T.UnPack( M,D,Y ); strcpy( S,DtoA( Tlaps/3600.0,-3 ) );    color( navy ); Print( -2,-1,"%04d %s %02d, %s%-12s <= %d =>%s",                          Y,_Mnt[M-1],D,_Day[int(T.D%7)],DtoA( T.T,-3 ),Kd,S );  }
   //   контрольные отсечки фазовой скорости
   //
 #if 0

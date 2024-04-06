@@ -67,7 +67,8 @@ Hull& Hull::Write( int format ) // Wavefront Technologies 4 Advanced Visualizer
                   else crossPoint( q,Q,P,L[nq]+iq,L[nQ]+iQ,L[nP]+iP );
           if( Shell[k][i]&LeftFrame )nQ=nP,iQ=iP,q=P;        // перед кормовым
                               else nq=nP,iq=iP,Q=P;          // перпендикуляром
-  } } } }
+    } } }
+  }
   else if( format==2 )
   { //
     //!    теперь запись в формате DС2, по варианту изготовления новых чертежей
@@ -76,85 +77,92 @@ Hull& Hull::Write( int format ) // Wavefront Technologies 4 Advanced Visualizer
     //
     //  во первой строке письма общие размерения графического изображения
     //
-    fprintf( F,"%g %g %g %g\n",
+    fprintf( F,"%g %g %g %g\n",                      // здесь задаются масштабы
                 Keel[0],-Draught,Keel[Nframes-1]-Keel[0],Draught*2 );
-    fprintf( F,"20 0 0 0 0 0\n1.0,0.1\n1.0\n*\n" );  // здесь задаются масштабы и
-    fprintf( F,"23 5 0 0 0 0\n%s\nGrid\nFrames\nFore and aft line\n"
-            "FAL crosswise\n21 1\n",UtA(sname(FileName)) ); // сетка и разметка
-    fprintf( F,"1 %d 0.5 0 3 3 0 1 2\n",Nframes+2 );        // сетка и разметка
+    fprintf( F,"20 0 0 0 0 0\n1.0,0.1\n1.0\n*\n; ANSI-1251 DesignCAD Russian\n"
+               "23 5 0 0 0 0\n%s\nGrid\nFrames\nStern and Stem line\n"
+               "Aft and Bow breadth\n21 1\n",UtA( fname( FileName) ) );
+    fprintf( F,"; Baseline\n1 %d 0.5 0 3 3 0 1 1\n",Nframes+2 );  // разметка
     for( i=0; i<Nframes+2; i++ )fprintf( F,"%lg %lg 0\n",Keel[i],Draught );
-    for( i=1; i<=Nframes; i++ )fprintf( F,"1 2 0.5 0 1 14 0 1 2\n%lg %lg 0\n%lg %lg 0\n",
-     Keel[i],Frame[i][0].z+Draught,Keel[i],Frame[i][Frame[i].len-1].z+Draught );
-    fprintf( F,"1 5 0.5 0 1 14 0 1 2\n%lg %lg %lg\n%lg %lg %lg\n%lg %lg %lg\n%lg %lg %lg\n%lg %lg %lg\n",
+    fprintf( F,"; Frames\n" );
+    for( i=1; i<=Nframes; i++ )
+      fprintf( F,"1 2 0.5 0 1 14 0 1 1\n%lg %lg 0\n%lg %lg 0\n",
+      Keel[i],Frame[i][0].z+Draught,Keel[i],Frame[i][Frame[i].len-1].z+Draught);
+    fprintf( F,"; Plane\n1 5 0.5 0 1 14 0 1 1\n"
+     "%lg %lg %lg\n%lg %lg %lg\n%lg %lg %lg\n%lg %lg %lg\n%lg %lg %lg\n",
      Keel[0],Draught,Breadth/2,Keel[Nframes+1],Draught,Breadth/2,Keel[Nframes+1],
      Draught,-Breadth/2,Keel[0],Draught,-Breadth/2,Keel[0],Draught,Breadth/2 );
-    fprintf( F,"1 4 0.5 0 1 14 0 1 2\n%lg %lg 0\n%lg 0 0\n%lg 0 0\n%lg %lg 0\n",
-             Keel[0],Draught,Keel[0],Keel[Nframes+1],Keel[Nframes+1],Draught );
-    fprintf( F,"21 3\n" );                           // диаметральная плоскость
-    fprintf( F,"1 %d 0.5 0 1 8\n",n=Stern.len );     // в 2D ортогонали
-    for( i=0; i<n; i++ )fprintf( F,"%g %g %g\n",Stern[i].x,Stern[i].z+Draught,-Stern[i].y );
-    fprintf( F,"1 %d 0.5 0 1 8\n",n=Stem.len );
-    for( i=0; i<n; i++ )fprintf( F,"%g %g %g\n",Stem[i].x,Stem[i].z+Draught,Stem[i].y );
-    fprintf( F,"21 2\n" );
+    fprintf( F,"; Board box\n"
+     "1 4 0.5 0 1 14 0 1 1\n%lg %lg 0\n%lg 0 0\n%lg 0 0\n%lg %lg 0\n",
+     Keel[0],Draught,Keel[0],Keel[Nframes+1],Keel[Nframes+1],Draught );
+    fprintf( F,"21 2\n; %d Frames\n",Nframes );
     for( j=0,k=1; k<=Nframes; )
     { for( i=n=0; i<Frame[k].len; i++ )if( Frame[k][i].x==Keel[k] )n++;
-      fprintf( F,"1 %d 1 0 0 %d 0 1 3\n",n,k-Mid==0?1:12 );
+      fprintf( F,"1 %d 1 0 0 %d 0 1 2\n",n,k-Mid==0?1:12 );
       for( i=n=0; i<Frame[k].len; i++ )if( Frame[k][i].x==Keel[k] )
       { Real S=Frame[k][i].y;
         if( k-Mid<=0 && j==0 )S=-S;
         fprintf( F,"%lg %lg %lg\n",S,Frame[k][i].z+Draught,Frame[k][i].x );
       } if( k-Mid==0 && j==0 )++j; else k++;
     }
-    fprintf( F,"21 4\n" );                           // диаметральная плоскость
-    fprintf( F,"1 %d 0.5 0 0 1\n",n=Stern.len );     // в 2D ортогонали
-    for( i=0; i<n; i++ )fprintf( F,"%g %g %g\n",-Stern[i].y,Stern[i].z+Draught,Stern[i].x );
-    fprintf( F,"1 %d 0.5 0 1 8\n",n=Stem.len );
-    for( i=0; i<n; i++ )fprintf( F,"%g %g %g\n",Stem[i].y,Stem[i].z+Draught,Stem[i].x );
+
+    fprintf( F,"21 3\n; Stern\n1 %d 1 0 0 8 0 1 3\n",n=Stern.len );
+    for( i=0; i<n; i++ )
+      fprintf( F,"%g %g %g\n",Stern[i].x,Stern[i].z+Draught,-Stern[i].y );
+    fprintf( F,"; Stem\n1 %d 1 0 0 8 0 1 3\n",n=Stem.len );
+    for( i=0; i<n; i++ )
+      fprintf( F,"%g %g %g\n",Stem[i].x,Stem[i].z+Draught,Stem[i].y );
+
+    fprintf( F,"21 4\n; Stern wide\n1 %d 0.5 0 1 8 0 1 4\n",n=Stern.len );
+    for( i=0; i<n; i++ )
+      fprintf( F,"%g %g %g\n",-Stern[i].y,Stern[i].z+Draught,Stern[i].x );
+    fprintf( F,"; Stem wide\n1 %d 0.5 0 1 8 0 1 4\n",n=Stem.len );
+    for( i=0; i<n; i++ )
+      fprintf( F,"%g %g %g\n",Stem[i].y,Stem[i].z+Draught,Stem[i].x );
   }                                  ///
   else                               /// варианты красивой трехмерной картинки
   if( format>2 && format<5 )         ///
   { if( !(F=_wfopen( U2W( fext( FileName,"dc3" ) ),L"wb" )) )return *this;
     fprintf( F,"%g %g %g %g 0 %g %g\n",
      Keel[0],-Draught,Keel[Nframes+1]-Keel[0],Draught*2,Breadth/-2,Breadth/2 );
-    fprintf( F,"20 0 0 0 0 0\n1.0,0.1\n1.0\n*\n" );// здесь задаются масштабы и
-    fprintf( F,"23 6 0 0 0 0\n%s\nGrid\nPort side\nStarboard side\n"
-      "Fore and aft line\nHull plating\n21 1\n",UtA( sname( FileName ) ) );
-    fprintf( F,"1 %d 0.5 0 3 3 0 1 2\n",Nframes+2 );        // сетка и разметка
-    for( i=0; i<Nframes+2; i++ )fprintf( F,"%g 0 0\n",Keel[i] );  // ортогонали
-    for( i=1; i<=Nframes; i++ )fprintf( F,"1 2 0.5 0 1 14 0 1 2\n%lg %lg 0\n%lg %lg 0\n",
-                    Keel[i],Frame[i][0].z,Keel[i],Frame[i][Frame[i].len-1].z );
-    fprintf( F,"1 5 0.5 0 1 14 0 1 2\n%lg 0 %lg\n%lg 0 %lg\n%lg 0 %lg\n%lg 0 %lg\n%lg 0 %lg\n",
-             Keel[0],Breadth/2,Keel[Nframes+1],Breadth/2,Keel[Nframes+1],-Breadth/2,
-             Keel[0],-Breadth/2,Keel[0],Breadth/2 );
-    fprintf( F,"1 4 0.5 0 1 14 0 1 2\n%lg 0 0\n%lg %lg 0\n%lg %lg 0\n%lg 0 0\n",
-             Keel[0],Keel[0],-Draught,Keel[Nframes+1],-Draught,Keel[Nframes+1] );
 
-    fprintf( F,"21 4\n" );            // по диаметральной плоскости
-    fprintf( F,"; Stern[%d]\n",n=Stern.len );
-    fprintf( F,"1 %d 1 0 0 1 0 1 5\n",n );
-    for( i=0; i<n; i++ )fprintf( F,"%g %g %g\n",
-                        Stern[i].x,Stern[i].z,Stern[i].y );
-    fprintf( F,"; Stem[%d]\n",n=Stem.len );
-    fprintf( F,"1 %d 1 0 0 1 0 1 5\n",n );
-    for( i=0; i<n; i++ )fprintf( F,"%g %g %g\n",
-                        Stem[i].x,Stem[i].z,Stem[i].y );
-    fprintf( F,"21 2\n" );              // левый борт без изъятий, но с минусом
+    fprintf( F,"20 0 0 0 0 0\n1.0,0.1\n1.0\n*\n; ANSI-1251 DesignCAD Russian\n"
+               "23 6 0 0 0 0\n%s\nGrid\nPortside\nStarboard\n"
+               "Stern and Stem line\nHull plating\n21 1\n; Baseline\n"
+               "1 %d 0.5 0 3 3 0 1 1\n",UtA( fname( FileName ) ),Nframes+2 );
+    for( i=0; i<Nframes+2; i++ )fprintf( F,"%g 0 0\n",Keel[i] );
+    fprintf( F,"; Frames\n" );
+    for( i=1; i<=Nframes; i++ )
+    fprintf( F,"1 2 0.5 0 1 14 0 1 1\n%lg %lg 0\n%lg %lg 0\n",
+             Keel[i],Frame[i][0].z,Keel[i],Frame[i][Frame[i].len-1].z );
+    fprintf( F,"; Plane\n1 5 0.5 0 1 14 0 1 1\n%lg 0 %lg\n%lg 0 %lg\n"
+               "%lg 0 %lg\n%lg 0 %lg\n%lg 0 %lg\n",Keel[0],Breadth/2,
+             Keel[Nframes+1],Breadth/2,Keel[Nframes+1],-Breadth/2,
+             Keel[0],-Breadth/2,Keel[0],Breadth/2 );
+    fprintf( F,"; Board box\n1 4 0.5 0 1 14 0 1 1\n%lg 0 0\n%lg %lg 0\n"
+               "%lg %lg 0\n%lg 0 0\n",Keel[0],Keel[0],-Draught,Keel[Nframes+1],
+             -Draught,Keel[Nframes+1] );
+
+    fprintf( F,"21 2\n; Starboard + gap\n" ); // борт без изъятий, но с минусом
     for( k=0; k<Nframes+2; k++ )
-    { fprintf( F,"; Frame(%d)[%d]-starboard+gap\n",k,n=Frame[k].len );
-      fprintf( F,"1 %d 1 0 0 12 0 1 3\n",n );
+    { fprintf( F,"; Frame(%d)\n1 %d 1 0 0 12 0 1 2\n",k,n=Frame[k].len );
       for( i=0; i<n; i++ )
         fprintf( F,"%g %g %g\n",Frame[k][i].x,Frame[k][i].z,Frame[k][i].y );
     }
-    fprintf( F,"21 3\n" );                // правый борт с погрызенными концами
+    fprintf( F,"21 3\n; Portside\n" );    // правый борт с погрызенными концами
     for( k=1; k<=Nframes; k++ )
     { for( i=n=0; i<Frame[k].len; i++ )if( Frame[k][i].x==Keel[k] )n++;
-      fprintf( F,"; Frame(%d)[%d]-port side\n",k,n );
-      fprintf( F,"1 %d 1 0 0 12 0 1 4\n",n );
+      fprintf( F,"; Frame(%d)\n1 %d 1 0 0 12 0 1 3\n",k,n );
       for( i=0; i<Frame[k].len; i++ )if( Frame[k][i].x==Keel[k] )
       fprintf( F,"%g %g %g\n",Frame[k][i].x,Frame[k][i].z,-Frame[k][i].y );
     }
+    fprintf( F,"21 4\n; Stern\n1 %d 1 0 0 1 0 1 4\n",n=Stern.len );
+    for( i=0; i<n; i++)fprintf(F,"%g %g %g\n",Stern[i].x,Stern[i].z,Stern[i].y);
+    fprintf( F,"; Stem\n1 %d 1 0 0 1 0 1 4\n",n=Stem.len );
+    for( i=0; i<n; i++)fprintf(F,"%g %g %g\n",Stem[i].x,Stem[i].z,Stem[i].y );
+
     if( format>3 )     //! здесь добавлена обшивка корпуса в качестве украшения
-    { fprintf( F,"21 5\n" ); Vector P,Q,q;      // -- то будет и шпация
+    { fprintf( F,"21 5\n; Hull plating\n" ); Vector P,Q,q;      // -- то будет и шпация
       //
       //  ...транцы на штевнях должны отрабатываться вогнутыми контурами... !!!
       //
@@ -167,17 +175,20 @@ Hull& Hull::Write( int format ) // Wavefront Technologies 4 Advanced Visualizer
       for( k=0; k<=Nframes; k++ )                       // Nframes+1 шпангоутов
       if( Shell[k] )if( (n=Shell[k][0])>0 )             // -- если есть корпус
       { for( int Board=-1;Board<2;Board+=2 ) // сначала левый затем правый борт
-        { fprintf( F,"; Shell(%d)[%d]~%s\n",k,n,Board<0?"port":"starboard" );
+        { fprintf( F,"; Shell(%d)[%d]~%s\n",k,n,Board<0?"portside":"starboard");
           Q=Select( k,Board );               // это блок стандартных шпаций
           q=Select( k,Board*2 );             //    - переход на правый борт
           for( i=3; i<=n; i++ )              // всех теоретических шпангоутов
           { P=Select( k,Board*i );           // попутная разборка треугольников
             if( Board<0 )crossDC( Q,q,P ); else crossDC( q,Q,P );
             if( Shell[k][i]&LeftFrame )Q=P; else q=P;        // перед кормовым
-  } } } } }                                                  // перпендикуляром
-  { int D,m,d,y; julday( D=julday(),m,d,y ); char c=format==1?'#':';';
-    fprintf( F,"%c\n%c %s\n%c %04d.%s.%02d %s%s\n",
-           c,c,UtA( FileName ),c,y,_Mnt[m-1],d,_Day[D%7],DtoA( onetime(),3 ) );
+    } } } }                                                  // перпендикуляром
+  }
+  { int D,m,d,y; char c='#',*sm,*sw,*sn=sname( FileName );
+    julday( D=julday(),m,d,y ); sm=(char*)_Mnt[m-1],sw=(char*)_Day[D%7];
+    if( format!=1 ){ c=';'; sn=UtA( sn ); } fprintf( F,"%c\n%c %s\n",c,c,sn );
+    if( format!=1 )sm=UtA( sm ); fprintf( F,"%c %04d.%s.%02d ",c,y,sm,d );
+    if( format!=1 )sw=UtA( sw ); fprintf( F,"%s%s\n",sw,DtoA(onetime(),3,":"));
   } fclose( F ); return *this;
 }
 /*      &Entity_Type,       Собственно тип объекта

@@ -14,7 +14,7 @@
 #include "../Window/Window.h"
 
 extern const char *_Mnt[],*_Day[];       // названия месяцев и дней недели
-extern Real              //              разметка: { Xo,Do },{ Xo+Lmx,Depth }
+extern Real              //               разметка: { Xo,Do },{ Xo+Lmx,Depth }
  Xo,Xm,Length,Lmx,Lwl,   // Длина конструктивная, максимальная и по ватерлинии
        Breadth,Bmx,Bwl,  // Ширина конструктивная, максимальная и по ватерлинии
  Do,   Draught,Depth,    // Осадка и высота борта
@@ -148,8 +148,8 @@ struct complex
   complex& operator+=( const complex& c ){ x+=c.x; y+=c.y; return *this; }
   complex& operator*=( const complex& c ){ double w=(x*c.x)-(y*c.y); y=(x*c.y)+(y*c.x); x=w; return *this; }
 };
-inline double norm( const double& x, const double& y ){ return x*x+y*y; }
-inline double norm( const complex& c ){ return norm( c.x,c.y ); }
+inline double const norm( const double& x, const double& y ){ return x*x+y*y; }
+inline double const norm( const complex& c ){ return c.x*c.x+c.y*c.y; }
 inline complex operator * ( complex c,const double& r ){ c.x*=r; c.y*=r; return c; }
 inline complex operator + ( complex c,const complex& e ){ c.x+=e.x; c.y+=e.y; return c; }
 inline complex polar( const double& a ){ return (complex){ cos( a ),sin( a ) }; }

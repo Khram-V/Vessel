@@ -2,16 +2,16 @@
 ; 5415 US Navy Combatant
 ;
 ; Main particulars
-; Lmax              152,83
-; Lpp (m)           142.00
-; Lwl (m)           142.18
-; Bwl (m)            19.06
-; T   (m)             6.15
-; Displacement (m³) 8424.4
-; S w/o rudder (m²) 2972.6
-; CB                0.507
-; CM                0.821
-; LCB (%Lpp), fwd+ -0.683
+;  Lmax              152,83
+;  Lpp (m)           142.00
+;  Lwl (m)           142.18
+;  Bwl (m)            19.06
+;  T   (m)             6.15
+;  Displacement (m³) 8424.4
+;  S w/o rudder (m²) 2972.6
+;  CB                0.507
+;  CM                0.821
+;  LCB (%Lpp), fwd+ -0.683
 ;
  < 5415 US Navy Combatant + sidekeel+rudder >
 153 73

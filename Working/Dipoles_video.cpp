@@ -89,7 +89,10 @@ bool Video::Draw()
      stat=ScanStatus();                        // со stat-статусом клавиатуры
   static unsigned vk=0;                        // счетчик изображений на экране
   if( key )switch( key )
-  { case ' ': if( stat&SHIFT )ex.Grid++;       // сетка абсолютного базиса
+  {
+    case _F1: Win.Help( Id,Cmds,Plus,-2,2 ); break;
+    case _F4: GetKey(); Win.Configuration(); break;
+    case ' ': if( stat&SHIFT )ex.Grid++;       // сетка абсолютного базиса
          else if( stat&CTRL )ex.Field++;       // выбор векторных полей
          else ex.Model--; break;               // раскраска или ребра диполя
     default: if( key>='0' && key<='9' )        // количество активных корпускул
