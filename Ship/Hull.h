@@ -51,13 +51,13 @@ public: Frame( int l=0 ); ~Frame();
      *y,*z;      // аппликаты и ординаты точек сплайна шпангоутов
  Real& operator()( int k ){ return z[k]; };  // аргументу по индексному отсчету
  Real& operator[]( int k ){ return y[k]; };  // In/Out доступ к функции
- Real G( _Real Z, bool=false );      // эмуляция плазовой ординаты по аппликате
+ Real G( _Real Z, bool=false );     // эмуляция плазовой ординаты по аппликате
  void SpLine( bool old=false );      // включение и ...
  void Easy(){ Spl=false; }           //       ... и сброс сплайн-функции
  void allocate( int ); //void free();
- Real operator()(_Real A ){ return G( A ); }
- void Double( int k );                // вставка сломанной точки на шпангоуте
- void YaZ( Real A, Real &Y,Real &Z ); // и, - не совсем последовательный поиск
+ Real operator()( _Real Z ){ return G( Z ); }
+ void Double( int k );                 // вставка сломанной точки на шпангоуте
+ void AYZ( Real A, Real &Y,Real &Z );  // и, - не совсем последовательный поиск
 };
 ///   Уточненный вариант корпуса, разделенного на шпангоуты
 //

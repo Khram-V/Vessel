@@ -9,8 +9,11 @@
 //
 #include "Aurora.h"
 
-bool logTime(){ const Field &S=*Storm; if( !VIL || S.Kt<2 )return false; else
- return 0<fprintf( VIL,"\n%9s/%-4d",DtoA(Storm->Trun/3600,-3),Storm->Kt ); }
+bool logTime()
+{ const Field &S=*Storm; if( !VIL || S.Kt<2 )return false; else
+ return 0<fprintf( VIL,Storm->Trun<60 ? "\n   %-6s/%-4d":"\n%-9s/%-4d",
+                 DtoA( Storm->Trun/3600,-3 ),Storm->Kt );
+}
 void logMeta(){ if( VIL ){ const Hull &S=*Vessel;
  fprintf(VIL,"\n  ⇒ Гидростатика: С{ x=%.1f, z=%.2f }, zG=%.2f, r=%.2f, h=%.2f"
  + logTime(), S.Buoyancy.x,S.Buoyancy.z,S.Gravity.z,

@@ -133,15 +133,13 @@ static void Alliance( Flex &S, Flex &Y, bool St, _Real X ) // St ? Stern : Stem
     if( S.len==1 )  // если на штевне одна точка, то возможно добавление другой
     { S[0].y=V.y; if( V.z!=S[0].z ){ V.x=S[0].x; S.Insert( V.z>S[0].z )=V; }
     } else          // все утолщения одинаковы, и точка расширения не пропадает
-    for( i=0; 0 && i<S.len; i++ ){ S[i].y=V.y; // здесь для всех одинаковая ордината
-      if( !i && V.z<S[0].z )j=1; else     //     поиск вставки или дополнения с
-      if( i==S.len-1 && V.z>S[-1].z       //      пропуском одинаковых аппликат
+    for( i=0; 0 && i<S.len; i++ ){ S[i].y=V.y;  // для всех одинаковая ордината
+      if( !i && V.z<S[0].z )j=1; else           // поиск вставки или дополнения
+      if( i==S.len-1 && V.z>S[-1].z          // с пропуском одинаковых аппликат
        || i>0 && intox( S[i-1].z,V.z,S[i].z ) )j=i; else continue;// всё\помимо
       V.x=Inter( V.z,S[j-1].z,S[j].z,S[j-1].x,S[j].x ); S.Insert( j )=V; }
   } else // основной блок компоновки контуров штевней с транцевыми расширениями
-  {
-    for( j=m; j<n; j++ )              // трудно сказать о нужности всех абсцисс
-//  for( V=S[j],k=0; k<Y.len-1; k++ ) // последовательно по транцевым ординатам
+  { for( j=m; j<n; j++ )              // трудно сказать о нужности всех абсцисс
     for( V=S[j],k=Y.len-2; k>=0; k-- )// последовательно по транцевым ординатам
     if( intox( Y[k+1].z,V.z,Y[k].z ) ) // поиск точки внутри интервала аппликат
     { V.y=Inter( V.z,Y[k].z,Y[k+1].z,Y[k].y,Y[k+1].y );
@@ -184,13 +182,13 @@ bool Hull::Read( const char FName[],   // здесь имя приходит в 
   if( !(Fh=FileOpen( FileName,"rt","vsl","Корпус корабля (<плаз>.vsl)\1*.vsl\1"
                               "Все файлы (<плаз>.*)\1*.*\1\1",FileTitle ) ) )
   if( !(Fh=fopen( strcpy( FileName,"Aurora.vsl" ),"rt" ) ) )
-  { if( (Fh=fopen( FileName,"wb" ) )!=NULL )                      // ,ccs=UTF-8
+  { if( (Fh=fopen( FileName,"wb" ) )!=NULL )                     // , ccs=UTF-8
     { fputs( Aurora,Fh ); fclose( Fh );           // предусматривается «Аврора»
-      if( (Fh=fopen( FileName,"rt" ) )!=NULL )goto Ok;     // новый файл открыт
-    } goto Bk;                             // здесь продолжается серия проверок
-  } // FileTitle[0]='?';
+      if( (Fh=fopen( FileName,"rt" ) )!=NULL )goto Ok; // новый файл открыт
+    } goto Bk;                       // здесь продолжается серия проверок
+  }                                  //  FileTitle[0]='?'
 Ok: Str=stringData( Fh );            // Длинная строка в буфере входного файла
-  if( *Str++==30 ){                  //  '\30'
+  if( *Str++==30 ){                  //  '\30=▲\x1E'
    Flex L,R; Vector V,W; bool lfr;   // векторы шпангоутных контуров по шпациям
    Real x,y,z; int i,j,k,l,m,n;      // ... точки по циклам двойной вложенности
     Ofs=Zero;                        // приведение к миделю и основной линии OЛ

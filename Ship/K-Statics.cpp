@@ -58,19 +58,17 @@ struct Hydrostatic        // подборка гидростатических �
   void Stability_Lines();
   void Axis_Statics( _Real A, bool clear=true );
   int  Stability_Menu();
-  Real In( _Real z, Real *F );
+  Real In( Real z, Real *F );
 };
-Real Hydrostatic::In( _Real z, Real *F )
-{ if( nZ<2 )return F[0]; else
-  { int k=minmax( 0,int( trunc( z/dZ ) ),nZ-2 ); Real *f=F+k;
-    return f[0] + (f[1]-f[0])*(z/dZ-k);
-} }
+Real Hydrostatic::In( Real z, Real *F ) // nZ>2 всегда
+{ int k=minmax(0,int(z/=dZ),nZ-2); Real *f=F+k; return f[0]+(f[1]-f[0])*(z-k);
+}
 Hydrostatic::Hydrostatic(): Lmax( Depth ),Lmin( Do )
-{ int i,k; Real x,z; EpsV=Volume/1000;
+{ int i,k; Real x,z,s; EpsV=Volume/1000;
   dX=Lmx/(nX-1);
   dZ=(Depth-Do)/(nZ-1);                  // Do - предустанавливается при вызове
   for( z=Do,k=0; k<nZ; k++,z+=dZ )       //  Y - таблица плазовых ординат
-  { for( x=Xo,i=0; i<nX; i++,x+=dX )Y[k][i]=Kh.Y(x,z);
+  { for( x=Xo,i=0; i<nX; i++,x+=dX )Y[k][i]=Kh.Y( x,z );
         aX[k]=Kh.Asx.G( z ); sX[k]=Kh.Stx.G( z ); // абсциссы и
         aY[k]=Kh.Asy.G( z ); sY[k]=Kh.Sty.G( z ); // ординаты транцевых штевней
   }
@@ -83,11 +81,11 @@ Hydrostatic::Hydrostatic(): Lmax( Depth ),Lmin( Do )
 //   корпуса судна, с определением его базовых характеристик
 //
 void Hydrostatic::Initial()     // Процедура предварительного перерасчета всех
-{ int i,k;                      //  массив и характеристик, необходимых для
+{ int i,k; bool b;              //  массив и характеристик, необходимых для
   Real R,r,cX,S, x,y,z;         //  построения кривых элементов теоретического
   for( k=0; k<nZ; k++ )         //  чертежа судна по массивам плазовых ординат
-  { x=Xo; //-dX/2;              //  для вычисления площадей, объемов
-    z=dZ*k; //( Real( k )+0.5 );     //  их моментов инерции (z+1/2 - центр объема)
+  { x=Xo;   //-dX/2;            //  для вычисления площадей, объемов
+    z=dZ*k; //(Real( k )+0.5);  //  их моментов инерции (z+1/2 - центр объема)
     R=r=cX=S=0.0;               // Первый прогон интегрирования, нулевая ширина
     for( i=0; i<nX; i++,x+=dX ) //  и метацентрических радиусов
     if( (y=Y[k][i])>0.0 )
@@ -95,18 +93,25 @@ void Hydrostatic::Initial()     // Процедура предварительн
       cX+= y*x;                 //
       r += y*y*y;               // стр.61 у Владимира Вениаминовича С-Т-Ш
       R += y*x*x;               //
-      if( !i || ( i>0 && Y[k][i-1]<=0.0 ) ) // && i<Kh.Ms
-      { Real sx=In( z,aX ),
-             sy=In( z,aY ); y=sy; S += sy *= ((i*dX)+Xo-sx)/dX; cX += sy*sx;
-        r += sy*sy*sy;
-        R += sy*sx*sx;
+      if( i>0 )b=Y[k][i-1]<=0.0; else b=false;
+      if( !i || b )
+      { Real sx=In( z,aX ),sy=max( 0.0,In( z,aY ) );
+        Real dx=(x-sx)/dX; sx=(x*sy+sx*y)/(y+sy); //sy=(y+sy)/4;
+        S += dx * sy;
+        r += dx * sy*sy*sy;
+        R += dx * sy*sx*sx;
+        cX+= dx * sy*sx;
       }
-      if( i==nX-1 || ( i<nX-1 && Y[k][i+1]<=0.0 ) ) // && i>=Kh.Ms
-      { Real sx=In( z,sX ),
-             sy=In( z,sY ); y=sy; S += sy *= (sx-(i*dX)-Xo)/dX; cX += sy*sx;
-        r += sy*sy*sy;
-        R += sy*sx*sx;
-    } }
+      if( i<nX-1 )b=Y[k][i+1]<=0.0; else b=false;
+      if( i==nX-1 || b )
+      { Real sx=In( z,sX ),sy=max( 0.0,In( z,sY ) );
+        Real dx=(sx-x)/dX; sx=(x*sy+sx*y)/(y+sy); //sy=(y+sy)/4;
+        S += dx * sy;
+        r += dx * sy*sy*sy;
+        R += dx * sy*sx*sx;
+        cX+= dx * sy*sx;
+      }
+    }
     Swl[k]=( S*=2*dX );             // Площадь ватерлинии
             cX*=2*dX;               // Момент площади ватерлинии
     if( !k ){ Vol[0]=zCV[0]=0; xCV[0]=Xm; if( S>EpsV/dZ )xCV[0]=cX/S; } else
@@ -125,7 +130,7 @@ void Hydrostatic::Initial()     // Процедура предварительн
   }                             //
   Srf[0]=S=Swl[0];              // Площадь смоченной поверхности
   for( k=1; k<nZ; k++ )         //
-  { S+=(Y[k][0]+Y[k-1][0]+Y[k][nX-1]+Y[k-1][nX-1])*dZ;  // без двойки два борта
+  { S+=( Y[k][0]+Y[k-1][0]+Y[k][nX-1]+Y[k-1][nX-1] )*dZ; // без двойки два борта
     for( i=1; i<nX; i++ )
     { y=Y[k][i]; Real yx=Y[k][i-1],yz=Y[k-1][i];
       if( y>0||yx>0||yz>0 )S+=sqrt( 1.0+norm( (yx-y)/dX,(yz-y)/dZ ) )*dX*dZ*2;
@@ -143,7 +148,9 @@ void Hydrostatic::Initial()     // Процедура предварительн
     zCV[k]+=Do-dZ/2;
     zM[k]=rx[k]+zCV[k];
 
-} }
+  }
+//for( i=4*nZ/5; i<nZ; i++ )Jx[i]=0;
+}
 static void MinMax( Real *F, int N, Real &Min, Real &Max, const int mx=0 )
 {                         if( !mx )Min=F[0]-0.1,Max=F[0]+0.1;
   for( int i=0; i<N; i++ )if( Min>F[i] )Min=F[i]; else

@@ -40,8 +40,8 @@ struct Event{ long D; Real T;              // Юлианская дата и ч�
   Event& Now();                           // здесь текущее компьютерное время
   Event(){ Now(); }                      //  ++ в простом/чистом конструкторе
   Event& Check();                      // согласование внешних сложений времени
-  Event( _Event New ): D( New.D ),T( New.T ){ Check(); }
-  Event( long d,_Real t=0.0 ): D( d ),T( t ){ Check(); }
+  Event( _Event cur ): D( cur.D ),T( cur.T ){ Check(); } // заданное событие и
+  Event( long d,_Real t=0.0 ): D( d ),T( t ){ Check(); } //   в дате и времени
   Event  operator + (_Real t ){ return Event( D,T+t ); }
   Event  operator - (_Real t ){ return Event( D,T-t ); }
   Event& operator +=(_Real t ){ T+=t; return Check(); }
@@ -71,8 +71,7 @@ char* DtoA( Real,int=0,const char* ="°"); // (±)ⁿ123°45'67"00 как кру
 char* AtoD( char*, Real& );               // (°)÷(:) с возможной заменой на ':'
 template<class real>int find( const real *A, const real &Ar, int len );
 //template<class real>inline real Angle( const real &A )          // A° = ±180°
-//                                     { return remainder( A,360 ); }
-//
+//                                           { return remainder( A,360 ); }
 //    Работа с обычными текстовыми строчками
 //
 int strcut( char* Str );                 // Убираются концевые пробелы, символы
@@ -84,7 +83,7 @@ char* fext ( char*, const char* Ext=0 ); // c принудительной за�
 FILE *FileOpen                           // ++ кодировка длинных строк FileOpen
   ( char *fn, const char *tp, const char *ex, const char *ch, const char *tl );
 char *getString( FILE *F );              // Чтение строки на статическом адресе
-char *getString( FILE *F, int t );       // неограниченной длины + табуляторы
+char *getString( FILE *F, int t );       // неограниченной длины +(-)табуляторы
 #endif                                   // результат - в подстрочках getString
 int  Usize( const char *A, bool=false ); // длина на выходе из DOS/Win в UTF-8
 int  Ulen( const char* UTF );            // количество позиций в строке UTF-8

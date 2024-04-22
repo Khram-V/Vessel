@@ -95,7 +95,7 @@ void Hull::Analytics()
   { if( Lmx<(W=m_Stem( Z=i*Depth/(Nz-1) )) )Lmx=W;  // так, на всякий случай
     if( Xo>(W=m_Stern( Z )) )Xo=W;
   }
-  // Производится перестроение аналитического корпуса к обычному виду
+  //  Производится перестроение аналитического корпуса к обычному виду
   //
  Real Dx=(m_Stem(Draught)-m_Stern(Draught))/(Nx+1),Dz,x,z;
       Jx=0.04-Xo/Dx;
@@ -109,7 +109,7 @@ void Hull::Analytics()
                          Deck[5]=Depth*1.1,Deck(5)=Deck.max=Lmx; Deck.SpLine();
   for( int i=0; i<Nx; i++ )
   { F[i].X=x=Dx*(i-Jx)+Dx/4;
-    Dz=Deck.G( x,true )/pow( Nz-1,1.543080635 ); Y=1.0; b=1;
+    Dz=Deck.G( x,true )/pow( Nz-1,1.543080635 ); Y=1.0; b=1; // x ставится YG
     for( int j=0; j<Nz; j++ ){ z=Dz*pow( j,1.543080635 );
      int &N=F[i].N;                   // изменяемая длина контура шпангоута
      int k=j+N+1-Nz;                  // отсчёт с учётом сброса лишних ординат
@@ -161,7 +161,7 @@ static Real m_Hull( Real z, Real x )
 { if( Hull_Type==2 )return Kh.Y( x,z );
   Real A,S,Z;
    if( z<1e-12 )return 0;
-   if( (S= m_Stem( z ))<x )return 0;
+   if( (S=m_Stem( z ))<x )return 0;
    if( (A=m_Stern( z ))>x )return 0;
    x = ( 2*x-S-A )/( S-A );
    z = 1-z/Draught;
@@ -204,7 +204,7 @@ void Building()                       //       ___\│ г--+-┼--°°L¬\+/
   }                                       // здесь прорисовываются контуры
   glEnable( GL_LINE_SMOOTH );             // пяти ватерлиний по масштабу осадки
   for( k=0,z=0.0; k<=10 && z<=Depth; k++,z+=Draught/5 )
-  { d=Lmx*0.0002; x=Kh.Asx.G( z,true )-d; y=Kh.Stx.G( z,true )+2*d; // 5000тч
+  { d=Lmx*0.0002; x=Kh.Asx.G( z,true )-d; y=Kh.Stx.G( z,true )+2*d;
     if( k>5 )__Board else
     if( k<5 )__Water else __Deck
     glBegin( GL_LINE_STRIP );
@@ -341,7 +341,7 @@ void Draw_Hull( int ids, Plane &_W )                         // Проекция
     glBegin( GL_LINE_STRIP );
     if( Hull_Keys&1 )
     for( Real a=0; a<=1.0005; a+=0.001 )    //! 1000 точек по контуру шпангоута
-    { Kh.F[k].YaZ( a,y,z );                 // контуры шпангоутов
+    { Kh.F[k].AYZ( a,y,z );                 // контуры шпангоутов
       if( z>Draught )__Board else __Water   // синие сверху и зеленые под водой
       if( !m )y=-y; glVertex2d( y,z );
     } else                                 // или изображение исходных контуров

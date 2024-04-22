@@ -40,7 +40,6 @@ FILE *FileOpen
     free( (void*)W.lpstrDefExt );
     free( (void*)W.lpstrFilter );
   } strcpy( FName,W2U(wName) ); return F; // должно быть место для имени во вне
-//} strcpy( FName,fname( W2U( wName ) ) ); return F; // место для имени во-вне.
 }
 //      по случаю - чтение файловых строчек с тем же (единым!) буфером в памяти
 //

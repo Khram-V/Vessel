@@ -16,7 +16,7 @@ Frame::~Frame(){ allocate( 0 ); }
 void Frame::allocate( int l )
 { Easy(); y=(Real*)Allocate( l*sizeof(Real),y );
   N=l-1;  z=(Real*)Allocate( l*sizeof(Real),z );  //! N-1 количество интервалов
-         _x=(Real*)Allocate( l*sizeof(Real),_x );
+         _x=(Real*)Allocate( l*sizeof(Real),_x ); /// !!! N - не точек !!!
          _y=(Real*)Allocate( l*sizeof(Real)*2,_y );
   if( l>0 ){ for( l=0; l<=N; l++ )_x[l]=l; memset( _y,0,sizeof( Real )*l*2 ); }
 }
@@ -29,7 +29,7 @@ static void MM( Frame &F )
   if( Do>F.min )Do=F.min; if( Depth<F.max )Depth=F.max;
 }
 void Hull::MinMax()
-{ Bmx=F[Ms][0]; Xo=F[0].X; Lmx=F[Ns-1].X; Do=Stx(0); Depth=Stx(Stx.N);
+{ Bmx=F[Ms][0]; Xo=F[0].X; Lmx=F[Ns-1].X; Do=Stx(0); Depth=Stx(Stx.N); Real S;
   MM( Sty ); MM( Stx ); for( int i=0; i<=Stx.N; i++ )Lmx=max( Lmx,Stx[i] );
   MM( Asy ); MM( Asx ); for( int i=0; i<=Asx.N; i++ )Xo=min( Xo,Asx[i] );
   for( int j=0; j<Ns; j++ )        // поиск-выборка максимальной ширины корпуса
@@ -72,8 +72,8 @@ static int find( Real *A,_Real Ar,int N )   // Двоичный поиск бл�
   { k=(N+i)/2; if( d ){ if( Ar<A[k] )N=k; else i=k; }
                  else { if( Ar>A[k] )N=k; else i=k; } } return i;
 }*/
-void Frame::YaZ( Real A,Real &Y,Real &Z )            // Аргумент: 0.0<=A<=1.0
-{ if( A<0.0 ){ Y=0.0; Z=z[0]; return; }
+void Frame::AYZ( Real A,Real &Y,Real &Z )            // Аргумент: 0.0<= A <=1.0
+{ if( A<0.0 ){ Y=0.0; Z=z[0]; return; }              //  и только для рисовалки
   if( A>1.0 ){ Y=0.0; Z=z[N]; return; } A*=_x[N];    // индексно-сплайновый
  int k=0; while( k<N-1 && A>_x[k+1] )k++; A-=_x[k];  // первый из неоднозначных
  Real h=_x[k+1]-_x[k]; if( fabs( h )<eps ){ Y=(y[k+1]+y[k])/2;
@@ -86,25 +86,33 @@ void Frame::YaZ( Real A,Real &Y,Real &Z )            // Аргумент: 0.0<=A
   } else
   { A/=h; Y = y[k] + A*( y[k+1]-y[k] );        // простая линейная интерполяция
           Z = z[k] + A*( z[k+1]-z[k] );
-} }
-Real Frame::G( _Real az, bool bound )            // эмуляция плазовой ординаты
+  }
+}
+Real Frame::G( _Real az, bool bound )           // эмуляция плазовой ординаты
 { if( N<1 )return y[0];                          // одна точка на другие случаи
-  if( az<min )return bound?y[0]:0.0;             // точка лежит ниже шпангоута
-  if( az>max )return bound?y[N]:0.0;             // точка лежит выше шпангоута
+  if( az<=min )return bound?y[0]:0.0;            // точка лежит ниже шпангоута
+  if( az>=max )return bound?y[N]:0.0;            // точка лежит выше шпангоута
+#if 0
+ int j=0;               // где y - неоднозначная функция, ищем первое вхождение
+  for( j=0; j<N && z[j]<az; j++ ); if( j>1 )j--;
+    return y[j]+(az-z[j])*(y[j+1]-y[j])/(z[j+1]-z[j]); // немного по простецки
+#else
   for( int k=0; ; k++ )                          // где Y - однозначная функция
   { if( k>=N )return bound?y[N]:0.0;             // теперь точка выше шпангоута
     if( az<=z[k+1] && z[k+1]>z[k] || k==N-1)     //       линейная интерполяция
     { Real X,Y=0,Z=z[k+1]-z[k];
-      X=( _x[k]+(az-z[k])*(_x[k+1]-_x[k])/Z )/_x[N]; YaZ( X,Y,Z ); return Y;
-} } }
+      X=( _x[k]+(az-z[k])*(_x[k+1]-_x[k])/Z )/_x[N]; AYZ( X,Y,Z ); return Y;
+  } }
+#endif
+}
 //         Блок операторов для корпуса в целом c простой линейной интерполяцией
 //                                          ординат в шпациях между шпангоутами
-Real Hull::Y( _Real x,_Real z )                       // за пределами обнуление
+Real Hull::Y( _Real x,_Real z )           // за пределами обнуление
 { Real A,S,a=Asx.G( z,true ),s=Stx.G( z,true ); int k;  // граничного шпангоута
   if( x<a || x>s )return 0.0;             // особый анализ точек в оконечностях
   if( x<F[0].X ){ A=Asy.G( z ),s=F[0].X,S=F[0].G(z); } else  // за ахтерштевнем
   if( x>F[Ns-1].X ){ S=Sty.G(z),a=F[Ns-1].X,A=F[Ns-1].G(z); }else // форштевнем
-  { for( k=0; k<Ns-2 && x>F[k+1].X; k++ );   // поиск ближайшего левого индекса
+  { for( k=0; k<Ns-2 && x>F[k+1].X; k++ ); // поиск ближайшего левого индекса
     if( a>F[k].X )A=Asy.G( z ); else a=F[k].X,A=F[k].G( z );
     if( s<F[k+1].X )S=Sty.G( z ); else s=F[k+1].X,S=F[k+1].G( z );
     if( a<=F[k].X && s>=F[k+1].X )
