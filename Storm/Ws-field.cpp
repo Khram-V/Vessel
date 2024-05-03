@@ -74,7 +74,7 @@ bool Field::Timer()                //! к несчастью все расчет
   Event T; T.UnPack( M,D,Y );      // время для обработки прерываний от таймера
   { TextContext Save( true ); color( navy );
     Info.Area( 0,0,60,1 ).Clear().Print( 2,0,"%04d %s %02d, %s%s <= %d",
-                                Y,_Mnt[M-1],D,_Day[int(T.D%7)],DtoA(T.T,3),Kt);
+                               Y,_Mnt[M-1],D,_Day[int(T.D%7)],DtoA(T.T,3),Kt );
     if( pause||stop ){ color(magenta); Info.Print(stop?" <стоп>":" <pause>" ); }
     if( Tlaps*3600-Trun>1.0 ){ color( red );
         Info.Print( " {%s",DtoA( Tlaps,3 ) );    // реальное время эксперимента
@@ -103,8 +103,9 @@ Field& Field::Simulation()  // моделирование волнения в и
   GrWave=Exp.wave>1?10:17.6; // количество волн для одного структурного цикла
   if( Trun<Tnew )           // на свободной границе нужен точный отсчёт времени
   { Real Tr=Trun;           // начальный отсчёт времени по выходу через секунду
-    if( Vessel->Statum || Exp.wave>1 )Ts=Tstep/tKrat;  // гидромеханика корабля
-                    else Ts=Tstep/tKrat; //Tnew-Trun;  // или только кинематика
+//  if( Vessel->Statum || Exp.wave>1 )Ts=Tstep/tKrat;  // гидромеханика корабля
+//                               else Ts=Tnew-Trun;   //! или только кинематика
+//  Ts=Tstep/tKrat;
     //
     //   Главный цикл во времени для проведения вычислительного эксперимента
     //
@@ -128,7 +129,7 @@ Field& Field::Simulation()  // моделирование волнения в и
         }
       } else             //! прямой вычислительный эксперимент разделением волн
       if( Exp.wave>1 )   // по всем трём независимым структурам из частиц-ячеек
-      { Vector dR={0,0,0};  // продвижение по курсу корабля за один шаг времени
+      { Vector dR={0,0,0}; // =продвижение по курсу корабля за один шаг времени
         if( Vessel->Route.len>1 )dR=Vessel->Route[-2]-Vessel->Route[-1];
 #pragma omp parallel sections
         {
@@ -155,7 +156,8 @@ Field& Field::Simulation()  // моделирование волнения в и
              .Protocol();
             ++Kt;                // счётчик циклов вычислительного эксперимента
       if( !WinReady(this) )break;// переисполнение очереди посторонних запросов
-  } } else WinReady(); return *this;
+    }
+  } else WinReady(); return *this;
 }
 //     Эксперимент выполняется с заданным расчетным шагом до истечения
 //     контрольного интервала времени, или до возникновения сигнала
@@ -238,8 +240,8 @@ Waves& Waves::ThreeSurface( _Real Step ) // + поле скорости зада
 Waves& Waves::ThreeBoundary
 ( _Real Tr, _Real S, _Real Step )        // Проход по периметру всей акватории
 { Vector Bh={0,0,0},B1=H[0][1],Dh,Dx,Dy;  // пере-экстраполяция граничных точек
-  const Real &tK=Storm->tKrat;     // к поправке дробления шага от Зоммерфельда
-  Real kW=Cw*S*tK/Ds/(tK+1);   // скорость волны от скорости пересечения сетки
+//const Real &tK=Storm->tKrat;     // к поправке дробления шага от Зоммерфельда
+  Real kW=Cw*S*tKrat/Ds/(tKrat+1); // скорость волны на время пересечения сетки
   for( int bx=0,by=0,j=0,i=1;; )            // по нелинейным эффектам отражения
   { int Ys=j>0?-1:0, Yn=j<My?1:0, jy=Ys+Yn,              // нормаль на выход
         Xw=i>0?-1:0, Xe=i<Mx?1:0, ix=Xw+Xe;             // из свободной границы

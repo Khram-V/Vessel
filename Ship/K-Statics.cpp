@@ -64,7 +64,7 @@ Real Hydrostatic::In( Real z, Real *F ) // nZ>2 всегда
 { int k=minmax(0,int(z/=dZ),nZ-2); Real *f=F+k; return f[0]+(f[1]-f[0])*(z-k);
 }
 Hydrostatic::Hydrostatic(): Lmax( Depth ),Lmin( Do )
-{ int i,k; Real x,z,s; EpsV=Volume/1000;
+{ int i,k; Real x,z; EpsV=Volume/1000;
   dX=Lmx/(nX-1);
   dZ=(Depth-Do)/(nZ-1);                  // Do - предустанавливается при вызове
   for( z=Do,k=0; k<nZ; k++,z+=dZ )       //  Y - таблица плазовых ординат
@@ -80,76 +80,76 @@ Hydrostatic::Hydrostatic(): Lmax( Depth ),Lmin( Do )
 //   Основные кривые элементов теоретического чертежа формы
 //   корпуса судна, с определением его базовых характеристик
 //
-void Hydrostatic::Initial()     // Процедура предварительного перерасчета всех
-{ int i,k; bool b;              //  массив и характеристик, необходимых для
-  Real R,r,cX,S, x,y,z;         //  построения кривых элементов теоретического
-  for( k=0; k<nZ; k++ )         //  чертежа судна по массивам плазовых ординат
-  { x=Xo;   //-dX/2;            //  для вычисления площадей, объемов
-    z=dZ*k; //(Real( k )+0.5);  //  их моментов инерции (z+1/2 - центр объема)
+void Hydrostatic::Initial()      // Процедура предварительного перерасчета всех
+{ int i,k; bool b;               //  массив и характеристик, необходимых для
+  Real R,r,cX,S, x,y,z=Do;  //+dZ/2; построения кривых элементов теоретического
+  for( k=0; k<nZ; k++,z+=dZ )    //  чертежа судна по массивам плазовых ординат
+  { x=Xo;   //-dX/2;             //  для вычисления площадей, объемов
+//  z=Do+dZ*k; //(Real( k )+0.5) //  их моментов инерции (z+1/2 - центр объема)
     R=r=cX=S=0.0;               // Первый прогон интегрирования, нулевая ширина
-    for( i=0; i<nX; i++,x+=dX ) //  и метацентрических радиусов
+    for( i=0; i<nX; i++,x+=dX ) //   и метацентрических радиусов
     if( (y=Y[k][i])>0.0 )
     { S += y;
-      cX+= y*x;                 //
-      r += y*y*y;               // стр.61 у Владимира Вениаминовича С-Т-Ш
-      R += y*x*x;               //
+      cX+= y*x;
+      r += y*y*y;                     // стр.61 у Владимира Вениаминовича С-Т-Ш
+      R += y*x*x;
       if( i>0 )b=Y[k][i-1]<=0.0; else b=false;
       if( !i || b )
       { Real sx=In( z,aX ),sy=max( 0.0,In( z,aY ) );
-        Real dx=(x-sx)/dX; sx=(x*sy+sx*y)/(y+sy); //sy=(y+sy)/4;
-        S += dx * sy;
-        r += dx * sy*sy*sy;
-        R += dx * sy*sx*sx;
-        cX+= dx * sy*sx;
+        sx = x + (sx-x)*( y+2*sy )/(y+sy)/3;          // центр площади трапеции
+        sy = (y+sy)/2;
+        S += sy;
+        r += sy*sy*sy;
+        R += sy*sx*sx;
+        cX+= sy*sx;
       }
       if( i<nX-1 )b=Y[k][i+1]<=0.0; else b=false;
       if( i==nX-1 || b )
       { Real sx=In( z,sX ),sy=max( 0.0,In( z,sY ) );
-        Real dx=(sx-x)/dX; sx=(x*sy+sx*y)/(y+sy); //sy=(y+sy)/4;
-        S += dx * sy;
-        r += dx * sy*sy*sy;
-        R += dx * sy*sx*sx;
-        cX+= dx * sy*sx;
-      }
-    }
-    Swl[k]=( S*=2*dX );             // Площадь ватерлинии
-            cX*=2*dX;               // Момент площади ватерлинии
-    if( !k ){ Vol[0]=zCV[0]=0; xCV[0]=Xm; if( S>EpsV/dZ )xCV[0]=cX/S; } else
+        sx = x +  (sx-x)*( y+2*sy )/(y+sy)/3;
+        sy = (y+sy)/2;
+        S += sy;
+        r += sy*sy*sy;
+        R += sy*sx*sx;
+        cX+= sy*sx;
+    } }
+    Swl[k]=( S*=2*dX );              // Площадь ватерлинии
+            cX*=2*dX;                // Статический момент площади ватерлинии
+    if( !k ){ Vol[0]=0; zCV[0]=Do; xCV[0]=Xm; if( S>EpsV/dZ )xCV[0]=cX/S; }else
     if( !S )Vol[k]=Vol[k-1],zCV[k]=zCV[k-1],xCV[k]=xCV[k-1]; else
-    { Real v=dZ*(S+Swl[k-1])/2;     // Чистый метод трапеций
-      Vol[k]=Vol[k-1] + v;          // Грузовой размер
-      zCV[k]=zCV[k-1] + v*z; //*(z-dZ/2); // Момент для аппликаты центра величины zC
-      xCV[k]=xCV[k-1] + cX*dZ;      // Момент для абсциссы центра величины xC
+    { Real v=dZ*(S+Swl[k-1])/2;      // Чистый метод трапеций
+      Vol[k]=Vol[k-1] + v;           // Грузовой размер
+      zCV[k]=zCV[k-1] + v*(z-dZ/2);  // Момент для аппликаты центра величины zC
+      xCV[k]=xCV[k-1] + cX*dZ;       // Момент для абсциссы центра величины xC
     }
     if( !k && !S )xCW[k]=Xm,Jy[k]=Jx[k]=0; else
     if( k && !S )xCW[k]=xCW[k-1],Jy[k]=Jy[k-1],Jx[k]=Jx[k-1]; else
-    { xCW[k]=cX/S; //+Xo;       // Центр площади ватерлинии
-      Jy[k]=(R*2*dX-cX*cX/S);   // /Vol[k]->Продольный метацентрический радиус
-      Jx[k]= r*2*dX/3;          // /Vol[k]->Поперечный --//--
+    { xCW[k]=cX/S; //+Xo;        // Центр площади ватерлинии
+      Jy[k]=(R*2*dX-cX*cX/S);    // /Vol[k]->Продольный метацентрический радиус
+      Jx[k]= r*2*dX/3;           // /Vol[k]->Поперечный --//--
     }
-  }                             //
-  Srf[0]=S=Swl[0];              // Площадь смоченной поверхности
-  for( k=1; k<nZ; k++ )         //
-  { S+=( Y[k][0]+Y[k-1][0]+Y[k][nX-1]+Y[k-1][nX-1] )*dZ; // без двойки два борта
+  }                              //
+  Srf[0]=S=Swl[0];               // Площадь смоченной поверхности
+  for( k=1; k<nZ; k++ )          //
+  { S+=( Y[k][0]+Y[k-1][0]+Y[k][nX-1]+Y[k-1][nX-1] )*dZ;// без двойки два борта
     for( i=1; i<nX; i++ )
     { y=Y[k][i]; Real yx=Y[k][i-1],yz=Y[k-1][i];
       if( y>0||yx>0||yz>0 )S+=sqrt( 1.0+norm( (yx-y)/dX,(yz-y)/dZ ) )*dX*dZ*2;
     } Srf[k]=S;
   }
-  zCV[0]=0;
+  zCV[0]=Do;
   xCV[0]=xCW[0];
   for( k=0; k<nZ; k++ )
   { if( !k )Ry[0]=rx[0]=0; else
-      { xCV[k]/=Vol[k]+Swl[k]*dZ;                   // половинка счетной ватерлинии
-        zCV[k]/=Vol[k]; //(Vol[k]+Vol[k-1])/2;
-        rx[k]=Jx[k]/Vol[k];
-        Ry[k]=Jy[k]/Vol[k];
-      }
-    zCV[k]+=Do-dZ/2;
+    { xCV[k]/=Vol[k]+Swl[k]*dZ;               // половинка счетной ватерлинии
+      zCV[k]/=Vol[k]; // (Vol[k]+Vol[k-1])/2;
+      rx[k]=Jx[k]/Vol[k];
+      Ry[k]=Jy[k]/Vol[k];
+    }
+//  zCV[k]-=dZ/2;   //  Do;
     zM[k]=rx[k]+zCV[k];
 
   }
-//for( i=4*nZ/5; i<nZ; i++ )Jx[i]=0;
 }
 static void MinMax( Real *F, int N, Real &Min, Real &Max, const int mx=0 )
 {                         if( !mx )Min=F[0]-0.1,Max=F[0]+0.1;

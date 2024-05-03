@@ -155,7 +155,7 @@ bool Field::Draw()
 //   Exp.peak?"Трохоидальные волны":"В полных потоках",ModelWave[Exp.wave&3] );
   color( black ); Print( 2,2,Model[V.Statum] ); Print( 2,3,
     "Курс %0.1f°, дрейф %0.1f°, скорость %0.1f узлов (Fr=%4.2f, Lw/L=%4.2f) ",
-     V.Course*360/_Pd,angle(V.Course,-V.Swing[-1].z)*360/_Pd,S*3600/_Mile,
+     V.Course*360/_Pd,angle(V.Course,-V.Head[-1].z)*360/_Pd,S*3600/_Mile,
      S/sqrt(_g*L),sqr(S)*_Pd/_g/L );
   Save().Refresh();                    // перерисовка с наложенными площадками
   return Recurse=false;

@@ -332,7 +332,7 @@ void Window::PutChar( byte Key )         // занесение одного си
     { glAct( this );           // со сбоем других внешних транзакций над OpenGL
       if( !KeyBoard( KeyBuffer[ ++KeyPos&=lKey ].Key ) ){ KeyPos=oK; break; }
     }
-  } //WinExecute();    // при отказе возвращается обратно в цикл ожидания очереди
+  } WinExecute();    // при отказе возвращается обратно в цикл ожидания очереди
 }                    // новый символ единожды опробовается к считыванию (=true)
 bool Window::KeyBoard( byte key ) // виртуальная процедура обработки прерываний
 { if( extKey ){ glContext S(this);// предустановка графического контента OpenGL

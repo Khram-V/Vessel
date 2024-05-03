@@ -9,15 +9,17 @@
 //
 #include "Aurora.h"
 
-bool logTime()
-{ const Field &S=*Storm; if( !VIL || S.Kt<2 )return false; else
- return 0<fprintf( VIL,Storm->Trun<60 ? "\n   %-6s/%-4d":"\n%-9s/%-4d",
-                 DtoA( Storm->Trun/3600,-3 ),Storm->Kt );
-}
+bool logTime( bool next )// запрос корректности текущего времени, или шаг назад
+{ const Field &S=*Storm;
+  if( !VIL || S.Kt<2 )return false; else
+  { Real T=S.Trun; if( !next )T -= Ts; // S.Tstep/S.tKrat;
+    return 0<fprintf( VIL,T<60?"\n   %-6s/%-4d":"\n%-9s/%-4d",
+                      DtoA( T/3600,-3 ),S.Kt-(!next) );
+} }
 void logMeta(){ if( VIL ){ const Hull &S=*Vessel;
  fprintf(VIL,"\n  ⇒ Гидростатика: С{ x=%.1f, z=%.2f }, zG=%.2f, r=%.2f, h=%.2f"
- + logTime(), S.Buoyancy.x,S.Buoyancy.z,S.Gravity.z,
-              S.Metacenter.z-S.Buoyancy.z,S.hX ); } }
+  + logTime(), S.Buoyancy.x,S.Buoyancy.z,S.Gravity.z,
+               S.Metacenter.z-S.Buoyancy.z,S.hX ); } }
 void logHydro(){ if( VIL ){ const byte St=Vessel->Statum;
      fprintf(VIL,"\n  ⇒ Гидромеханика[%d]: %s"+logTime(),St,Model[St]); } }
 void logDamp(){ if( VIL ){ _Vector F=Vessel->muF,M=Vessel->muM;
@@ -32,12 +34,16 @@ void Model_Config( Window* Win ){ byte &St=Vessel->Statum,ans=St;
   if( ans!=St ){ St=ans; logHydro(); }
 }
 //  блок протокола по экстремальным событиям в параметрах качки корпуса корабля
-//
+//!                                       максимум всегда на предыдущем отсчёте
 static bool shortEx=false;
-static bool extFix( Real *W, Real c ){ bool ret=false; c=e5( c );
-  if( W[0]!=W[1] )if( W[1]==c || (c-W[1])*(W[1]-W[0])<0.0 ) // экстремум вперёд
-  { if( fabs( c )>fabs( W[2] ) ){ W[2]=c; ret=true; } else ret=!shortEx;
-  } W[0]=W[1]; W[1]=c; return ret;
+static bool extFix( Real *W, Real &c )
+{ bool ret=false; c=e5( c );
+  if( c!=W[1] )                       // сопоставление с предыдущей величиной
+  if( (c-W[1])*(W[1]-W[0])<=0.0 )     // экстремум на предыдущем отсчете W[1]
+  { ret=!shortEx;                     // будет включен по полному списку всегда
+    if( c>W[1] ){ if( W[1]<W[2] ){ W[2]=W[1]; ret=true; } } else // минимум [2]
+    if( c<W[1] ){ if( W[1]>W[3] ){ W[3]=W[1]; ret=true; } }      // максимум[3]
+  } W[4]+=c; W[0]=W[1]; W[1]=c; c=W[0]; return ret;
 }
 static void PtoG( char *s )
 { for( int i=0; s[i]; i++ )if( s[i]=='.' )Uset( s+i,0,"°" );        // градусы°
@@ -45,39 +51,53 @@ static void PtoG( char *s )
 #include <unistd.h>
 void logStop();
 //!   регистрация экстремальных событий в ходе вычислительно эксперимента
+//    Текущая величинах[0],prev[1], min[2],max[3], SUM[4]
 //    смещение { ξ η ζ }м, углы поворота { ϑ ψ χ }°
 //    〈•〉-экстремум;  〈·〉-сопутствующие отсчеты
 //    〈П÷Л〉 Б-〈П÷Л〉на борт (π/30); Р-руль〈П÷Л〉 полборта (π/60);
-//         М-помалу〈П÷Л〉=авторулевой (π/120)
-//                                                              4 32 64 128
-static Real wV[24],                                       // W{ x=8 y=16 z=2 }
-           *wZ=wV+3,*wA=wV+6,*wM=wV+9,*wF=wV+12,*wC=wV+15,*wX=wV+18,*wY=wV+21;
+//                           М-помалу〈П÷Л〉=авторулевой (π/120)
+//                                                               4 32 64 128
+static Real wV[40],                                        // W{ x=8 y=16 z=2 }
+          *wZ=wV+5,*wA=wV+10,*wM=wV+15,*wF=wV+20,*wC=wV+25,*wX=wV+30,*wY=wV+35;
+static long KS=0;                             // счетчик записей под осреднение
 void logStop()
-{ if( !VIL )return;
-  fprintf( VIL,"\n\n << успешное завершение >>" ); logTime();
-  if( Vessel->Educt&0xFF )fprintf( VIL,
-       "  ⇒ ±ξ%+4.2f χ%+4.2f ζ%+4.2f ϑ%+4.2f ψ%+4.2f « %+4.2f %+4.2f %+4.2f »",
-                wV[2],-wC[2]*_Rd,wZ[2],wX[2]*_Rd,wY[2]*_Rd,wA[2],wM[2],wF[2] );
-  fprintf( VIL,"\n" ); ftruncate( fileno(VIL),ftell(VIL) ); fclose(VIL); VIL=0;
+{ if( !VIL )return; logTime(); fprintf( VIL,"  ⇒ << успешное завершение >>" );
+  if( KS>0 && Vessel->Educt&0xFF )
+  { Real RS=Real( KS )/_Rd; fprintf( VIL,"\n\t"
+     "скорость хода      ±ξ[м/с]%6.2f < %+4.2f > %-+4.2f\n\t"
+     "рыскание на курсе  ±χ[°] %7.2f < %+4.2f > %-+4.2f\n\t"
+     "вертикальная качка ±ζ[м] %7.2f < %+4.2f > %-+4.2f\n\t"
+     "бортовая качка     ±ϑ[°] %7.2f < %+4.2f > %-+4.2f\n\t"
+     "килевая качка      ±ψ[°] %7.2f < %+4.2f > %-+4.2f\n\t"
+     "ускорения по корме {a/g} %+7.2f < %+4.2f > %-+5.2f\n\t"
+     "[м/с²/g] на миделе {m/g} %+7.2f < %+4.2f > %-+5.2f\n\t"
+     "  — —  у форштевня {f/g} %+7.2f < %+4.2f > %-+5.2f",
+      wV[2],     wV[4]/KS, wV[3],
+     -wC[2]*_Rd,-wC[4]/RS,-wC[3]*_Rd,
+      wZ[2],     wZ[4]/KS, wZ[3],
+      wX[2]*_Rd, wX[4]/RS, wX[3]*_Rd,
+      wY[2]*_Rd, wY[4]/RS, wY[3]*_Rd,
+      wA[2],wA[4]/KS,wA[3],wM[2],wM[4]/KS,wM[3],wF[2],wF[4]/KS,wF[3] );
+  } fprintf( VIL,"\n" ); ftruncate(fileno(VIL),ftell(VIL)); fclose(VIL); VIL=0;
 }
 Hull& Hull::Protocol()
 { if( VIL && Educt&0xFF )
-  { Field &S=*Storm; Vector Dir=Swing[-1];         // в третьей точке экстремум
+  { Field &S=*Storm; Vector Dir=Head[-1];          // в третьей точке экстремум
     if( S.Kt<2 )                                   // ... { ξ η ζ }м,{ ϑ ψ χ }°
     { fprintf( VIL,
-      "\n  ⇒ Время Kt      скорость,узл. курс±рыскание руль"
-      " Z миделя∫волн бортовая килевая « корма мидель нос »/g" );
+      "\n  ⇒ Время Kt    ⇒ скорость,узл. курс±рыскание руль"
+      " Z миделя∫волн бортовая килевая « корма мидель нос »/g" ); KS=0;
       memset( wV,0,sizeof( wV ) );
-    } else
-    { byte ev=0;
-     Real w=Course+Dir.z,a,m,f,v=(cSp-Speed)*3600.0/_Mile, // +отличие скорости хода в узлах
-          w1=Route[-1].z,w2=Route[-2].z,w3=Route[-3].z,
-          s1=Length*sin( Swing[-1].y )/2, s2=Length*sin( Swing[-2].y )/2,
-          s3=Length*sin( Swing[-3].y )/2, d=S.Tstep/S.tKrat; d=_g*d*d;
-      m = ( w1 - 2*w2 + w3 )/d;          // расчетный шаг в циклах эксперимента
-      a = ( w1+s1 -2*(w2+s2) + w3+s3 )/d;
-      f = ( w1-s1 -2*(w2-s2) + w3-s3 )/d;
-      shortEx = (Educt&0x200)!=0;    // режим записи только превышающих величин
+    } else { byte ev=0;                       // +отличие скорости хода в узлах
+     Real w=Course+Dir.z,a=0,m=0,f=0,v=(cSp-Speed)*3600.0/_Mile; KS++;
+      if( S.Kt>2 )
+      { Real w1=Route[-1].z,w2=Route[-2].z,w3=Route[-3].z,
+             s1=Length*sin( Head[-1].y )/2, s2=Length*sin( Head[-2].y )/2,
+             s3=Length*sin( Head[-3].y )/2, d=Ts; d=_g*d*d;
+        m = ( w1 - 2*w2 + w3 )/d;        // расчетный шаг в циклах эксперимента
+        a = ( w1+s1 -2*(w2+s2) + w3+s3 )/d;
+        f = ( w1-s1 -2*(w2-s2) + w3-s3 )/d;
+      } shortEx = (Educt&0x200)!=0;  // режим записи только превышающих величин
       if( extFix( wV,v )       )if( Educt&1  )ev|=1;   // потеря скорости хода
       if( extFix( wC,angle(w)) )if( Educt&2  )ev|=2;   // рыскание
       if( extFix( wZ,Z )       )if( Educt&4  )ev|=4;   // вертикальная,
@@ -87,18 +107,18 @@ Hull& Hull::Protocol()
       if( extFix( wM,m )       )if( Educt&64 )ev|=64;  // ускорение на миделе
       if( extFix( wF,f )       )if( Educt&128)ev|=128; // и вблизи форштевня
       if( ev )
-      { static char str[64]; int i; logTime();  // сначала время, отсчеты шагов
+      { static char str[64]; int i; logTime( false ); // сначала время, отсчеты
         sprintf( str,"  ⇒ %s±ξ%5.1f%-+5.1f %s±χ%6.1f%-+6.1f",
                  ev&1?"•":"·",Speed*3600.0/_Mile,v,
                  ev&2?"•":"·",Course*_Rd,-w*_Rd ); PtoG( str+24 );
-        fprintf( VIL,str );// Б-〈П÷Л〉на борт; Р-руль〈П÷Л〉 полборта; М-помалу〈П÷Л〉
+        fprintf( VIL,str );// Б-〈П÷Л〉на борт; Р-руль〈П÷Л〉полборта; М-помалу〈П÷Л〉
         if( fabs( w )<_Pi/32.0 )fprintf( VIL,"↨ " ); else
         { fprintf( VIL,w>0?"п":"л" );
           fprintf( VIL, dCs>_Pi/59?"Б" : dCs<_Pi/61?"M":"P" );
         }
         sprintf( str," %sζ%+4.1f∫%-+4.1f ",     // вертикальная качка и уровень
                  ev&4?"•":"·",Z,S.Value( out( Zero ) ) ); i=Ulen( str );
-        fprintf( VIL,str ); while( ++i<15 )fprintf( VIL,"_" );
+        fprintf( VIL,str ); while( ++i<15 )fprintf( VIL," " );    // ++ пробелы
         sprintf( str," %sϑ%-+6.1f %sψ%-+6.1f ",                   // углы качки
                  ev&8?"•":"·",Dir.x*_Rd,ev&16?"•":"·",Dir.y*_Rd ); PtoG( str );
         fprintf( VIL,"%s« %s%+4.1f %s%+4.1f %s%-+5.1f »",str,
@@ -113,10 +133,10 @@ void wavePrint()                // процедура печати исполь�
   { Waves &W = y==10 ? S.Wind : ( y==11 ? S.Swell : S.Surge );
     textcolor( LIGHTCYAN ); cprint( 2,y,"%-5s: ",W.Title );
     textcolor( LIGHTGRAY ); cprint( 9,y,y==10
-  ? "L=%3.0f м, T=%4.1f\", A=%4.2f м, C=%4.1f м/с, Dir=%3.0f°, Ds=%.1f м [%d·%d] = {%.0f·%.0f} м\n"
-  : "  %3.0f м,   %4.1f\",   %4.2f м,   %4.1f м/с,     %3.0f°,    %.1f м [%d·%d] \n",
-     W.Length,W.Length/W.Cw,W.Height,W.Cw,(_Pi-atan2(W.x.y,W.x.x))*_Rd,
-     W.Ds,W.Mx,W.My,S.Long,S.Wide );
+  ? "λ=%3.0f м, τ=%4.1f\", ζ=%4.1f/%4.2g м, C=%4.1f м/с, A=%3.0f°, δS=%.1f м [%d·%d]={%.0f·%.0f} м\n"
+  : "  %3.0f м,   %4.1f\",   %4.1f/%4.2g м,   %4.1f м/с,   %3.0f°,    %.1f м [%d·%d] \n",
+     W.Length,W.Length/W.Cw,W.Height,hW*W.Height/W.Length,
+     W.Cw,(_Pi-atan2(W.x.y,W.x.x))*_Rd,W.Ds,W.Mx,W.My,S.Long,S.Wide );
 } }
 void logWave()
 { wavePrint(); if(!VIL )return; // процедура печати используется для обновления
@@ -127,7 +147,7 @@ void logWave()
     fprintf( VIL,"   %s: "+(2-y),W.Title );
     fprintf( VIL,!y
   ? "λ=%3.0f м, τ=%4.1f\", ζ=%4.2f м, α=%4.2f, C=%4.1f м/с, A=%3.0f°, δS=%.1f м [%d·%d]\n"
-  : "  %3.0f м,   %4.1f\",   %4.2f м,  =%4.2f,   %4.1f м/с,   %3.0f°,    %.1f м [%d·%d]\n",
+  : "  %3.0f м,   %4.1f\",   %4.2f м,   %4.2f,   %4.1f м/с,   %3.0f°,    %.1f м [%d·%d]\n",
      W.Length,W.Length/W.Cw,W.Height,hW*W.Height/W.Length,
      W.Cw,(_Pi-atan2(W.x.y,W.x.x))*_Rd,W.Ds,W.Mx,W.My );
   }
@@ -139,14 +159,15 @@ void logWave()
 Hull& Hull::wPrint( bool log ) // информация по смоченному корпусу на текстовой
 { Field &F=*Storm;            //             консоли и в протоколе эксперимента
   textcolor( YELLOW ),       // текстовые данные о состоянии и динамике корабля
-  cprint( 1,14," Time %s + %3.2f\"      \n"
+  cprint( 1,14," Time%s +%.2g\"/%.3g \n"
                " Speed %3.1fуз(%4.2f=%3.1fL)  \n"
                " Volume %1.0f << %1.0f  \n"
                " Surface %1.0f << %1.0f  \n"
                " Floatable %1.0f << %1.0f  \n"
                " μCenter %4.1f >> %4.1f -- %3.1f Gravity.z  \n"
                "       h %4.2f >> %4.2f -- μM %3.1f >> %3.1f   ",
-        DtoA(F.Kt*F.Tstep/F.tKrat/3600,3),F.Tstep,Speed*3600/_Mile,
+        DtoA( F.Trun/3600,F.Trun>3600?2:(F.Trun>60?3:-3) ),
+        TimeStep,tKrat,Speed*3600/_Mile,
         Speed/sqrt(_g*Length),sqr(Speed)*_Pd/_g/Length,Volume,iV,Surface,iS,
         Floatage,iF,Metacenter.x,vM.x,Gravity.z,hX,vM.z,Metacenter.y,vM.y ),
   cprint( 80,8,"Statum{ %X } ",Statum ), // printB( Statum );

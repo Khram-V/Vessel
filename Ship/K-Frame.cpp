@@ -29,7 +29,7 @@ static void MM( Frame &F )
   if( Do>F.min )Do=F.min; if( Depth<F.max )Depth=F.max;
 }
 void Hull::MinMax()
-{ Bmx=F[Ms][0]; Xo=F[0].X; Lmx=F[Ns-1].X; Do=Stx(0); Depth=Stx(Stx.N); Real S;
+{ Bmx=F[Ms][0]; Xo=F[0].X; Lmx=F[Ns-1].X; Do=Stx(0); Depth=Stx(Stx.N);
   MM( Sty ); MM( Stx ); for( int i=0; i<=Stx.N; i++ )Lmx=max( Lmx,Stx[i] );
   MM( Asy ); MM( Asx ); for( int i=0; i<=Asx.N; i++ )Xo=min( Xo,Asx[i] );
   for( int j=0; j<Ns; j++ )        // поиск-выборка максимальной ширины корпуса
@@ -62,8 +62,7 @@ void Frame::SpLine( bool old )
   } _y[N]=_z[N]=0.0;
   for( int i=N-1; i>=0; i-- )_y[i]=_y[i]*_y[i+1]+v[i],
                              _z[i]=_z[i]*_z[i+1]+u[i]; Allocate( 0,u );
-}
-/*
+}/*
 static int find( Real *A,_Real Ar,int N )   // Двоичный поиск ближайшего левого
 { int k,i=0; bool d=A[N]>A[0];              //  индекса для заданного аргумента
   if( Ar<=A[0] )return d?0:N-1;             //   с учетом знака его прироста
