@@ -91,7 +91,7 @@ public:                                     // выбор текстового �
   SIZE AlfaRect( const char*,bool=false ); // c кодировками true ? ANSI:UTF-8
   Place& AlfaBit( byte *CCCP=NULL );      // OEM сходу исключён _8x08_8x14_8x16
   Place& Alfabet( int=0,const char* ="Courier New",int=FW_MEDIUM,bool=false );
-  Place& Print( int x,int y, const char *f, ... ); // лист y/x<=0 -снизу/справа
+  Place& Print( int x,_Real y,const char *f,... ); // лист y/x<=0 -снизу/справа
   Place& Print( const char *f, ... );              // контекстная печать
   Place& Text( Course Dir, _Real X,_Real Y,_Real Z, const char* _fmt, ... );
   Place& Text( Course Dir, const Real *P, const char* fmt, ... );

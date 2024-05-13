@@ -49,7 +49,8 @@ Hull& Hull::Config()
     Menu[12].Msg=DrawMode&4 ? "Контуры рёбер триангуляционного покрытия"
                             : "Закрашиваемая поверхность корабельной обшивки";
     Menu[1].Msg=Model[Statum];
-    if( (ans=T.Answer( ans ))==12 )DrawMode^=4; else
+    ans=T.Answer( ans );
+    if( ans==12 )DrawMode=(DrawMode&~12)|(((DrawMode&12)+4)&12); else
     if( ans==13 )DrawMode=(DrawMode&~3)|((DrawMode-1)&3); else
     if( ans==1 )Model_Config( this );
     if( h!=hX )// сдвиг центра масс и пересчет тензора инерции под новую высоту

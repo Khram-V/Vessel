@@ -79,14 +79,15 @@ Hull& Hull::NavigaInform( Window *Win )
 { Field &S=*Storm; Tensor B;     // единичный масштаб пространственного тензора
  Vector C=Head[-1]; C.z+=_Ph;    // крен, дифферент и курс корабля(в геобазисе)
  int i,l=-0.18*hypot( Win->Width,Win->Height );       // размер из аксонометрии
- Place Compass( Win,PlaceOrtho );      // | PlaceAbove ~~ c единичной разметкой
+ bool GMod = (DrawMode&8)==0;  // режим с разделением графиков качки и ходкости
+ Place Compass( Win,PlaceOrtho );  // | PlaceAbove ~~ cлучай единичной разметки
  TextContext TS( true );
-  if( Win!=this )Compass.Area( 0,0,1.25*l,l );
-        else     Compass.Area( 1,-6,24,16 );
-                 Compass.Activate( true );
+  if( Win!=this || !GMod )Compass.Area( 0,0,1.25*l,l );
+                    else  Compass.Area( 1,-6,24,16 );
+                          Compass.Activate( true );
   //
   //! картушка морского волнения, курса, скорости корабля
-  //+  отметки трёх волновых полей Wind+Swell+Surge = Length+Height+=Tensor::x
+  //+   отметки трёх волновых полей Wind+Swell+Surge = Length+Height+=Tensor::x
   //                                                        амплитуда=>высота/2
  Real L=min( 1.0,Length     // условная высота и длина стрелки волны в картушке
       / max( max( S.Wind.Length,S.Swell.Length ),S.Surge.Length ) );
@@ -101,10 +102,10 @@ Hull& Hull::NavigaInform( Window *Win )
                     DirWave( S.Surge,cyan,Compass ); else   // реликтовый накат
   if( right )Compass.Print( 1,3,"Заштилело" );
   //
-  //  стрелка-указатель заданного курса корабля
+  //                                  стрелка-указатель заданного курса корабля
   //
   B.axiZ( _Ph-Course )/=L;
-  for( i=0; i<2; i++ )                            // стрелка выбранного курса
+  for( i=0; i<2; i++ )                              // стрелка выбранного курса
   { if( !i ){ glLineWidth( 2 ); color( blue,0,.75 ); glBegin( GL_LINE_LOOP ); }
        else { glLineWidth( 1 ); color( yellow,0,.3 ); glBegin( GL_POLYGON ); }
     P(.75,0),P(.4,-.05),P(.5,-.01),P(-.75,-.05),
@@ -126,7 +127,7 @@ Hull& Hull::NavigaInform( Window *Win )
   //  контроль положения руля весьма полезен для понимания маневров на волнении
   //
  Real U,H; B.axiZ( C.z );
-  angle( H=Hull::Course+Head[-1].z ); // текущее отклонение от заданого курса
+  angle( H=Hull::Course+Head[-1].z );   // текущее отклонение от заданого курса
   { const Vector R=(Vector){ -0.85 },N=(Vector){ 0,0.025 }; Vector W;
     if( fabs( H )<_Pi/32 )W=(Vector){ 0.2 }; else   // полрумба в доле градуса°
     if( dCs<_Pi/45 )W=(Vector){ 0.2,0.06 }; else W=(Vector){ 0.18,0.125 };
@@ -146,7 +147,7 @@ Hull& Hull::NavigaInform( Window *Win )
     P(C.x,0),P(C.x-L,H),P(C.x-.9*L,.6*H),P(C.x-L/2,0),
     P(C.x-.9*L,-.6*H),P(C.x-L,-H); glEnd();
   }
-  //  контрольная полупрозрачная плоскость для чисто конструктивной ватерлинии
+  //   контрольная полупрозрачная плоскость для чисто конструктивной ватерлинии
   //
   glBegin( GL_TRIANGLES ); //GL_POLYGON ); //GL_TRIANGLE_FAN );
   for( i=0; i<WaterLine.len; i+=3 )
@@ -217,13 +218,11 @@ Hull& Hull::NavigaInform( Window *Win )
     { color( lightgreen,0.0,0.2 );        // <10° - комфортная радость на борту
       rectangle( (Point){-Lp,U},(Point){Lp-Lt,min(1.0,2*U)} );
       rectangle( (Point){-Lp,-U},(Point){Lp-Lt,max(-1.0,-2*U)} );
-/*    if( U<0.5 ){ color( lightblue,0.7,0.5 );// >20° невыносимые условия качки
+      if( U<0.5 ){ color( lightblue,0.7,0.5 );// >20° невыносимые условия качки
         rectangle( (Point){-Lp,2*U},(Point){Lp-Lt,1} );
-        rectangle( (Point){-Lp,-2*U},(Point){Lp-Lt,-1} ); } */
+        rectangle( (Point){-Lp,-2*U},(Point){Lp-Lt,-1} ); }
     }
-    //   подпись экстремальных величин на правом незатеняемом участочке
-    //
-//    Compass.Alfabet( 20,"Times New Roman",FW_MEDIUM,true );
+    //  Compass.Alfabet( 20,"Times New Roman",FW_MEDIUM,true );
     //
     //   разметка шкалы времени
     //
@@ -241,120 +240,125 @@ Hull& Hull::NavigaInform( Window *Win )
     } if( --i%j>1 )
       Compass.Text( _South_West,(Point){ Lp,-1 },DtoA( dT/3600,3 ) );
     //
-    //   закрашенный профиль волны по вертикальной качке
+    //   закрашенный профиль волны с корпусом судна на вертикальной качке
     //
-    color( lightgreen,.7,.8 ); rectangle( (Point){Lp-Lt,-.5},(Point){Lp,.46} );
+    color( lightgreen,.7,.8 );
+    rectangle( (Point){Lp-Lt,-.5},(Point){Lp,.46} ); glLineWidth( 2 );
     glBegin( GL_QUAD_STRIP );
     for( i=k; i<=l; i++ )
-    { color( green,0.75 ); glVertex3d( -Lp+(i-k)*L,(Mix[i].z*2-Min.z)/Max.z-0.5,0 );
-      color( cyan,0.5 ); glVertex3d( -Lp+(i-k)*L,(Route[i].z*2-Min.z)/Max.z-0.5,0 );
+    { color( aqua,.2 ); glVertex3d( -Lp+(i-k)*L,(Mix[i].z*2-Min.z)/Max.z-.5,0);
+      color( silver ); glVertex3d(-Lp+(i-k)*L,(Route[i].z*2-Min.z)/Max.z-.5,0);
     } glEnd();
-    color( green,0.5 ); glLineWidth( 1 );
-    glBegin( GL_LINE_STRIP );
+    color( aqua,-0.2 ); glBegin( GL_LINE_STRIP );
     for( i=k; i<=l; i++ )
       glVertex3d( -Lp+(i-k)*L,(Mix[i].z*2-Min.z)/Max.z-0.5,0 ); glEnd();
-    color( cyan,-0.5 ); glLineWidth( 1.6 );
-    glBegin( GL_LINE_STRIP );
+    color( silver,-0.2 ); glBegin( GL_LINE_STRIP );
     for( i=k; i<=l; i++ )
       glVertex3d( -Lp+(i-k)*L,(Route[i].z*2-Min.z)/Max.z-0.5,0 ); glEnd();
-    Compass.Print( -1,3,"%3.2f",(Max.z+Min.z)/2 )
-           .Print( 0,4,"/Z}" )          // вертикальная качка вдоль аппликаты Z
-           .Print( -1,5,"%3.2f",Min.z/2 );
     //
-    // поверху накладывается бортовая и килевая качка
+    //   подпись экстремальных величин на правом незатеняемом участочке
+    //
+    color( dimgray );
+    Compass.Print( -1,3,"%3.2f",(Max.z+Min.z)/2 )
+           .Print( 0,3.8,"/Z}" )        // вертикальная качка вдоль аппликаты Z
+           .Print( -1,4.6,"%3.2f",Min.z/2 );
+    //
+    // поверху накладываются графики с отсчётами углов бортовой и килевой качки
     //
     color( blue ); glBegin( GL_LINE_STRIP );
     for( i=k; i<=l; i++)glVertex3d(-Lp+(i-k)*L,(Head[i].y-Trim)/H,0); glEnd();
     Compass.Print( -1,Hx>Hy?2:1,DtoA( (Trim+Max.y)*_Rd,-1 ) );
-    Compass.Print( -1,Hx<Hy?7:6,DtoA( (Trim+Min.y)*_Rd,-1 ) )
-           .Print( -3,4,"/Y" );          // дифферент вокруг ординаты  по оси Y
+    Compass.Print( -1,Hx<Hy?6.6:5.6,DtoA( (Trim+Min.y)*_Rd,-1 ) )
+           .Print( -3,3.8,"/Y" );        // дифферент вокруг ординаты  по оси Y
     color( magenta ); glBegin( GL_LINE_STRIP );
     for( i=k; i<=l; i++)glVertex3d( -Lp+(i-k)*L,i90(Head[i].x)/H,0 ); glEnd();
     Compass.Print( -1,Hx>Hy?1:2,DtoA( Max.x*_Rd,-1 ) );
-    Compass.Print( -1,Hx<Hy?6:7,DtoA( Min.x*_Rd,-1 ) )
-           .Print( -5,4,"{X" );          // крен относительно абсциссы на оси X
+    Compass.Print( -1,Hx<Hy?5.6:6.6,DtoA( Min.x*_Rd,-1 ) )
+           .Print( -5,3.8,"{X" );        // крен относительно абсциссы на оси X
 ///
 ///     площадка графиков скорости хода, рыскания и трёх вертикальных ускорений
 ///     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   Compass.Area( 25,-8,0,7 ).Activate( true );  // семь строк от нижней границы
-    color( green,0.25 ); liney( (Point){ -Lp,1 },(Point){ Lp-Lt,1 } );
-    for( i=0; i*U<dT; i++ )
-    { const Real mX = -Lp + i*U*L/Ts;           // новая шкала разметки времени
-      liney( (Point){ mX,1 },(Point){ mX,i%(dT<60?5:6)?0.95:0.9 } );
-    }
+    if( GMod )
+    { Compass.Area( 25,-8,0,7 ).Activate( true );  // и ещё +7 строчек вверх
+      color( green,0.25 ); liney( (Point){ -Lp,1 },(Point){ Lp-Lt,1 } );
+      for( i=0; i*U<dT; i++ )
+      { const Real mX = -Lp + i*U*L/Ts;           // новая шкала разметки времени
+        liney( (Point){ mX,1 },(Point){ mX,i%(dT<60?5:6)?0.95:0.9 } );
+    } }
     // и три ускорения свободного падения по наблюдениям в оконечностях корпуса
     //
-   Real A1,A2=0,A3,F1,F2=0,F3,maxA,minA; const Real D2=Ts*Ts*_g;
+   const Real D2=Ts*Ts*_g;
+   Real A1=0,F1=0,A2=0,F2=0,A3,F3,A,F,
+        maxA=eps,minA=-eps,maxM=eps,minM=-eps,maxF=eps,minF=-eps;
     glBegin( GL_QUAD_STRIP );
     for( i=k; i<=l; i++ )
-    { U=Length*sin( Head[i].y )/2;
-      F3=Route[i].z-U;             // нос -- аппликата ватерлинии на форштевне
+    { U=Length*sin( Head[i].y )/2; // вертикальное смещение относительно миделя
+      F3=Route[i].z-U;             // нос  -- аппликата ватерлинии на форштевне
       A3=Route[i].z+U;             // корма -- на ахтерштевне
       if( i-k>2 )                  // кривая лента носовых и кормовых ускорений
-      { color( blue,0,0.1 ); glVertex3d( -Lp+(i-k-1)*L,(F1-F2-F2+F3)/D2/2,0 );
-        color( red,0,0.1 ); glVertex3d( -Lp+(i-k-1)*L,(A1-A2-A2+A3)/D2/2,0 );
+      { color(blue,0,.3); glVertex3d( -Lp+(i-k-1)*L,(F=(F1-F2-F2+F3)/D2)/2,0 );
+        color(green,0,.3); glVertex3d(-Lp+(i-k-1)*L,(A=(A1-A2-A2+A3)/D2)/2,0 );
+        if( maxA<A )maxA=A; else if( minA>A )minA=A;
+        if( maxF<F )maxF=F; else if( minF>F )minF=F;
       } A1=A2,A2=A3,F1=F2,F2=F3;
     } glEnd();
-    glLineWidth( 3 ); color( yellow ); glBegin( GL_LINE_STRIP );
+    glLineWidth( 3 ); color( yellow ); glBegin( GL_LINE_STRIP ); A1=A2=0;
     for( i=k; i<=l; i++ )
-    { A3 = Route[i].z;  H=(A1-A2-A2+A3)/D2;         // в районе мидельшпангоута
-      if( i-k==3 )maxA=H+eps,minA=H-eps; else if( maxA<H )maxA=H;
-                                         else if( minA>H )minA=H;
-      if( i-k>2 )glVertex3d( -Lp+(i-k-1)*L,H/2,0 ); A1=A2,A2=A3;
+    { A3=Route[i].z; H=(A1-A2-A2+A3)/D2;            // в районе мидельшпангоута
+      if( i-k>2 ){ glVertex3d( -Lp+(i-k-1)*L,H/2,0 );
+                   if( maxM<H )maxM=H; else if( minM>H )minM=H; } A1=A2,A2=A3;
     } glEnd();
-    color( gray ); Compass.Print( -1,3,"%+3.1f",maxA+1 )
-                          .Print( -1,5,"%+3.1f",minA+1 );
-    glLineWidth( 1 ); color( cyan ); glBegin( GL_LINE_STRIP );
-    for( i=k; i<=l; i++ )
-    { F3=Route[i].z - Length*sin( Head[i].y )/2;             // нос
-      if( i-k>2 )glVertex3d( -Lp+(i-k-1)*L,(F1-F2-F2+F3)/D2/2,0 ); F1=F2,F2=F3;
-    } glEnd();
-    Compass.Print( 0,4,"/St}" );
-    color( magenta,0.5 ); glBegin( GL_LINE_STRIP );
-    for( i=k; i<=l; i++ )
-    { A3=Route[i].z + Length*sin( Head[i].y )/2;             // корма
-      if( i-k>2 )glVertex3d( -Lp+(i-k-1)*L,(A1-A2-A2+A3)/D2/2,0 ); A1=A2,A2=A3;
-    } glEnd();
-    Compass.Print( -4,4,"{As" );
+    glLineWidth( 1 );
+    if( GMod )     // центральная подпись для ускорений в средней части корпуса
+    { color( blue );       Compass.Print(  0,3.8,"/St}" );
+      color( green );      Compass.Print( -4,3.8,"{As" );
+      color( yellow,-.6 ); Compass.Print( -1,3,  "%+3.1f",maxM )
+                                  .Print( -1,4.6,"%+3.1f",minM );
+      color( yellow,-.4 );
+      line( (Point){-Lp,-0.5},(Point){Lp-Lt,-0.5} );
+      line( (Point){-Lp,0.5},(Point){Lp-Lt,0.5} );
+      line( (Point){-Lp},(Point){Lp-Lt},cyan );             // уровень среднего
     //
-    //  дополнительная разметка поля графиков с тремя ускорениями
+    //              график скорости хода и поступательной качки по ходу корабля
     //
-    H=55.0/Real(Compass.Height);
-    line( (Point){-Lp},(Point){Lp-Lt},cyan );               // уровень среднего
-    color( yellow,-0.4 );
-    line( (Point){-Lp,-0.5},(Point){Lp-Lt,-0.5} );
-    line( (Point){-Lp,0.5},(Point){Lp-Lt,0.5} );
-    Compass.Text( _South_West, -Lp, 1,0,"3g" )
-           .Text( _West,       -Lp, 0,0," g" )
-           .Text( _North_West, -Lp,-1,0,"-g" );
-    //
-    //  график скорости хода и/или поступательной качки по ходу корабля
-    //
-    for( i=k; i<=l; i++ )                                  // разбег скорости
-    { r=Rate[i].x;
-      if( i==k )maxA=r+eps,minA=r-eps;
-       else if( maxA<r )maxA=r; else if( minA>r )minA=r;
-    } color( green );
-    Compass.Print( -1,1,"%+3.1f",maxA*3600/_Mile )
-           .Print( -1,7,"%+3.1f",minA*3600/_Mile ); maxA-=minA;
-    glBegin( GL_LINE_STRIP );
-    for( i=k; i<=l; i++ )glVertex3d( -Lp+(i-k)*L,2*(Rate[i].x-minA)/maxA-1,0 );
-    glEnd();
+      for( i=k; i<=l; i++ )                                  // разбег скорости
+      { r=Rate[i].x;
+        if( i==k )Max.x=r+eps,Min.x=r-eps; else
+        if( Max.x<r )Max.x=r; else if( Min.x>r )Min.x=r;
+      } color( green );
+      Compass.Print( -1,1,"%+3.1f",Max.x*3600/_Mile )
+             .Print( -1,6.6,"%+3.1f",Min.x*3600/_Mile ); Max.x-=Min.x;
+      glBegin( GL_LINE_STRIP );
+      for( i=k;i<=l;i++ )glVertex3d(-Lp+(i-k)*L,2*(Rate[i].x-Min.x)/Max.x-1,0);
+      glEnd();
     //
     //  рыскание на курсе по отсчетам углового положения направления курса по Z
     //
-    for( i=k; i<=l; i++ )                               // разбег скорости хода
-    { r=angle( r=Head[i].z+Mix[i].y );
-      if( i==k )maxA=r+eps,minA=r-eps; else
-      if( maxA<r )maxA=r; else if( minA>r )minA=r;
-    } color( blue );
-    Compass.Print( -1,2,DtoA( maxA*_Rd,-1 ) );
-    Compass.Print( -1,6,DtoA( minA*_Rd,-1 ) ); if( maxA<-minA )maxA=-minA; else
-                                               if( minA>-maxA )minA=-maxA;
-    glBegin( GL_LINE_STRIP ); maxA-=minA;
-    for( i=k; i<=l; i++ )
-      glVertex3d(-Lp+(i-k)*L,2*(angle( r=Head[i].z+Mix[i].y )-minA)/maxA-1,0 );
-    glEnd();
+      for( i=k; i<=l; i++ )                             // разбег скорости хода
+      { r=angle( r=Head[i].z+Mix[i].y );
+        if( i==k )Max.y=r+eps,Min.y=r-eps; else
+        if( Max.y<r )Max.y=r; else if( Min.y>r )Min.y=r;
+      } color( blue );
+      Compass.Print( -1,2,DtoA( Max.y*_Rd,-1 ) );
+      Compass.Print( -1,5.6,DtoA( Min.y*_Rd,-1 ) );
+      if( Max.y<-Min.y )Max.y=-Min.y; else if( Min.y>-Max.y )Min.y=-Max.y;
+      glBegin( GL_LINE_STRIP ); Max.y-=Min.y;
+      for( i=k; i<=l; i++ )
+      glVertex3d(-Lp+(i-k)*L,2*(angle(r=Head[i].z+Mix[i].y)-Min.y)/Max.y-1,0 );
+      glEnd();
+    }
+    //                дополнительная разметка поля графиков с тремя ускорениями
+    //
+    Compass.Alfabet( 18,"Times New Roman",FW_BLACK,true );
+    color( gray );      Compass.Print( 1,1,"3g · { " );
+    color( blue );      Compass.Print( "%+0.1f,", maxA );
+    color( pink,-0.5 ); Compass.Print( "%+0.1f,", maxM );
+    color( green );     Compass.Print( "%+0.1f }",maxF );
+    color( gray );      Compass.Text( _Center,-Lp,0,0,"+g" )
+                              .Print( 1,-.25,"-g · { " );
+    color( blue );      Compass.Print( "%+0.1f,", minA );
+    color( pink,-0.5 ); Compass.Print( "%+0.1f,", minM );
+    color( green );     Compass.Print( "%+0.1f }",minF );
   } return *this;
 }
 //  Простая визуализация формы исходного корпуса в независимом графическом окне

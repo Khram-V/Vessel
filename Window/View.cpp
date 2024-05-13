@@ -39,7 +39,7 @@ void rectangle( const Real *LD,const Real *RU,bool fill )  // прямоугол
    .Text( _North_East,L+l,0,0,x );
 }
 View::View( const char* Tt, int X,int Y, int W,int H, _Real Size )
-    :Window( Tt,X,Y,W,H ),eye( (Vector){-130,-10,0} ),look( (Vector){0,0,30} ),
+    :Window( Tt,X,Y,W,H ),eye( (Vector){-130,-10,0} ),look( (Vector){0,0,0} ),
     Distance( Size?-Size:-.8*Width ),   // расстояние от камеры до места съёмки
     mx( 0 ),my( 0 )                     //  указатель мышки в нулевое положение
   { View_initial();
@@ -87,7 +87,7 @@ bool View::KeyBoard( byte key )   // к спуску из внешних вир�
     case _Down: if( ScanStatus()&CTRL  )Distance/=1.1; else
                 if( ScanStatus()&SHIFT )look.y-=Ds; else eye.y--; break;
     case _Home: Distance=Di,             // ...от точки взгляда до места обзора
-            eye=(Vector){ -130,-10,0 },look=(Vector){ 0,0,30 }; break;
+             eye=(Vector){ -130,-10,0 },look=(Vector){ -2,-2,0 }; break;
    default: return Window::KeyBoard(key);// передача в цикл ожидания клавиатуры
   } Draw(); return true;                 // либо - запрос от клавиатуры погашен
 }

@@ -45,8 +45,9 @@ byte Mekhanik_Status=1,  //  режим гидро\механики хода и 
                      2 - оставляется подводная часть со шпангоутами над водой
                      3 - весь корпус прорисовывается целиком отчасти прозрачным
                    х04 - тоже, без обшивки и только с триангуляционными ребрами
-                   х10 - разблокировка графики с включением надводного борта
-               Аксонометрический вид корпуса корабля и профилей морских волн */
+                   х08 - исходный вариант: одно поле графиков и картушка справа
+                ?? х10 - разблокировка графики с включением надводного борта */
+///   Аксонометрический вид корпуса корабля и профилей морских волн
 Hull::Hull(): View     // в прицепе View окошко графической визуализации OpenGL
 ( Title_Hull,-12,12,400,150 ),   //  Xpm( 4 ),Ypm( 4 ), Xpm( 64 ),Ypm( 72 )
   FileName( 0 ),ShipName( 0 ),   // Исходный Файл и название исходного проекта
@@ -101,9 +102,10 @@ Hull::Hull(): View     // в прицепе View окошко графическ
   if( !Read(  Ac>1 ? W2U( Av[1] ) : "Aurora.vsl" ) )
        Break( "Ошибка считывания корпуса %s -> %s",W2U( Av[1] ),FileName );
   Window::Locate( Xpm( 4 ),Ypm( 4 ),Xpm( 64 ),Ypm( 72 ) ).Clear();
-  Distance*=1.25;
-  look.y=-12; look.x=5;
-  eye.y=-5;
+  Distance*=1.08;
+  look.x=1;
+  look.y=-2; //eye.y=-10;
+  look.z=0;
 }
 //                      Shell  n = 0 - ахтерштевень;      n = 1 - корма;
 //void Hull::FullFree()    //  n = Frames+2 - форштевень; n = Frames+1 - нос;
@@ -139,7 +141,7 @@ Field( _Real L,_Real W, //_Real T, // длина, ширина бассейна,
   Exp.peak=1; //  0 - простое решение в потоках 1 - трохоидальные волны {s,z}
   Exp.draw=0; //  0 - 3 метода закраски и сеточной прорисовки морского волнения
   Exp.view=0; //  0 - световая раскраска или 1 - фон с разделением границ волн
-  Wind.Wind=M_SQRT1_2;  // ветровая асимметрия гребней волн под действием ветра
+  Wind.Wind=_s2/2.0;    // ветровая асимметрия гребней волн под действием ветра
 /*Exp.ship=1; // 1 - гидростатика  +  2 - учет скорости и давления по Бернулли
   Trun=(Tlaps=Instant.T)*3600; // отсчет реального времени для моделирования[s]
   Instant.T=0.0; //- отсчет времени от начала суток - или всегда условно разный
@@ -359,20 +361,21 @@ static const char
            "<1/3>"," ± крен 30° на левый/правый",
            "<5/Alt>"," руль прямо/так держать",
            "<0>    ","   стоп машина",
-           "§ ",  "« Настройки моделирования »",
-           "<Tab/Space>", "   закраски/контуры",
-           "<Ctrl/+Shift> ","задержка или стоп",
-           "<стрелки•leftMouse>",  "ориентация",
-           "<+Shift•rightMouse>",  "  смещение",
-           "<+Ctrl•(roll)>"," дальность, наклон",
-           "<Del>+<Shift> "," исходный обзор",
-           "<BkSp> "," остановка волнения",0
+           "§ ",  " « Настройки моделирования »",
+           " <Enter>     ","  отрисовка графиков",
+           " <Tab/Space> ","   закраски/контуры",
+           " <Ctrl/+Shift> ","задержка или стоп",
+           " <стрелки•leftMouse>",  "ориентация",
+           " <+Shift•rightMouse>", "    смещение",
+           " <+Ctrl•(roll)>"," дальность, наклон",
+           " <Del>+<Shift> ","    исходный обзор",
+           " <BkSp> ","  прекращение волнения",0
          };
 bool Hull::KeyBoard( byte Keyb )                     // С краткой подсказкой по
 { const static char                                  // настройкам и методам
-     *Id[]={ "Ship","  Целевое проектирование,  ",   // визуализации корпуса и
-                   "   теория и штормовая",          // всего вычислительного
-                   "    мореходность корабля",0 },   // эксперимента
+     *Id[]={"Ship","  Целевое проектирование,   ",  // визуализации корпуса и
+                   "  теория и штормовая",          // всего вычислительного
+                   "  мореходность корабля",0 },    // эксперимента
      *Cmds[]={ "F1 ","- краткая справка",
                "F2 ","запись модели в CAD-формате",
                "F3 ","выбор и чтение иного корпуса",
@@ -387,16 +390,16 @@ bool Hull::KeyBoard( byte Keyb )                     // С краткой под
     case _F4: Config(); break;                // конфигурация формы отображения
     case _F8: Model_Config( this ); break;
     case _Tab: DrawMode=(DrawMode&~3)|((DrawMode-1)&3); break;
-    case _Enter:
+    case _Enter: DrawMode^=8; break;    // одно поле графиков и картушка справа
     case _Blank: DrawMode^=4; break;    // прорисовка корпуса или треугольников
     case _Del: if( ScanStatus()&SHIFT ) // восстановление исходного отображения
     { DrawMode=0x3; Initial();          // исходный вариант цветовой раскраски
     } Distance=-2.4*sqrt(sqr(Length)+sqr(Breadth*2)+sqr(Draught*4));//дальность
-      eye=(Vector){45,-15,0},look=(Vector){-5,0,0}; break;// векторы ориентации
-    case _Esc:
+      eye=(Vector){45,-10,0},look=(Vector){1,-2,0}; break;// векторы ориентации
+    case _Esc: Above();                            // установка активности окна
      if( MessageBox( hWnd,UtA("Завершение вычислений")," Aurora :: Ship",
-       MB_APPLMODAL|MB_ICONQUESTION|MB_OKCANCEL|MB_DEFBUTTON1 )==IDOK )Close();
-            return true;                               // ~Window(); ~Hull()
+         MB_APPLMODAL|MB_ICONQUESTION|MB_OKCANCEL|MB_DEFBUTTON1 )==IDOK )
+         Close(),Storm->Close(); return true;          // ~Window(); ~Hull()
    default: return View::KeyBoard( Keyb );             // и направления взгляда
   } Draw(); return true;                               // иначе команда принята
 }
@@ -419,10 +422,10 @@ bool Field::KeyBoard( byte Keyb )
                  Original( false );    // возврат вычислений в начальный момент
                } Distance=-0.8*Long;   // ... от точки взгляда до места обзора
                eye=(Vector){ 150,-16.4,0 },look=(Vector){ 0,-10,0 }; break;
-    case _Esc:
+    case _Esc: Above();                // установка активности окна
      if( MessageBox( 0,UtA( "Завершение эксперимента" )," Storm :: Sea",
-       MB_APPLMODAL|MB_ICONQUESTION|MB_OKCANCEL|MB_DEFBUTTON1 )==IDOK )Close();
-            return true;
+         MB_APPLMODAL|MB_ICONQUESTION|MB_OKCANCEL|MB_DEFBUTTON1 )==IDOK )
+         Close(),Vessel->Close(); return true;
    default: return View::KeyBoard( Keyb );
   } Draw(); return true;                 // команда принята к исполнению
 }
@@ -437,17 +440,20 @@ static bool Hull_and_Waves_Draw()        // вся графика исполня
 }
 //!                      Главная процедура запускает процессы реального времени
 ///                                       и зацикливается на опросах клавиатуры
-//#include <Fenv.h>
+#include <OMP.h>
+#include <Fenv.h>
 //#include <Float.h>
 //#include <locale.h>
-
-int main() // int ans, char **av )
-{//            _clearfp();
- //unsigned CW=_control87
- //(_EM_OVERFLOW|_EM_UNDERFLOW|_EM_ZERODIVIDE|_EM_INVALID|_EM_DENORMAL,_MCW_EM);
- //feclear{raise}except( FE_ALL_EXCEPT );
- //    setlocale( LC_ALL,".UTF8" );
- //    setlocale( LC_CTYPE,".UTF8" );
+int main()                                 // ( int ans, char **av, char **ac )
+{                                          // setlocale( LC_ALL,".UTF8" );
+                                           // setlocale( LC_CTYPE,".UTF8" );
+//_clearfp(); unsigned CW=_control87
+//(_EM_OVERFLOW|_EM_UNDERFLOW|_EM_ZERODIVIDE|_EM_INVALID|_EM_DENORMAL,_MCW_EM);
+  feclearexcept( FE_ALL_EXCEPT );     // feclear{raise}except( FE_ALL_EXCEPT );
+#ifdef _OPENMP
+  omp_set_dynamic( true );
+  omp_set_nested( true );
+#endif
   textsize( 92,40 ),
   texttitle( Title ),
   textcolor( WHITE ),cprint( 2,1,Title ),
@@ -460,8 +466,8 @@ int main() // int ans, char **av )
     " vD [м] - условный центр сосредоточения гидродинамических пар сил\n"
     " vS [H/ρ] - накопительный вектор сил от перепадов уровня моря\n"
     " vR [H·м/ρ] - поворотный момент от криво-наклонной ватерлинии\n"
-    " mW [м4] - моменты инерции площади действующей ватерлинии\n"
-    " mM [м5] - объёмные моменты инерции погруженного корпуса\n"
+    " mW [м⁴] - моменты инерции площади действующей ватерлинии\n"
+    " mM [м⁵] - объёмные моменты инерции погруженного корпуса\n"
     " inMass  - исходные моменты инерции корпуса\n" );
   //
   // конструктор выбора корпуса - открывает и настраивает графику с чтением
@@ -491,8 +497,8 @@ int main() // int ans, char **av )
 
   Ship.Above();           // установка активности окна с прорисовками корабля
 
-//Ship.Initial()          // установка главных осей с исходными геометрическими
-//    .Floating( false ); // расчётами по корпусу, без графической визуализации
+  Ship.Initial()          // установка главных осей с исходными геометрическими
+      .Floating( false ); // расчётами по корпусу, без графической визуализации
 
    Sea.SetTimer( 500 );   // вычисления по волнению и механике корабля (½ сек)
   Ship.SetTimer( 1000,Hull_and_Waves_Draw );     // изображение корабля и моря,
@@ -506,21 +512,22 @@ int main() // int ans, char **av )
 //{
 //do{ Sea.Simulation(); WaitTime( 100 ); }while( Ship.asYet() && Sea.asYet() );
 //#pragma omp task
-{
+//{
   do                                            // -=+*&#
   { static int i=0; cprint( 1,22,"%c",( "0123456789ABCDEF" )[++i%=16] );
     WaitTime( 250 );    // приостановка без снижения производительности Windows
     //Sleep( 25 );      // или варианты полной задержки по блокирующему таймеру
     //while( Ship.GetKey()||Sea.GetKey() ); // где-то в прерываниях недовыборка
   } while( Ship.Ready() && Sea.Ready() );
-} // task
+//} // task
 //} // master
 //} // parallel
 //#pragma omp taskwait
 
+ void logStop(); logStop();
   if( Ship.Ready() )Ship.Close();
   if( Sea.Ready() )Sea.Close();
-  textcolor( LIGHTMAGENTA ); cprint( 1,24,"\n << успешное завершение >> " );
-  void logStop(); logStop();
+  textcolor( LIGHTMAGENTA );
+  cprint( 1,24,"\n << успешное завершение >> " ); _exit( EXIT_SUCCESS );
   return EXIT_SUCCESS;
 }

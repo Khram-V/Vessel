@@ -192,7 +192,7 @@ Place& Place::String( Course Dir, const Real *P, const char* T )
               { char s[l]; vsnprintf( s,l,fmt,a ); va_end( a ); String
 #define Str ; } return *this; // просто с "временной" строчкой на всё и про всё
 Place& Place::Print( const char *fmt,... ){ Arg( s )Str }
-Place& Place::Print( int x,int y, const char *fmt,... )
+Place& Place::Print( int x,_Real y, const char *fmt,... )
 { cbX=x; chY=y>0 ? Height-AF.H*y : 3-AF.H*y;  // запоминается начальная позиция
   if( x>0 )chX=(x-1)*AF.W; else chX=Width+AF.W*x; Arg( s )Str
 }
