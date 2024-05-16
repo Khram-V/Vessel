@@ -13,7 +13,7 @@ bool logTime( bool next )// запрос корректности текущег
 { const Field &S=*Storm;
   if( !VIL || S.Kt<2 )return false; else
   { Real T=S.Trun; if( !next )T -= Ts; // S.Tstep/S.tKrat;
-    return 0<fprintf( VIL,T<60?"\n   %-6s/%-4d":"\n%-9s/%-4d",
+    return 0<fprintf( VIL,T<60?"\n   %-6s\\%-4d":"\n%-9s/%-4d",
                       DtoA( T/3600,-3 ),S.Kt-(!next) );
 } }
 void logMeta(){ if( VIL ){ const Hull &S=*Vessel;
@@ -49,7 +49,6 @@ static void PtoG( char *s )
 { for( int i=0; s[i]; i++ )if( s[i]=='.' )Uset( s+i,0,"°" );        // градусы°
 }
 #include <unistd.h>
-void logStop();
 //!   регистрация экстремальных событий в ходе вычислительно эксперимента
 //    Текущая величинах[0],prev[1], min[2],max[3], SUM[4]
 //    смещение { ξ η ζ }м, углы поворота { ϑ ψ χ }°
@@ -60,6 +59,7 @@ void logStop();
 static Real wV[40],                                        // W{ x=8 y=16 z=2 }
           *wZ=wV+5,*wA=wV+10,*wM=wV+15,*wF=wV+20,*wC=wV+25,*wX=wV+30,*wY=wV+35;
 static long KS=0;                             // счетчик записей под осреднение
+static bool mV=false;                         // признак минимума скорости хода
 void logStop()
 { if( !VIL )return; logTime(); fprintf( VIL,"  ⇒ << успешное завершение >>" );
   if( KS>0 && Vessel->Educt&0xFF )
@@ -85,11 +85,12 @@ Hull& Hull::Protocol()
   { Field &S=*Storm; Vector Dir=Head[-1];          // в третьей точке экстремум
     if( S.Kt<2 )                                   // ... { ξ η ζ }м,{ ϑ ψ χ }°
     { fprintf( VIL,
-      "\n  ⇒ Время Kt    ⇒ скорость,узл. курс±рыскание руль"
+      "\n  ⇒ Время\\Kt    ⇒ Скорость±δ,узл курс±рыскание руль"
       " Z миделя∫волн бортовая килевая « корма мидель нос »/g" ); KS=0;
-      memset( wV,0,sizeof( wV ) );
+      memset( wV,0,sizeof( wV ) );                                mV=false;
     } else { byte ev=0;                       // +отличие скорости хода в узлах
-     Real w=Course+Dir.z,a=0,m=0,f=0,v=(cSp-Speed)*3600.0/_Mile; KS++;
+     Real w=Course+Dir.z,a=0,m=0,f=0,V=Speed*3600.0/_Mile; //,v=cSp*3600.0/_Mile-V;
+      KS++;
       if( S.Kt>2 )
       { Real w1=Route[-1].z,w2=Route[-2].z,w3=Route[-3].z,
              s1=Length*sin( Head[-1].y )/2, s2=Length*sin( Head[-2].y )/2,
@@ -98,7 +99,7 @@ Hull& Hull::Protocol()
         a = ( w1+s1 -2*(w2+s2) + w3+s3 )/d;
         f = ( w1-s1 -2*(w2-s2) + w3-s3 )/d;
       } shortEx = (Educt&0x200)!=0;  // режим записи только превышающих величин
-      if( extFix( wV,v )       )if( Educt&1  )ev|=1;   // потеря скорости хода
+      if( extFix( wV,V )       )if( Educt&1  )ev|=1;   // потеря скорости хода
       if( extFix( wC,angle(w)) )if( Educt&2  )ev|=2;   // рыскание
       if( extFix( wZ,Z )       )if( Educt&4  )ev|=4;   // вертикальная,
       if( extFix( wX,Dir.x )   )if( Educt&8  )ev|=8;   // бортовая и
@@ -106,15 +107,16 @@ Hull& Hull::Protocol()
       if( extFix( wA,a )       )if( Educt&32 )ev|=32;  // ускорение ахтерштевня
       if( extFix( wM,m )       )if( Educt&64 )ev|=64;  // ускорение на миделе
       if( extFix( wF,f )       )if( Educt&128)ev|=128; // и вблизи форштевня
+      if( !mV && V && ev&1 )wV[4]=(wV[2]=V)*S.Kt,mV=true; // усреднение разгона
       if( ev )
       { static char str[64]; int i; logTime( false ); // сначала время, отсчеты
-        sprintf( str,"  ⇒ %s±ξ%5.1f%-+5.1f %s±χ%6.1f%-+6.1f",
-                 ev&1?"•":"·",Speed*3600.0/_Mile,v,
-                 ev&2?"•":"·",Course*_Rd,-w*_Rd ); PtoG( str+24 );
+        sprintf( str,"  ⇒ %sV±ξ%5.1f%-+5.1f %s±χ%6.1f%-+6.1f",
+           ev&1?"•":"·",V,cSp*3600.0/_Mile-V,
+           ev&2?"•":"·", Course*_Rd,-w*_Rd ); PtoG( str+24 );
         fprintf( VIL,str );// Б-〈П÷Л〉на борт; Р-руль〈П÷Л〉полборта; М-помалу〈П÷Л〉
         if( fabs( w )<_Pi/32.0 )fprintf( VIL,"↨ " ); else
         { fprintf( VIL,w>0?"п":"л" );
-          fprintf( VIL, dCs>_Pi/59?"Б" : dCs<_Pi/61?"M":"P" );
+          fprintf( VIL,dCs>_Pi/59?"Б" : dCs<_Pi/61?"M":"P" );
         }
         sprintf( str," %sζ%+4.1f∫%-+4.1f ",     // вертикальная качка и уровень
                  ev&4?"•":"·",Z,S.Value( out( Zero ) ) ); i=Ulen( str );

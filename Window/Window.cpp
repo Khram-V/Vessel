@@ -153,6 +153,8 @@ bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
           { if( wParam>=VK_F1 && wParam<=VK_F12 )Key=_F1+wParam-VK_F1; }
       } if( Key )PutChar( Key );               // запись в буфер клавиатуры
     }   break;
+//  case WM_TIMER: if( idEvent==wParam )       // 275 -> внутренняя процедура
+//                 { PutTimer(); return true; } break;
     case WM_CHAR:                              // 258 = WM_CHAR message handler
     { byte Key;
       switch( Key=wParam )
@@ -163,8 +165,6 @@ bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
 //                      return true;           // 3 -> просто на выход
       } PutChar( Key );                        // и ещё одна запись в буфер
     }   break;
-//  case WM_TIMER: if( idEvent==wParam )       // 275 -> внутренняя процедура
-//                 { PutTimer(); return true; } break;
     case WM_CLOSE: Close();         // =16 - сигнал о возможности закрытия окна
       DestroyWindow( hWnd ); break; // внутри идёт запрос закрытия окна Windows
     case WM_DESTROY:     // =2 здесь должны быть закрыты все внутренние объекты

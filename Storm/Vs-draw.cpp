@@ -321,7 +321,7 @@ Hull& Hull::NavigaInform( Window *Win )
     //
     //              график скорости хода и поступательной качки по ходу корабля
     //
-      for( i=k; i<=l; i++ )                                  // разбег скорости
+      for( i=k; i<=l; i++ )                             // разбег скорости хода
       { r=Rate[i].x;
         if( i==k )Max.x=r+eps,Min.x=r-eps; else
         if( Max.x<r )Max.x=r; else if( Min.x>r )Min.x=r;
@@ -334,8 +334,8 @@ Hull& Hull::NavigaInform( Window *Win )
     //
     //  рыскание на курсе по отсчетам углового положения направления курса по Z
     //
-      for( i=k; i<=l; i++ )                             // разбег скорости хода
-      { r=angle( r=Head[i].z+Mix[i].y );
+      for( i=k; i<=l; i++ )
+      { r=angle( r=-Mix[i].y-Head[i].z );
         if( i==k )Max.y=r+eps,Min.y=r-eps; else
         if( Max.y<r )Max.y=r; else if( Min.y>r )Min.y=r;
       } color( blue );
@@ -344,7 +344,7 @@ Hull& Hull::NavigaInform( Window *Win )
       if( Max.y<-Min.y )Max.y=-Min.y; else if( Min.y>-Max.y )Min.y=-Max.y;
       glBegin( GL_LINE_STRIP ); Max.y-=Min.y;
       for( i=k; i<=l; i++ )
-      glVertex3d(-Lp+(i-k)*L,2*(angle(r=Head[i].z+Mix[i].y)-Min.y)/Max.y-1,0 );
+      glVertex3d(-Lp+(i-k)*L,2*(angle(r=-Mix[i].y-Head[i].z)-Min.y)/Max.y-1,0 );
       glEnd();
     }
     //                дополнительная разметка поля графиков с тремя ускорениями

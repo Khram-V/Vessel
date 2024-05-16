@@ -399,7 +399,7 @@ bool Hull::KeyBoard( byte Keyb )                     // С краткой под
     case _Esc: Above();                            // установка активности окна
      if( MessageBox( hWnd,UtA("Завершение вычислений")," Aurora :: Ship",
          MB_APPLMODAL|MB_ICONQUESTION|MB_OKCANCEL|MB_DEFBUTTON1 )==IDOK )
-         Close(),Storm->Close(); return true;          // ~Window(); ~Hull()
+         Close(); return true;                         // ~Window(); ~Hull()
    default: return View::KeyBoard( Keyb );             // и направления взгляда
   } Draw(); return true;                               // иначе команда принята
 }
@@ -425,7 +425,7 @@ bool Field::KeyBoard( byte Keyb )
     case _Esc: Above();                // установка активности окна
      if( MessageBox( 0,UtA( "Завершение эксперимента" )," Storm :: Sea",
          MB_APPLMODAL|MB_ICONQUESTION|MB_OKCANCEL|MB_DEFBUTTON1 )==IDOK )
-         Close(),Vessel->Close(); return true;
+         Close(); return true;
    default: return View::KeyBoard( Keyb );
   } Draw(); return true;                 // команда принята к исполнению
 }
@@ -524,7 +524,7 @@ int main()                                 // ( int ans, char **av, char **ac )
 //} // parallel
 //#pragma omp taskwait
 
- void logStop(); logStop();
+  logStop();
   if( Ship.Ready() )Ship.Close();
   if( Sea.Ready() )Sea.Close();
   textcolor( LIGHTMAGENTA );
