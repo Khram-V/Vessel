@@ -38,13 +38,13 @@ static void WinExecute( HWND hW=NULL )
     while( W ){ if( W->hWnd )while( WinRequest( W->hWnd) ); W=W->Next; }
 } } */
 Window* Place::Ready()             // либо одно активное, либо все окна Windows
-{ if( Site )WinExecute( Site->hWnd ); //else if( First )WinExecute();
+{ if( Site )WinExecute( Site->hWnd ); else if( First )WinExecute();
   return Site;
 }
 bool WinReady( Window *Win )       // без указания адреса опрашиваются все окна
-{ WinExecute(); if( Win )return Win->Ready()!=NULL; return First!=NULL;
-}
-//  Подборка настроек для пересохранения графической среды и параметров Windows
+   { WinExecute(); if( Win )return Win->Ready()!=NULL; return First!=NULL;
+   }
+// Подборка настроек для пересохранения графической среды и параметров Windows
 //
 static void PushMatrix()     //! сброс в стек координатных систем OpenGL-Window
 { glPushAttrib( GL_VIEWPORT_BIT | GL_POLYGON_BIT | GL_ENABLE_BIT ); // что надо
@@ -136,8 +136,8 @@ bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
     case WM_SYSKEYUP  : break;                  // 261
     case WM_KEYDOWN   :                         // 256
     case WM_SYSKEYDOWN:                         // 260
-    { byte Key=0;                               // на входе чистый ключ
-      switch( wParam )
+    { byte Key=0;       WinExecute( hWnd );     // на входе чистый ключ
+      switch( wParam )                          // командные перекодировки
       { case VK_PRIOR : Key=_North_East; break; // 33
         case VK_NEXT  : Key=_South_East; break; // 34
         case VK_END   : Key=_South_West; break; // 35
@@ -161,8 +161,8 @@ bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
       { case VK_BACK  : Key=_BkSp; break;      // 8 -> _BkSp(14)
         case VK_TAB   : Key=_Tab;  break;      // 9 -> _Tab(30)
         case VK_CANCEL: while( First )First->Close();
-                        PostQuitMessage( VK_CANCEL ); exit( VK_CANCEL );
-//                      return true;           // 3 -> просто на выход
+             //         PostQuitMessage( VK_CANCEL ); //exit( VK_CANCEL );
+                        return true;           // 3 -> просто на выход
       } PutChar( Key );                        // и ещё одна запись в буфер
     }   break;
     case WM_CLOSE: Close();         // =16 - сигнал о возможности закрытия окна
@@ -181,7 +181,7 @@ Window::Window( const char *_title, int x,int y, int w,int h )
 //ScreenWidth( GetSystemMetrics( SM_CXSCREEN ) ),
 //ScreenHeight( GetSystemMetrics( SM_CYSCREEN ) ),
   WindowX( CW_USEDEFAULT ),WindowY( CW_USEDEFAULT ),
-  isTimer( false ),isMouse( false ), mSec( 0 ),idEvent( 0x12 ),
+  isTimer( 0 ),isMouse( false ), mSec( 0 ),idEvent( 0x12 ),
   KeyPos( 0 ),KeyPas( 0 ),onKey( false ),extKey( NULL ),extTime( NULL )
 { ATOM atom;
   WNDCLASSW wc;
@@ -273,8 +273,8 @@ void Window::Close()                 // Разрушение окна в обр�
     wglDeleteContext( hRC ); hRC=0;              // - без очистки страниц?
     ReleaseDC( hWnd,hDC );   hDC=0;              // освобождение всех ресурсов
     DestroyWindow( hWnd );  hWnd=0;              // - запрос на закрытие окна
-    if( Cur )glAct( Cur ); else                  // - на смежный нижний уровень
-             PostQuitMessage( WM_QUIT );         // ~~ закрытие последнего окна
+    if( Cur )glAct( Cur ); //else                // - на смежный нижний уровень
+    //       PostQuitMessage( WM_QUIT );         // ~~ закрытие последнего окна
 } }
 //!   Позиционирование окон по правилам Windows
 //!
@@ -320,7 +320,7 @@ static byte WinAsyncKeyStates( byte code=0 )            // простой опр
   if( GetAsyncKeyState( VK_LMENU    ) )code|=L_ALT;
   if( GetAsyncKeyState( VK_RMENU    ) )code|=R_ALT; return code;
 }
-static const byte lKey=0x3F;    // маска(длина) клавиатурного буфера=64 символа
+#define lKey 0x3F               // маска(длина) клавиатурного буфера=64 символа
 void Window::PutChar( byte Key )         // занесение одного символа и его кода
 { KeyBuffer[++KeyPas&=lKey].Key=Key;          // в кольцевой буфер для символов
   KeyBuffer[KeyPas].Code=WinAsyncKeyStates();  // и клавиш управляющих аккордов
@@ -329,35 +329,31 @@ void Window::PutChar( byte Key )         // занесение одного си
   while( KeyPos!=KeyPas )      // нагромождение очереди запросов от клавиатуры
   { int oK=KeyPos;             // Фиксированная предустановка графической среды
     { glAct( this );           // со сбоем других внешних транзакций над OpenGL
-      if( !KeyBoard( KeyBuffer[ ++KeyPos&=lKey ].Key ) ){ KeyPos=oK; break; }
-    }
-  } WinExecute();    // при отказе возвращается обратно в цикл ожидания очереди
+      if( !KeyBoard( KeyBuffer[++KeyPos&=lKey].Key ) ){ KeyPos=oK; break; }
+  } } WinExecute();  // при отказе возвращается обратно в цикл ожидания очереди
 }                    // новый символ единожды опробовается к считыванию (=true)
 bool Window::KeyBoard( byte key ) // виртуальная процедура обработки прерываний
-{ if( extKey ){ glContext S(this);// предустановка графического контента OpenGL
-    return extKey( key );         // true - символ принят, false - к возврату
+{ if( extKey ){ glContext S( this ); // установка графического контента OpenGL
+              return extKey( key ); // true - символ принят, false - к возврату
   } return false; //!KeyPas!=KeyPos; либо все недочитанные символы сбрасываются
 }
 //!  Обращение к клавиатуре через активное и контекстно настроенное окно Window
 //                  ! осторожно, здесь предполагается отсутствие вызовов OpenGL
 byte Window::WaitKey()    // стандартный цикл ожидания нового символа в Windows
-{ onKey=true;
-  while( isTimer )if( !WinRequest() )WaitMessage(); //glFinish(); WinExecute();
-  while( KeyPos==KeyPas ) //|| isTimer )
-       { if( !Site )return onKey=false;
-         if( !WinRequest() )WaitMessage();
-       }
-  onKey=false; return KeyBuffer[ ++KeyPos&=lKey ].Key;   // ожидание символа כל
-}                                                        //    в том же окне
+{ onKey=true;  while( KeyPos==KeyPas )                   // || isTimer>0 )
+                    { if( !WinRequest() )WaitMessage();  // ожидание символа כל
+                      if( !Site )return onKey=false; }   //    в том же окне
+  onKey=false; return KeyBuffer[ ++KeyPos&=lKey ].Key;
+}
 byte Window::GetKey()          // запрос появления нового символа на клавиатуре
-   { WinExecute(); if( KeyPas==KeyPos )return 0;
-                   return KeyBuffer[ ++KeyPos&=lKey ].Key; }
+   { if( KeyPas==KeyPos )return 0; return KeyBuffer[ ++KeyPos&=lKey ].Key; }
+#undef lKey
 byte Window::ScanKey()         // просто проверка текущей активности клавиатуры
-   { WinExecute(); return KeyPas==KeyPos ? 0 : KeyBuffer[KeyPos].Key; }
+   { return KeyPas==KeyPos ? 0 : KeyBuffer[KeyPos].Key; }
 byte Window::ScanStatus()      // обновление в случае отсутствия новых запросов
-   { WinExecute(); if( KeyPas==KeyPos )return WinAsyncKeyStates();
-                                       return KeyBuffer[KeyPos].Code; }
-//
+   { if( KeyPas==KeyPos )return WinAsyncKeyStates();
+                         return KeyBuffer[KeyPos].Code;
+   }
 //!  Внутренние процедуры для реализации виртуальных обращений с мышкой
 //!
 bool Place::Mouse( int x,int y ) // виртуальная функция динамически подменяется
@@ -372,7 +368,7 @@ bool Place::Mouse( int b, int x,int y )
 } //                                      предотвращение рекурсии прерываний
 #define call if( !isMouse){ isMouse=true; glContext S(this); bool ret=P->Mouse(
 #define end ); if( ret ){ if( P==this )Save().Refresh(); else P->Show(); }   \
-                                                            isMouse=false; }
+                                                          isMouse=false; }
 void Window::PutMouse( UINT State, int x,int y )
 { switch( State )                        // ? ( и как теперь с виртуальностью )
   { case WM_MOUSEMOVE    : break;        // ? контекст OpenGL не сверяется
@@ -393,8 +389,7 @@ void Window::PutMouse( UINT State, int x,int y )
     if( !isMouse )
     { isMouse=true; glContext S( this ); bool ret=Mouse( _MouseWheel,x,y );
       if( ret )Save().Refresh(); isMouse=false; MouseState=0;
-    }
-  } else
+  } } else
   { Place *P=this; int px=x,py=y;         //   поиск последней/верхней площадки
     for( Place *S=P; S; S=S->Up )         //      по общему списку их наложений
     { int _x=x-S->pX,_y=y+S->pY-Height+S->Height; //       выход будет успешным
@@ -419,7 +414,7 @@ void Window::PutMouse( UINT State, int x,int y )
         } call MouseState,px,py end xo=-2;
       }
     } // MouseState &= ~_MouseWheel;
-  }   // WinExecute( hWnd  );
+  } WinExecute( hWnd  );
 }
 //!  Прямое и параллельное обращение к таймеру с соблюдением очередей Windows
 //!      (все расчеты в миллисекундах, опрокидывание через 49,7 суток)
@@ -443,13 +438,13 @@ static UINT_PTR tId=16;             // идентификатор нового �
 
 static void CALLBACK TimerProc( HWND hWind,UINT uMsg,UINT_PTR timerId,DWORD St)
 { if( hWind )
-  { Window *Win=Find( hWind );      // исполнение в контекстной среде
+  { Window *Win=Find( hWind );                // исполнение в контекстной среде
     if( Win )
-    { if( !Win->mSec )Win->isTimer=false; else
-      if( !Win->isTimer )
-      { Win->isTimer=true; // настройка OpenGL контекстным эпилогом перерисовки
-        { glContext S( Win ); if( Win->Timer() )Win->Save().Refresh(); }
-        Win->isTimer=false;
+    { if( !Win->mSec )Win->isTimer=0; else
+      if( !Win->isTimer )  // настройка OpenGL контекстным эпилогом перерисовки
+      { glContext S( Win ); bool St; Win->isTimer++; St=Win->Timer(); // запрос
+                                     Win->isTimer--;
+        if( St )Win->Save().Refresh(); WinExecute( Win->hWnd );
     } } return;                      // фиксируется фоновая подложка всего окна
   }
   if( tId!=timerId )return;              // всякие Sleep и т.п. пусть идут мимо
@@ -457,7 +452,7 @@ static void CALLBACK TimerProc( HWND hWind,UINT uMsg,UINT_PTR timerId,DWORD St)
   if( extFree )                          // запуск вычислений на заданное время
   { DWORD Rt,T;    //, St=GetTickCount() -- отсчет начала приоритетных расчётов
     do
-    { T=GetTickCount();                  // отметка реального времени счёта
+    { T=GetTickCount();                  //= отметка реального времени расчётов
       if( !extFree() )mWait=0;           //! исполнение или полный выход =false
       RealTime+=(Rt=GetTickCount())-T;   //  использованный интервал времени #0
       if( mWait && Rt-St>=mWork )        //- перезапуск по истечению указанного
@@ -473,7 +468,7 @@ Window& Window::SetTimer( DWORD mS,bool(*inTm)() )    // время+адрес �
 }
 Window& Window::KillTimer()
 { if( mSec )                             // приостановка с ожиданием завершения
-  { mSec=0; while( isTimer )if( !WinRequest() )WaitMessage();
+  { mSec=0; while( isTimer>0 )if( !WinRequest() )WaitMessage();
     extTime=NULL; ::KillTimer( hWnd,idEvent );        // теряется внешняя связь
   } return *this;
 }
@@ -497,9 +492,12 @@ DWORD WaitTime( DWORD Wait,        // активная задержка для �
 void Break( const char Msg[],... )    // Случай аварийного завершения программы
 { va_list V; va_start( V,Msg );       // или приостановка с первым символом "~"
  char str[vsprintf( 0,UtA(Msg),V )+4]; vsprintf( str,UtA(Msg),V ); va_end( V );
-  WinExecute(); glFinish();
+//WinExecute();
+  glFinish();
   MessageBox( NULL,str,*Msg=='~'?"Info":"Break",MB_ICONASTERISK|MB_OK );
   if( *Msg!='~' )exit( MB_OK );
 }
-//Window& Above(){ SetForegroundWindow( hWnd ); SetFocus( hWnd );
-// SetActiveWindow( hWnd ); ShowWindow( hWnd,SW_SHOWNA ); return Refresh(); }
+/*Window& Above(){ SetForegroundWindow( hWnd ); SetFocus( hWnd );
+  SetActiveWindow( hWnd ); ShowWindow( hWnd,SW_SHOWNA ); return Refresh(); } */
+//while( isTimer>0 )if( !WinRequest() )WaitMessage(); glFinish(); WinExecute();
+//while( isTimer>0 )if( !WinRequest( hWnd ) )WaitMessage();

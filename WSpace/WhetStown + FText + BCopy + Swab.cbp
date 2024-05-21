@@ -12,7 +12,14 @@
 				<Option object_output="Dev/Obj/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="*.VSL" />
+				<Option parameters="*.VSL /R /B" />
+				<Compiler>
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-Os" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
 			</Target>
 			<Target title="SWAB">
 				<Option output="Dev/SWAB" prefix_auto="1" extension_auto="1" />
@@ -84,6 +91,17 @@
 					<Add option="-funsigned-char" />
 					<Add option="-fexec-charset=UTF-8" />
 					<Add option="-finput-charset=UTF-8" />
+				</Compiler>
+			</Target>
+			<Target title="Hello">
+				<Option output="Dev/Hello" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="Data" />
+				<Option object_output="Dev/Obj/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option parameters="0גכעגכע.vsl" />
+				<Compiler>
+					<Add option="-fverbose-asm" />
 				</Compiler>
 			</Target>
 		</Build>

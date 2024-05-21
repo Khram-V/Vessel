@@ -180,7 +180,7 @@ Hull& Hull::wPrint( bool log ) // информация по смоченному
   textcolor( LIGHTCYAN ),
   cprint( 27,15,"vF:{%6.1f,%.1f,%-6.1f}  ", vF.x,vF.y,vF.z ),
   cprint( 27,16,"vW:{%6.1f,%.1f,%-6.1f}  ", vW.x,vW.y,vW.z ),
-  cprint( 27,17,"vD:{%6.1f,%.1f,%-6.1f}  ", vD.x,vD.y,vD.z ),
+//cprint( 27,17,"vD:{%6.1f,%.1f,%-6.1f}  ", vD.x,vD.y,vD.z ),
 //cprint( 27,17,"vS:{%6.1f,%.1f,%-5.1f }  ",vS.x,vS.y,vS.z ),
   textcolor( LIGHTGREEN,BLUE ),
   cprint( 55,17,"mW:| %7.0f  %-9.1f | ",mW.x.x,mW.x.y ),

@@ -202,7 +202,8 @@ Hull& Hull::Drawing( byte type )  // 0 - DrawMode; 1 - корпус; 2 + про�
   Text( _Up,arrow( K+Breadth*y,   K-y*Breadth,  ArLen ),     "y" );
   Text( _Up,arrow( K+x*Length*-.6,K+x*Length*.6,ArLen ),     "x" );
                   // белый центр гидродинамических пар сил и реакций - моментов
-  arrow( spot( K,24,white ),spot( out( vD ),12,white ),ArLen );
+//arrow( spot( K,24,white ),spot( out( vD ),12,white ),ArLen );
+  arrow( spot( K,24,white ),spot( out( (vB+vF)*0.5 ),12,black ),ArLen );
   //
   //  четырёхугольник исходных центров площади ватерлинии и величины,
   //                                 с центром тяжести и метацентром

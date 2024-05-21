@@ -1,10 +1,11 @@
 ;
 ; ONR Tumblehome Ship (ONRT) = DD(X)-21 «Zumwalt» class destroyer
+;
 ; The ONR Tumblehome model 5613 is a preliminary design of a modern surface combatant,
 ; which is publically accessible for fundamental research. The 1/49 scaled ship model
 ; is appended with skeg and bilge keels. The model has a wave piercing hull design
 ; with 10° tumblehome sides and transom stern. The model also has rudders, shafts
-; and propellers with propeller shaft brackets, but the superstructure is not attached.
+; and propellers with propeller shaft brackets, but the superstructure is not attached
 ;                           scale Model - Full
 ; Length of waterline       LWL(m) 3.147 154.0
 ; Maximum beam of waterline BWL(m) 0.384 18.78
@@ -190,4 +191,4 @@
  W = 8614.8
  S = 3217.7
  δ = .5417
-  2020.10.29
+ 2020.10.29
