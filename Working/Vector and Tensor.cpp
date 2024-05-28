@@ -159,21 +159,21 @@ int main( int argc, char** argv )  // начальная настройка ко
       case ' '   : painting_Model^=true;       // закраска граней куба
     }
     if( stat&SHIFT && stat&CTRL )
-    { cprint( 2,3,Move_mode="Euler <ctrl+shift>" );
+    { print( 2,3,Move_mode="Euler <ctrl+shift>" );
       switch( key )
       { case _Up   :case _Down: Model*=Euler( com,0,0 ); break;
         case _Right:case _Left: Model*=Euler( 0,com,0 ); break;
         case _Home :case _End : Model*=Euler( 0,0,com ); break;
     } } else
     if( stat&CTRL )
-    { cprint( 2,3,Move_mode="Krylov <ctrl>     " );
+    { print( 2,3,Move_mode="Krylov <ctrl>     " );
       switch( key )
       { case _Up   :case _Down: Model*=Krylov( com,0,0 ); break;
         case _Right:case _Left: Model*=Krylov( 0,com,0 ); break;
         case _Home :case _End : Model*=Krylov( 0,0,com ); break;
     } } else
     if( stat&SHIFT )
-    { cprint( 2,3,Move_mode="axisXYZ <shift>   " );
+    { print( 2,3,Move_mode="axisXYZ <shift>   " );
       switch( key )
       { case _Up   :case _Down: Model.axiX( cx+=com ); break; // вверх - вниз
         case _Right:case _Left: Model.axiY( cy+=com ); break; // вправо - влево
@@ -189,10 +189,10 @@ int main( int argc, char** argv )  // начальная настройка ко
         case _Del  : V=(Vector){1,0,0}; break;
       }
       sprintf( Msg,"Vector{%.3g,%.3g,%.3g} <alt>",V.x,V.y,V.z );
-      cprint( 2,3,Move_mode=Msg );
+      print( 2,3,Move_mode=Msg );
 
     } else
-    { cprint( 2,3,Move_mode=(char*)(key>=_Enter?" <~~~> <~~~>      ":"rotXYZ <~~~>      " ));
+    { print( 2,3,Move_mode=(char*)(key>=_Enter?" <~~~> <~~~>      ":"rotXYZ <~~~>      " ));
       switch( key )
       { case _Up   :case _Down: cx+=com; Model.rotX( com ); break;
         case _Right:case _Left: cy+=com; Model.rotY( com ); break;

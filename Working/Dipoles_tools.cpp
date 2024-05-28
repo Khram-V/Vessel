@@ -40,10 +40,10 @@ void Text_to_ConIO( Dipoles &D )
 { static int ct=0; time_t lt=time(0); // к текстовому окну с подключением мышки
   if( !ct )textsize( 80,25,25 );      //   при неявной внешней инициализации
   textcolor( LIGHTGREEN );
-  cprint( 2,2,"<%d/%d>=<%d/%d> %s ",
+  print( 2,2,"<%d/%d>=<%d/%d> %s ",
         ++ct,Time_count,nDip,RealTime,asctime( (tm*)localtime( &lt ) ) );
   for( int i=0; i<nDip && i<32; i++ )
-  { Dipole &B=D[i]; cprint( 2,i+3,"R={%5.2f,%5.2f,%5.2f}=%-5.2f V=%+.2f ",
-                                   B.R.x,B.R.y,B.R.z,abs(B.R),abs(B.V)-1 );
+  { Dipole &B=D[i]; print( 2,i+3,"R={%5.2f,%5.2f,%5.2f}=%-5.2f V=%+.2f ",
+                                  B.R.x,B.R.y,B.R.z,abs(B.R),abs(B.V)-1 );
   }
 }

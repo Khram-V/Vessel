@@ -87,7 +87,7 @@ static Mlist Menu_a[]=
 };
 bool Pro::KeyBoard( byte key )
 { textcolor( LIGHTGREEN,BLACK ),
-  cprint(2,7,"Key = %d\\x%X = '%s' + <%X>",key,key,WtU(key),ScanStatus() );
+  print(2,7,"Key = %d\\x%X = '%s' + <%X>",key,key,WtU(key),ScanStatus() );
   switch( key )
   { case 'I': case 'i': show_info^=true;         break;
     case '=': case '+': slices++;                break;
@@ -205,17 +205,17 @@ static void display( Place &Tv )
     Tv.Refresh();               // и собственно так, если много площадок
 }
 static bool MouseMove( int X,int Y )
-{  textbackground( BLUE ); textcolor( YELLOW );
-   cprint( 3,12,"Tv.Move :   { %d,%d } \n",X,Y ); return false; }
+{ textbackground( BLUE ); textcolor( YELLOW );
+  print( 3,12,"Tv.Move :   { %d,%d } \n",X,Y ); return false; }
 static bool MousePress( int State, int X,int Y )
-{  textbackground( LIGHTBLUE ); textcolor( WHITE );
-   cprint( 3,13,"Tv.Press: %X { %d,%d } \n",State,X,Y ); return false; }
+{ textbackground( LIGHTBLUE ); textcolor( WHITE );
+  print( 3,13,"Tv.Press: %X { %d,%d } \n",State,X,Y ); return false; }
 static bool OneMove( int X,int Y )
-{  textbackground( BLUE ); textcolor( COLORS( YELLOW|32 ) );
-   cprint( 3,15,"One.Move : { %d,%d } \n",X,Y ); return false; }
+{ textbackground( BLUE ); textcolor( COLORS( YELLOW|32 ) );
+  print( 3,15,"One.Move : { %d,%d } \n",X,Y ); return false; }
 static bool OnePress( int State, int X,int Y )
 { textbackground( LIGHTBLUE ); textcolor( WHITE );
-  cprint( 3,16,"One.Press: %X { %d,%d } \n",State,X,Y ); return false;
+  print( 3,16,"One.Press: %X { %d,%d } \n",State,X,Y ); return false;
 }
 static bool Init=false;
 Place *aOne=NULL;
@@ -315,7 +315,7 @@ int main( int argc,char *argv[] )
     { byte ans=Tvm.GetKey();
       if( ans==_Esc )break;
       if( ans ){ textcolor( YELLOW );
-                 cprint( 2,8,"Key = %d\\x%X = '%s' + <%X> ",
+                 print( 2,8,"Key = %d\\x%X = '%s' + <%X> ",
                          ans,ans,WtU(ans),Tvm.ScanStatus() ); }
       display( One ); WaitTime( 100 );
     }

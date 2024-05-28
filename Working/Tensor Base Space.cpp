@@ -59,9 +59,10 @@ static Course Configuration()      // меню настройки экспери
     fz=min( 10.0,fabs( fz ) );
   return _F4;
 }
-#define a( t ) ( M_PI*sin( fmod( angle/60/t,M_PI*2 ) ) )
+#define a( t ) ( R*M_PI*sin( fmod( angle/60/t,M_PI*2 ) ) )
 static bool drawing()
 { Real angle=(ElapsedTime()-STime)/60; // время запуска программы в милиминутах
+  Real R=1.0;
     Win.Activate();                   // привязка к основному графическому окну
     glClearColor( rotate_OpenGL?0.75:0.9,0.95,0.99,1 );      // цвет фона окна
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );   // полная расчистка
@@ -71,7 +72,8 @@ static bool drawing()
     { (Tensor)Mxl*=Krylov( a(1),a(1.3),a(1.6) );
 //    (Tensor)Mxl=Euler( Mxl,1,1.3,1.6 );
 //    Mxl.Identity();//.Euler( a(1),a(1.3),a(1.6) );    // в собственном базисе
-      Mxl=(Point){ a(1),a(1.2)/2,a(1.6)/3 }*pow( Real( Mxl ),0.33 );
+      R=pow( Real( Mxl ),0.33 );
+      Mxl=(Point){ a(1),a(1.2)/2,a(1.6)/3 }; //*pow( Real( Mxl ),0.33 );
 //    Mxl=(Tensor){ dir( (Vector){ sin(angle),cos(angle),sin(angle/3) } ) };
       glTranslated( Mxl.X/-30,Mxl.Y/-20,-Mxl.Z/60 );
     }
@@ -183,8 +185,8 @@ int main( int argc, char** argv )
     drw: Win.Draw(); // drawing();
       if( key==_F4 ){ if( Configuration()!=_Esc )goto drw; }
       //Win.Refresh();   // двойная длинная перерисовка
-      if( key>=' ' )textcolor( LIGHTGRAY ),cprint( 2,2," key=%d='%c' \n",key,key<' '?' ':key );
-          else      textcolor( YELLOW    ),cprint( 2,2," cmd=%d='%c' \n",key,key<' '?' ':key );
+      if( key>=' ' )textcolor( LIGHTGRAY ),print( 2,2," key=%d='%c' \n",key,key<' '?' ':key );
+          else      textcolor( YELLOW    ),print( 2,2," cmd=%d='%c' \n",key,key<' '?' ':key );
     } while( Win.Ready() && (key=Win.WaitKey())!=_Esc ); return 0;
 }
 static void Model_Draw( Model_Type typ ) // Простые равнообъёмные фигуры

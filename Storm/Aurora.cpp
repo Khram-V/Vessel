@@ -64,7 +64,7 @@ Hull::Hull(): View     // в прицепе View окошко графическ
   Locate( Zero ),                // прямая ссылка на текущее местоположение [м]
   Route(),Rate(),Head(),Whirl(),Mix() // конструкторы для кинематики во времени
 { Vessel=this;                  // ссылка на корпус, пусть будет внешний доступ
-  Nframes=Mid=0; Length=Breadth=Draught=1.0; vC=vR=vS=Zero; //vD=Zero;
+  Nframes=Mid=0; Length=Breadth=Draught=1.0; vC=vR=vS=vD=Zero;
   nF=muF=(Vector){ 0.1,0.8,0.6 }; // демпфер по абсциссе, ординате и аппликате
   nM=muM=(Vector){ 0.2,0.6,0.8 }; // ... по бортовой, килевой качке и рысканию
   Ofs=Zero; mx=my=0;              // и мышку тоже в исходное
@@ -456,9 +456,8 @@ int main()                                 // ( int ans, char **av, char **ac )
 #endif
   textsize( 92,40 ),
   texttitle( Title ),
-  textcolor( WHITE ),cprint( 2,1,Title ),
-  textcolor( LIGHTCYAN ),printf( SubTitle ),
-  textcolor( CYAN ),printf( CopyRight ),textcolor( LIGHTGREEN ),cprint( 1,26,
+  textcolor( WHITE ),print(2,1,Title),textcolor( LIGHTCYAN ),printf(SubTitle),
+  textcolor( CYAN ),printf(CopyRight),textcolor( LIGHTGREEN ),print( 1,27,
     " C  [м] - положение мгновенного центра величины (подводного объёма)\n"
     " mC (δ) - матрица ориентации корпуса (корабельные оси в морском базисе)\n"
     " vF [м] - корабельные координаты центра площади действующей ватерлинии\n"
@@ -496,11 +495,10 @@ int main()                                 // ( int ans, char **av, char **ac )
   Ship.Window::KeyBoard( AllKeyb ); // доступен при прямом обращении в Window
 
   Ship.Above();           // установка активности окна с прорисовками корабля
-
   Ship.Initial()          // установка главных осей с исходными геометрическими
       .Floating( false ); // расчётами по корпусу, без графической визуализации
 
-   Sea.SetTimer( 500 );   // вычисления по волнению и механике корабля (½ сек)
+   Sea.SetTimer( 500 );   // вычисления по волнению с механикой корабля (½ сек)
   Ship.SetTimer( 1000,Hull_and_Waves_Draw );     // изображение корабля и моря,
                  // часы и прочая оперативная информация справа в нижней строке
 
@@ -514,8 +512,8 @@ int main()                                 // ( int ans, char **av, char **ac )
 //#pragma omp task
 //{
   do                                            // -=+*&#
-  { static int i=0; cprint( 1,22,"%c",( "0123456789ABCDEF" )[++i%=16] );
-    WaitTime( 250 );    // приостановка без снижения производительности Windows
+  { static int i=0; print( 1,23,"%c",( "0123456789ABCDEF" )[++i%=16] );
+    WaitTime( 500 );    // приостановка без снижения производительности Windows
     //Sleep( 25 );      // или варианты полной задержки по блокирующему таймеру
     //while( Ship.GetKey()||Sea.GetKey() ); // где-то в прерываниях недовыборка
   } while( Ship.Ready() && Sea.Ready() );
@@ -528,6 +526,6 @@ int main()                                 // ( int ans, char **av, char **ac )
   if( Ship.Ready() )Ship.Close();
   if( Sea.Ready() )Sea.Close();
   textcolor( LIGHTMAGENTA );
-  cprint( 1,24,"\n << успешное завершение >> " ); _exit( EXIT_SUCCESS );
+  print( 1,24,"\n << успешное завершение >> " ); _exit( EXIT_SUCCESS );
   return EXIT_SUCCESS;
 }

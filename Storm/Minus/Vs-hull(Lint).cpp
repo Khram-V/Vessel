@@ -575,8 +575,8 @@ Ok: Str=stringData( Fh );            // Длинная строка в буфе�
 #define fine( a ){ a=z##a+1; goto InnFind; }
 /*
  if( zl>lf.len || zr>rf.len )
-   { cprint( 2,26,"~!!! n=%d, zl=%d(%d<%d), zr=%d(%d<%d)    ",
-               n,sl,zl,lf.len,sr,zr,rf.len ); getch(); }
+   { print( 2,26,"~!!! n=%d, zl=%d(%d<%d), zr=%d(%d<%d)    ",
+              n,sl,zl,lf.len,sr,zr,rf.len ); getch(); }
 */
         if( zr>=rf.len )r=zr;      // по одному контрольному фрагменту для
         if( zl>=lf.len )l=zl;      // двух смежных шпангоутов рабочей шпации
@@ -631,8 +631,8 @@ Ok: Str=stringData( Fh );            // Длинная строка в буфе�
         }
 /*
  if( sl>zl || sr>zr )
-   { cprint( 2,26,"~$$$ n=%d, sl=%d(%d<%d), sr=%d(%d<%d)    ",
-          n,sl,zl,lf.len,sr,zr,rf.len ); getch(); }
+   { print( 2,26,"~$$$ n=%d, sl=%d(%d<%d), sr=%d(%d<%d)    ",
+         n,sl,zl,lf.len,sr,zr,rf.len ); getch(); }
 */
       //   особая перепроверка (=пропуск) зараз всех смежных совпадающих точек
       //
@@ -727,8 +727,8 @@ Ok: Str=stringData( Fh );            // Длинная строка в буфе�
     return true;
   }
 Bk: textcolor( YELLOW,RED ),
-    cprint( 2,7,"  >>> отмена или ошибка чтения данных: %s",FileName ),
-    textcolor( LIGHTGRAY,BLACK );         free( ShipName ); ShipName=0;
+    print( 2,7,"  >>> отмена или ошибка чтения данных: %s",FileName ),
+    textcolor( LIGHTGRAY,BLACK );        free( ShipName ); ShipName=0;
   return false;
 }
 // C06=0.9945218954,C12=0.9781476007,C24=0.9135454576,C30=0.8660254038,

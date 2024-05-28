@@ -22,10 +22,15 @@ void logMeta(){ if( VIL ){ const Hull &S=*Vessel;
                S.Metacenter.z-S.Buoyancy.z,S.hX ); } }
 void logHydro(){ if( VIL ){ const byte St=Vessel->Statum;
      fprintf(VIL,"\n  ⇒ Гидромеханика[%d]: %s"+logTime(),St,Model[St]); } }
-void logDamp(){ if( VIL ){ _Vector F=Vessel->muF,M=Vessel->muM;
-fprintf( VIL,"\n  ⇒ Демпфирование: μV{ ξ=%4.2lf, η=%4.2lf, ζ=%4.2lf };"
-  " μω{ θ=%4.2lf, ψ=%4.2lf, χ=%4.2lf }, Kv=%0.2lg"+logTime(),
-        F.x,F.y,F.z,M.x,M.y,M.z,Vessel->Kv ); } }
+void logDamp()
+{ Hull &H=*Vessel; H.DampInit(); textcolor( BROWN );
+  print(56,22,"μ√:│ ξ%.1f∫%.2f η%.1f∫%.2f ζ%.1f∫%.2f │ ",H.muF.x,H.nF.x,H.muF.y,H.nF.y,H.muF.z,H.nF.z );
+  print(57,23, "ω:│ ϑ%.1f∫%.2f ψ%.1f∫%.2f χ%.1f∫%.2f │ ",H.muM.x,H.nM.x,H.muM.y,H.nM.y,H.muM.z,H.nM.z );
+  if( VIL )
+  { fprintf( VIL,"\n  ⇒ Демпфирование: μV{ ξ=%4.2lf, η=%4.2lf, ζ=%4.2lf };"
+    " μω{ θ=%4.2lf, ψ=%4.2lf, χ=%4.2lf }, Kv=%0.2lg"+logTime(),
+        H.muF.x,H.muF.y,H.muF.z,H.muM.x,H.muM.y,H.muM.z,H.Kv );
+} }
 void Model_Config( Window* Win ){ byte &St=Vessel->Statum,ans=St;
   Mlist Menu[]={ {1,0,"  Выбор модели гидромеханики корабля"},{2,45,Model[0]},
              {1,45,Model[1]},{1,45,Model[2]},{1,45,Model[3]},{1,45,Model[4]} };
@@ -133,8 +138,8 @@ void wavePrint()                // процедура печати исполь�
 { Field &S=*Storm;              //  при изменении параметров волн Field::Config
   for( int y=10; y<=12; y++ )
   { Waves &W = y==10 ? S.Wind : ( y==11 ? S.Swell : S.Surge );
-    textcolor( LIGHTCYAN ); cprint( 2,y,"%-5s: ",W.Title );
-    textcolor( LIGHTGRAY ); cprint( 9,y,y==10
+    textcolor( LIGHTCYAN ); print( 2,y,"%-5s: ",W.Title );
+    textcolor( LIGHTGRAY ); print( 9,y,y==10
   ? "λ=%3.0f м, τ=%4.1f\", ζ=%4.1f/%4.2g м, C=%4.1f м/с, A=%3.0f°, δS=%.1f м [%d·%d]={%.0f·%.0f} м\n"
   : "  %3.0f м,   %4.1f\",   %4.1f/%4.2g м,   %4.1f м/с,   %3.0f°,    %.1f м [%d·%d] \n",
      W.Length,W.Length/W.Cw,W.Height,hW*W.Height/W.Length,
@@ -161,47 +166,49 @@ void logWave()
 Hull& Hull::wPrint( bool log ) // информация по смоченному корпусу на текстовой
 { Field &F=*Storm;            //             консоли и в протоколе эксперимента
   textcolor( YELLOW ),       // текстовые данные о состоянии и динамике корабля
-  cprint( 1,14," Time%s +%.2g\"/%.3g \n"
+  print( 1,14," Time%s +%.2g\"/%.3g \n"
                " Speed %3.1fуз(%4.2f=%3.1fL)  \n"
                " Volume %1.0f << %1.0f  \n"
                " Surface %1.0f << %1.0f  \n"
-               " Floatable %1.0f << %1.0f  \n"
-               " μCenter %4.1f >> %4.1f -- %3.1f Gravity.z  \n"
-               "       h %4.2f >> %4.2f -- μM %3.1f >> %3.1f   ",
+               " Floatable %1.0f << %1.0f  \n\n"
+               " μCenter %4.1f >> %4.1f -- Gravity.z=%+3.1f  \n"
+               "       h %4.2f >> %4.2f -- H %3.1f >> %3.1f   ",
         DtoA( F.Trun/3600,F.Trun>3600?2:(F.Trun>60?3:-3) ),
         TimeStep,tKrat,Speed*3600/_Mile,
         Speed/sqrt(_g*Length),sqr(Speed)*_Pd/_g/Length,Volume,iV,Surface,iS,
         Floatage,iF,Metacenter.x,vM.x,Gravity.z,hX,vM.z,Metacenter.y,vM.y ),
-  cprint( 80,8,"Statum{ %X } ",Statum ), // printB( Statum );
-  textcolor( WHITE ),cprint( 28,14,"C:{%6.1f,%.1f,%-6.1f}  ",vB.x,vB.y,vB.z );
-  cprint( 55,14,"mC:| %5.2f %-5.2f %-5.2f | X %s  ",x.x,x.y,x.z,DtoA(atan2(-z.y,z.z)*_Rd,-1)),
-  cprint( 58,15,   "| %5.2f %-5.2f %-5.2f | Y %s  ",y.x,y.y,y.z,DtoA(atan2( x.z,x.x)*_Rd,-1)),
-  cprint( 58,16,   "| %5.2f %-5.2f %-5.2f | Z %s  ",z.x,z.y,z.z,DtoA(atan2(-x.y,x.x)*_Rd,-1));
+  print( 80,8,"Statum{ %X } ",Statum ), // printB( Statum );
+  textcolor( WHITE );
+  print( 28,14, "C:{%6.1f,%.1f,%-6.1f}  ",vB.x,vB.y,vB.z );
   textcolor( LIGHTCYAN ),
-  cprint( 27,15,"vF:{%6.1f,%.1f,%-6.1f}  ", vF.x,vF.y,vF.z ),
-  cprint( 27,16,"vW:{%6.1f,%.1f,%-6.1f}  ", vW.x,vW.y,vW.z ),
-//cprint( 27,17,"vD:{%6.1f,%.1f,%-6.1f}  ", vD.x,vD.y,vD.z ),
-//cprint( 27,17,"vS:{%6.1f,%.1f,%-5.1f }  ",vS.x,vS.y,vS.z ),
+  print( 27,15,"vF:{%6.1f,%.1f,%-6.1f}  ",vF.x,vF.y,vF.z ),
+  print( 27,16,"vW:{%6.1f,%.1f,%-6.1f}  ",vW.x,vW.y,vW.z ),
+  print( 27,17,"vD:{%6.1f,%.1f,%-6.1f}  ",vD.x,vD.y,vD.z );
+  if( Statum )textcolor( GREEN ),
+              print( 27,18,"vS:{%6.1f,%.1f,%-6.1f}  ",vS.x,vS.y,vS.z ),
+              print( 27,19,"vR:{%6.1f,%.1f,%-6.1f}  ",vR.x,vR.y,vR.z );
   textcolor( LIGHTGREEN,BLUE ),
-  cprint( 55,17,"mW:| %7.0f  %-9.1f | ",mW.x.x,mW.x.y ),
-  cprint( 58,18,   "| %7.1f  %-9.0f | ",mW.y.x,mW.y.y ),
-//cprint( 55,17,"mM:| %7.0f  %-8.1f  %-9.1f | ",mM.x.x,mM.x.y,mM.x.z ),
-//cprint( 58,18,   "| %7.1f  %-8.0f  %-9.1f | ",mM.y.x,mM.y.y,mM.y.z ),
-//cprint( 58,19,   "| %7.1f  %-8.1f  %-9.0f | ",mM.z.x,mM.z.y,mM.z.z ),
-  textcolor( LIGHTGRAY,BLACK ),
-  cprint( 51,19,"inMass:"
-                "| %7.0f  %-8.1f  %-9.1f | ",inMass.x.x,inMass.x.y,inMass.x.z),
-  cprint( 58,20,"| %7.1f  %-8.0f  %-9.1f | ",inMass.y.x,inMass.y.y,inMass.y.z),
-  cprint( 58,21,"| %7.1f  %-8.1f  %-9.0f | ",inMass.z.x,inMass.z.y,inMass.z.z),
-  textcolor( GREEN );
-  if( Statum )cprint( 55,22,"vS:{%6.1f,%.1f,%-6.1f}  ",vS.x,vS.y,vS.z ),
-              cprint( 55,23,"vR:{%6.1f,%.1f,%-6.1f}  ",vR.x,vR.y,vR.z );
+  print( 56,20,"mW:| %7.0f  %-9.1f | ",mW.x.x,mW.x.y ),
+  print( 59,21,   "| %7.1f  %-9.0f | ",mW.y.x,mW.y.y ),
+//print( 56,17,"mM:| %7.0f  %-8.1f  %-9.1f | ",mM.x.x,mM.x.y,mM.x.z ),
+//print( 59,18,   "| %7.1f  %-8.0f  %-9.1f | ",mM.y.x,mM.y.y,mM.y.z ),
+//print( 59,19,   "| %7.1f  %-8.1f  %-9.0f | ",mM.z.x,mM.z.y,mM.z.z ),
+  textcolor( WHITE,BLACK );
+  print( 56,14,"mC:| %5.2f %-5.2f %-5.2f | X %s  ",x.x,x.y,x.z,DtoA(atan2(-z.y,z.z)*_Rd,-1)),
+  print( 59,15,   "| %5.2f %-5.2f %-5.2f | Y %s  ",y.x,y.y,y.z,DtoA(atan2( x.z,x.x)*_Rd,-1)),
+  print( 59,16,   "| %5.2f %-5.2f %-5.2f | Z %s  ",z.x,z.y,z.z,DtoA(atan2(-x.y,x.x)*_Rd,-1));
   if( log )
-  { textcolor( WHITE ); cprint( 1,7,"  >>> %s \n"
-      "  >>> { L=%g, B=%g, T=%g, Ψ=%s\\δd=%.0fсм }^%g  №〈A.%d<%+d+>%d.Ф 〉 ",
-      ShipName,Length,Breadth,Draught,DtoA(Trim*_Rd,2),asin(Trim)*Length*50,
-      Ofs.z-Draught,Stern.len,Nframes,Stem.len );
-                textcolor( CYAN ); cprint( 1,38,fname( fext( FileName ) ) );
+  { char *s=DtoA( Trim*_Rd,2 ); while( *s==' ' )++s; logDamp();
+    textcolor( WHITE ); print( 1,7,"  >>> %s \n"
+      "  >>> { L=%g, B=%g, T=%g, Ψ=%s\\δd≈%.0fсм }∧%g  №〈A.%d<%+d+>%d.Ф 〉∨%g ",
+         ShipName,Length,Breadth,Draught,s,asin( Trim )*Length*50,
+         Ofs.z-Draught,Stern.len,Nframes,Stem.len,Kv );
+    print(52,17,"inMass:"
+                "│ %7.0f  %-8.1f  %-9.1f │ ",inMass.x.x,inMass.x.y,inMass.x.z),
+    print(59,18,"│ %7.1f  %-8.0f  %-9.1f │ ",inMass.y.x,inMass.y.y,inMass.y.z),
+    print(59,19,"│ %7.1f  %-8.1f  %-9.0f │ ",inMass.z.x,inMass.z.y,inMass.z.z);
+
+    textcolor( CYAN ); print( 1,38,fname( fext( FileName ) ) );
     if( !VIL ){ textcolor( MAGENTA ); printf( " <= без протокола" ); } else
     if( Educt&0xFF )
     { textcolor( GREEN ); printf( " <=%s: %s%s; %s%s%s{%s%s%s}",

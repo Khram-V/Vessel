@@ -459,7 +459,7 @@ Ok: Str=stringData( Fh );            // Длинная строка в буфе�
     return true;
   }
 Bk: textcolor( YELLOW,RED ),
-    cprint( 2,7,"  >>> отмена или ошибка в цифровой модели: %s",FileName ),
+    print( 2,7,"  >>> отмена или ошибка в цифровой модели: %s",FileName ),
     textcolor( LIGHTGRAY,BLACK ); free( ShipName ); ShipName=0;
   return false;
 }

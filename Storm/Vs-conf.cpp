@@ -64,10 +64,9 @@ Hull& Hull::Config()
       Storm->Original( false ).Kt=0;
       Initial().Floating(); //Storm->Kt=sKt;
       wPrint( true );
-    }
+    }                                          // факторы демпфирования сдвигов
     if( DM!=muM || DF!=muF ){ DM=muM; DF=muF; logDamp(); }
-    DampInit();                                // факторы демпфирования сдвигов
-    sT=max( 0.5,sTime )*60; sTime=sT/60.0;     // протяжённость графиков качки
+    sT=max( 0.5,sTime )*60; sTime=sT/60.0;      // протяжённость графиков качки
   } while( ans!=_Esc );
   return *this;
 }
@@ -307,12 +306,12 @@ Waves::Get( char *s, Real &L, Real &H, Real &D )  // характеристик�
   } return *this;
 }
 //  уточнение коэффициентов углового и поступательного демпфирования
-//
-void Hull::DampInit()
-{ nM=muM*(0.5*Ts); /** &/inMass */ nM.x = (1.0-exp( -nM.x ))/nM.x;
-                                   nM.y = (1.0-exp( -nM.y ))/nM.y;
-                                   nM.z = (1.0-exp( -nM.z ))/nM.z;
-  nF=muF*(0.5*Ts); /** &/Volume */ nF.x = (1.0-exp( -nF.x ))/nF.x;
-                                   nF.y = (1.0-exp( -nF.y ))/nF.y;
-                                   nF.z = (1.0-exp( -nF.z ))/nF.z;
+//                    инициируется после первого геометрического цикла при Kt=0
+Hull& Hull::DampInit()
+{ nM=muM*Ts; /* &/inMass */ nM.x = (1.0-exp( -nM.x ))/nM.x; //! Ts/2
+                            nM.y = (1.0-exp( -nM.y ))/nM.y;
+                            nM.z = (1.0-exp( -nM.z ))/nM.z;
+  nF=muF*Ts; /* &/Volume */ nF.x = (1.0-exp( -nF.x ))/nF.x;
+                            nF.y = (1.0-exp( -nF.y ))/nF.y;
+                            nF.z = (1.0-exp( -nF.z ))/nF.z; return *this;
 }

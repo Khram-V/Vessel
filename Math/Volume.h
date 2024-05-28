@@ -124,4 +124,8 @@ struct Ball    // естественно-физические определен
 //Ball& operator<<=( _Vector V ); // задвиг путевой разности и снижение индекса
   Ball& Fix( int kt, int lt, int ln ); // сброс индекса и установка новой длины
 };
+
+
+inline Point operator * ( Point P,_Real R ){ P.X*=R; P.Y*=R; P.Z*=R; return P; }
+
 #endif

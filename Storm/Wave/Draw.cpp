@@ -150,9 +150,9 @@ void Waves::TextInfo()
     textcolor( LIGHTCYAN ); printf( "%6.1f \\ %.4g/%.4g \\ %.3g -- скорость[м/с] \\ шаг времени[с]/крат \\ и сетки[м]\n",Cw,dT,tKrat,Ds );
   } else
   { Vector W,K; int i;
-    textcolor( WHITE ); cprint( 1,7,"%12s \\ %d/%-6d -- время[сек] \\ шаг  \n",DtoA( Tlaps/3600 ),Kt,Kd ),clreol();
+    textcolor( WHITE ); print( 1,7,"%12s \\ %d/%-6d -- время[сек] \\ шаг  \n",DtoA( Tlaps/3600 ),Kt,Kd ),clreol();
     if( abs( wH )<Long/2-2 )
-    textcolor( YELLOW,BLUE ),cprint( 8,8,"wV=%.2f \\ wH=%-.1f -- скорость[м/с] \\ граница[м] ",wV,wH );
+    textcolor( YELLOW,BLUE ),print( 8,8,"wV=%.2f \\ wH=%-.1f -- скорость[м/с] \\ граница[м] ",wV,wH );
     textcolor( LIGHTCYAN,BLACK ); clreol(); gotoxy( 1,9 );Amax( Nx+1,H,"уровня" )
     textcolor( LIGHTGREEN ); Amax( Nx,V,"скорости" ) printf( "\n" ),clreol();
   }

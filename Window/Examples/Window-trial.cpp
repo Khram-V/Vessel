@@ -102,19 +102,19 @@ const char
 struct _One: public Window
 { DWORD cw,dw,cnt;
   _One():Window( "One::First OpenGL window" ),dw(0),cnt(0){};
-  virtual ~_One(){ cprint( 1,15,"One::Destructor \n" ); gotoxy( 1,21 ); }
+  virtual ~_One(){ print( 1,15,"One::Destructor \n" ); gotoxy( 1,21 ); }
   virtual bool KeyBoard( byte key )
   { if( key==_F1 ){ Help( Nam1,Cmds,Plus ); return true; } return false;
   }                      // остальное в очередь ожиданий для get- или waitKey()
   virtual bool Timer()
   { Activate( true ); Rotation( Real(cw=ElapsedTime())/250.0 );  // WaitTime( 500 );
     glColor3f( 0,0,1 ); Print( 1,0,"One::счётчик кадров: № %d + %d ms",cnt,cw-dw );
-    textcolor( LIGHTCYAN ); cprint( 1,12,"One::Timer[%d] = %d = %d \n",cnt,cw,cw-dw );
+    textcolor( LIGHTCYAN ); print( 1,12,"One::Timer[%d] = %d = %d \n",cnt,cw,cw-dw );
     dw=cw; ++cnt; Save(); return true; //->Save().Refresh();
   }
   virtual bool Draw(){ return Timer(); }
-  virtual bool Mouse( int x,int y ){ cprint( 1,13,"One::Move( %d, %d ) \n",x,y ); return false; }
-  virtual bool Mouse( int s,int x,int y ){ cprint( 1,14,"One::Press( %04X, %d, %d ) \n",s,x,y ); return false; }
+  virtual bool Mouse( int x,int y ){ print( 1,13,"One::Move( %d, %d ) \n",x,y ); return false; }
+  virtual bool Mouse( int s,int x,int y ){ print( 1,14,"One::Press( %04X, %d, %d ) \n",s,x,y ); return false; }
 } One;
 //
 //     Второй блок с освобожденные от графической среды функциями
@@ -127,14 +127,14 @@ static bool SecondTimer()
 { static DWORD cw,dw=0,cnt=0;
   Win2->Activate( true ); Rotation( Real(cw=ElapsedTime())/-333.0 );
   glColor3f( 0,0.5,0 ); Win2->Print(1,0,"Ext::Счетчик кадров: № %d ",cnt );
-  textcolor( LIGHTGREEN ); cprint(1,16,"Ext::SecondTimer[%d] = %d = %d \n",cnt,cw,cw-dw );
+  textcolor( LIGHTGREEN ); print(1,16,"Ext::SecondTimer[%d] = %d = %d \n",cnt,cw,cw-dw );
   dw=cw; ++cnt; //
   return true; // == Win2->Save().Refresh();
 }
 static bool MouseMove( int x,int y )           // мышки пишут только на консоли
-{ cprint( 1,17,"Ext::Move: x=%d, y=%d  \n",x,y ); return false; }
+{ print( 1,17,"Ext::Move: x=%d, y=%d  \n",x,y ); return false; }
 static bool MousePress( int State, int x,int y )
-{ cprint(1,18,"Ext::Press: State: %04X, x=%d, y=%d \n",State,x,y);return false;
+{ print(1,18,"Ext::Press: State: %04X, x=%d, y=%d \n",State,x,y);return false;
 }
 //  сначала строится кинематика в цикле затем включаются таймеры для двух окон
 //
@@ -168,7 +168,7 @@ int main( int argc, char **argv )
     }
     switch( Key=Second.GetKey() )
     { case _Esc:
-           cprint( 1,19,"Second::Destructor \n" ); gotoxy(1,21);
+           print( 1,19,"Second::Destructor \n" ); gotoxy(1,21);
            Second.~Window(); break;
       case ' ': Second.Clear(),clrscr(); break;
 //    case _F1: TextHelp( &Second,Nam2,Cmds,Plus );
