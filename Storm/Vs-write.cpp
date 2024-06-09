@@ -7,8 +7,8 @@
 static int fColor=-1;
 static FILE *F=NULL;
 static void printF( Vector V )
-{ V=e5( V ); if( V.y<0 )V.y=0; fprintf( F,"v %lg %lg %lg\n",V.x,V.z,V.y );
-                               fprintf( F,"v %lg %lg %lg\n",V.x,V.z,-V.y );
+{ e6( V ); if( V.y<0 )V.y=0; fprintf( F,"v %lg %lg %lg\n",V.x,V.z,V.y );
+                             fprintf( F,"v %lg %lg %lg\n",V.x,V.z,-V.y );
 }
 static void crossPoint( _Point A,_Point B,_Point C, int a,int b,int c )
 { if( fabs( A.Y )<eps && fabs( B.Y )<eps && fabs( C.Y )<eps )return;
@@ -17,7 +17,7 @@ static void crossPoint( _Point A,_Point B,_Point C, int a,int b,int c )
                  fprintf( F,"f %d %d %d\n",a,b,c );
 }
 static void crossDC( Vector A,Vector B,Vector C )
-{ A=e5( A ); B=e5( B ); C=e5( C );
+{ e6( A ); e6( B ); e6( C );
   if( fabs( A.y )<eps && fabs( B.y )<eps && fabs( C.y )<eps )return;
   fprintf(F,"31 4 1 0 0 %d\n%lg %lg %lg\n%lg %lg %lg\n%lg %lg %lg\n%lg %lg %lg\n",
   A.z<=0&&B.z<=0&&C.z<=0?3:9,A.x,A.z,A.y,B.x,B.z,B.y,C.x,C.z,C.y,A.x,A.z,A.y );

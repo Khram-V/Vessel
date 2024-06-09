@@ -21,12 +21,23 @@ void Flex::Delete( int k )        // без укорочения числово�
 Vector& Flex::operator+=(_Vector R){ return Insert(len)=R;} // оконечный вектор
 Vector& Flex::operator/=(_Vector R){ return Insert(0)=R;} // замещение в начале
 
-Real e5( _Real R ){ return round( R*1e5 )/1e5; }
-Vector e5( Vector W )        // округление записи для точных сравнений 0.01 мм
-{ W.x=e5( W.x );
-  W.y=e5( W.y ); //W.y<=eps?0.0:e5( W.y );
-  W.z=e5( W.z ); return W;
-}
+void e6( Real &R ){ R=round( R*1e5 )/1e5; }
+void e6( Vector &W )        // округление записи для точных сравнений 0.01 мм
+   { e6( W.x );
+     e6( W.y ); // W.y<=eps?0.0:e5( W.y );
+     e6( W.z ); // return W;
+   }
+Real& angle( Real &A ){ return A=remainder( A,_Pd  ); }           // -180°÷180°
+//{ if( A>=0 )A=fmod( A,_Pd ); else A=_Pd-fmod(-A,_Pd ); return A; } // 0°÷360°
+Real angle( _Real A,_Real B ){ return remainder( A-B,_Pd ); }     // A-B: -п÷п
+Vector& angle( Vector &A){ angle(A.x),angle(A.y),angle(A.z); return A; }
+Vector operator ~(_Vector v){ return (Vector){v.x,-v.y,v.z}; } // другого борта
+bool intor( _Real F,_Real S,_Real G )          // с включением базовой точки G
+                 { return G>F ? F<S^S>G :            // S>F && S<=G == ]F<S<=G]
+                          G<F ? F>S^S<G : S==G; }    // S<F && S>=G == [G<=S<F[
+bool intoi( _Real F,_Real S,_Real G ){ return (S-F)*(S-G)<=0.0; } // с захватом
+bool intox( _Real F,_Real S,_Real G ){ return (S-F)*(S-G)<0.0; }  //   и без
+
 #if 0                                 /// -- временно  исключено
 operator Flex::Vector*(){ return P; } // адресный доступ ко всему вектору точек
 Vector Flex::Get( int k )         // выборка с изъятием из существующего списка

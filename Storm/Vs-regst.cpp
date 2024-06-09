@@ -42,7 +42,7 @@ void Model_Config( Window* Win ){ byte &St=Vessel->Statum,ans=St;
 //!                                       максимум всегда на предыдущем отсчёте
 static bool shortEx=false;
 static bool extFix( Real *W, Real &c )
-{ bool ret=false; c=e5( c );
+{ bool ret=false; e6( c );
   if( c!=W[1] )                       // сопоставление с предыдущей величиной
   if( (c-W[1])*(W[1]-W[0])<=0.0 )     // экстремум на предыдущем отсчете W[1]
   { ret=!shortEx;                     // будет включен по полному списку всегда
