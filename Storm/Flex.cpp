@@ -37,7 +37,19 @@ bool intor( _Real F,_Real S,_Real G )          // с включением баз
                           G<F ? F>S^S<G : S==G; }    // S<F && S>=G == [G<=S<F[
 bool intoi( _Real F,_Real S,_Real G ){ return (S-F)*(S-G)<=0.0; } // с захватом
 bool intox( _Real F,_Real S,_Real G ){ return (S-F)*(S-G)<0.0; }  //   и без
-
+//    Интерполяция с разрезанием шпангоутов для фиксации точек на ватерлинии
+//     ... отчасти исключаются из рассмотрения вершины пустых треугольников
+Real Inter( _Real x,_Real x0,_Real x1,_Real y0,_Real y1 ) //~ любое направление
+{ if( x==x0 )return y0;                                 // точное совпадение по
+  if( x==x1 )return y1;                                 // крайним аргументам и
+//if( x==x1 || x0==x1 )return y1;                       // повторное совпадение
+  if( x0==x1 )return (y0+y1)/2;                         // среднеарифметическое
+              return y0+(x-x0)*(y1-y0)/(x1-x0);         // ? и беда при малом h
+}
+Vector Inter( _Real x, _Real x0,_Real x1, _Vector v0,_Vector v1 )
+{ if( x==x0 )return v0; if( x==x1 )return v1; if( x0==x1 )return 0.5*(v0+v1);                       // среднеарифметическое
+  return v0 + ( v1-v0 )*( (x-x0)/(x1-x0) );             // беда при малом x1-x0
+}
 #if 0                                 /// -- временно  исключено
 operator Flex::Vector*(){ return P; } // адресный доступ ко всему вектору точек
 Vector Flex::Get( int k )         // выборка с изъятием из существующего списка
@@ -52,7 +64,7 @@ Vector Flex::operator()( Real arg )           +++ необходима пров�
     }                           // последовательность в трехмерном пространстве
   }
 //!    Параболическая интерполяция (второго порядка) по трём точкам (варианты)
-//
+//                             аргумент внутри интервала аргумента для [A-B-C]
 inline Vector x_Value( _Vector A, _Vector B, _Vector C, _Real x )
 { Real a=x-A.x,b=x-B.x,c=x-C.x,ab=A.x-B.x,bc=B.x-C.x,ac=A.x-C.x;
        return A*(b*c/ab/ac) - B*(a*c/ab/bc) + C*(a*b/ac/bc);
@@ -60,7 +72,7 @@ inline Vector x_Value( _Vector A, _Vector B, _Vector C, _Real x )
 inline Vector y_Value( _Vector A, _Vector B, _Vector C, _Real y )
 { Real a=y-A.y,b=y-B.y,c=y-C.y,ab=A.y-B.y,bc=B.y-C.y,ac=A.y-C.y;
        return A*(b*c/ab/ac) - B*(a*c/ab/bc) + C*(a*b/ac/bc);
-} //#else
+} //! #else
 inline Vector x_Value( _Vector a, _Vector b, _Vector c, _Real x )
 { Vector ba=(b-a)/(b.x-a.x),cb=(c-b)/(c.x-b.x);
        return a + ba*(x-a.x) + (cb-ba)*((x-a.x)*(x-b.x)/(c.x-a.x)); }

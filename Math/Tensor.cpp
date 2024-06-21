@@ -37,7 +37,29 @@ Vector& Vector::operator*=( _Vector d )  // произведение ортог�
   { Real a=y*d.z-z*d.y,b=z*d.x-x*d.z; z=x*d.y-y*d.x; x=a; y=b; return *this; }
                 // покомпонентное произведение/сопоставление скалярных поправок
 Vector& Vector::operator&=( _Vector d ){ x*=d.x,y*=d.y,z*=d.z; return *this; }
-
+  //
+  //      Три поворота вектора относительно совместной координатной системы
+  //
+Vector& Vector::rotX( _Real a )
+            { Real c=cos(a),s=sin(a),w=y*c-z*s; z=z*c+y*s; y=w; return *this; }
+Vector& Vector::rotY( _Real a )
+            { Real c=cos(a),s=sin(a),w=z*c-x*s; x=x*c+z*s; z=w; return *this; }
+Vector& Vector::rotZ( _Real a )
+            { Real c=cos(a),s=sin(a),w=x*c-y*s; y=y*c+x*s; x=w; return *this; }
+//
+//     Элементарные и раскрываемые операции-функции
+//
+const Real  sqr( _Real a ){ return a*a; }
+const Real  abs( _Real a ){ return fabs( a ); }
+const Real norm( _Real a,_Real b ){ return a*a + b*b; }
+const Real norm( _Real a,_Real b,_Real c ){ return a*a + b*b + c*c; }
+const Real norm( _Vector a ){ return a.x*a.x + a.y*a.y + a.z*a.z; }
+Real   abs(_Vector a ){ Real n=norm(a); if( n>0 )return sqrt( n ); return 0; }
+Vector dir(_Vector a ){ Real n=norm(a); if( n>0 )return a/sqrt(n); return Zero;}
+Vector In3(_Vector A,_Vector B,_Vector C,_Real x)// Кривая в трёх точках
+{ return (A*(x-1)*x+C*x*(x+1))/2-B*(x+1)*(x-1); }// с координатами A:-1,B:0,C:1
+Vector In2(_Vector A,_Vector B,_Real x )  // Прямая линия по двух точкам
+{ return A*(1-x) + B*x; }                        // единичных координат A:0,B:1
 
 /*                                                          встречный вектор
 Vector operator - ( Vector a ){ a.x=-a.x,a.y=-a.y,a.z=-a.z; return a; }

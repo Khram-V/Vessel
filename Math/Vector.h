@@ -4,7 +4,7 @@
  **/
 #ifndef __Vector_
 #define __Vector_
-#include <math.h>
+//#include <math.h>
 #include "../Type.h"
                                               //
 struct Point;  typedef const Point& _Point;   // точка дальних мировых отсчетов
@@ -37,9 +37,9 @@ struct Vector       // Определение векторных операци�
   //
   //      Три поворота вектора относительно совместной координатной системы
   //
-  Vector& rotX(_Real a ){ Real c=cos(a),s=sin(a),w=y*c-z*s; z=z*c+y*s; y=w; return *this; }
-  Vector& rotY(_Real a ){ Real c=cos(a),s=sin(a),w=z*c-x*s; x=x*c+z*s; z=w; return *this; }
-  Vector& rotZ(_Real a ){ Real c=cos(a),s=sin(a),w=x*c-y*s; y=y*c+x*s; x=w; return *this; }
+  Vector& rotX(_Real a ); //{ Real c=cos(a),s=sin(a),w=y*c-z*s; z=z*c+y*s; y=w; return *this; }
+  Vector& rotY(_Real a ); //{ Real c=cos(a),s=sin(a),w=z*c-x*s; x=x*c+z*s; z=w; return *this; }
+  Vector& rotZ(_Real a ); //{ Real c=cos(a),s=sin(a),w=x*c-y*s; y=y*c+x*s; x=w; return *this; }
   //
   //      Две операции переформатирован и для открытия доступа
   //       ко всяким стандартным и различным пакетам программ
@@ -48,6 +48,8 @@ struct Vector       // Определение векторных операци�
   operator Real*(){ return (Real*)this; }         // это для вектора OpenGL-3dv
 //operator float*(){ static float b[3]; b[0]=x,b[1]=y,b[2]=z; return b; }
 };
+const Vector Zero={ 0,0,0 },Zenit={ 0,0,1 };
+//
 //     Арифметические операции с векторами в (не)дружественной среде
 //                                                             встречный вектор
 bool   operator ! ( _Vector ), operator + ( _Vector ),
@@ -78,23 +80,22 @@ struct Point     // Координатная точка в масштабах а
  friend Point  operator + ( Point c,_Vector e ){ return c+=e; }
  friend Point  operator - ( Point c,_Vector e ){ return c-=e; }
  friend Vector operator - (_Point c,_Point e )
-             { return (Vector){c.X-e.X,c.Y-e.Y,c.Z-e.Z }; }
+             { return (Vector){ c.X-e.X,c.Y-e.Y,c.Z-e.Z }; }
 //operator Vector(){ return *((Vector*)this); }
-  operator Real*(){ return (Real*)this; }     // для внешних операций и графики
+ operator Real*(){ return (Real*)this; }     // для внешних операций и графики
 };
 //
 //     Элементарные и раскрываемые операции-функции
 //
-inline const Real   sqr( _Real a ){ return a*a; }
-inline const Real   abs( _Real a ){ return fabs( a ); }
-inline const Real  norm( _Real a,_Real b ){ return a*a + b*b; }
-inline const Real  norm( _Real a,_Real b,_Real c ){ return a*a + b*b + c*c; }
-inline const Real  norm( _Vector a ){ return a.x*a.x + a.y*a.y + a.z*a.z; }
-inline Real   abs( _Vector a ){ Real n=norm( a ); return n>0.0?sqrt( n ):0.0; }
-inline Vector dir( _Vector a ){ Real n=norm( a ); return n>0.0?a/sqrt( n )
-                                                           : (Vector){0,0,0}; }
-inline Vector In3(_Vector A,_Vector B,_Vector C,_Real x)// Кривая в трёх точках
-{ return (A*(x-1)*x+C*x*(x+1))/2-B*(x+1)*(x-1); }// с координатами A:-1,B:0,C:2
-inline Vector In2(_Vector A,_Vector B,_Real x )  // Прямая линия по двух точкам
-{ return A*(1-x) + B*x; }                        // единичных координат A:0,B:1
+const Real  sqr(_Real a );                // { return a*a; }
+const Real  abs(_Real a );                // { return fabs( a ); }
+const Real norm(_Real a,_Real b );        // { return a*a + b*b; }
+const Real norm(_Real a,_Real b,_Real c); // { return a*a + b*b + c*c; }
+const Real norm(_Vector a );              // { return a.x*a.x+a.y*a.y+a.z*a.z;}
+Real   abs(_Vector a );                  // { return sqrt( norm( a ) ); }
+Vector dir(_Vector a );                  // { return a/sqrt( norm( a ) ); }
+Vector In3(_Vector A,_Vector B,_Vector C,_Real x ); // Кривая в трёх точках
+//{return(A*(x-1)*x+C*x*(x+1))/2-B*(x+1)*(x-1);} // с координатами A:-1,B:0,C:1
+Vector In2(_Vector A,_Vector B,_Real x );        // Прямая линия по двух точкам
+//{ return A*(1-x) + B*x; }                      // единичных координат A:0,B:1
 #endif

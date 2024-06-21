@@ -132,7 +132,7 @@ int main( int Ac, char **Av )
       printf( " %8ld Read %s ",FileLength=( FileData.nFileSizeHigh*MAXDWORD )
                                + FileData.nFileSizeLow,done?"Write":"Only" );
       if( done && FileLength )
-      { if( (Fi=fopen( FileData.cFileName,"rt" ))!=NULL )
+      { if( (Fi=fopen( FileData.cFileName,"rb" ))!=NULL )
         { int Len,m,e=0,t=abs( T );
           long ni=0,no=0; S=OutPut( 0 ); ic=0;      //! установка нового буфера
           while( (inS=getString( Fi ))!=NULL )
