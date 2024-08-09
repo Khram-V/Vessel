@@ -154,6 +154,7 @@ inline complex operator * ( complex c,const double& r ){ c.x*=r; c.y*=r; return 
 inline complex operator + ( complex c,const complex& e ){ c.x+=e.x; c.y+=e.y; return c; }
 inline complex polar( const double& a ){ return (complex){ cos( a ),sin( a ) }; }
 inline complex exp( const complex& c ){ return polar( c.y )*exp( c.x ); }
+inline Real e5( _Real R ){ return round( R*1e5 )/1e5; }
 //
 //  ... и все-таки нужна подборка стандартных цветов (без перевыбора)...
 //

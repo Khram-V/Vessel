@@ -65,8 +65,8 @@ Real Hydrostatic::In( Real z, Real *F ) // nZ>2 всегда
 }
 Hydrostatic::Hydrostatic(): Lmax( Depth ),Lmin( Do )
 { int i,k; Real x,z; EpsV=Volume/1000;
-  dX=Lmx/(nX-1);
-  dZ=(Depth-Do)/(nZ-1);                  // Do - предустанавливается при вызове
+  dX=Lmx/nX; //(nX-1);
+  dZ=(Depth-Do)/nZ; //(nZ-1);            // Do - предустанавливается при вызове
   for( z=Do,k=0; k<nZ; k++,z+=dZ )       //  Y - таблица плазовых ординат
   { for( x=Xo,i=0; i<nX; i++,x+=dX )Y[k][i]=Kh.Y( x,z );
         aX[k]=Kh.Asx.G( z ); sX[k]=Kh.Stx.G( z ); // абсциссы и
@@ -81,10 +81,10 @@ Hydrostatic::Hydrostatic(): Lmax( Depth ),Lmin( Do )
 //   корпуса судна, с определением его базовых характеристик
 //
 void Hydrostatic::Initial()      // Процедура предварительного перерасчета всех
-{ int i,k; bool b;               //  массив и характеристик, необходимых для
-  Real R,r,cX,S, x,y,z=Do;  //+dZ/2; построения кривых элементов теоретического
+{ int i,k; // bool b;            //  массив и характеристик, необходимых для
+  Real R,r,cX,S, x,y,z=Do+dZ/2;  //  построения кривых элементов теоретического
   for( k=0; k<nZ; k++,z+=dZ )    //  чертежа судна по массивам плазовых ординат
-  { x=Xo;   //-dX/2;             //  для вычисления площадей, объемов
+  { x=Xo+dX/2;   //-dX/2;        //  для вычисления площадей, объемов
 //  z=Do+dZ*k; //(Real( k )+0.5) //  их моментов инерции (z+1/2 - центр объема)
     R=r=cX=S=0.0;               // Первый прогон интегрирования, нулевая ширина
     for( i=0; i<nX; i++,x+=dX ) //   и метацентрических радиусов
@@ -93,26 +93,31 @@ void Hydrostatic::Initial()      // Процедура предваритель�
       cX+= y*x;
       r += y*y*y;                     // стр.61 у Владимира Вениаминовича С-Т-Ш
       R += y*x*x;
+#if 0
       if( i>0 )b=Y[k][i-1]<=0.0; else b=false;
       if( !i || b )
-      { Real sx=In( z,aX ),sy=max( 0.0,In( z,aY ) );
-        sx = x + (sx-x)*( y+2*sy )/(y+sy)/3;          // центр площади трапеции
-        sy = (y+sy)/2;
-        S += sy;
-        r += sy*sy*sy;
-        R += sy*sx*sx;
-        cX+= sy*sx;
+      { Real ix=In( z,aX ),iy=max( 0.0,In( z,aY ) ),
+        sy = (ix-x)*(y+iy) /dX/4,
+        sx = x - (x-ix)*( y+2*iy )/(y+iy)/3;          // центр площади трапеции
+//        S += sy;
+sy=(y+iy)/dX/2;
+//        r += sy*sy*sy;
+//        R += sy*sx*sx;
+//        cX+= sy*sx;
       }
       if( i<nX-1 )b=Y[k][i+1]<=0.0; else b=false;
       if( i==nX-1 || b )
-      { Real sx=In( z,sX ),sy=max( 0.0,In( z,sY ) );
-        sx = x +  (sx-x)*( y+2*sy )/(y+sy)/3;
-        sy = (y+sy)/2;
-        S += sy;
-        r += sy*sy*sy;
-        R += sy*sx*sx;
-        cX+= sy*sx;
-    } }
+      { Real ix=In( z,sX ),iy=max( 0.0,In( z,sY ) ),
+        sy = (ix-x)*(y+iy) /dX/4,
+        sx = x +  (ix-x)*( y+2*iy )/(y+iy)/3;
+//        S += sy;
+sy=(y+iy)/dX/2;
+//        r += sy*sy*sy;
+//        R += sy*sx*sx;
+//        cX+= sy*sx;
+      }
+#endif
+    }
     Swl[k]=( S*=2*dX );              // Площадь ватерлинии
             cX*=2*dX;                // Статический момент площади ватерлинии
     if( !k ){ Vol[0]=0; zCV[0]=Do; xCV[0]=Xm; if( S>EpsV/dZ )xCV[0]=cX/S; }else
@@ -132,9 +137,16 @@ void Hydrostatic::Initial()      // Процедура предваритель�
   Srf[0]=S=Swl[0];               // Площадь смоченной поверхности
   for( k=1; k<nZ; k++ )          //
   { S+=( Y[k][0]+Y[k-1][0]+Y[k][nX-1]+Y[k-1][nX-1] )*dZ;// без двойки два борта
+    if( k==1 )
+    for( i=1; i<nX; i++ )
+    { S += (Y[0][i-1]+Y[0][i])*dX; //if( i && i<nX-1 )S+=y; // второй борт под трапециями
+    }
     for( i=1; i<nX; i++ )
     { y=Y[k][i]; Real yx=Y[k][i-1],yz=Y[k-1][i];
-      if( y>0||yx>0||yz>0 )S+=sqrt( 1.0+norm( (yx-y)/dX,(yz-y)/dZ ) )*dX*dZ*2;
+      if( y>0||yx>0||yz>0 )
+      { S += y = sqrt( 1.0+norm( (yx-y)/dX,(yz-y)/dZ ) )*dX*dZ*2;
+//      if( i==1 || i==nX-1 )S -= y/2;       // трапеции строго по оконечностям
+      }
     } Srf[k]=S;
   }
   zCV[0]=Do;
@@ -174,14 +186,17 @@ static void Graphic_for_Element
   } else dL=AxisStep( L-=I );
      wC->Set( I,0, I+L,nZ );
    Y=wC->Z( y );
-  uY=wC->Z( y-up );
+  uY=wC->Z( y-up*2 )-Y;
   if( up )
-  { line( I,Y,I+L,Y );
-    for( Real x=int( I/dL+1 )*dL; x<I+L+dL/2; x+=dL )         // Разметка шкалы
-    { line( x,Y,x,uY );
-      if( x>I+dL/5 ) //if( I>=0 || x>0 )
-      stWin->Alfabet(16,"Times").Text(up>0?_South_West:_North_West,x,Y,0,"%.9g",x);
-    } stWin->Alfabet(19,"Times").Text(up>0?_South_East:_North_East,I,Y,0,Label );
+  { Real x=int( I/dL )*dL;
+    line( I,Y,I+L,Y );
+//    for( Real x= x<I+L+dL/2; )   //x+=dL )    // Разметка шкалы
+//  {
+    for( int i=0; x<I+L+dL/5; i++,x+=dL/5 )
+    { line( x,Y,x,i%5?Y+uY/3:Y+uY );
+      if( i>0 && i%5==0 )
+      stWin->Alfabet(16,"Times").Text(up>0?_South_West:_North_West,x,Y+uY/5,0,"%.9g",e5(x));
+    } stWin->Alfabet(19,"Times").Text(up>0?_South_East:_North_East,I,Y+uY/5,0,Label );
   }
   if( C )
   { glBegin( GL_LINE_STRIP );
@@ -359,28 +374,28 @@ void Hydrostatic::Stability_Lines()           // Быстрая отрисовк
  complex dC; Lmin=Lmax=0.0;
   if( w1*dW*2 < dZ )w1 = dZ/dW/2+1;                   // проверка доступности
   if( wN*dW*2 > Depth-dZ )wN = (Depth-dZ)/dW/2;       // интервала ватерлиний
- Real aP[nA][(wN-w1)*2+1];                             // Res[a,d]
+ Real aP[nA][(wN-w1)*2+1];                            //  Res[a,d]
   //
   //  Процедура пересчета всех массивов к равнообъёмным накренениям
   //
   for( j=0; j<nA; j++,A+=dA )
   { for( k=1; k<nZ; k++ )
-    { Real V=Vol[k];                              // Поиск аргумента-осадки
+    { Real V=Vol[k];                                // Поиск аргумента-осадки
       for( i=1; aV[j][i]<V && i<nZ-1; )i++;         //   по грузовому размеру
-      Sw[k]=i-(aV[j][i]-V)/(aV[j][i]-aV[j][i-1]); // - индексная метка осадки
+      Sw[k]=i-(aV[j][i]-V)/(aV[j][i]-aV[j][i-1]);   // - индексная метка осадки
     }
     for( k=w1*2; k<=wN*2; k++ )                 // расчетные плечи остойчивости
-    { Real dV,z=k*dW-Do,&Sm=aP[j][k-w1*2];      // формы/статики ...
-      int m=z/dZ,i=int( Sw[m] );                // интерполяция к теоретическим
-      if( i<0 )i=0; else if( i>=nZ-1 )i=nZ-2;   // ватерлиниям -- только --
-      if( m<0 )m=0; else if( m>=nZ-1 )m=nZ-2;   // -- с одной промежуточной
+    { Real dV,z=k*dW-Do+dZ,&Sm=aP[j][k-w1*2];   // формы/статики ...
+      int m=minmax( 0,int( z/dZ ),nZ-1 );       // интерполяция к теоретическим
+      int i=minmax( 0,int( Sw[m] ),nZ-2 );      // ватерлиниям -- только --
+                                                // -- с одной промежуточной
       dV = Sw[m]-i;                             //  0 - от центра величины
       dC = aC[j][i+1]*dV + aC[j][i]*( 1-dV );   //  1 - Метацентрическая высота
       switch( Mode&0x3 )                        //  2 - относительно ватерлинии
-      { case 0: Sm=dC.y-( In( z,zCV )+Zmet-Do )*sin( A ); break; // 3 ЦТ над ОЛ
+      { case 0: Sm=dC.y-( In( z,zCV )+Zmet-Do )*sin( A ); break;
         case 1: Sm=dC.y-( In( z,zM )-Zmet-Do )*sin( A ); break;
-        case 2: Sm=dC.y-( k*dW+Zmet-Do )*sin( A ); break;
-        case 3: Sm=dC.y-( Zmet-Do )*sin( A );
+        case 2: Sm=dC.y-( z+Zmet  )*sin( A ); break;
+        case 3: Sm=dC.y-( Zmet-Do )*sin( A );                   // 3 ЦТ над ОЛ
       }
       if( Sm>Lmax )Lmax=Sm; else if( Sm<Lmin )Lmin=Sm;
   } }
@@ -406,6 +421,10 @@ static bool Mouse_in_Window( int x, int y )
   if( wS->Is( x,y ) )M=wS; else
   if( wC->Is( x,y ) )M=wC; else
   if( wT->Is( x,y ) )M=wT; else M=NULL;
+/*
+glEnable( GL_COLOR_LOGIC_OP );
+glLogicOp( GL_XOR ); => GL_COPY | GL_SET
+*/
   if( M ){ gl_LIGHTRED; MPL->Print( 1,1,"%s \n%s=%.2f, %s=%.2f ",
                         M->iD,M->sX,M->wX(x),M->sZ,M->wZ(y) ); } MPL->Show();
   return false;

@@ -41,17 +41,17 @@ Hull& Hull::Contour_Lines()      // рисуем контуры габаритн
     { R = -Traverse + Traverse*( s/S ); R.z=w; dot( F.Wave(Trun,R)); } glEnd();
   }
   // пусть будет еще лишняя сотня кривых линий вертикальных граней жидких ячеек
-  //
-  dS=( S=abs( Traverse ) )/120.0; glLineWidth( 0.01 );   // длина и шаг профиля
-  for( Real s=0; s<S*2; s+=dS )
+  //                                          0.01
+  dS=( S=abs( Traverse ) )/120.0; glLineWidth( 0.1 ); // длина и шаг профиля и
+  for( Real s=0; s<S*2; s+=dS )           //! зелёные стрелки скоростей течений
   { R=Traverse*( s/S )-Traverse; color( lightgreen ); glBegin( GL_LINE_STRIP );
-    for( R.z=0; R.z>=D; R.z+=dQ )dot( F.Wave(Trun,R) ); glEnd(); color( cyan );
+    for( R.z=0; R.z>=D; R.z+=dQ )dot( F.Wave(Trun,R) ); glEnd(); color( green );
     for( R.z=0; R.z>=D; R.z+=dP ){ P=F.WaveV(Trun,R,V); arrow(P,P+V,abs(V)/6); }
   }
   dS=( S=abs( Ahead ) )/120.0;
   for( Real s=0; s<S*2; s+=dS )
   { R=Ahead*( s/S )-Ahead; color( lightgreen ); glBegin( GL_LINE_STRIP );
-    for( R.z=0; R.z>=D; R.z+=dQ )dot( F.Wave(Trun,R) ); glEnd(); color( cyan );
+    for( R.z=0; R.z>=D; R.z+=dQ )dot( F.Wave(Trun,R) ); glEnd(); color( green );
     for( R.z=0; R.z>=D; R.z+=dP ){ P=F.WaveV(Trun,R,V); arrow(P,P+V,abs(V)/6); }
   } glLineWidth( 1 ); return *this;
 }
@@ -80,7 +80,7 @@ Hull& Hull::NavigaInform( Window *Win )
  Vector C=Head[-1]; C.z+=_Ph;    // крен, дифферент и курс корабля(в геобазисе)
  int i,l=-0.18*hypot( Win->Width,Win->Height );       // размер из аксонометрии
  bool GMod = (DrawMode&8)==0;  // режим с разделением графиков качки и ходкости
- Place Compass( Win,PlaceOrtho );  // | PlaceAbove ~~ cлучай единичной разметки
+ Place Compass( Win,PlaceOrtho );  // | PlaceAbove ~~ случай единичной разметки
  TextContext TS( true );
   if( Win!=this || !GMod )Compass.Area( 0,0,1.25*l,l );
                     else  Compass.Area( 1,-6,24,16 );

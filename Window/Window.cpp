@@ -24,7 +24,8 @@ static Window *First=NULL; // первое окно в последовател�
 //
 static bool WinRequest( HWND hWin=NULL )  // текущее состояние запросов Windows
 { MSG WinMsg; if( PeekMessage( &WinMsg,hWin,0,0,PM_REMOVE ) )
-              { if( WinMsg.message==WM_QUIT )exit( WinMsg.wParam ); else
+              { //if( WinMsg.message==WM_QUIT )
+                //{ while( First )First->Close(); exit( WinMsg.wParam ); } else
                 { TranslateMessage( &WinMsg );
                    DispatchMessage( &WinMsg );
                 } return true;
@@ -165,6 +166,7 @@ bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
                         return true;           // 3 -> просто на выход
       } PutChar( Key );                        // и ещё одна запись в буфер
     }   break;
+//  case WM_QUIT: while( First )First->Close(); exit( 16 );
     case WM_CLOSE: Close();         // =16 - сигнал о возможности закрытия окна
       DestroyWindow( hWnd ); break; // внутри идёт запрос закрытия окна Windows
     case WM_DESTROY:     // =2 здесь должны быть закрыты все внутренние объекты
@@ -279,7 +281,7 @@ void Window::Close()                 // Разрушение окна в обр�
 //!   Позиционирование окон по правилам Windows
 //!
 Window& Window::Locate( int X,int Y, int W,int H )     // по правилам Windows
-{ int BX=1,BY=1,BC=0;                                 // позиционирование идет
+{ int BX=1,BY=1,BC=0; //const int x=X,y=Y,w=W,h=H;    // позиционирование идет
   if( Title ){ BC=GetSystemMetrics( SM_CYCAPTION );  // от левого верхнего угла
                BY=GetSystemMetrics( SM_CYSIZEFRAME );
                BX=GetSystemMetrics( SM_CXSIZEFRAME ); }
@@ -294,6 +296,7 @@ Window& Window::Locate( int X,int Y, int W,int H )     // по правилам 
     // wglMakeCurrent( NULL,NULL );                  // - закрытие OpenGL
     ReleaseDC( hWnd,hDC ); hDC=0;
     // SetWindowPos( hWnd,HWND_TOP,WindowX,WindowY,W,H,SWP_SHOWWINDOW );
+    // MoveWindow( hWnd,x,y,w,h,true );
     MoveWindow( hWnd,WindowX,WindowY,W,H,true );
     hDC=GetDC( hWnd );
     // UpdateWindow( hWnd );

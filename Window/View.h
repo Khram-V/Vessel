@@ -36,4 +36,8 @@ public: View( const char* Title,int X=0,int Y=0,int W=0,int H=0,_Real Size=1 );
 virtual bool KeyBoard( byte Keyb );
 virtual bool Draw();
 };
+/*
+  glEnable( GL_COLOR_LOGIC_OP );
+  glLogicOp( GL_XOR ); => GL_COPY | GL_SET
+*/
 #endif // __View_

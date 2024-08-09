@@ -5,7 +5,6 @@
 		<Option title="Hull of Ship optimisation" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="Ship/" />
 		<Build>
 			<Target title="Hull">
 				<Option output="../../Work/Hull" prefix_auto="1" extension_auto="1" />
@@ -27,6 +26,15 @@
 					<Add library="dl" />
 				</Linker>
 			</Target>
+			<Target title="Ship">
+				<Option output="../../Work/Ship" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../Ship/Ships" />
+				<Option object_output="Dev/Obj" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option parameters='&quot;Fregate type 23-11.fbm&quot;' />
+				<Option projectLinkerOptionsRelation="2" />
+			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Os" />
@@ -45,43 +53,69 @@
 			<Add library="comdlg32" />
 			<Add library="gomp" />
 		</Linker>
-		<Unit filename="../Math/Complex.h" />
+		<Unit filename="../Math/Complex.h">
+			<Option target="Hull" />
+			<Option target="Hull-64" />
+		</Unit>
 		<Unit filename="../Ship/Hull.cpp">
-			<Option virtualFolder="Ship/" />
+			<Option target="Hull" />
+			<Option target="Hull-64" />
 		</Unit>
 		<Unit filename="../Ship/Hull.h">
-			<Option virtualFolder="Ship/" />
+			<Option target="Hull" />
+			<Option target="Hull-64" />
 		</Unit>
 		<Unit filename="../Ship/K-Frame.cpp">
-			<Option virtualFolder="Ship/" />
+			<Option target="Hull" />
+			<Option target="Hull-64" />
 		</Unit>
 		<Unit filename="../Ship/K-Hull.cpp">
-			<Option virtualFolder="Ship/" />
+			<Option target="Hull" />
+			<Option target="Hull-64" />
 		</Unit>
 		<Unit filename="../Ship/K-Math.cpp">
-			<Option virtualFolder="Ship/" />
+			<Option target="Hull" />
+			<Option target="Hull-64" />
 		</Unit>
 		<Unit filename="../Ship/K-Statics.cpp">
-			<Option virtualFolder="Ship/" />
+			<Option target="Hull" />
+			<Option target="Hull-64" />
 		</Unit>
 		<Unit filename="../Ship/K_Michell.cpp">
-			<Option virtualFolder="Ship/" />
+			<Option target="Hull" />
+			<Option target="Hull-64" />
 		</Unit>
 		<Unit filename="../Ship/K_Wave.cpp">
-			<Option virtualFolder="Ship/" />
+			<Option target="Hull" />
+			<Option target="Hull-64" />
 		</Unit>
 		<Unit filename="../Ship/K_WaveAta.cpp">
-			<Option virtualFolder="Ship/" />
+			<Option target="Hull" />
+			<Option target="Hull-64" />
 		</Unit>
-		<Unit filename="../Ship/K_WaveGot.cpp" />
+		<Unit filename="../Ship/K_WaveGot.cpp">
+			<Option target="Hull" />
+			<Option target="Hull-64" />
+		</Unit>
+		<Unit filename="../Ship/Ship.cpp">
+			<Option target="Ship" />
+		</Unit>
+		<Unit filename="../Ship/Ship.h">
+			<Option target="Ship" />
+		</Unit>
+		<Unit filename="../Ship/Ship_IO.cpp">
+			<Option target="Ship" />
+		</Unit>
 		<Unit filename="../Tools/Allocate.cpp" />
 		<Unit filename="../Tools/FileOpen.cpp" />
 		<Unit filename="../Tools/Ship.Rc">
 			<Option compilerVar="WINDRES" />
-			<Option virtualFolder="Ship/" />
 		</Unit>
 		<Unit filename="../Tools/StrCpy.cpp" />
 		<Unit filename="../Type.h" />
+		<Unit filename="../Window/ConIO.cpp">
+			<Option target="Ship" />
+		</Unit>
 		<Unit filename="../Window/Julian.cpp" />
 		<Unit filename="../Window/UniCode.cpp" />
 		<Unit filename="../Window/Window-Free.cpp">
@@ -91,9 +125,18 @@
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="../Window/Window.cpp" />
-		<Unit filename="../Window/Window.h" />
-		<Unit filename="../Window/Window_Help.cpp" />
-		<Unit filename="../Window/Window_Menu.cpp" />
+		<Unit filename="../Window/Window.h">
+			<Option target="Hull" />
+			<Option target="Hull-64" />
+		</Unit>
+		<Unit filename="../Window/Window_Help.cpp">
+			<Option target="Hull" />
+			<Option target="Hull-64" />
+		</Unit>
+		<Unit filename="../Window/Window_Menu.cpp">
+			<Option target="Hull" />
+			<Option target="Hull-64" />
+		</Unit>
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

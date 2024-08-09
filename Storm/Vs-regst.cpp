@@ -178,6 +178,7 @@ Hull& Hull::wPrint( bool log ) // информация по смоченному
         Speed/sqrt(_g*Length),sqr(Speed)*_Pd/_g/Length,Volume,iV,Surface,iS,
         Floatage,iF,Metacenter.x,vM.x,Gravity.z,hX,vM.z,Metacenter.y,vM.y ),
   print( 80,8,"Statum{ %X } ",Statum ), // printB( Statum );
+  print( 28,13, "P:{%6.1f,%.1f,%-6.1f}  ",vP.x,vP.y,vP.z );
   textcolor( WHITE );
   print( 28,14, "C:{%6.1f,%.1f,%-6.1f}  ",vB.x,vB.y,vB.z );
   textcolor( LIGHTCYAN ),
@@ -209,9 +210,9 @@ Hull& Hull::wPrint( bool log ) // информация по смоченному
     print(59,19,"│ %7.1f  %-8.1f  %-9.0f │ ",inMass.z.x,inMass.z.y,inMass.z.z);
 
     textcolor( CYAN ); print( 1,38,fname( fext( FileName ) ) );
-    if( !VIL ){ textcolor( MAGENTA ); printf( " <= без протокола" ); } else
+    if( !VIL ){ textcolor( MAGENTA ); print( " <= без протокола" ); } else
     if( Educt&0xFF )
-    { textcolor( GREEN ); printf( " <=%s: %s%s; %s%s%s{%s%s%s}",
+    { textcolor( GREEN ); print( " <=%s: %s%s; %s%s%s{%s%s%s}",
       Educt&0x200?"кратко":"полно",Educt&1?" ход,":"",Educt&2?" курс":"",
       Educt&4?" вертикаль,":"",Educt&8?" борт,":"",Educt&16?" киль ":"",
       Educt&32?"корма,":"",Educt&64?"мидель,":"",Educt&128?"нос":"" );

@@ -22,7 +22,8 @@ const char
              "Ost","OtS","OSO","SOtO","SO","SOtS","SSO","StO", // + роза ветров
            "Su\"d","StW","SSW","SWtS","SW","SWtW","WSW","WtS", // ῥόμβος — юла
             "West","WtN","WNW","NWtW","NW","NWtN","NNW","NtW" },
- *Model[]={ "Кинематика качки в 4-х точках на склонах волн",  // ⌠ Hull::Statum
+//*Model[]={"Кинематика качки в 4-х точках на склонах волн",  // ⌠ Hull::Statum
+ *Model[]={ "Кинематика пяти точек шаблона на склонах волн",  // ⌠ Hull::Statum
             "Объёмная плавучесть переменного водоизмещения",  // │
             "Давление смоченных элементов бортовой обшивки",  // │
             "Давление на встречном потоке без морских волн",  // │
@@ -64,7 +65,7 @@ Hull::Hull(): View     // в прицепе View окошко графическ
   Locate( Zero ),                // прямая ссылка на текущее местоположение [м]
   Route(),Rate(),Head(),Whirl(),Mix() // конструкторы для кинематики во времени
 { Vessel=this;                  // ссылка на корпус, пусть будет внешний доступ
-  Nframes=Mid=0; Length=Breadth=Draught=1.0; vC=vR=vS=vD=Zero;
+  Nframes=Mid=0; Length=Breadth=Draught=1.0; vC=vR=vS=vD=vP=Zero;
   nF=muF=(Vector){ 0.1,0.8,0.6 }; // демпфер по абсциссе, ординате и аппликате
   nM=muM=(Vector){ 0.2,0.6,0.8 }; // ... по бортовой, килевой качке и рысканию
   Ofs=Zero; mx=my=0;              // и мышку тоже в исходное
@@ -101,7 +102,9 @@ Hull::Hull(): View     // в прицепе View окошко графическ
  int Ac; WCHAR **Av=CommandLineToArgvW( GetCommandLineW(),&Ac );
   if( !Read(  Ac>1 ? W2U( Av[1] ) : "Aurora.vsl" ) )
        Break( "Ошибка считывания корпуса %s -> %s",W2U( Av[1] ),FileName );
-  Window::Locate( Xpm( 4 ),Ypm( 4 ),Xpm( 64 ),Ypm( 72 ) ).Clear();
+//Window::Locate( Xpm( 4 ),Ypm( 4 ),Xpm( 64 ),Ypm( 72 ) ).Clear();
+  Window::Locate( Xpm( 4 ),Ypm( 4 ),min( 1280L,Xpm( 64 ) ),
+                                    min( 1024L,Ypm( 72 ) ) ).Clear();
   Distance*=1.08;
   look.x=1;
   look.y=-2; //eye.y=-10;
@@ -456,8 +459,8 @@ int main()                                 // ( int ans, char **av, char **ac )
 #endif
   textsize( 92,40 ),
   texttitle( Title ),
-  textcolor( WHITE ),print(2,1,Title),textcolor( LIGHTCYAN ),printf(SubTitle),
-  textcolor( CYAN ),printf(CopyRight),textcolor( LIGHTGREEN ),print( 1,27,
+  textcolor( WHITE ),print(2,1,Title),textcolor( LIGHTCYAN ),print(SubTitle),
+  textcolor( CYAN ),print(CopyRight),textcolor( LIGHTGREEN ),print( 1,27,
     " C  [м] - положение мгновенного центра величины (подводного объёма)\n"
     " mC (δ) - матрица ориентации корпуса (корабельные оси в морском базисе)\n"
     " vF [м] - корабельные координаты центра площади действующей ватерлинии\n"
@@ -526,6 +529,6 @@ int main()                                 // ( int ans, char **av, char **ac )
   if( Ship.Ready() )Ship.Close();
   if( Sea.Ready() )Sea.Close();
   textcolor( LIGHTMAGENTA );
-  print( 1,24,"\n << успешное завершение >> " ); _exit( EXIT_SUCCESS );
+  print( 1,24,"\n << успешное завершение >> " ); // _exit( EXIT_SUCCESS );
   return EXIT_SUCCESS;
 }

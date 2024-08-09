@@ -8,33 +8,34 @@
 #include "Aurora.h"
         Flex:: Flex(): len( 0 ),P( NULL ){}
         Flex::~Flex(){ if( len ){ Allocate( 0,P ); len=0; P=NULL; } }
-Vector& Flex:: operator[]( int k ){ return P[minmax(0,k>=0?k:k+len,len-1)]; } // выборка внутренней точки [k]
+Vector& Flex:: operator[]( int k )              // выборка внутренней точки [k]
+  { return P[ minmax( 0,k>=0?k:k+len,len-1 ) ]; }
 Vector& Flex::Insert( int k )                   // вставка точки по индексу [k]
-{ int l=isAlloc( (void*)P )/sizeof( Vector );   //= длина внутри памяти массива
+  { int l=isAlloc( (void*)P )/sizeof( Vector ); //= длина внутри памяти массива
       k=minmax( 0,k,len ); ++len;               //  от нуля до следующей ячейки
-  if( l<=len )P=(Vector*)Allocate( (len+120)*sizeof(Vector),P );          //+48
-  for( l=len-1; l>k; l-- )P[l]=P[l-1]; return P[k];
-}                                 // одна точка вытаскивается и векторного ряда
-void Flex::Delete( int k )        // без укорочения числового массива в памяти
-   { if( k>=0 && k<len )for( --len; k<len; k++ )P[k]=P[k+1];
-   }
+    if( l<=len )P=(Vector*)Allocate( (len+120)*sizeof(Vector),P );        //+48
+    for( l=len-1; l>k; l-- )P[l]=P[l-1]; return P[k];
+  }                              // одна точка вытаскивается из векторного ряда
+void Flex::Delete( int k )       //   без укорочения числового массива в памяти
+  { if( k>=0 && k<len )for( --len; k<len; k++ )P[k]=P[k+1];
+  }
 Vector& Flex::operator+=(_Vector R){ return Insert(len)=R;} // оконечный вектор
 Vector& Flex::operator/=(_Vector R){ return Insert(0)=R;} // замещение в начале
 
-void e6( Real &R ){ R=round( R*1e5 )/1e5; }
+void e6( Real &R ){ R = round( R*1e5 )/1e5; }
 void e6( Vector &W )        // округление записи для точных сравнений 0.01 мм
    { e6( W.x );
      e6( W.y ); // W.y<=eps?0.0:e5( W.y );
-     e6( W.z ); // return W;
+     e6( W.z );
    }
 Real& angle( Real &A ){ return A=remainder( A,_Pd  ); }           // -180°÷180°
 //{ if( A>=0 )A=fmod( A,_Pd ); else A=_Pd-fmod(-A,_Pd ); return A; } // 0°÷360°
 Real angle( _Real A,_Real B ){ return remainder( A-B,_Pd ); }     // A-B: -п÷п
-Vector& angle( Vector &A){ angle(A.x),angle(A.y),angle(A.z); return A; }
+Vector& angle( Vector &A){ angle( A.x ),angle( A.y ),angle( A.z ); return A; }
 Vector operator ~(_Vector v){ return (Vector){v.x,-v.y,v.z}; } // другого борта
 bool intor( _Real F,_Real S,_Real G )          // с включением базовой точки G
-                 { return G>F ? F<S^S>G :            // S>F && S<=G == ]F<S<=G]
-                          G<F ? F>S^S<G : S==G; }    // S<F && S>=G == [G<=S<F[
+          { return G>F ? F<S^S>G :             //       S>F && S<=G == ]F<S<=G]
+                   G<F ? F>S^S<G : S==G; }     //       S<F && S>=G == [G<=S<F[
 bool intoi( _Real F,_Real S,_Real G ){ return (S-F)*(S-G)<=0.0; } // с захватом
 bool intox( _Real F,_Real S,_Real G ){ return (S-F)*(S-G)<0.0; }  //   и без
 //    Интерполяция с разрезанием шпангоутов для фиксации точек на ватерлинии

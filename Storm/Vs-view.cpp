@@ -60,14 +60,14 @@ if( Level<0 )
 //!  сборка сортировкой двух фрагментов ватерлинии в интервале одной шпации
 //           (здесь надо найти локализованное решение по выбору ориентации)
 //
-void Hull::waterPoints( _Vector N,_Vector Q,_Vector P ){ wL+=N;
+void Hull::waterPoints( _Vector N,_Vector Q,_Vector P ){ wL+=N; /// dir( N )??
   if( (Tensor(*this)*(N*(P-Q))).z>=0 ){ wL+=Q; wL+=P; } else { wL+=P; wL+=Q; }
 }
 void Hull::divideTriangle
 ( _Vertex T,_Real t, _Vertex R,_Real r, _Vertex L,_Real l )
 { _Vertex rR=(Vector)T+(R-T)*(t/(t-r)),       // правая точка пересечения ребра
           lL=(Vector)T+(L-T)*(t/(t-l)); Level=t>=0?-1:1;// треугольника и левая
-  if( rR!=lL )waterPoints( dir( (lL-T)*(T-rR) ),lL,rR ); // +++
+  if( rR!=lL )waterPoints( (lL-T)*(T-rR),lL,rR ); // +++
           drawTriangle( T,rR,lL );
   if( !l && !r )return;                 Level=t<0?-1:1;
   if( !l )drawTriangle( L,rR,R ); else
@@ -84,15 +84,15 @@ void Hull::Triangle( Vertex a,Vertex b,Vertex c )     // обработка тр
 //  wLine = a.z>=0.0 && b.z>=0.0 && c.z>=0.0 ? 1:-1; //  действующая ватерлиния
     wLine = a.z+b.z+c.z>=0 ? 1:-1; // здесь пересечений ватерлинии не ожидается
     Level = -2; //wLine*2; //-2;
-    if( aZ==0&&bZ==0 ){ if( cZ>0 )waterPoints( dir((b-c)*(c-a)),b,a ); else Level=2; } else
-    if( bZ==0&&cZ==0 ){ if( aZ>0 )waterPoints( dir((c-a)*(a-b)),c,b ); else Level=2; } else
-    if( cZ==0&&aZ==0 ){ if( bZ>0 )waterPoints( dir((a-b)*(b-c)),a,c ); else Level=2; } else
+    if( !aZ && !bZ ){ if(cZ>0)waterPoints((b-c)*(c-a),b,a); else Level=2; }else
+    if( !bZ && !cZ ){ if(aZ>0)waterPoints((c-a)*(a-b),c,b); else Level=2; }else
+    if( !cZ && !aZ ){ if(bZ>0)waterPoints((a-b)*(b-c),a,c); else Level=2; }else
     if( aZ<=0&&bZ<=0&&cZ<=0 )Level=2; else   // треугольник целиком над волной
     if( aZ>=0&&bZ>=0&&cZ>=0 )Level=-2; else  // треугольник полностью под водой
     { Real ab=aZ*bZ,bc=bZ*cZ,ca=cZ*aZ;       // иначе рассечение по ватерлинии
-      if( ab<0&&ca<=0 ){ divideTriangle( a,aZ,b,bZ,c,cZ ); return; } // выбор вершины
-      if( bc<0&&ab<=0 ){ divideTriangle( b,bZ,c,cZ,a,aZ ); return; } // треугольника
-      if( ca<0&&bc<=0 ){ divideTriangle( c,cZ,a,aZ,b,bZ ); return; } // для деления
+      if( ab<0&&ca<=0){divideTriangle(a,aZ,b,bZ,c,cZ); return;}// выбор вершины
+      if( bc<0&&ab<=0){divideTriangle(b,bZ,c,cZ,a,aZ); return;}// треугольника
+      if( ca<0&&bc<=0){divideTriangle(c,cZ,a,aZ,b,bZ); return;}// для деления
     } drawTriangle( a,b,c );
 } }
 //    Кинематическая постановка корпуса корабля на объединенное волновое поле
@@ -203,7 +203,7 @@ Hull& Hull::Drawing( byte type )  // 0 - DrawMode; 1 - корпус; 2 + про�
   Text( _Up,arrow( K+x*Length*-.6,K+x*Length*.6,ArLen ),     "x" );
                   // белый центр гидродинамических пар сил и реакций - моментов
 //arrow( spot( K,12,blue ),spot( out( vD ),36,maroon ),ArLen ); /// 12,white
-  arrow( spot( K,24,white ),spot( out( vD ),24,lightmagenta ),ArLen/3 );
+//arrow( spot( K,24,white ),spot( out( vD ),24,lightmagenta ),ArLen/3 );
   line( line( C,spot( out( dV ),24,yellow ),green ),F );
   //
   //  четырёхугольник исходных центров площади ватерлинии и величины,
@@ -229,6 +229,8 @@ Hull& Hull::Drawing( byte type )  // 0 - DrawMode; 1 - корпус; 2 + про�
 
   Text( _Down,spot( C,12,blue ),"C" );     // действующий центр величины
   if( C!=P )arrow( spot( P,18 ),C,ArLen ); //   динамика центра величины
+//                 spot( out( vP ),24,lightmagenta );
+  Text( _Down,spot( out( vP ),36,lightmagenta ),"P" );     // действующий центр величины
 
   Text( _Up,spot( M,12,c ),"m " );         // действующий метацентр
   if( S!=M )arrow( spot( S,18 ),M,ArLen ); //  кинематика метацентра тихой воды

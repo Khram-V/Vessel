@@ -12,7 +12,9 @@ char& string::operator[]( int k ) // c контролем размерности
 //  Грубое отсечение всех управляющих кодов и концевых пробелов в строке
 //
 int strcut( char* S )
-{ int len=strlen( S ); S+=len; while(len>0 && *--S<=' ')--len,*S=0; return len;
+{ int len=0;
+  if( S ){ len=strlen( S ); S+=len; while( len>0 && *--S<=' ' )--len,*S=0; }
+  return len;
 }
 //  Адрес имени файла без полного пути по директориям и с отсечением расширения
 //

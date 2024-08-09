@@ -170,8 +170,11 @@ private:      //! подборка скрытых параметров и сво
   bool (*extKey)(byte); //  свободная процедура обработки прерываний клавиатуры
   bool (*extTime)();   // внешняя процедура, на выход запрос нового изображения
 };
-#define Xpm( X ) ( GetSystemMetrics( SM_CXSCREEN )*Real( X )/100.0 )     // %%X
-#define Ypm( Y ) ( GetSystemMetrics( SM_CYSCREEN )*Real( Y )/100.0 )     // %%Y
+#define Xpm( X ) ( ( GetSystemMetrics( SM_CXSCREEN )*long( X ) )/100 ) // %%X
+#define Ypm( Y ) ( ( GetSystemMetrics( SM_CYSCREEN )*long( Y ) )/100 ) // %%Y
+//#define Xpm( X ) ( ( GetSystemMetrics( SM_CXFULLSCREEN )*long(X) )/100 ) // %%X
+//#define Ypm( Y ) ( ( GetSystemMetrics( SM_CYFULLSCREEN )*long(Y) )/100 ) // %%Y
+
 //
 //!  Определения и процедуры управления наложенными фрагментами экрана
 //   реализуется создание, позиционирование, активизация и очистка фрагментов
