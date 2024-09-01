@@ -34,7 +34,7 @@
 				<Option working_dir="Dev" />
 				<Option object_output="Dev/Obj/" />
 				<Option type="0" />
-				<Option compiler="gnu_gcc_stable" />
+				<Option compiler="gcc" />
 				<Compiler>
 					<Add directory="../Tools/Glut" />
 					<Add directory="../Window" />
@@ -297,6 +297,14 @@
 		<Unit filename="../Window/Examples/Window-trial.cpp">
 			<Option target="Window Trial" />
 			<Option target="GLFW Trial" />
+		</Unit>
+		<Unit filename="../Window/Font.cpp">
+			<Option target="Window Trial" />
+			<Option target="Window Shapes" />
+		</Unit>
+		<Unit filename="../Window/Font.h">
+			<Option target="Window Trial" />
+			<Option target="Window Shapes" />
 		</Unit>
 		<Unit filename="../Window/Julian.cpp">
 			<Option target="A-lib64" />

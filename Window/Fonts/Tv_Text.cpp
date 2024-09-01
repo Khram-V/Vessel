@@ -127,3 +127,23 @@ int Bfont::Text( Real X,Real Y,const char* _s ){ return Text(  _ix_(X),_iy_(Y),_
 
 int Bfont::Text( Course d,point p,const char* _s){ return Text(d,p.x,p.y,_s ); }
 int Bfont::Text(          point p,const char* _s){ return Text(  p.x,p.y,_s ); }
+
+////
+///  <<  Второй блок заменяет операции вывода растрового текста >>
+//
+static int Tv_PutText( int x, int y, int _mx, const char *textstring )
+{ if( y>=0 && --y+Tv.Th<=Tv.mY+1 )
+  { unsigned char *_sf; int i,j,k,h;
+    unsigned short bits[16];
+    if( Tv.Th<14 )_sf=(unsigned char*)_8x08,h=8;  else
+//  if( Tv.Th<16 )_sf=(char*)_8x14,h=14; else
+                  _sf=(unsigned char*)_8x16,h=16;
+    for( k=0; textstring[k]; k++,x+=Tv.Tw )
+    { if( x+8>_mx )break;
+      if( x>=0 )
+      { for( i=0,j=h*textstring[k]+h-1; i<h; i++ )bits[i]=~(_sf[j-i]);
+        putbits( x,y+1,9,h,bits,COPY_PUT );
+    } } return k;
+  }     return 0;
+}
+

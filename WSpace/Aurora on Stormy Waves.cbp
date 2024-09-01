@@ -202,6 +202,7 @@
 		<Unit filename="../Window/ConIO.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="../Window/Font.cpp" />
 		<Unit filename="../Window/Julian.cpp" />
 		<Unit filename="../Window/Sym_CCCP.c">
 			<Option compilerVar="CC" />

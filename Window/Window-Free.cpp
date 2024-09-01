@@ -1,8 +1,5 @@
 //
 //! Подборка независимых от среды программирования транзакций в OpenGL
-//
-#include "Window.h"
-//
 //! (пере)Установка размеров рабочей площадки/фрагмента внутри окна Window
 //   если X,Y > 0 - отсчеты от левого верхнего угла, иначе - правого и нижнего
 //   если Width,Height > 0 - отсчеты в символах, если 0 - до самой границы окна
@@ -10,11 +7,11 @@
 //     отсутствие шрифта - подключение окна (не приводит к размеру точки [1x1])
 //
 Place& Place::Area( int X,int Y, int W,int H )   // достаточно сделать шаг
-{ int fw=AF.W,fh=AF.H;                           // единичным и далее по Place,
+{ int fw=Tw,fh=Th;                         // единичным и далее по Place,
 // всё по горизонтали
    if( !W )W=Site->Width;  else if( W<0 )W=-W,fw=1; else W=W*fw; // связанной с
    if( X>0 )X=(X-1)*fw; else X = Site->Width - W + X*fw;      // базовой Window
-       X=minmax( 0,X,Site->Width-AF.W );              // перерасчет с проверкой
+       X=minmax( 0,X,Site->Width-Tw );                // перерасчет с проверкой
    if( X+W>Site->Width  )                             // жертвуем шириной окна
      { if( W==Site->Width )W-=X; else X=max( 0,Site->Width-W ); }
 // затем по вертикали
@@ -27,7 +24,7 @@ Place& Place::Area( int X,int Y, int W,int H )   // достаточно сде�
    if( Img )   // если ранее сохранялась фоновая подложка, то восстанавливается
    if( X!=pX || Y!=pY || Width!=W || Height!=H )Rest();  // растянутая картинка
    pX=X,pY=Y,Width=W,Height=H;
-   if( chY>Height-AF.H )chY=Height-AF.H;            // аппликата верхней строки
+   if( chY>Height-Th )chY=Height-Th;                // аппликата верхней строки
 // if( Signs & PlaceAbove )Save();
    return *this;
 }
@@ -42,6 +39,8 @@ RasterSector::RasterSector( int X,int Y, int W,int H ) // настройка ч�
     glDisable( GL_DEPTH_TEST );
     glDisable( GL_LIGHTING );
   }
+RasterSector::~RasterSector(){ PopMatrix(); }
+
 TextContext::TextContext( bool b ): Base( b )
 //    dp( glIsEnabled( GL_DEPTH_TEST ) ),
 //    cf( glIsEnabled( GL_CULL_FACE ) ),
@@ -53,7 +52,6 @@ TextContext::TextContext( bool b ): Base( b )
   glPolygonMode( GL_BACK,GL_FILL );
 //glListBase( FontBase );
 }
-RasterSector::~RasterSector(){ PopMatrix(); }
 TextContext::~TextContext(){ if( Base )PopMatrix(); else glPopAttrib(); }
 
 Place& Place::Clear( bool back ) // очистка фоном/true или текущим/false цветом
@@ -115,88 +113,3 @@ Window& Window::Refresh()    // сборка изображения с копи�
 }
 Place& Place::Refresh(){ Site->Refresh(); return *this; }// туда же на всё окно
 Window& Window::Above(){ SetForegroundWindow( hWnd ); return Refresh(); }
-//
-//!   Работа с текстами в стиле Microsoft-Windows
-//                              растровый шрифт DOS-OEM(866)alt из эпохи CCCP
-static
-void _OutBitText( const char *str, byte *bit, int &X,int &Y,int bX )
-{ int x=X,w=bit[0]+1,h=bit[1]+2; char c;     // в разборе текста контролируется
-   glPushClientAttrib( GL_CLIENT_PIXEL_STORE_BIT ); // переход на новую строку
-   glPixelStorei( GL_UNPACK_SWAP_BYTES,false );     // Step through the string,
-   glPixelStorei( GL_UNPACK_LSB_FIRST,false );      //  drawing each character.
-   glPixelStorei( GL_UNPACK_ROW_LENGTH, 0 );        // A newline will simply
-   glPixelStorei( GL_UNPACK_SKIP_ROWS,  0 );        // translate the next
-   glPixelStorei( GL_UNPACK_SKIP_PIXELS,0 );        // character's insertion
-   glPixelStorei( GL_UNPACK_ALIGNMENT,  1 );      // point back to the start of
-   while( ( c = *str++ )!=0 )                     // the line and down one line
-    if( c=='\n' ){ glBitmap( 0,0,0,0,-X,-h,NULL ); X=0; Y-=h; } else
-                 { glBitmap( w-1,h-2,         // Bitmap's width and height
-                              -1,1,           // The origin in the font glyph
-                               w,0,           // смещение до новой позиции
-                               bit+2+c*(h-2)  //  + 2 байта и номер Х на высоту
-                           ); X+=w; }         // сдвиг позиции и растра символа
-   if( bX<=0 )X=x; glPopClientAttrib();       // подготовка к следующей строчке
-   glFlush();
-}
-// и стандартный TrueType шрифт Microsoft Windows-Ansi-1251 (1 байт 256 знаков)
-//
-static
-void _OutText( const char *str, int base, int &X,int &Y, int bX,int pX )
-{  glPushAttrib( GL_LIST_BIT );               // собственно печать текста
-   glListBase( base ); glCallLists( strlen( str ),GL_UNSIGNED_BYTE,str );
-   glPopAttrib();
-// glFlush();
-  int P[4]={ 0,0,0,0 };                // для выборки новой позиции chX
-   if( bX>0 ){ glGetIntegerv( GL_CURRENT_RASTER_POSITION,P ); X=P[0]-pX; }
-}
-Place& Place::String( const char *T )  // исходная строка реально не изменяется
-{ TextContext St;
-  RasterSector Sv( pX,pY,Width,Height );        // перекодировка с выбором
-  char *str=UtA( T,AF.Bit!=NULL );              // DOS-866 или Windows-1251
-  while( str )if( !str[0] )break; else
-  { char *w=strchr( str,'\n' ); if( w )w[0]=0;  // намечается следующая строка?
-    if( AF.Bit )
-    { if( cbX<=0 )chX-=strlen(str)*AF.W;
-      glRasterPos2i( chX,chY ); _OutBitText( str,AF.Bit,chX,chY,cbX ); } else
-#if 0                         /// так должно быть, но работает только в Intel
-    { if( cbX<=0 )chX-=AlfaRect( str,true ).cx;
-      glRasterPos2i( chX,chY ); _OutText( str,AF.Base,chX,chY,cbX,pX );
-#else                         // небольшая перепутаница в AMD-OpenGL - что жаль
-    { long l=AlfaRect( str,true ).cx;  if( cbX<=0 )chX-=l; int hk=chX;
-      glRasterPos2i(chX,chY); _OutText( str,AF.Base,chX,chY,cbX,pX );
-      if( chX==hk )chX+=l+1; //
-#endif
-    }
-    if( !w )break; w[0]='\n'; chY-=AF.H; str=w+1;     //  будет еще одна строка
-    if( cbX>0 )chX=(cbX-1)*AF.W; else chX=Width+AF.W*cbX;
-  } return *this;
-}
-//!  Прорисовка плоско/горизонтального текста по предварительному определению
-//!       размеров букв и смещением надписи относительно точки в плоскости XY
-//
-Place& Place::String( Course Dir, const Real *P, const char* T )
-{ TextContext St;
-  int dx,dy; char *str=UtA( T,AF.Bit!=NULL ); // выбор DOS-866 или Windows-1251
-   glRasterPos3d( P[0],P[1],P[2] );           // плоская надпись со смещением
-  SIZE sz=AlfaRect( str,true ); dx= -sz.cx/2; // _Center
-   if( Dir&_East  )dx = 4;      dy= -sz.cy/6; // сдвиги и переносы строк
-   if( Dir&_West  )dx =-sz.cx - 4;            // здесь отключены
-   if( Dir&_North )dy = sz.cy/5 + 3;
-   if( Dir&_South )dy =-sz.cy + 3; glBitmap( 0,0,0,0,dx,dy,NULL );
-   if( AF.Bit )_OutBitText( str,AF.Bit,dx,dy,1 );
-         else  _OutText( str,AF.Base,dx,dy,1,pX ); return *this;
-}
-#include <stdio.h>   // блок для четырёх вариантов текстовых надписей в формате
-#include <stdarg.h>  // с реентерабельной\стековой подстрочкой переменной длины
-#define Arg va_list a; va_start( a,fmt ); int l=vsnprintf( 0,0,fmt,a )+1; \
-              { char s[l]; vsnprintf( s,l,fmt,a ); va_end( a ); String
-#define Str ; } return *this; // просто с "временной" строчкой на всё и про всё
-Place& Place::Print( const char *fmt,... ){ Arg( s )Str }
-Place& Place::Print( int x,_Real y, const char *fmt,... )
-{ cbX=x; chY=y>0 ? Height-AF.H*y : 3-AF.H*y;  // запоминается начальная позиция
-  if( x>0 )chX=(x-1)*AF.W; else chX=Width+AF.W*x; Arg( s )Str
-}
-Place& Place::Text( Course Dir, const Real *P, const char* fmt, ... )
-     { Arg( Dir,P,s )Str }
-Place& Place::Text( Course Dir, _Real X,_Real Y,_Real Z, const char* fmt, ... )
-     { const Real R[]={X,Y,Z }; Arg( Dir,R,s )Str }

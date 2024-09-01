@@ -1,7 +1,29 @@
 //
-//!   Контекстно-связанный интерфейс с экранными окнами для графики OpenGL
-//    формальные построения и динамические переустановки текстовых страниц
-//            и графических фрагментов внутри главного окна Window
+//!  Конструкторы и процедуры сохранения и перерисовки фонового изображения
+//!    - все странички всегда связаны с одним из графических окон Window,
+//!    - однако отсутствие ссылки Prev - показывает,
+//!      что окно исключено из всех операций со списками окон
+//     ( это площадка базового окна или фантомное отображение вне Window )
+//
+Place::Place( Window *Win, byte Mode ): Site( Win ),Signs( Mode ),Up( NULL ),
+       pX( 0 ),pY( 0 ),Width( Win->Width ),Height( Win->Height ),
+       MouseState(0),xo(0),yo(-1),      // беспросветная унылость мышки/курсора
+       Th( 1 ), Tw( 1 ),     // здесь символьные отсчеты ставятся по пиксельным
+       chX(0),chY(0),cbX(1), // место и отступ строки текста от боковой границы
+       extDraw( NULL ),      // свободное рисование без дополнительных настроек
+       extPass( NULL ),      // адреса двух внешних\свободных и бесконтрольных
+       extPush( NULL ),      // процедур для параллельного контроля хода мышки
+           iFn( NULL ),      // шрифтовой блок при нуле будет ссылкой на Window
+           Img( NULL ),      // фоновый растр с наложенной площадкой PlaceAbove
+        isDraw( false ),     //  прорисовка сбрасывается по случаю незавершения
+       isMouse( false )      //     предыдущей операции (во избежание рекурсии)
+{ if( glAct( Win ) )         // связь контекста OpenGL с требуемым окном Window
+  if( this!=(Place*)Win )    // обход неприкасаемого базового окна Window.Place
+  { Place *S=(Place*)Win; Tw=S->Tw; Th=S->Th;
+    chY=Height-Th;           // буквенная позиция изначально будет сверху/слева
+    while( S->Up )S=S->Up; S->Up=this;   // новая площадка набрасывается сверху
+//  if( Site->Up==this )Site->Save();    // первый фрагмент сохраняет фон окна?
+} }
 //
 //!   блок контекстно-зависимых (дружественных) процедур управления фрагментами
 //                  возможно нужна единая ссылка к чистому выходу из прерываний
@@ -19,61 +41,35 @@ Place& Place::Activate( bool act )        // активизация графич
     glMatrixMode(GL_MODELVIEW); glLoadIdentity(); // единичная  матрица  модели
   } return *this;
 }
-//!    Начальная установка базового шрифта, связанного с текущим окном OpenGL
-//
-Place& Place::AlfaBit( unsigned char *DispCCCP )     /// старый советский растр
-{ if( !Fnt )Fnt=(Font*)calloc( sizeof(Font),1 );    // ставится локальный адрес
-  if( !( Fnt->Bit=DispCCCP ) )return Alfabet();    // сходу не линкуется => TTF
-  Fnt->W=(Fnt->Bit)[0]+1,Fnt->H=(Fnt->Bit)[1]+2;
-//wglMakeCurrent( Site->hDC,Site->hRC );
-  if( Fnt->Base )glDeleteLists( Fnt->Base,ListsGroup ); Fnt->Base=0;
-  if( Fnt->hF )DeleteObject( Fnt->hF ); Fnt->hF=0; return *this;
+
+
+
+
+bool Place::Draw()       // в виртуальной среде Draw доступен внутренний пролог
+{ if( Site && extDraw )  // настройки OpenGL с контекстным эпилогом прорисовки
+  { glContext S( Site ); // подготовка среды к внешнему исполнению с рекурсией
+    if( extDraw() )      // -- исполнение внешней независимой транзакции
+      { if( this==Site )Save().Refresh(); else Show(); return false; }
+  } return Site!=NULL;
 }
-//!  Windows TrueType шрифт Courier New-18 устанавливается по умолчанию
-//
-Place& Place::Alfabet( int h, const char *fn, int weight, bool italic )
-{ //wglMakeCurrent( Site->hDC,Site->hRC );
-   if( !Fnt )Fnt=(Font*)calloc( sizeof(Font),1 );   // ставится локальный адрес
-   if( Fnt->Base )glDeleteLists( Fnt->Base,ListsGroup ); Fnt->Base=0;
-   if( Fnt->hF )DeleteObject( Fnt->hF );                 Fnt->Bit=NULL;
-  LOGFONT logfont={};                         // Setup Font characteristics ≡ 0
-   logfont.lfHeight       = h<6?Site->ScreenHeight/48:h; //  высота шрифта = 1?
-// logfont.lfWidth        = 0;
-   logfont.lfEscapement   = GM_COMPATIBLE;         //   GM_ADVANCED - 0
-// logfont.lfOrientation  = 0;
-   logfont.lfWeight       = weight; // FW_DONTCARE+THIN,ULTRALIGHT,LIGHT,NORMAL
-   logfont.lfItalic       = italic; //    MEDIUM,SEMIBOLD,BOLD,EXTRABOLD,HEAVY
-// logfont.lfUnderline    = false;
-// logfont.lfStrikeOut    = false;
-   logfont.lfCharSet      = RUSSIAN_CHARSET;    // DEFAULT_CHARSET ANSI_CHARSET
-   logfont.lfOutPrecision = OUT_STRING_PRECIS;        // OUT_TT_PRECIS
-   logfont.lfClipPrecision= CLIP_DEFAULT_PRECIS;      // OUT_STROKE_PRECIS
-   logfont.lfQuality      = DEFAULT_QUALITY;          // PROOF_QUALITY
-   logfont.lfPitchAndFamily=FF_MODERN|FIXED_PITCH;    // FF_ROMAN DEFAULT_PITCH
-   strcpy( logfont.lfFaceName,fn?fn:"Courier New");   // имя шрифта 32 байта
-   Fnt->hF = CreateFontIndirect( &logfont );          // Create the font and
-  HFONT oFont=(HFONT)SelectObject( Site->hDC,Fnt->hF );  // display list
-   Fnt->Base=glGenLists( ListsGroup );
-   if( !wglUseFontBitmaps( Site->hDC,0,ListsGroup,Fnt->Base ) ) //! странная ??
-        wglUseFontBitmaps( Site->hDC,0,ListsGroup,Fnt->Base );  //! проблема ??
-// { glDeleteLists( Fnt->Base,ListsGroup==ListsGroup );
-//   Fnt->Base=0; FontWidth=FontHeight=1 } else
-   { TEXTMETRIC T; GetTextMetrics( Site->hDC,&T );
-     Fnt->W=T.tmAveCharWidth;     // (AlfaRect( "_Ё°y" ).cx+3)/4;
-     Fnt->H=logfont.lfHeight;     // T.tmAscent; // tmHeight+tmExternalLeading;
-   }
-   if( oFont )SelectObject( Site->hDC,oFont ); return *this;
+//!  Внутренние процедуры для реализации виртуальных обращений с мышкой
+//!
+bool Place::Mouse( int x,int y ) // виртуальная функция динамически подменяется
+{ if( extPass )return extPass( x,y ); else// локальная среда внешней транзакции
+  if( Site->extPass )return Site->extPass( x+pX,y-pY-Height+Site->Height );
+  return false;               // без внешних транзакций считать всё завершённым
 }
-//   Определение размеров изображения текст !!! необходим многострочный вариант
-//
-SIZE Place::AlfaRect( const char *s, bool ANSI )  // предварительно формируется
-{ SIZE F={ ANSI?(long)strlen( s ):Ulen( s ),0 };  // в буфере или ANSI-строчка
-  if( AF.Bit )F.cx*=AF.W,F.cy=AF.H; else
-  { glListBase( AF.Base ); char *str=(char*)s;
-   HFONT oFont=(HFONT)SelectObject( Site->hDC,AF.hF );
-    if( !ANSI )str=UlA( strdup( s ),false );     // сброс UTF-8 в ANSI на месте
-    GetTextExtentPoint32( Site->hDC,str,F.cx,&F );
-    if( oFont )SelectObject( Site->hDC,oFont );
-    if( !ANSI )free( str );
-  } return F;
+bool Place::Mouse( int b, int x,int y )
+{ if( extPush )return extPush( b,x,y ); else
+  if( Site->extPush )return Site->extPush( b,x+pX,y-pY-Height+Site->Height );
+  return false;
+}
+Place::~Place()  // освобождение площадки, шрифтов, картинки и всех точек входа
+{ if( Site )if( glAct( Site ) )              // +++ средняя площадка вышибается
+  { if( Img ){ free( Img ); Img=NULL; }      // все связные объекты расчищаются
+    if( iFn )AlfaBit();                      // здесь полный destructor шрифтам
+    for( Place *S=(Place*)Site;S;S=S->Up )if( S->Up==this ){ S->Up=Up; break; }
+    if( Site==this )Site=NULL; else;        // возврат к моменту создания Place
+    if( Signs&PlaceAbove )Site->Refresh();  // обновление после удаления Place
+  }
 }

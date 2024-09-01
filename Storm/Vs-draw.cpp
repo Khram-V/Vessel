@@ -129,8 +129,8 @@ Hull& Hull::NavigaInform( Window *Win )
  Real U,H; B.axiZ( C.z )/=L; //B=Tensor(*this)*B;
   angle( H=Hull::Course+Head[-1].z );   // текущее отклонение от заданого курса
   { const Vector R=(Vector){ -0.85 },N=(Vector){ 0,0.025 }; Vector W;
-    line( B*(Vector){0,-0.8},B*(Vector){0,0.8},magenta );
-    spot( arrow( B*(Vector){-1},B*(Vector){1},0.26/L ),5,blue );
+    line( B*(Vector){0,-0.8},B*(Vector){0,0.8},magenta ); glLineWidth(2);
+    spot( arrow( B*(Vector){-1},B*(Vector){0.975},0.26/L ),5,blue );
     if( fabs( H )<_Pi/32 )W=(Vector){ 0.2 }; else   // полрумба в доле градуса°
     if( dCs<_Pi/45 )W=(Vector){ 0.2,0.06 }; else W=(Vector){ 0.18,0.125 };
     if( H<0 )W.y=-W.y; glBegin( GL_POLYGON );
@@ -157,8 +157,6 @@ Hull& Hull::NavigaInform( Window *Win )
     P(C.x,0),P(C.x-L,H),P(C.x-.9*L,.6*H),P(C.x-L/2,0),
     P(C.x-.9*L,-.6*H),P(C.x-L,-H); glEnd();
   }
-
-
   //   контрольная полупрозрачная плоскость для чисто конструктивной ватерлинии
   //
   glBegin( GL_TRIANGLES ); //GL_POLYGON ); //GL_TRIANGLE_FAN );
@@ -203,7 +201,7 @@ Hull& Hull::NavigaInform( Window *Win )
    Vector Max,Min;                              // экстремумы графиков качки
    Compass.Area( 25,-1,0,7 ).Activate( true );  // семь строк от нижней границы
    Real Lp=Real(Compass.Width)/Compass.Height,  // размеры информационного окна
-        Lt=12.0*Real(Fnt->W)/Compass.Height;    // и удвоенный отступ справа
+        Lt=12.0*Real(Tw)/Compass.Height;    // и удвоенный отступ справа
     //
     //   здесь надо выделить временной интервал записи графиков в экранном поле
     //
@@ -236,7 +234,7 @@ Hull& Hull::NavigaInform( Window *Win )
         rectangle( (Point){-Lp,2*U},(Point){Lp-Lt,1} );
         rectangle( (Point){-Lp,-2*U},(Point){Lp-Lt,-1} ); }
     }
-    //  Compass.Alfabet( 20,"Times New Roman",FW_MEDIUM,true );
+    //Compass.Alfabet( 20,"Times New Roman",FW_MEDIUM,true );
     //
     //   разметка шкалы времени
     //
@@ -250,9 +248,9 @@ Hull& Hull::NavigaInform( Window *Win )
       liney( (Point){ mX,1 },(Point){ mX,i%j?0.92:0.85 } );
       //if( mX<Lp-Lt*1.2 )
       if( i && !( i%j ) )
-        Compass.Text( _South,(Point){ mX,-1 },DtoA( i*U/3600,3 ) );
+        Compass.Text( _South,(Point){ mX,-0.8 },DtoA( i*U/3600,3 ) );
     } if( --i%j>1 )
-      Compass.Text( _South_West,(Point){ Lp,-1 },DtoA( dT/3600,3 ) );
+      Compass.Text( _South_West,(Point){ Lp,-0.8 },DtoA( dT/3600,3 ) );
     //
     //   закрашенный профиль волны с корпусом судна на вертикальной качке
     //
