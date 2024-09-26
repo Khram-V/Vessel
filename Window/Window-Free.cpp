@@ -7,35 +7,40 @@
 //     отсутствие шрифта - подключение окна (не приводит к размеру точки [1x1])
 //
 Place& Place::Area( int X,int Y, int W,int H )   // достаточно сделать шаг
-{ int fw=Tw,fh=Th;                         // единичным и далее по Place,
+{ Real fw=Tw,fh=Th;                         // единичным и далее по Place,
 // всё по горизонтали
    if( !W )W=Site->Width;  else if( W<0 )W=-W,fw=1; else W=W*fw; // связанной с
    if( X>0 )X=(X-1)*fw; else X = Site->Width - W + X*fw;      // базовой Window
-       X=minmax( 0,X,Site->Width-Tw );                // перерасчет с проверкой
+       X=minmax( 0,X,Site->Width-int( Tw ) );         // перерасчет с проверкой
    if( X+W>Site->Width  )                             // жертвуем шириной окна
      { if( W==Site->Width )W-=X; else X=max( 0,Site->Width-W ); }
 // затем по вертикали
    if( !H )H=Site->Height; else if( H<0 )H=-H,fh=1; else H=H*fh; ++H;
-   if( fh>1 ){ if( Y>0 )Y = Site->Height - H - fh*(Y-1); else Y = -Y*fh; }
-       else { if( Y<=0 )Y = Site->Height - H + Y; }
+   if( fh>1 ){ if( Y>0 )Y=Site->Height-H-fh*(Y-1); else Y=-Y*fh; }
+        else { if( Y<=0 )Y=Site->Height-H+Y; }
    if( H>Site->Height )H=Site->Height;            // относительно главного окна
    if( Y+H>Site->Height )Y=Site->Height-H; if( Y<0 )Y=0;
 // if( Signs & PlaceAbove )
    if( Img )   // если ранее сохранялась фоновая подложка, то восстанавливается
    if( X!=pX || Y!=pY || Width!=W || Height!=H )Rest();  // растянутая картинка
-   pX=X,pY=Y,Width=W,Height=H;
-   if( chY>Height-Th )chY=Height-Th;                // аппликата верхней строки
+   pX=X,pY=Y,Width=W,Height=H+Th/5;
+/* if( chY>Height-Th ) */ chY=Height-Th; chX=1;     // аппликата верхней строки
 // if( Signs & PlaceAbove )Save();
    return *this;
 }
 //      Комплекс встроенных и внутренних процедур
 //      Подготовка площадки для растровых манипуляций
 //
-RasterSector::RasterSector( int X,int Y, int W,int H ) // настройка чисто
+//#include <GL/Glu.h>
+RasterSector::RasterSector
+  ( int pX,int pY, int W,int H, Real Scale )  // настройка чисто
   { PushMatrix();
-    glLoadIdentity(); glMatrixMode( GL_PROJECTION );
-    glLoadIdentity(); glViewport( X,Y,W,H );
-    glOrtho( 0,W,0,H,-1,1 ); glMatrixMode( GL_MODELVIEW );
+    glLoadIdentity(); glMatrixMode( GL_PROJECTION ); //cX=cY=0;
+    glLoadIdentity(); glViewport( pX,pY,W,H );
+    glOrtho( 0,W/Scale,0,H/Scale,0,1 );
+//  gluOrtho2D( cX-cX/Scale,W/Scale,
+//              cY-cY/Scale,H/Scale );              // gluOrtho2D( 0,W,0,H );
+    glMatrixMode( GL_MODELVIEW );
     glDisable( GL_DEPTH_TEST );
     glDisable( GL_LIGHTING );
   }

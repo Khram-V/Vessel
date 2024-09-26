@@ -24,7 +24,7 @@ static void crossDC( Vector A,Vector B,Vector C )
 }
 Hull& Hull::Write( int format ) // Wavefront Technologies 4 Advanced Visualizer
 { int i,j,k,n;
-  if( format==1 )
+  if( format==1 )        // здесь тексты сохраняются в рабочем формате UTF-8
   { if( !(F=_wfopen( U2W( fext( FileName,"obj" ) ),L"wb" )) )return *this;
    Point P,Q,q; int L[Nframes+2];
     memset( L,0,sizeof(int)*(Nframes+2) ); fColor=-1;

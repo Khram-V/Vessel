@@ -72,16 +72,28 @@ bool Field::Timer()                //! к несчастью все расчет
          pause=false,stop=false;   // для задержки и приостановки эксперимента
   int M,D,Y;                       // подпись независима от состояния расчётов
   Event T; T.UnPack( M,D,Y );      // время для обработки прерываний от таймера
-  { TextContext Save( true ); color( navy );
-    Info.Area( 0,0,60,1 ).Clear().Print( 2,0,"%04d %s %02d, %s%s <= %d",
-                               Y,_Mnt[M-1],D,_Day[int(T.D%7)],DtoA(T.T,3),Kt );
+  {
+#if 0
+    TextContext Save( true );                            color( aqua,0.6,0.9 );
+    Info.AlfaBit(_8x16).Area( 0,0,60,1 ).Clear( false ); color( blue );
+    Info.Print( 2,1,"%04d %s %02d, %s%s <= %d",
+         Y,_Mnt[M-1],D,_Day[int(T.D%7)],DtoA(T.T,3),Kt );
     if( pause||stop ){ color(magenta); Info.Print(stop?" <стоп>":" <pause>" ); }
     if( Tlaps*3600-Trun>1.0 ){ color( red );
         Info.Print( " {%s",DtoA( Tlaps,3 ) );    // реальное время эксперимента
         Info.Print("%s}",DtoA(Trun/3600-Tlaps,3)); }// отставание со знаком "-"
     if( recurse ){ color( green ); Info.Print( " %d=затор",recurse ); }
     Info.Save().Show();
-  }                            // приостановка <Ctrl> и блокировка <Ctrl+Shift>
+#else
+    static string S;
+    sprintf( S,"%04d %s %02d, %s%s отсчёт ",Y,_Mnt[M-1],D,_Day[int(T.D%7)],DtoA(T.T,2) );
+             S<<DtoA(Tlaps,-3)<<"<"<<Kt<<"> ";
+    if( pause||stop )S<<( stop?" <стоп>":" <пауза>" );
+    if( Tlaps*3600-Trun>1.0 )S<<"  ←∆ "<<DtoA(Trun/3600-Tlaps,3);
+    if( recurse )S<<" →"<<recurse<<"=затор";
+    Title( S ),Vessel->Title( S ),texttitle( S );
+#endif
+  }                             // приостановка <Ctrl>, блокировка <Ctrl+Shift>
   if( pause=ScanStatus()&CTRL ) // вычислительного процесса - до повтора <Ctrl>
     { stop=ScanStatus()&SHIFT; Instant=T-Tlaps; } else
   if( stop )Instant=T-Trun/3600; else// если Ctrl отпущен,то требование полной
@@ -149,15 +161,11 @@ Field& Field::Simulation()  // моделирование волнения в и
           } else
           { Vector &W=Ws[y][x];
                    W.z = Wind.AmH( W ) + Swell.AmH( W ) + Surge.AmH( W );
-        } }
-      }
+      } } }
       Vessel->Floating()     // наложение уровня + расчёт воздействия на корпус
              .Movement()     // моделирование гидродинамики корабля на волнении
-             .Protocol();
-            ++Kt;                // счётчик циклов вычислительного эксперимента
-      if( !WinReady(this) )break;// переисполнение очереди посторонних запросов
-    }
-  } else WinReady(); return *this;
+             .Protocol(); ++Kt;  // счётчик циклов вычислительного эксперимента
+  } } WinReady(); return *this;  // переисполнение очереди посторонних запросов
 }
 //     Эксперимент выполняется с заданным расчетным шагом до истечения
 //     контрольного интервала времени, или до возникновения сигнала

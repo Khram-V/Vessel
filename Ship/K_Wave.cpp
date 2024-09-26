@@ -257,7 +257,7 @@ void Hull_Wave( const int _Type )
    PL=&Ship;                        //  для простых или ускоренных перерасчётов
 //V=PL.V/( Lwl*Draught*Bwl );                      == коэффициент общей полноты
   glClearColor( 0.95,1,0.9,1 ); glInitial();
-  Win.Activate().Alfabet( 18,"Times" )    // привязанная к текущему окну
+  Win.Activate().AlfaVector( 18,1 )       // привязанная к текущему окну
      .Mouse( Mouse_in_Window )            // графическое окно волнообразования
      .Mouse( Mouse_Click )
      .Clear();

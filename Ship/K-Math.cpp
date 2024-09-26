@@ -187,7 +187,7 @@ void Building()                       //       ___\│ г--+-┼--°°L¬\+/
 //    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //!   Проекция полуширота - собственно блок рисования теоретических чертежей
 //
-  Win.Activate().Alfabet( 12,"Times" ).Clear(); wW.Focus();
+  Win.Activate().AlfaVector( 12,1 ).Clear(); wW.Focus();
   __Grid glLineStipple( 1,0x0FFF );    // Первыми прорисовываются ватерлинии
   x=Kh.Asx.G( Draught );               //
   for( k=0,z=0; k<=5; z+=Breadth/10,k++ )                       // -- батоксы
@@ -211,15 +211,15 @@ void Building()                       //       ___\│ г--+-┼--°°L¬\+/
     for( ; x<y; x+=d )glVertex2d( x,Kh.Y( x,z ) ); glEnd();
   } __Deck
   glBegin( GL_LINE_STRIP );
-  glVertex2d( x=Kh.Asx[Kh.Asx.N],0.0 ); // Прорисовка линии палубы
-  glVertex2d( x,Kh.Asy[Kh.Asy.N] );     // ! x - здесь встает на палубе
+  glVertex2d( x=Kh.Asx[Kh.Asx.N],0.0 );         // Прорисовка линии палубы
+  glVertex2d( x,Kh.Asy[Kh.Asy.N] );             // ! x - здесь встает на палубе
               y=Kh.Stx[Kh.Stx.N];
   for( k=0; k<Kh.Ns; k++ )
   { z=Kh.F[k].X; if( z>x && z<y )glVertex2d( z,Kh.F[k].y[Kh.F[k].N] );
   } glVertex2d( y,Kh.Sty[Kh.Sty.N] );
     glVertex2d( y,0.0 );
     glEnd(); __Marks
-  Win.Alfabet( 18,"Times" ).Text( _South_West,Xo+Lmx,wW.Z(0),0,Kh.Name );
+  Win.AlfaVector( 16,1 ).Text( _South_West,Xo+Lmx,wW.Z(-2),0,Kh.Name );
   //
   //!  Проекция бок
   //
@@ -280,7 +280,7 @@ void Building()                       //       ___\│ г--+-┼--°°L¬\+/
          else gl_LIGHTGREEN; line( x,z,x+Lwl,z ); glDisable( GL_LINE_STIPPLE );
     if( k>0 && z<Draught*2 )
     { if( z>Draught )__Marks else __Water
-      Win.Alfabet(k==5?16:12,"Times").Text(_West,Xo,z,0,k!=5?"%d  ":"Квл ",k);
+      Win.AlfaVector( k==5?16:12,1 ).Text(_West,Xo,z,0,k!=5?"%d  ":"Квл ",k);
   } }
   // Разметка контура: палуба - штевни - киль
   //
@@ -314,7 +314,7 @@ void Draw_Hull( int ids, Plane &_W )                         // Проекция
     for( k=0,y=-0.4*Breadth; k<=8; k++,y+=Breadth/10 )            // -- батоксы
     { if( k!=4 )glEnable( GL_LINE_STIPPLE ); else glDisable( GL_LINE_STIPPLE );
       line( y,0,y,z );
-    } glDisable( GL_LINE_STIPPLE ); Win.Alfabet( 18 );
+    } glDisable( GL_LINE_STIPPLE ); Win.AlfaVector( 18 );
     __Water Win.Text( _North_East,Breadth/2,Draught,0,"ВЛ" );
     __Deck  Win.Text( _South_West,0,0,0,"ДП" );
     if( ids>1 )                                          // Разметка ватерлиний

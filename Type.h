@@ -32,8 +32,8 @@ enum Course
         _West=2,_Zenith=0,     _East=8, _Left=2,_Center=0,_Right=8,
   _South_West=6,_South=4,_South_East=12,_End =6, _Down =4,_PgDn=12,
   _Enter=13,_BkSp,_F1,_F2,_F3,_F4,_F5,_F6,_F7,_F8,_F9,_F10,_F11,_F12,
-  _Esc=27,_Ins,_Del,_Tab,_Blank=32        // +5, +7, +10, +31 — в запасе
-};                                        // ⁰ⁱ⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₒₓₔ
+  _Esc=27,_Ins,_Del,_Tab,_Blank=32              // +5, +7, +10, +31 — в запасе
+};                                             // ⁰ⁱ⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₒₓₔ
 void julday( long day,int& m,int& d,int& y ); // Julian( day ) ⇒ дата( m,d,y )
 long julday( int m, int d, int y );          // возврат: дата( m,d,y ) ⇒ Julian
 long julday(); Real onetime();              // Текущие дата и время[дни и часы]
@@ -62,6 +62,10 @@ struct Event{ long D; Real T;              // Юлианская дата и ч�
 //
 class string{ char *s; int len;       // текстовая строчка неограниченной длины
 public: string(); ~string();          // начальная установка=2k очистка выходом
+//      string( const char* );        // какой-никакой, конструктор тоже нужен
+ string& operator << ( const int );
+ string& operator << ( const char* ); // строка расширяется с контролем памяти
+ string& operator -= ( const char* ); // здесь строчка ставится в самое начало
  operator char*(){ return s; }        // обычный доступ по адресу начала строки
  char& operator[]( int k );           //   и до каждого символа, но с контролем
 };
@@ -81,8 +85,10 @@ char* fname( const char* FileName );     // Поиск собственно са
 char* sname( char* ShortFileName  );     // то же имя, с отсечённым расширением
 char* fext ( char*, const char* Ext=0 ); // c принудительной заменой расширения
 #if defined(_STDIO_H_)||defined(_INC_STDIO) // имён файлов: FileName.Extensions
+//FILE *FileOpen                         // ++ кодировка длинных строк FileOpen
+//( char *fn, const char *tp, const char *ex, const char *ch, const char *tl );
 FILE *FileOpen                           // ++ кодировка длинных строк FileOpen
-  ( char *fn, const char *tp, const char *ex, const char *ch, const char *tl );
+  ( WCHAR*, const WCHAR*, const WCHAR*, const WCHAR*, const WCHAR* );
 char *getString( FILE *F );              // Чтение строки на статическом адресе
 char *getString( FILE *F, int t );       // неограниченной длины +(-)табуляторы
 #endif                                   // результат - в подстрочках getString
@@ -92,17 +98,18 @@ char* Uget( const char *U );             // однократная выборк�
 char* Uset( const char *UTF, int k );    // установка на индекс -1 конец строки
 char* Uset( int &k, const char *U );     //  ++ с подтверждением местоположения
 char* Uset( char* U,int k,const char* S,bool ins=false ); // вставка S на U[k]
-char* UtR( char &s, char *U );           // символ UTF-8 -> Russian-OEM(866)alt
-char* UtW( char &s, char *U );           // символ UTF-8 -> Russian-Win-1251
+//char* UtR( char &s, char *U );         // символ UTF-8 -> Russian-OEM(866)alt
+//char* UtW( char &s, char *U );         // символ UTF-8 -> Russian-Win-1251
 const char* RtU( const char R );         // получение UTF-8 кода из символа OEM
 const char* WtU( const char W );         // получение UTF-8 кода из Win-1251
 char* UlA( char* U, bool oem=false );    // Конвертация из Unicode на месте
-char* UtA( const char* U, bool=false );  // Преобразование строк в буфере ввода
-char* AtU( const char* A, bool=false );  // для OEM-866(true) и Win-1251(false)
+char* UtA( const char* U,bool R=false ); // Преобразование строк в буфере ввода
+char* AtU( const char* A,bool R=false ); // для OEM-866(true) и Win-1251(false)
 char* W2U( const wchar_t* WU );          // чисто Windows прилады перекодировок
 wchar_t* U2W( const char* U8 );          // UTF-8 -> UTF-16(LE)=Unicode-Windows
-//char* UtC( unsigned &u, char *U );     // UTF-8 -> UniCode, на выходе адрес
-//const char* CtU( unsigned u );         // UniCode -> UTF-8 (int->string)
+const char* CtU( unsigned u );           // UniCode -> UTF-8 (int->string)
+char* UtC( unsigned &u, const char *U ); // UTF-8 -> UniCode  продвижение буквы
+unsigned UtC( const char *U );           // + на всякий случай
 
 //template<class T>inline const T abs(const T &A){ return A<0?-A:A; }
 template<class T>inline const T &minmax( const T &a, const T &b, const T &c )

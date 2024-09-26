@@ -61,7 +61,7 @@ Plane::Plane( const char *i, const char *x, const char *z, Window *Win ):
          aX=aZ=0.0; uZ=uz=Height; dx=dz=1.0; }     // Signs=0;
 Plane& Plane::Focus(){ glMatrixMode( GL_PROJECTION ); glLoadIdentity();
          glOrtho( aX-ax*dx, uX+( W-ux )*dx,        // left, right
-                  aZ-az*dz, uZ+( H-uz )*dz,-1,1 ); // bottom, top
+                  aZ-az*dz, uZ+( H-uz )*dz,0,1 ); // bottom, top
          glMatrixMode( GL_MODELVIEW ); glLoadIdentity(); return *this; }
 Plane& Plane::Set(_Real X,_Real Z,_Real _X,_Real _Z )// отступ от правой-нижней
        { aX=X,uX=_X; dx=( uX-aX )/( ux-ax );       // границ и размерения новой
@@ -108,8 +108,8 @@ void MainDraw::Loft( bool rShape )          // общая разметка гр�
       wH.ax-=wH.ux;             // Здесь "корпус" вписывается на мидель в "бок"
       wH.ux=wH.ux*2+wH.ax;
       wH.Set( Breadth/-2,Do,Breadth/2,Depth );
-      MPL.Alfabet( 18,"Times" ).Area( 0,20,18,-36 );               // это мышка
-      TPL.Alfabet( 18,"Times",1,true ).Area( 0,0,48,1 );           //  и таймер
+      MPL.AlfaVector( 18,0 ).Area( 0,22,18,-36 );        // это мышка
+      TPL.AlfaVector( 16,0 ).Area( 0,0,48,1 );           //  и таймер
 }
 static bool Wid=false,              // перерисовка на полный или заданный экран
           First=false;              // блокировка при неготовности конструктора
@@ -119,16 +119,16 @@ bool MainDraw::Draw()               // Здесь также будет прив
   { while( Kh.Read() );             // При вызове без параметров будет Hull.vsl
       Loft( Active=true );          // Степановские, польские или новые корпуса
     } Building(); gl_BLUE;
-      Alfabet( 18,"Times" ).Print( 5,-5,"L = %.3g",Length );
+      AlfaVector( 16,1 ).Print( 5,-5,"L = %.3g",Length );
   if( fabs( Length-Lmx )>Length/300 )Print( " \\ %.3g",Lmx );
   if( fabs( Length-Lwl )>Length/300 )Print( " / %.3g",Lwl );
       Print( 5,-4,"B = %.3g",Breadth );
   if( fabs(Breadth-Bmx)>Breadth/300 )Print( " \\ %.3g",Bmx );
   if( fabs(Breadth-Bwl)>Breadth/300 )Print( " / %.3g",Bwl );
-      Print(      " {¤%d }",Kh.Ms );
+      Print(      " { %d }",Kh.Ms );
       Print( 5,-3,"T = %.3g",Draught );
   if( fabs( Do )>Draught/300 )Print( " / %.3g",Do );
-      Print( 5,-2,"V = %.5g  d = %.3g",Volume,Volume/Bwl/Lwl/Draught );    // δ
+      Print( 5,-2,"V = %.5g  δ = %.3g",Volume,Volume/Bwl/Lwl/Draught );    // δ
       Print( 5,-1,"S = %.5g, %s",Surface,Hull_Keys&1?"spline":"vector" );
       Save().Show(); First=true; return false;
 }
@@ -157,9 +157,14 @@ void glInitial()
 { glShadeModel( GL_SMOOTH );
   glHint( GL_LINE_SMOOTH_HINT,GL_NICEST );  glEnable( GL_LINE_SMOOTH );
   glHint( GL_POINT_SMOOTH_HINT,GL_NICEST ); glEnable( GL_POINT_SMOOTH );
-  glEnable( GL_DITHER );                  // Предопределение графической среды
+//glEnable( GL_DITHER );                  // Предопределение графической среды
   glEnable( GL_BLEND );
   glBlendFunc( GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA );
+
+//glDisable( GL_SCISSOR_TEST );
+//glDisable( GL_SCISSOR_BOX );
+//glDisable( GL_CLIP_PLANE1 );
+
 }
 int main() // int ans, char *argv[], char *envp[] )
 { feclearexcept( FE_ALL_EXCEPT );
@@ -169,18 +174,19 @@ int main() // int ans, char *argv[], char *envp[] )
   //
   //  Уединенное приветствие
   //
-  gl_BLUE; Win.Alfabet( 26,"Arial",800).Print( 2,1,"Корабль  —  " );
-           Win.Alfabet( 20,"Courier",800).Print("морская гидромеханика\n" );
-  gl_CYAN; Win.Alfabet( 19,"Lucida",600 )
-              .Print( "   Лаборатория вычислительной гидромеханики"
-                      "\n           и морских исследований"
-                      "\n   РОССИЯ, Южно-Сахалинск - Санкт-Петербург\n\n" );
-  gl_GREEN; Win.Alfabet( 20,"Times",1,1).Print( 2,-2,
+  gl_BLUE; Win.AlfaVector( 24,2 ).Print( 2,1.25,"Корабль - " );
+           Win.AlfaVector( 20,1 ).Print("морская гидромеханика\n" );
+  gl_CYAN; Win.AlfaVector( 16,2 )
+              .Print( "\n  Лаборатория вычислительной гидромеханики"
+                      "\n                и морских исследований" );
+  gl_LIGHTBLUE; Win.AlfaVector( 16,0 )
+              .Print( "\n  РОССИЯ, Южно-Сахалинск - Санкт-Петербург\n\n" );
+  gl_LIGHTRED; Win.AlfaVector( 13,1 ).Print( 2,-1.25,
                   "Вычислительные эксперименты по штормовой мореходности\n"
                   "Гидростатика, остойчивость, волновое сопротивление," );
-  gl_YELLOW; Win.Alfabet(12,"Times",1,1)
-                .Print( -3,0,"©1975-23, Василий Храмушин" ).Show();
-  WaitTime( 500 );
+  gl_YELLOW; Win.AlfaVector( 9,1 )
+                .Print( -3,0,"©1975-24, Василий Храмушин" ).Show();
+  WaitTime( 250 );
 //
 //      подборка управляющих параметров и структур с информацией
 //
@@ -199,7 +205,7 @@ int main() // int ans, char *argv[], char *envp[] )
                        , { 1,9, cU[cM] }                        //  8
                        , { 0,3, " L=%-3.0lf",&cL }              //  9
                        , { 0,3, " B=%-3.0lf",&cB }              // 10
-                       , { 0,3, " №=%-3d",   &cN }              // 11
+                       , { 0,3, " N=%-3d",   &cN }              // 11
                        , { 2,28," << обводы скуловых волн >>" } // 12
                        , { 1 } };                               // 13
 //!   Собственно начало работы

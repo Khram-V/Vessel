@@ -9,6 +9,14 @@ char& string::operator[]( int k ) // c контролем размерности
 { if( k>=len ){ s=(char*)realloc( s,(len=( k/256+7)*256 )+256 ); } // align=256
   return s[k];   // и только для ~ разовых операций без рекурсии и параллелизма
 }
+string& string::operator << ( const char *str  )
+{ int i=strlen( s ),l=strlen( str );
+  if( i+l>len-256 )operator[]( i+l+1 )=0; strcpy( s+i,str ); return *this;
+}
+string& string::operator << ( const int d )
+{ int i=strlen( s );
+  if( i>len-256 )operator[]( i+256 )=0; itoa( d,s+i,10 ); return *this;
+}
 //  Грубое отсечение всех управляющих кодов и концевых пробелов в строке
 //
 int strcut( char* S )

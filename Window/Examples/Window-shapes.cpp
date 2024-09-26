@@ -73,7 +73,7 @@ static const entry table[] =
 //
 static struct Pro:Window
 { Pro():
-  Window( "Window Shapes example / типа того в UTF-8 ‏יְרוּשָׁלַיִם",0,0,800,600 ){}
+  Window( "Window Shapes example / типа того в UTF-8 ‏יְרוּשָׁלַיִם",0,0,1200,600 ){}
    virtual bool KeyBoard( byte );
 } Tvm;
 static Real Amax=123.5;
@@ -101,19 +101,37 @@ bool Pro::KeyBoard( byte key )
     case _F2: while( TextMenu( Mlist( Menu_a ),this ).Answer()!=_Esc ); break;
     case _F3: // GetKey(); -- в прерывания символ из буфера не выбира(ется)лись
     { Place R( this,PlaceAbove ); glClearColor( 1,1,0.8,1 ),glColor3f( 0,0,1 );
-            R.AlfaBit( _8x16 ).Area( 2,2,38,10 ).Clear();
-      const char *s="\n│ ˉ○◙♪"
-                      "  │.\n"
-                      "│  !\"#$%%&'()*+,-./ 0123456789:;<=>? │.\n"
-                      "│ @ABCDEFGHIJKLMNO PQRSTUVWXYZ[\\]^_ │.\n"
-                      "│ `abcdefghijklmno pqrstuvwxyz{|}~ │.\n"
-                      "│ АБВГДЕЖЗИЙКЛМНОП РСТУФХЦЧШЩЪЫЬЭЮЯ │.\n"
-                      "│ абвгдежзийклмноп ░▒▓│┤╡╢╖╕╣║╗╝╜╛┐ │.\n"
-                      "│ └┴┬├─┼╞╟╚╔╩╦╠═╬╧ ╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀ │.\n"
-                      "│ рстуфхцчшщъыьэюя ≡±≥≤⌠⌡÷≈°∙·√ⁿ²■ │.";
-      R.Print( s ).Show();
-      glClearColor( 0.9,1,0.95,1 );  // восстановление фонового цвета
-      WaitKey();
+      const char
+      *s="│≡Первая строчка ˉ○◙♪"
+         "  \n"
+         "│ !\"#$%&'()*+,-./0123456789:;<=≠>? \n"
+         "│ ©…@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_ \n"
+         "│ `abcdefghijklmnopqrstuvwxyz{|}~ \n"
+         "│ ÇüéâäàåçêëèïîìÄÅÉæÆôöòûùÿÖÜø£Ø₧ƒ   \n"
+         "│ áíóúñÑªº¿⌐¬½¼¡«»│─║═   \n"
+         "│ ░▒▓┤╡╢╖╕╣║╗╝╜╛┐└┴┬├┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀ \n"
+         "│ ßµδ∞∩∝≡±≥≤⌠⌡∂∫∮†‡∑§÷≈°∙·∇√ⁿ²■¦↑→←↓ \n"
+         "│ АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ  \n"
+         "│ абвгдеёжзийклмнопрстуфхцчшщъыьэюя  \n"
+         "│ ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ \n"
+         "│ αβψδεϕφγηίξκλμνοπρστϑωχυζ🌀 │ окончание блока W"
+/*
+         "│ !\"#$%%&'()*+,-./ 0123456789:;<=>? │.\n"
+         "│ @ABCDEFGHIJKLMNO PQRSTUVWXYZ[\\]^_ │.\n"
+         "│ `abcdefghijklmno pqrstuvwxyz{|}~  │.\n"
+         "│ АБВГДЕЁЖЗИЙКЛМНОП РСТУФХЦЧШЩЪЫЬЭЮЯ │.\n"
+         "│ абвгдеёжзийклмноп ░▒▓│┤╡╢╖╕╣║╗╝╜╛┐ │.\n"
+         "│ └┴┬├─┼╞╟╚╔╩╦╠═╬╧ ╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀ │.\n"
+         "│ рстуфхцчшщъыьэюя ≡±≥≤⌠⌡÷≈°∙·√ⁿ²■ │.\n"
+         "│ ΐΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩΪΫάέήίΰ │.\n"
+         "│ αβγδεζηκλμνξοπρςστυφχψωϊϋόύώ θι  │.\n"
+         "│ ©…∞ₒₐₓₑₔ‘’„“”«»‹›•∙×±≥≤÷≈≡≠∂δ∆∇∧∀∨⇒⇔↦←↑→↓↔↕↨∏∑∩∫ƒєæΘ │ окончание блока W"
+*/        ;
+//          R.AlfaBit( _8x16 )
+            R.AlfaVector( 0 )
+             .Area( 3,2,68,15 ).Clear().Print( 1,1,s ).Show();
+             glClearColor( 0.9,1,0.95,1 );     // восстановление фонового цвета
+            WaitKey();
     } break;
     default:
     { switch( key )
@@ -144,7 +162,8 @@ static void display( Place &Tv )
       { color( (colors)i ); rectangle( (Point){ -1+2*i/Real(black+1),-0.8 },
                                (Point){ -1+2*(i+1)/Real(black+1),-0.7} ); }
     }
-//Tvm.WaitKey(); Tvm.Show(); return;
+    //Tvm.WaitKey(); Tvm.Show(); return;
+    Tv.Activate( false );
     gluPerspective( 32,rat, -1,1 );                    // + украшательство со
     gluLookAt( 1,2,3, 0,0,-0.5, 0,0.5,0 );             // взгляда наперекосяк
     glColor3f( 0,0,1 );
@@ -166,15 +185,9 @@ static void display( Place &Tv )
     glPushMatrix(),glScalef( 0.4,0.4,0.4 ),glTranslated( 2.5,-0.75,0 );
     glRotated( rat,sin(t),cos(t/1.5),cos(t/2) ); table[function_index].wire();
     glPopMatrix();
-    glColor3f( 0,1,1 ),glLineWidth( 1 );
+    Tv.Activate( false );
+    glFlush();
     glPushMatrix(),glTranslated( 0,1,1 ),glRotated( t*10,0,1,0 );
-    glBegin( GL_LINE_LOOP );  // GL_TRIANGLES ); //GL_QUADS );
-      glNormal3f( 0,  0,-1 ); glVertex3f( -1,-.2, 0 );
-      glVertex3f(-.2,-.2,0 ); glVertex3f(-.2,-.6, 0 );
-      glVertex3f(-1,-.6, 0 ); glVertex3f(-.2,-.2, 0 );
-      glVertex3f(-.2,-.59,0); glVertex3f( -1,-.59,0 );
-      glVertex3f(-1,-.2, 0 ); glVertex3f(-.2,-.6, 0 );
-    glEnd();
     glColor3f( 0,0,1 ),glLineWidth( 0 ),glDisable( GL_LIGHTING );
       Tv.Text( _Center,    -0.6,-0.4,0, "Центр" );
       Tv.Text( _East,      -0.2,-0.4,0, "East"  );
@@ -185,6 +198,16 @@ static void display( Place &Tv )
       Tv.Text( _North_West,-1,  -0.2,0, "СЗ" );
       Tv.Text( _South_East,-0.2,-0.6,0, "ЮВ" );
       Tv.Text( _South_West,-1,  -0.6,0, "ЮЗ" );
+    glColor3f( 0,1,0 ),glLineWidth( 1 );
+    glBegin( GL_LINE_LOOP );  // GL_TRIANGLES ); //GL_QUADS );
+//    glNormal3f( 0,0,-1 );
+      glVertex3f( -1,-.2, 0 );
+      glVertex3f(-.2,-.2, 0 ); glVertex3f(-.2,-.6, 0 );
+      glVertex3f( -1,-.6, 0 ); glVertex3f(-.2,-.2, 0 );
+      glVertex3f(-.2,-.59,0 ); glVertex3f( -1,-.59,0 );
+      glVertex3f( -1,-.2, 0 ); glVertex3f(-.2,-.6, 0 );
+    glEnd();
+    glFlush();
     glPopMatrix();
     if( show_info )
     { glColor3f( 1,0,1 ); Tv.Print( 1,1,"Shape PgUp PgDn: [°·] " );
@@ -224,7 +247,8 @@ static bool Clock()    // - регулярное обновление карти
   glColor3f( 0,0.5,1 );             // наложение маленькой площадки со временем
  static Place *W=NULL; // порождается окно в пиксельных размерах и без подложки
   if( !W ){ W=new Place( &Tvm,PlaceAbove );
-    W->AlfaBit( _8x16 );            //- это поправит размер по-умолчанию [9:18]
+//  W->AlfaBit( _8x16 );            //- это поправит размер по-умолчанию [9:18]
+    W->AlfaVector( 16 );
   } W->Area( 0,1,44,1 ).Activate().Clear().Print( 0,0," %04d %s %02d, %s%s ",
                        Y,_Mnt[M-1],D,_Day[int(T.D%7)],DtoA( T.T,0 ) ).Show();
   if( Init )display( *aOne );
@@ -264,18 +288,24 @@ int main( int argc,char *argv[] )
     //
     //  Этот текст должен появляться на экране без дополнительных Show-указаний
     //
-//  Tvm.AlfaBit( _8x16 ).Print                    // в GLFW пока происходит
-    Tvm.Alfabet( 28,"Times New Roman" ).Print     // подмена на растр DispCCCP
-       ( 4,1,"Текст в окошке со сдвигом\n без доп.настроек в исходном цвете\n"
-             " - третья строка ЩЩ");
-    glColor3f(1,1,0); Tvm.Print("ЩЩ,\n запятая и продолжение с новой записи ЩЩ");
+//  Tvm.AlfaBit( _8x16 )                          // в GLFW пока происходит
+//  Tvm.Alfabet( 24,"Times New Roman" )           // подмена на растр DispCCCP
+    Tvm.AlfaVector( 0 ) //.Area( 1,1,200,100 ).Activate()
+    .Print
+       ( 6,1,"Текст в окошке со сдвигом\n▓ без доп.настроек в исходном цвете\n"
+             "█ - третья строка ЩЩ");
+    glColor3f(1,1,0); Tvm.Print("ЩЩ,\n запятая и продолжение\n с новой записи ЩЩ");
     glColor3f(0,1,1); Tvm.Print("ЩЩ, \n запятая, и снова продолжение");
     glColor3f(1,1,0); Tvm.Print(-6,7,"Строки справа-налево\nс общим отступом = -6");
     glColor3f(1,1,1); Tvm.Print
+//       ( -12,-8,"Это -3 строки снизу и справа\n"
+//                "с отличным отступом = -12 и\n"
+//                "!важно! построчно сверху-вниз\n = ++ " );
        ( -12,-8,"Это -3 строки в отсчётах снизу и справа-налево\n"
                 "с отличным отступом справа = -12 и\n"
                 "!важно! печать восстановлена построчно сверху-вниз\n = ++ " );
-    glColor3f(1,1,0); Tvm.Print( "...и продолжение после перевода строки" );
+    glColor3f(1,0,0); Tvm.Print( "...и продолжение после перевода строки " );
+    glColor3f(0,1,0);
     for( int i=0; i<=black; i++ )
     { color( (colors)i );
       if( !i )rectangle( (Point){-1,-1},(Point){1,-0.7} );
@@ -292,8 +322,8 @@ int main( int argc,char *argv[] )
     Tvm.SetTimer( 500,Clock );                    // часы в правом верхнем углу
     Tvm.WaitKey();      //! простая приостановка обязательно должна срабатывать
     { Place Zero( &Tvm,PlaceAbove ); glClearColor( 1,1,1,0.5 );
-      glColor3f(0,0,1);  Zero.Area(12,-14,40,2).Clear().Print("  Строчка в окошке");
-      glColor3f(0,.5,0); Zero.Alfabet(22,"Times New Roman").Print(" со сменой шрифта");
+      glColor3f(0,0,1); Zero.Area(12,-14,40,1).Clear().Print(1,1,"Строчка в окошке");
+      glColor3f(0,.5,0); Zero.AlfaVector( 12 ).Print( " со сменой шрифта" );
       Zero.Show(); Tvm.WaitKey();
     }
     View_initial(); glDepthRange( -1,1 ); Init=true;
@@ -305,19 +335,21 @@ int main( int argc,char *argv[] )
    aOne=&One;
     One.Mouse( OneMove )
        .Mouse( OnePress )
-//     .AlfaBit( _8x08 );             //  маленькие буквочки на большом окне
-       .Alfabet( 24,"Arial" )
+//     .AlfaBit( _8x08 )               //  маленькие буквочки на большом окне
+//     .Alfabet( 12,"Arial" )
+       .AlfaVector( 16 )
        .Area( 20,2,112,36 )
 //     .Area( 0,0,0,0 )
        .Activate( true )
        ;
+    Tvm.AlfaVector( 12 );
     while( Tvm.Ready() )
     { byte ans=Tvm.GetKey();
       if( ans==_Esc )break;
       if( ans ){ textcolor( YELLOW );
                  print( 2,8,"Key = %d\\x%X = '%s' + <%X> ",
                          ans,ans,WtU(ans),Tvm.ScanStatus() ); }
-      display( One ); WaitTime( 100 );
+      display( Tvm ); WaitTime( 1000 );
     }
   //Tvm.KillTimer();
   Break( "~Как бы всё благополучно" );

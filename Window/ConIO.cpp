@@ -9,16 +9,27 @@
 COORD wherexy(){ return (COORD){ short( Screen.dwCursorPosition.X+1 ),                                 short( Screen.dwCursorPosition.Y+1 ) }; }static void Fill( TCHAR c, WORD b, int len, COORD pos )  { DWORD written; FillConsoleOutputCharacter( StdOut,c,len,pos,&written );                   FillConsoleOutputAttribute( StdOut,b,len,pos,&written ); }void clrscr(){ Fill( ' ',__FORE+( __BACK<<4 ),     Screen.dwSize.X * Screen.dwSize.Y, (COORD){ 0,0 } ); gotoxy( 1,1 ); }void clreol(){ Fill( ' ',__FORE+( __BACK<<4 ),     Screen.dwSize.X - Screen.dwCursorPosition.X, Screen.dwCursorPosition ); }////     при изменении размеров окна крайне желательно восстановление//     исходной консоли (если, конечно, на выходе нет _exit( abn ) )//void textsize( int w,int h,int bh )  { const SMALL_RECT S={ 0,0,short( w-1 ),short( h-1 ) };
     SetConsoleWindowInfo( StdOut,true,&S );
     SetConsoleScreenBufferSize( StdOut,(COORD){ short(w),short(h>bh?h:bh) } );  }
-void texttitle( const char* title ){ SetConsoleTitle( title ); }
+void texttitle( const char* title )         //GetConsoleTitleA( S,sizeof(S ) );
+  { static char *T=(char*)""; char S[strlen(T)+strlen(title)+8];
+    strcat( strcat( strcpy( S,T )," 🌀 " ),title );
+    if( *T==0 )T=(char*)title; SetConsoleTitle( S );
+  }
 }
 // extern "C" to "C++"
 #define ArgStr( n ) va_list aV; va_start( aV,fmt ); n=vprintf( fmt,aV ); \
                     va_end( aV ); return n;
 int print( int x,int y, const char *fmt,... ){ gotoxy( x,y ); ArgStr( x ) }int print( const char *fmt,... ){ int n; ArgStr( n ) } // CharToOem( str,str )////   Неявная и не особо управляемая инициализация нового окна текстовой консоли//                              Rus-Windows/Cyr(1251) DOS/OEM(866) UTF-8(65001)//#include <locale.h>
+//static bool CtrlHandler( DWORD fdwCtrlType ){ ExitProcess(0); return false; }
 static struct _ScreenSave_{ _ScreenSave_(){ FreeConsole(),AllocConsole(); // отсоединение с пересозданием
                  *stderr=*stdout=*freopen( "CONOUT$","w",stdout );  // == "CON"
-                  StdOut=GetStdHandle( STD_OUTPUT_HANDLE );                  SetConsoleMode( StdOut,ENABLE_PROCESSED_OUTPUT );
-                  GetConsoleScreenBufferInfo( StdOut,&Screen ); clrscr();                  SetConsoleCP( CP_UTF8 );                  SetConsoleOutputCP( CP_UTF8 );//                setlocale( LC_CTYPE,"" );
+                  StdOut=GetStdHandle( STD_OUTPUT_HANDLE );//                StdOut=CreateConsoleScreenBuffer( GENERIC_WRITE,FILE_SHARE_WRITE,0,CONSOLE_TEXTMODE_BUFFER,0 );
+//                SetConsoleMode( StdOut,ENABLE_PROCESSED_OUTPUT );
+//                SetConsoleCtrlHandler( (PHANDLER_ROUTINE)CtrlHandler,true );
+                  GetConsoleScreenBufferInfo( StdOut,&Screen );                  SetConsoleCP( CP_UTF8 );                  SetConsoleOutputCP( CP_UTF8 );
+//                EnableWindow( GetConsoleWindow(),false );
+//                FlushConsoleInputBuffer( StdOut ); // GENERIC_WRITE
+                  clrscr();
+//                texttitle( "🌀" );//                setlocale( LC_CTYPE,"" );
 //                setlocale( LC_ALL,".UTF8" );
                 }#if 0
  ~_ScreenSave_(){ SetConsoleWindowInfo( StdOut,true,&(Screen.srWindow) );                  SetConsoleScreenBufferSize( StdOut,Screen.dwSize );                  SetConsoleTextAttribute( StdOut,Screen.wAttributes );                  Screen.dwCursorPosition.Y=Screen.srWindow.Bottom-2;

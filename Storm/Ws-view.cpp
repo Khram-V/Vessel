@@ -68,6 +68,7 @@ inline int ColorSelect( int a, int b )
 //
 bool Field::Draw()
 { static bool Recurse=false;
+  if( !IsWindowVisible( hWnd ) || IsIconic( hWnd ) )return false;
   if( Recurse || !Kt )return false; Recurse=true; Activate();
   glEnable( GL_LIGHTING );
 //  glEnable( GL_CULL_FACE );
@@ -82,6 +83,7 @@ bool Field::Draw()
   glRotated( eye.y-90,1,0,0 );                          // поставить на киль
   glRotated( eye.z,   0,1,0 );                          // дифферент
   glRotated( eye.x,   0,0,1 );                          // рыскание
+  AlfaVector(Height/WinLines);
   //
   //   рисуем оси координат и габаритный прямоугольный параллелограмм
   //

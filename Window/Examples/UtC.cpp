@@ -19,12 +19,12 @@
 #include "../../Type.h"
 //char* UtR( char* UTF );                  // UTF-8 -> Russian-OEM(DOS-866)alt
 //char* RtU( char *OEM );                  // DOS-866(alt) -> строка UTF-8
-const char* CtU( unsigned int u );         // UniCode -> UTF-8    (int->string)
-      char* UtC( unsigned &u, char *s );   // UTF-8 -> UniCode, на выходе адрес
+//const char* CtU( unsigned int u );       // UniCode -> UTF-8    (int->string)
+//      char* UtC( unsigned &u, char *s ); // UTF-8 -> UniCode, на выходе адрес
                                            //   со смещением до следующей буквы
+/*
 #define X( x )if( (U[x]&0xC0)==0x80 )  // контроль старших бит из других байтов
 static int nS=0;                       // контрольное число байт в символах UTF
-
 char* UtC( unsigned &u, char *U ) // синтез буквы Unicode из полноценного UTF-8
 { if( (u=*U)&0x80 )               //  со столь же излишним контролем кодировки
   { if((*U&0xE0)==0xC0){ X(1){ u=(*U++&0x1F)<<6; u|=*U&0x3F; nS=2; } } else
@@ -40,7 +40,8 @@ const char* CtU( unsigned u ) // раскодирование UniCode в тек�
   if(u<0x110000){ w[0]=(u>>18)&0x7|0xF0; w[1]=(u>>12)&0x3F|0x80; w[2]=(u>>6)&0x3F|0x80; w[3]=u&0x3F|0x80; nS=4; }
   else{ w[0]=0xEF; w[1]=0xBF; w[2]=0xBD; nS=3; } w[nS]=0; return w;
 }
-typedef union{ unsigned char c[4]; unsigned int d; } charint;
+*/
+typedef union{ unsigned char c[5]; unsigned int d; } charint;
 int main( int l, char **Av )
 { FILE *Fi,*Fo;
    SetConsoleCP( CP_UTF8 );
@@ -49,8 +50,10 @@ int main( int l, char **Av )
   if( (Fi=fopen( Av[1],"rb" ))!=NULL )
   { printf( "UtC %s",Av[1] );
     if( (Fo=fopen( strcat( sname( Av[1] ),".utf" ),"wb" ))!=NULL )
-    { printf( " --> %s",fname( Av[1] ) );                           // невидимый признак
-      fprintf( Fo,"%c%c%c...",0xEF,0xBB,0xBF );            //! UTF-8 = Unicode
+    { printf( " --> %s",fname( Av[1] ) );           // невидимый признак
+      fprintf( Fo,"%c%c%c...    UTF-8       │               ↔   UniCode "
+                           " │                          ↔    Windows-16 ",
+                   0xEF,0xBB,0xBF );                //! UTF-8 = Unicode
       for( l=0; !feof( Fi ); l++ )
       { unsigned char i,j=0,k=0,m=0; unsigned u; charint s; s.d=0; //s.c[4]=0;
         if( (i=getc( Fi ))&0x80 )
@@ -65,19 +68,20 @@ int main( int l, char **Av )
         }   else { fprintf( Fo,      "\n\t0x%02X       │ \"",s.c[0]=i );
         if( i!=10 )fprintf( Fo,"%c",i ); else fwrite( &(u=0x9997E2),3,1,Fo );
                    fprintf( Fo,"\", →     %02X",i ); } //  'E29799'
-       charint v={ i,j,k,m };
+       charint v={ i,j,k,m,0 };
        char cv[]={ i,j,k,m };
         UtC( u,cv );
       //UtC( u,(char[]){i,j,k,m} );   // выборка десятичного UniCode
-        fprintf( Fo," ↔ %-5u ← ",u );
+        fprintf( Fo," ↔ %5u ← ",u );
         fwrite ( &(v.d),1,v.d<0x80?1 : v.d<0x10000?2 : v.d<0x1000000?3:4,Fo );
         fprintf( Fo," ↓ %s  + %8u = %s",CtU( u ),s.d,v.c );
         //
         // теперь двухбайтовые символы Unicode Windows/
         //
        wchar_t UniCode[4]={0,0,0,0};
-       size_t n=MultiByteToWideChar( CP_UTF8,0,(char*)(v.c),-1,UniCode,1 ); fprintf( Fo," %5d ",UniCode[0] );
+       size_t n=MultiByteToWideChar( CP_UTF8,0,(char*)(v.c),-1,UniCode,1 );           fprintf( Fo," %5d ",UniCode[0] );
               n=WideCharToMultiByte( CP_UTF8,0,UniCode,-1,(char*)(v.c),1,NULL,NULL ); fprintf( Fo," = %s ",v.c );
+        fprintf( Fo," Win => %5d",U2W( (char*)(v.c) )[0] );
 //         mbtowc( UniCode,(char*)(s.c),4 );
       }
         fprintf( Fo,"\n\n lCount=%d\n",l ); fclose( Fo );

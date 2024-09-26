@@ -5,6 +5,7 @@
 #define _UNICODE
 #include <StdIO.h>
 #include <String.h>
+#include <StdLib.h>
 #include <Windows.h>
 
 #include <locale.h>
@@ -34,10 +35,10 @@ static size_t Utf16_To_Utf8_Calc( const WCHAR *src, const WCHAR *srcLim )
     } size+=2;
   }
 }
-static byte *Utf16_To_Utf8( byte *dest, const WCHAR *src, const WCHAR *srcLim )
+static char *Utf16_To_Utf8( char *dest, const WCHAR *src, const WCHAR *srcLim )
 { for( ;; )
   { if( src==srcLim )return dest; UInt32 val=*src++;
-    if( val<0x80 ){ *dest++ = (byte)val; continue; }
+    if( val<0x80 ){ *dest++ = (char)val; continue; }
     if( val<_UTF8_RANGE(1) )
     { dest[0] = _UTF8_HEAD( 1,val );
       dest[1] = _UTF8_CHAR( 0,val ); dest+=2; continue;
@@ -57,7 +58,7 @@ static byte *Utf16_To_Utf8( byte *dest, const WCHAR *src, const WCHAR *srcLim )
     dest[2] = _UTF8_CHAR( 0,val ); dest+=3;
   }
 }
-static int Utf16_To_Utf8Buf( byte *dest, const WCHAR *src, size_t srcLen )
+static int Utf16_To_Utf8Buf( char *dest, const WCHAR *src, size_t srcLen )
 {
   size_t destLen = Utf16_To_Utf8_Calc( src,src+srcLen ); destLen+=1;
 
@@ -83,16 +84,15 @@ static class Locale
   { setlocale( LC_ALL,".UTF8" );
     setlocale( LC_CTYPE,".UTF8" );
     SetConsoleCP( CP_UTF8 );
-    SetConsoleOutputCP( CP_UTF8 ); printf( "‏יְרוּשָׁלַיִם \n" );
-  }
-} __attribute__((constructor))
-  __attribute__((init_priority(500))) Local;
-static void
-  __attribute__((constructor))_bar() { printf( "Bar(-)да: ‏יְרוּשָׁלַיִם \n" ); }
+    SetConsoleOutputCP( CP_UTF8 ); printf( "\n:0 ‏יְרוּשָׁלַיִם \n" );
+} } __attribute__((constructor))
+    __attribute__((init_priority(500))) Local;
+//static void
+// __attribute__((constructor))_bar() { printf( "Что-то не то (-) да: ‏יְרוּשָׁלַיִם \n" ); }
 
 int __cdecl main( int Ac, char *Av[] )
-//int _tmain( int Ac, LPTSTR Av[] )
-//int wmain( int Ac, WCHAR **Av )
+//int _tmain( int Argc, LPTSTR Argv[] )
+//int wmain( int Argc, LPTSTR Argv[] )
 //int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE, PWSTR pCmdLine, int)
 //int WINAPI WinMain
 //(   HINSTANCE hInstance,	// указатель на текущий экземпляр
@@ -112,22 +112,25 @@ int __cdecl main( int Ac, char *Av[] )
 //  SetConsoleOutputCP( CP_UTF8 );
 //  strcpy( Av[1],"V:\\גכעגכע.vsl" );      //   предусматривается "Аврора"
 
-int argc; WCHAR **argv=CommandLineToArgvW( GetCommandLineW(),&argc );
+  printf( "\n\r:1 - " ); printf( "%s",GetCommandLineA() );
+  printf( "\n\r:2 - " ); printf( "%s",UnicodeToUTF8( GetCommandLineW() ) );
+  printf( "\n\r:3 - " ); printf( "%s + %s\n",Av[0],Av[1] );
 
-  printf( "\n\r:1 - " ); printf( "%s ",GetCommandLineA() );
-  printf( "\n\r:2 - " ); wprintf( L"%s ",GetCommandLineW() );
-  printf( "\n\r:3 - " ); printf( "%s + %s ",Av[0],Av[1] );
+ int Argc;
+  WCHAR **Argv=CommandLineToArgvW( GetCommandLineW(),&Argc );
 
- byte a0[500],a1[500]; //wchar_t TT;
+ char a0[500]="",a1[500]=""; //wchar_t TT;
 
-  Utf16_To_Utf8Buf( a0,argv[0],100 );
-  Utf16_To_Utf8Buf( a1,argv[1],100 );
-//  wcstombs( a0,argv[0],100 );
-//  wcstombs( a1,argv[1],100 );
-  printf( "\n\r:4 - " ); wprintf( L"%s + %s ",argv[0],argv[1] );
-  printf( "\n\r:5 - " ); printf( "%s + %s ",a0,UnicodeToUTF8( argv[1]) );
+  Utf16_To_Utf8Buf( a0,Argv[0],100 );
+  Utf16_To_Utf8Buf( a1,Argv[1],100 );
+//  wcstombs( a0,Argv[0],100 );
+//  wcstombs( a1,Argv[1],100 );
+  printf( "\n\r:4 - " ); wprintf( L"%s + %s ",Argv[0],Argv[1] );
+  printf( "\n\r:5 - " ); printf( "%s + %s ",a0,a1 );
+  printf( "\n\r:6 - " ); printf( "%s + ",UnicodeToUTF8( Argv[0] ) );
+                         printf(         UnicodeToUTF8( Argv[1] ) );
 
-  printf( "\n\r:6 - %d/%d УТФ-8 =  ©75 Сахалин-‏יְרוּשָׁלַיִם ---------\n",Ac,argc ); //getchar(); //strcpy( av[1],a1 );
+  printf( "\n\r:7 - %d/%d УТФ-8 =  ©75 Сахалин-‏יְרוּשָׁלַיִם ---------\n",Ac,Argc ); //getchar(); //strcpy( av[1],a1 );
   return 0;
 }
 

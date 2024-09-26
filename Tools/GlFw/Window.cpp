@@ -116,7 +116,8 @@ static void callbackError( int error, const char* description )
 Place::Place( Window *Win, byte Mode ): Site( Win ),Up( NULL ),Signs( Mode ),
       pX( 0 ),pY( 0 ),Width( Win->Width ),Height( Win->Height ),
       hFont( 0 ),BitFont( NULL ),                // DispСССР: _8x16,_8x14,_8x08
-      FontWidth( 0 ),FontHeight( 0 ),chX( 0 ),chY( 0 ),      // буквенное место
+      FontWidth( 0 ),FontHeight( 0 ),
+      chX( 0 ),chY( 0 ),      // буквенное место
       MouseState( 0 ),       // беспросветная внутренняя унылость мышки/курсора
       extDraw( NULL ),       // свободное рисование без дополнительных настроек
       extPass( NULL ),       // адреса двух внешних\свободных и бесконтрольных

@@ -12,6 +12,7 @@
 				<Option object_output="Dev/Obj/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
 				<Option parameters="*.VSL /R /B" />
 				<Compiler>
 					<Add option="-fexpensive-optimizations" />
@@ -80,18 +81,22 @@
 					<Add library="comdlg32" />
 				</Linker>
 			</Target>
-			<Target title="UTFiles">
-				<Option output="Dev/UTFiles" prefix_auto="1" extension_auto="1" />
+			<Target title="Design_Fonts">
+				<Option platforms="Windows;" />
+				<Option output="Dev/DesignFonts" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Data" />
 				<Option object_output="Dev/Obj/" />
-				<Option type="1" />
+				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters='&quot;0גכעגכע.vsl&quot;' />
+				<Option parameters='&quot;~באסילי.vsl  что равно abrakadabra&quot;' />
 				<Compiler>
 					<Add option="-funsigned-char" />
 					<Add option="-fexec-charset=UTF-8" />
 					<Add option="-finput-charset=UTF-8" />
 				</Compiler>
+				<Linker>
+					<Add library="comdlg32" />
+				</Linker>
 			</Target>
 			<Target title="Hello">
 				<Option output="Dev/Hello" prefix_auto="1" extension_auto="1" />
@@ -141,25 +146,36 @@
 		</Unit>
 		<Unit filename="../Tools/FileOpen.cpp">
 			<Option target="DC3-Interpolation-Extrapolation" />
+			<Option target="Design_Fonts" />
 		</Unit>
 		<Unit filename="../Tools/Math.Rc">
 			<Option compilerVar="CPP" />
 			<Option target="C-WhetStones" />
+			<Option target="Design_Fonts" />
 		</Unit>
 		<Unit filename="../Tools/StrCpy.cpp">
 			<Option target="DC3-Interpolation-Extrapolation" />
+			<Option target="Design_Fonts" />
 		</Unit>
 		<Unit filename="../Type.h">
 			<Option target="DC3-Interpolation-Extrapolation" />
+			<Option target="Design_Fonts" />
+		</Unit>
+		<Unit filename="../Window/ConIO.cpp">
+			<Option target="Design_Fonts" />
 		</Unit>
 		<Unit filename="../Window/UniCode.cpp">
 			<Option target="DC3-Interpolation-Extrapolation" />
+			<Option target="Design_Fonts" />
 		</Unit>
 		<Unit filename="../Working/Contour.cpp">
 			<Option target="DC3-Interpolation-Extrapolation" />
 		</Unit>
 		<Unit filename="../Working/Contour.h">
 			<Option target="DC3-Interpolation-Extrapolation" />
+		</Unit>
+		<Unit filename="../Working/Design_Fonts.cpp">
+			<Option target="Design_Fonts" />
 		</Unit>
 		<Unit filename="../Working/FText.c">
 			<Option compilerVar="CC" />
@@ -168,9 +184,6 @@
 		<Unit filename="../Working/SWAB.c">
 			<Option compilerVar="CC" />
 			<Option target="SWAB" />
-		</Unit>
-		<Unit filename="../Working/UTFiles.cpp">
-			<Option target="UTFiles" />
 		</Unit>
 		<Unit filename="../Working/WHET.c">
 			<Option compilerVar="CC" />

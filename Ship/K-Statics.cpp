@@ -15,6 +15,7 @@ static Real Amax=180,     // Максимальный угол накренен�
 static byte Mode=0x03;    // 0x00 - плечи остойчивости формы при Zg=Zc
                           // 0x01 - остойчивость с метацентрической высотой
                           // 0x02 - положение ЦТ относительно ватерлинии
+static Real HiText=1;
 //
 //    Главные, т.е. внутренние константы
 //
@@ -188,21 +189,23 @@ static void Graphic_for_Element
    Y=wC->Z( y );
   uY=wC->Z( y-up*2 )-Y;
   if( up )
-  { Real x=int( I/dL )*dL;
+  { Real x=int( I/dL )*dL; stWin->AlfaVector( HiText*0.8,1 );
     line( I,Y,I+L,Y );
-//    for( Real x= x<I+L+dL/2; )   //x+=dL )    // Разметка шкалы
-//  {
-    for( int i=0; x<I+L+dL/5; i++,x+=dL/5 )
+    for( int i=0; x<I+L+dL/5; i++,x+=dL/5 )    // Разметка шкалы
     { line( x,Y,x,i%5?Y+uY/3:Y+uY );
       if( i>0 && i%5==0 )
-      stWin->Alfabet(16,"Times").Text(up>0?_South_West:_North_West,x,Y+uY/5,0,"%.9g",e5(x));
-    } stWin->Alfabet(19,"Times").Text(up>0?_South_East:_North_East,I,Y+uY/5,0,Label );
+      stWin->Text(up>0?_South_West:_North_West,x,Y+uY/5,0,"%.9g",e5(x));
+    } stWin->AlfaVector( HiText,2 )
+            .Text(up>0?_South_East:_North_East,I,Y+uY/5,0,Label )
+            .AlfaVector( HiText,1 );
+
   }
   if( C )
   { glBegin( GL_LINE_STRIP );
     for( int i=1; i<nZ-1; i++ )glVertex2d( C[i],i );      // !!! -2 или
     glEnd(); stWin->Text( _South_East,C[sp],sp,0,Label ); // без днища и палубы
-} }
+  }
+}
 //  Блок расчета грузового размера и смоченной поверхности корпуса
 //
 void Hydrostatic::Graphics()
@@ -210,27 +213,27 @@ void Hydrostatic::Graphics()
   Real mn=0,mx=0,dW=Draught/10;
   stWin->Activate(); wC->Focus().Clear();
   gl_BLUE;
-    Graphic_for_Element( Vol,-40,0,Vol[nZ-1],-4,k++,"V" );
-    Graphic_for_Element( Srf,-40,0,Srf[nZ-1], 4,k++,"S" );
+    Graphic_for_Element( Vol,-2.5*HiText,0,Vol[nZ-1],-4,k++,"V" );
+    Graphic_for_Element( Srf,-2.5*HiText,0,Srf[nZ-1], 4,k++,"S" );
   gl_LIGHTRED;
     stWin->Text( _South_West,0,0,0,"КЭТЧ " );
   gl_GREEN;
     MinMax( xCW+1,nZ-2,mn,mx );
     MinMax( xCV+1,nZ-2,mn,mx,1 ); if( mn<Xo )mn=Xo;
                                   if( mx>Xo+Lwl )mx=Xo+Lwl;
-    Graphic_for_Element(   0,-80,mn,mx,4,k,"xS,xC" ); // Абсциссы
-    Graphic_for_Element( xCV,-80,mn,mx,0,k++, "xC" ); // величины
-    Graphic_for_Element( xCW,-80,mn,mx,0,k+=2,"xS" ); // и площади
+    Graphic_for_Element(   0,-5*HiText,mn,mx,4,k,"xS,xC" ); // Абсциссы
+    Graphic_for_Element( xCV,-5*HiText,mn,mx,0,k++, "xC" ); // величины
+    Graphic_for_Element( xCW,-5*HiText,mn,mx,0,k+=2,"xS" ); // и площади
     MinMax( Swl+1,nZ-2,mn=0,mx=0 );
-    Graphic_for_Element( Swl,-80,mn-0.1,mx+0.1,-4,k+=2,"Swl" );
+    Graphic_for_Element( Swl,-5*HiText,mn-0.1,mx+0.1,-4,k+=2,"Swl" );
   gl_RED;
     MinMax( rx+1,nZ-2,mn=0,mx=0 );
-    Graphic_for_Element( rx,-120,0,min(mx,Breadth*2 ),-4,k++,"r" );
+    Graphic_for_Element( rx,-7.5*HiText,0,min(mx,Breadth*2 ),-4,k++,"r" );
     MinMax( Ry+1,nZ-2,mn=0,mx=0 );
-    Graphic_for_Element( Ry,-120,0,min(mx,Length*2),+4,k++,"R" );
+    Graphic_for_Element( Ry,-7.5*HiText,0,min(mx,Length*2),+4,k++,"R" );
   gl_MAGENTA;
-    Graphic_for_Element( Jx,-160,0,0,-4,k++,"Jx" );   // Инерция
-    Graphic_for_Element( Jy,-160,0,0,+4,k++,"Jy" );   // ватерлинии
+    Graphic_for_Element( Jx,-10*HiText,0,0,-4,k++,"Jx" );   // Инерция
+    Graphic_for_Element( Jy,-10*HiText,0,0,+4,k++,"Jy" );   // ватерлинии
   gl_BLACK;
     Graphic_for_Element(   0,0,0,Depth,4,k++,"Z,zC,zM",0 );
     Graphic_for_Element( zCV,0,0,Depth,0,k++,"zC"     ,0 );
@@ -244,9 +247,11 @@ void Hydrostatic::Graphics()
     if( k&1 )glDisable( GL_LINE_STIPPLE );
   }
   gl_BLUE;
-  stWin->Print(-3,-5," %s \n Длина / ширина / осадка:   %1.0f / %0.1f / %0.1f \n"
-                     " Водоизмещение / смоченная обшивка:  %0.1f / %0.1f",
-                     Kh.Name,Length,Breadth,Draught,Volume,Surface );
+  stWin->AlfaVector( HiText,2 )
+   .Print(-3,-5," %s \n Длина / ширина / осадка:   %1.0f / %0.1f / %0.1f \n"
+                " Водоизмещение / смоченная обшивка:  %0.1f / %0.1f",
+                Kh.Name,Length,Breadth,Draught,Volume,Surface );
+  stWin->AlfaVector( HiText,1 );
   //
   //  отметка аппликат метацентров и центров величины для расчетных ватерлиний
   //
@@ -290,13 +295,13 @@ void Hydrostatic::Axis_Statics( _Real A,bool clear )
   for( k=1,z=-dz/2; z>=Lmin; k++,z-=dz/2 )
      glVertex2d( wT->X( (k%2)?6:12 ),z ),glVertex2d( 0,z );
   glEnd(); gl_CYAN;
-  stWin->Alfabet( 18,"Times",400,true ).Text( _East,wT->X( 64 ),Lmax,0,
+  stWin->AlfaVector( HiText,1 ).Text( _East,wT->X( 64 ),Lmax,0,
                  !Mode ? "Остойчивость формы: Zg = Zc + %4.2f м" :
                Mode==1 ? "Метацентрическая высота: h = %4.2f м"  :
                Mode==2 ? "Центр тяжести над ватерлинией:  Zg-T = %4.2f м" :
                          "Аппликата фиксирована: Zg = %4.2f м", Zmet );
   gl_BLACK;
-  stWin->Alfabet( 16,"Times" ); i = A*180.0/M_PI>90?6: A*180.0/M_PI>45?3:2;
+  stWin->AlfaVector( HiText*0.9,1 ); i = A*180.0/M_PI>90?6: A*180.0/M_PI>45?3:2;
   for( k=0; k<=36 && k*dA<A; k++ )
    if( !(k%i) )stWin->Text( _South,k*dA,wT->Z( wT->z( Lmin )-2 ),0,"%i",k*5 );
   for( z=dz; z<=Lmax; z+=dz )stWin->Text( _North_East,wT->X( 6 ),z,0,"%.3g",z );
@@ -435,7 +440,8 @@ int Hydrostatic::Stability_Menu()
                  , { 2,1 },{ 0,5,"%5.2lf",&Zmet }       // выбор типа диаграммы
                  , { 1,5,"Максимальный угол крена %1°",&Amax }
                  , { 1,2,"Выбор ватерлиний  с %2d",&w1},{0,2,"  по %2d",&wN} };
-  TextMenu T( Mlist(Menu_S),stWin,(wT->ux)/9-1,0 ); static int ans=-1;
+  TextMenu T( Mlist(Menu_S),stWin,(wC->ax)/9-2,0 );
+  static int ans=-1;
   switch( Mode&3 )
     { case 0: Menu_S[1].Msg="ЦТ над центром величины "; break;
       case 1: Menu_S[1].Msg="Метацентрическая высота "; break;
@@ -463,7 +469,8 @@ static bool First=false;                // Блокировка пролога �
 
 bool WinStability::Draw()
 { if( !First || !Ready() )return false; First=false;
-  int H=Height,W=Width; Activate();
+  int H=Height,W=Width;
+  AlfaVector( HiText=Real( H )/48, 1 ).Activate();
   glClearColor( 1,0.96,0.92,1 ); Clear();
   wT->az= min( H/12,32 );                // основание диаграммы остойчивости
   wT->uz=(wS->az=wC->az=4*H/9)-36;       // разделение с корпусом и КЭТЧ сверху
@@ -487,7 +494,8 @@ bool WinStability::Draw()
 void Hull_Statics()             // кривых элементов теоретического чертежа,
 {                              // статической остойчивости и ? масштаба Бонжана
  static int W=1280,H=800;     // размерности графического окна в текущем сеансе
- WinStability StabWin( W,H ); stWin=&StabWin; StabWin.Activate();
+ WinStability StabWin( W,H ); stWin=&StabWin;
+  StabWin.AlfaVector( HiText=Real( H )/48.0,1 ).Activate();
  Plane Hull("Корпус",      "Y","Z",stWin); wS=&Hull; // Окно проекции корпус
  Plane Stat("КЭТЧ",        "F","Z",stWin); wC=&Stat; // Гидростатические кривые
  Plane Stab("Остойчивость","a","h",stWin); wT=&Stab; // Диаграмма остойчивости
@@ -513,9 +521,7 @@ void Hull_Statics()             // кривых элементов теорет�
            "","        метацентрические радиусы",
            " Jx,Jy"," поперечный и продольный моменты",
            "","          инерции площади ватерлинии",0 };
-  StabWin.Activate()
-         .Alfabet( 18,"Times" )
-         .Mouse( Mouse_in_Window );    // откат обработки прерываний
+  StabWin.Activate().Mouse( Mouse_in_Window );    // откат обработки прерываний
   First=true;
   StabWin.Draw();             // разметка экрана и прорисовкой проекции корпус
  int ans=_Enter;
@@ -527,7 +533,7 @@ void Hull_Statics()             // кривых элементов теорет�
 MainLoop:
   switch( ans )
   { case _Esc:StabWin.Close(); break;
-    case _F1: StabWin.Help( Name,Cmds,Plus,0,0 ); break;
+    case _F1: StabWin.Help( Name,Cmds,Plus,0,1 ); break;
     case _F4: do{ Real A=Amax;
                   if( !(ans=LD.Stability_Menu()) )goto Ret;
                   if( A!=Amax )LD.Stability(); StabWin.Draw();

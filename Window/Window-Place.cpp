@@ -8,12 +8,12 @@
 Place::Place( Window *Win, byte Mode ): Site( Win ),Signs( Mode ),Up( NULL ),
        pX( 0 ),pY( 0 ),Width( Win->Width ),Height( Win->Height ),
        MouseState(0),xo(0),yo(-1),      // беспросветная унылость мышки/курсора
-       Th( 1 ), Tw( 1 ),     // здесь символьные отсчеты ставятся по пиксельным
-       chX(0),chY(0),cbX(1), // место и отступ строки текста от боковой границы
+       Th(1),Tw(1),Thin(1),  // здесь символьные отсчеты ставятся по пиксельным
+       chX(0),chY(0),bX(1),  // место и отступ строки текста от боковой границы
        extDraw( NULL ),      // свободное рисование без дополнительных настроек
        extPass( NULL ),      // адреса двух внешних\свободных и бесконтрольных
        extPush( NULL ),      // процедур для параллельного контроля хода мышки
-           iFn( NULL ),      // шрифтовой блок при нуле будет ссылкой на Window
+           Bit( NULL ),      // шрифтовой блок, b при нуле включается DesignCAD
            Img( NULL ),      // фоновый растр с наложенной площадкой PlaceAbove
         isDraw( false ),     //  прорисовка сбрасывается по случаю незавершения
        isMouse( false )      //     предыдущей операции (во избежание рекурсии)
@@ -41,10 +41,6 @@ Place& Place::Activate( bool act )        // активизация графич
     glMatrixMode(GL_MODELVIEW); glLoadIdentity(); // единичная  матрица  модели
   } return *this;
 }
-
-
-
-
 bool Place::Draw()       // в виртуальной среде Draw доступен внутренний пролог
 { if( Site && extDraw )  // настройки OpenGL с контекстным эпилогом прорисовки
   { glContext S( Site ); // подготовка среды к внешнему исполнению с рекурсией
@@ -67,7 +63,7 @@ bool Place::Mouse( int b, int x,int y )
 Place::~Place()  // освобождение площадки, шрифтов, картинки и всех точек входа
 { if( Site )if( glAct( Site ) )              // +++ средняя площадка вышибается
   { if( Img ){ free( Img ); Img=NULL; }      // все связные объекты расчищаются
-    if( iFn )AlfaBit();                      // здесь полный destructor шрифтам
+//  if( Bit )AlfaBit();                      // здесь полный destructor шрифтам
     for( Place *S=(Place*)Site;S;S=S->Up )if( S->Up==this ){ S->Up=Up; break; }
     if( Site==this )Site=NULL; else;        // возврат к моменту создания Place
     if( Signs&PlaceAbove )Site->Refresh();  // обновление после удаления Place

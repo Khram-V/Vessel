@@ -31,7 +31,7 @@
 			<Target title="Window Shapes">
 				<Option platforms="Windows;" />
 				<Option output="Dev/Window-shapes" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="Dev" />
+				<Option working_dir="Data/" />
 				<Option object_output="Dev/Obj/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
@@ -122,11 +122,11 @@
 			<Target title="UTF-8-Unicode-OEM(866)alt">
 				<Option platforms="Windows;" />
 				<Option output="Dev/UtC" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="Data" />
+				<Option working_dir="../Window/Fonts" />
 				<Option object_output="Dev/Obj/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option parameters="..\..\Window\Fonts\UTF-8(866).txt" />
+				<Option parameters="DesignCAD.345" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Linker>
 					<Add library="comdlg32" />
@@ -202,6 +202,7 @@
 		<Unit filename="../Tools/Allocate.cpp">
 			<Option target="A-lib64" />
 			<Option target="A-lib32" />
+			<Option target="Window Shapes" />
 		</Unit>
 		<Unit filename="../Tools/Allocate.h">
 			<Option target="A-lib64" />
@@ -212,6 +213,7 @@
 			<Option target="A-lib32" />
 			<Option target="GLFW Shapes" />
 			<Option target="UTF-8-Unicode-OEM(866)alt" />
+			<Option target="Window Shapes" />
 		</Unit>
 		<Unit filename="../Tools/GlFw/Utility.cpp">
 			<Option target="GLFW Shapes" />

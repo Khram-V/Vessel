@@ -224,11 +224,11 @@ static Real e6( _Real R ){ return round( R*1e6 )/1e6; }
 int Hull::Write()
 { Real T; long D;
  int i,k,m,d,y; julday( D=julday(),m,d,y ); T=onetime();
- char Str[MAX_PATH*2];
-  sprintf( Str,"%02d%02d%02d-%02d%02d",y%100,m,d,int( T ),int( T*60 )%60 );
-  if( (Fh=FileOpen( Str,"wb","vsl",
-                "Копия корпуса (*.vsl)\1*.vsl\1Все файлы (*.*)\1*.*\1\1",
-                "? Запись таблицы ординат во временный файл" ))!=NULL )
+ WCHAR Str[MAX_PATH*2];
+  swprintf( Str,L"%02d%02d%02d-%02d%02d",y%100,m,d,int( T ),int( T*60 )%60 );
+  if( ( Fh=FileOpen( Str, L"wb", L"vsl",
+               L"Копия корпуса (*.vsl)\1*.vsl\1Все файлы (*.*)\1*.*\1\1",
+               L"? Запись таблицы ординат во временный файл" ) )!=NULL )
   { fprintf( Fh,";\n; Цифровой теоретический чертёж корпуса корабля,\n"
                    ";   построенный на контурах штевней и шпангоутов\n" );
     FPutS( "©~75\\24.Khram.Калининград",";" );
@@ -390,9 +390,10 @@ bool Hull::Read()              // Нормальный выход с новым 
 //    Считывание заголовков и проверка наличия управляющих кодов
 //
  int i,j,k,Nx,Nz; Real w; // bool hew=true;
- static char FileTitle[]="  Выбрать *.vsl или <Esc> к образцу МИДВ корпуса";
-  if( !(Fh=FileOpen( Name,"rt","vsl","Корпус корабля (<плаз>.vsl)\1*.vsl\1"
-                          "Все файлы (<плаз>.*)\1*.*\1\1",FileTitle ) ) )
+ static WCHAR FileTitle[]=L"  Выбрать *.vsl или <Esc> к образцу МИДВ корпуса";
+  if( !(Fh=FileOpen( U2W( Name ), L"rt", L"vsl",
+                           L"Корпус корабля (<плаз>.vsl)\1*.vsl\1"
+                           L"Все файлы (<плаз>.*)\1*.*\1\1",FileTitle ) ) )
   if( !(Fh=fopen( strcpy( Name,"Hull.vsl" ),"rt" ) ) )
   { if( (Fh=fopen( Name,"wb" ) )!=NULL )
     { fputs( MIDV,Fh ); fclose( Fh ); // hew=false; // случай корпуса из памяти

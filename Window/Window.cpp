@@ -14,7 +14,6 @@
 //                        ©2010-май, В.Н.Храмушин, СахГУ №2010615850/2010-09-08
 //
 static Window *First=NULL; // первое окно в последовательном статическом списке
-//#define AF (*(Fnt?Fnt:Site->Fnt))
 //
 // ════════════════════════════════════════════════════════════════════════════
 //   Window Procedure - общая для всех процедура обработки Windows прерываний
@@ -145,7 +144,7 @@ bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
 //
 Window::Window( const char *_title, int x,int y, int w,int h )
 : Place( this,PlaceOrtho ), // ортогонализуется [-1:1] | PlaceAbove-сохраняется
-  hDC( 0 ), hWnd( 0 ), hRC( 0 ), Title( _title ),Next( NULL ),
+  hDC( 0 ), hWnd( 0 ), hRC( 0 ), Caption( _title ), Next( NULL ),
 //ScreenWidth( GetSystemMetrics( SM_CXSCREEN ) ),
 //ScreenHeight( GetSystemMetrics( SM_CYSCREEN ) ),
   WindowX( CW_USEDEFAULT ),WindowY( CW_USEDEFAULT ),
@@ -204,7 +203,7 @@ Window::Window( const char *_title, int x,int y, int w,int h )
    pfd.nVersion = 1;                        // set the pixel format for the DC
    pfd.dwFlags = PFD_DRAW_TO_WINDOW         // Draw to Window (not to bitmap)
                | PFD_SUPPORT_OPENGL         // Support OpenGL calls in window
-               | PFD_DOUBLEBUFFER;          // Double buffered mode           ~ PFD_SWAP_COPY | PFD_SWAP_LAYER_BUFFERS | PFD_GENERIC_FORMAT
+               | PFD_DOUBLEBUFFER;          // Double buffered mode ~ PFD_SWAP_COPY | PFD_SWAP_LAYER_BUFFERS | PFD_GENERIC_FORMAT
    pfd.iPixelType = PFD_TYPE_RGBA;          // RGBA Color mode
    pfd.cColorBits = 24;      //32
    pfd.cDepthBits = 16;      //32
@@ -218,7 +217,7 @@ Window::Window( const char *_title, int x,int y, int w,int h )
 //
    Up=NULL;                          // верхний фрагмент в списке наложений
    Site=this;                        // связанный Place ссылается на Window
-   Activate().Alfabet().Clear();     // исходный шрифт и настройка площадки
+   Activate().AlfaVector().Clear();  // исходный шрифт и настройка площадки
    chY=Height-Th;                    // позиция текстового курсора сверху/слева
 }
 Window::~Window(){ Close(); }        // закрытие окна может не разрушать Window
@@ -247,10 +246,10 @@ void Window::Close()                 // Разрушение окна в обр�
 //!   Позиционирование окон по правилам Windows
 //!
 Window& Window::Locate( int X,int Y, int W,int H )     // по правилам Windows
-{ int BX=1,BY=1,BC=0; //const int x=X,y=Y,w=W,h=H;    // позиционирование идет
-  if( Title ){ BC=GetSystemMetrics( SM_CYCAPTION );  // от левого верхнего угла
-               BY=GetSystemMetrics( SM_CYSIZEFRAME );
-               BX=GetSystemMetrics( SM_CXSIZEFRAME ); }
+{ int BX=1,BY=1,BC=0;  //const int x=X,y=Y,w=W,h=H;    // позиционирование идет
+  if( Caption ){ BC=GetSystemMetrics( SM_CYCAPTION );  // от левого верхнего угла
+                 BY=GetSystemMetrics( SM_CYSIZEFRAME );
+                 BX=GetSystemMetrics( SM_CXSIZEFRAME ); }
   W = ( Width =min( W>0?W:800,ScreenWidth-BX*2 ) )+BX*2;
   H = ( Height=min( H>0?H:600,ScreenHeight-BY*2-BC ) )+BY*2+BC;
   X = X>0 ? X:( X<0 ? X + ScreenWidth-W : 2*( ScreenWidth-W )/3 );
@@ -259,15 +258,15 @@ Window& Window::Locate( int X,int Y, int W,int H )     // по правилам 
   WindowY = minmax( 0,Y,ScreenHeight-H ); pY=0;
   if( hWnd )
   { // glAct( this );
-    // wglMakeCurrent( NULL,NULL );                  // - закрытие OpenGL
+//  wglMakeCurrent( NULL,NULL );                  // - закрытие OpenGL
     ReleaseDC( hWnd,hDC ); hDC=0;
-    // SetWindowPos( hWnd,HWND_TOP,WindowX,WindowY,W,H,SWP_SHOWWINDOW );
-    // MoveWindow( hWnd,x,y,w,h,true );
+//  SetWindowPos( hWnd,HWND_TOP,WindowX,WindowY,W,H,SWP_SHOWWINDOW );
+//  MoveWindow( hWnd,x,y,w,h,true );
     MoveWindow( hWnd,WindowX,WindowY,W,H,true );
     hDC=GetDC( hWnd );
-    // UpdateWindow( hWnd );
-    Activate().Alfabet();      // размерения окна и переадаптированный шрифт
-    chY=Height-Th;             // позиция текстового курсора сверху/слева
+//  UpdateWindow( hWnd );
+    Activate().AlfaVector();   // размерения окна и переадаптированный шрифт
+//  chY=Height-Th;             // позиция текстового курсора сверху/слева
     Refresh();                 // на выходе сброс привязки к текущему контексту
   } return *this;
 }
@@ -356,9 +355,9 @@ void Window::PutMouse( UINT State, int x,int y )
       { if( xo<-1 )ClipCursor( NULL );
         if( yo<0 )xo=x,yo=y; else     // перемещение окна left<Alt> и left<Btn>
         if( x!=xo || y!=yo )Locate
-        ( WindowX+x-xo-(Title?GetSystemMetrics(SM_CXSIZEFRAME):1 ),
-          WindowY+y-yo-(Title?GetSystemMetrics(SM_CYSIZEFRAME)
-                            + GetSystemMetrics(SM_CYCAPTION):1),Width,Height);
+        ( WindowX+x-xo-(Caption?GetSystemMetrics(SM_CXSIZEFRAME):1 ),
+          WindowY+y-yo-(Caption?GetSystemMetrics(SM_CYSIZEFRAME)
+                              + GetSystemMetrics(SM_CYCAPTION):1),Width,Height);
       } else if( yo>=0 )yo=-1; else
       { POINT LU={ P->pX,Height-P->pY-P->Height }; ClientToScreen( hWnd,&LU );
         if( xo!=-2 )              // xo=-2 - установлено ограничение хода мышки
@@ -441,15 +440,22 @@ DWORD WaitTime( DWORD Wait,        // активная задержка для �
 // #include "UniCode.cpp"
 // #include "Julian.cpp"
 // #include "Sym_CCCP.c"
+
+Window& Window::Title( const char* A )
+{ if( Caption ){ char S[strlen(Caption)+strlen(A)+8];
+    SetWindowTextW( hWnd,U2W( strcat(strcat(strcpy(S,Caption),"  ↔  " ),A) ) );
+  } return *this;
+}
 void Break( const char Msg[],... )    // Случай аварийного завершения программы
 { va_list V; va_start( V,Msg );       // или приостановка с первым символом "~"
- char str[vsprintf( 0,UtA(Msg),V )+4]; vsprintf( str,UtA(Msg),V ); va_end( V );
-//WinExecute();
-  glFinish();
-  MessageBox( NULL,str,*Msg=='~'?"Info":"Break",MB_ICONASTERISK|MB_OK );
+ char str[vsprintf( 0,Msg,V )+4]; vsprintf( str,Msg,V ); va_end( V );
+  if( First )glFinish(),WinExecute();
+  MessageBoxW( NULL,U2W(str),*Msg=='~'?L"Info":L"Break",MB_ICONASTERISK|MB_OK );
   if( *Msg!='~' )exit( MB_OK );
 }
+#if 0
 /*Window& Above(){ SetForegroundWindow( hWnd ); SetFocus( hWnd );
   SetActiveWindow( hWnd ); ShowWindow( hWnd,SW_SHOWNA ); return Refresh(); } */
 //while( isTimer>0 )if( !WinRequest() )WaitMessage(); glFinish(); WinExecute();
 //while( isTimer>0 )if( !WinRequest( hWnd ) )WaitMessage();
+#endif
