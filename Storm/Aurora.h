@@ -197,7 +197,7 @@ public:                           // конструктор, авторская 
   void divideTriangle(_Vertex,_Real,_Vertex,_Real,_Vertex,_Real );
   void drawTriangle( _Vertex,_Vertex,_Vertex ); //! элементарные треугольничики
   void waterPoints( _Vector,_Vector,_Vector );  // нормали и отрезки ватерлинии
-  bool Read( const WCHAR[],         // чтение исходной таблицы плазовых ординат
+  bool Read( const char *Name,      // чтение исходной таблицы плазовых ординат
             _Real newDraught=0.0 ); //        изменение осадки на перечитывании
   bool LNext( int,unsigned &m,Vector &L,byte*); // левый/кормовой - шпангоут
   bool RNext( int,unsigned &m,Vector &R,byte*); // правый/носовой контур шпации

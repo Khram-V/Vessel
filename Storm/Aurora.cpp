@@ -71,6 +71,7 @@ Hull::Hull(): View     // в прицепе View окошко графическ
   Ofs=Zero; mx=my=0;              // и мышку тоже в исходное
   AlfaVector( Height/WinLines ).Activate();         // привязка к Window::Place
   glPolygonMode( GL_FRONT_AND_BACK,GL_FILL );       //   и первый рисунок
+  FileName=(char*)calloc( MAX_PATH,4 );
 #if 1
 //  color(navy); Alfabet(22,"Courier",800).Print( 2,1,"Aurora ~ " );
 //  color(blue); Alfabet(18,"Courier",600).Print( "штормовая гидромеханика");
@@ -113,7 +114,7 @@ Hull::Hull(): View     // в прицепе View окошко графическ
   //WaitTime( 500 );
  int Ac; WCHAR **Av=CommandLineToArgvW( GetCommandLineW(),&Ac );
 //if( !Read(  Ac>1 ? W2U( Av[1] ) : "Aurora.vsl" ) )
-  if( !Read(  Ac>1 ? Av[1] : L"Aurora.vsl" ) )
+  if( !Read(  W2U( Ac>1 ? Av[1] : L"Aurora.vsl" ) ) )
        Break( "Ошибка считывания корпуса %s -> %s",W2U( Av[1] ),FileName );
 //Window::Locate( Xpm( 4 ),Ypm( 4 ),Xpm( 64 ),Ypm( 72 ) ).Clear();
   Window::Locate( Xpm( 4 ),Ypm( 4 ),min( 1280L,Xpm( 64 ) ),
@@ -401,7 +402,7 @@ bool Hull::KeyBoard( byte Keyb )                     // С краткой под
   switch( Keyb )
   { case _F1: Help( Id,Cmds,Plus,1,1 ); break;            // справка с корпусом
     case _F2: Write( Write_choice( this ) ); break;       // запись 3D-модели
-    case _F3: if( !Read( L"*.vsl" ) )
+    case _F3: if( !Read( "*.vsl" ) )
               Break( "Ошибка повторного чтения корпуса %s",FileName );
           Storm->Original( false ); break;    // очистка волнового поля
     case _F4: Config(); break;                // конфигурация формы отображения

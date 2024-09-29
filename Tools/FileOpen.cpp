@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <windows.h>
 #include "../Type.h"
+static string LS;     //! ~файловая рабочая строчка текста неограниченной длины
 #if 0
 FILE *FileOpen
 (       char *FName,  // = буфер полного пути имени файла с длиной = MAX_PATH*2
@@ -43,16 +44,16 @@ FILE *FileOpen
 }
 #endif
 FILE *FileOpen
-(       WCHAR *wName,  // = буфер полного пути имени файла с длиной = MAX_PATH*2
+( char *wName,// = буфер полного пути имени файла в UTF-8 с длиной = MAX_PATH*2
   const WCHAR *wType,   // = "rt"
   const WCHAR *Ext,    // = "vsl",
   const WCHAR *Choice, // = "Ship Hull Form (*.vsl)\0*.vsl\0All Files\0*.*\0\0"
   const WCHAR *Title ) // = "? выбрать корпус или - Esc - для модели МИДВ"
-{ FILE *F=NULL; WCHAR *C=NULL;
-  if( *Title!=L'?' && *wName!=L'*' )F=_wfopen( wName,wType );
+{ FILE *F=NULL; WCHAR *C=NULL,*Fname=U2W( wName ); // буфер не менее 2К статики
+  if( *Title!=L'?' && *wName!='*' )F=_wfopen( Fname,wType );
   if( !F )
   { OPENFILENAMEW W={ sizeof( OPENFILENAMEW ),0 };
-                  W.lpstrFile   = wName; // L"Аврора.vsl";
+                  W.lpstrFile   = Fname; // L"Аврора.vsl";
     if( Title  )  W.lpstrTitle  = Title;
     if( Ext    )  W.lpstrDefExt = Ext;
     if( Choice ){ W.lpstrFilter =( C=wcsdup( Choice ) );
@@ -66,11 +67,11 @@ FILE *FileOpen
                    | OFN_EXPLORER | OFN_HIDEREADONLY; // OFN_ALLOWMULTISELECT
       if( GetOpenFileNameW( &W ) )F=_wfopen( W.lpstrFile,wType );
     } if( C )free( C );
+    strcpy( wName,W2U( wcscpy( (WCHAR*)( (char*)LS ),Fname) ) );
   } return F;
 }
-//      по случаю - чтение файловых строчек с тем же (единым!) буфером в памяти
+//      по случаю - чтение файловых строчек со своим (другим!) буфером в памяти
 //
-static string LS;        //! другая рабочая строчка текста неограниченной длины
 
 char *getString( FILE *F )        // Чтение текстовой строки произвольной длины
 { int k=0;                        //  с проверкой наличия <cr> перед <lf>

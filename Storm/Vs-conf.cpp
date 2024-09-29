@@ -58,7 +58,7 @@ Hull& Hull::Config()
       logMeta();                      //! проверить !
     }
     if( D!=Draught )                  // предварительная очистка волнового поля
-    { if( !Read( U2W(FileName),D ) )  // главные оси и геометрические параметры
+    { if( !Read( FileName,D ) )  // главные оси и геометрические параметры
            Break( "Ошибка повторного чтения корпуса %s",FileName );
     //int sKt=Storm->Kt;
       Storm->Original( false ).Kt=0;
@@ -207,7 +207,7 @@ Hull& Hull::Get( char *s )
           if( strcut( s=z ) )Statum=byte( minmax( 0,atoi( s ),4 ) );
       } }
       if( D>0 && D!=Draught )     // изменение конструктивной осадки парохода
-      if( !Read( U2W(FileName),D ) )Break("Ошибка смены осадки: %s",FileName);
+      if( !Read( FileName,D ) )Break("Ошибка смены осадки: %s",FileName);
   } } return Initial();
 }
 //    выборка факторов демпфирования поступательных и угловых колебаний корпуса

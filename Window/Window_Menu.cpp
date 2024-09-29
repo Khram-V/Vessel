@@ -157,9 +157,9 @@ bool TextMenu::Draw()            // картинка со списком стр�
         if( k==K )if( L.dat )
         { glColor3f( 1,0,0 ); kurs=minmax( 0,kurs,L.lf-1 );
           glBegin( GL_LINE_STRIP );
-                   glVertex2f( l+kurs-0.1,L.Y+1.1);      // текстовый курсор
-          if( ins )glVertex2f( l+kurs-0.1,L.Y );        // изменяемого символа
-              else glVertex2f( l+kurs+1,L.Y+1.1 ); glEnd();
+                   glVertex2f( l+kurs-0.1,L.Y+0.9 );      // текстовый курсор
+          if( ins )glVertex2f( l+kurs-0.1,L.Y );         // изменяемого символа
+              else glVertex2f( l+kurs+1,L.Y+0.9 ); glEnd();
           if( ked==-1 )strcpy( StK,Uset( St,i ) );     // изменяемая подстрочка
   } } } } Show(); return false;
 }

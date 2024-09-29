@@ -19,12 +19,12 @@ void texttitle( const char* title )         //GetConsoleTitleA( S,sizeof(S ) );
 #define ArgStr( n ) va_list aV; va_start( aV,fmt ); n=vprintf( fmt,aV ); \
                     va_end( aV ); return n;
 int print( int x,int y, const char *fmt,... ){ gotoxy( x,y ); ArgStr( x ) }int print( const char *fmt,... ){ int n; ArgStr( n ) } // CharToOem( str,str )////   Неявная и не особо управляемая инициализация нового окна текстовой консоли//                              Rus-Windows/Cyr(1251) DOS/OEM(866) UTF-8(65001)//#include <locale.h>
-//static bool CtrlHandler( DWORD fdwCtrlType ){ ExitProcess(0); return false; }
+static bool CtrlHandler( DWORD fdwCtrlType ){ ExitProcess(0); return false; }
 static struct _ScreenSave_{ _ScreenSave_(){ FreeConsole(),AllocConsole(); // отсоединение с пересозданием
                  *stderr=*stdout=*freopen( "CONOUT$","w",stdout );  // == "CON"
                   StdOut=GetStdHandle( STD_OUTPUT_HANDLE );//                StdOut=CreateConsoleScreenBuffer( GENERIC_WRITE,FILE_SHARE_WRITE,0,CONSOLE_TEXTMODE_BUFFER,0 );
 //                SetConsoleMode( StdOut,ENABLE_PROCESSED_OUTPUT );
-//                SetConsoleCtrlHandler( (PHANDLER_ROUTINE)CtrlHandler,true );
+                  SetConsoleCtrlHandler( (PHANDLER_ROUTINE)CtrlHandler,true );
                   GetConsoleScreenBufferInfo( StdOut,&Screen );                  SetConsoleCP( CP_UTF8 );                  SetConsoleOutputCP( CP_UTF8 );
 //                EnableWindow( GetConsoleWindow(),false );
 //                FlushConsoleInputBuffer( StdOut ); // GENERIC_WRITE
