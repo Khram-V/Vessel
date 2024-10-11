@@ -13,7 +13,7 @@
 				<Option object_output="Dev/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters='«Аврора» &quot;A-1206 Cruise-2&quot; &quot;Free!Ship/Wolfson Twin keel yacht&quot;  &quot;СРТМК «Василий Яковенко»-502ЭМ&quot; &quot;2006 Плавниковый подзор&quot; &quot;DTMB-5415 US Navy Combatant(keel)&quot; DD(X)-ONR5613 &quot;A-1204 Траулер-83+слип&quot; &quot;Эскадренный броненосец «Цесаревич»&quot; &quot;Г-5 Туполев&quot; &quot;A-1202 Морской спасатель - научно-исследовательское судно&quot; &quot;Крейсер «Рюрик»-II-1905&quot; &quot;EFF04 для Курил&quot; &quot;Крейсер «Варяг»-58&quot; &quot;Буксир «Арктикаборг»&quot; &quot;A-1200 Early&quot; Examples\Куб-5 &quot;БПК «Стерегущий»-61&quot; &quot;OSU Regional Class Research Vessel&quot; &quot;Буксир «Витязь»&quot; &quot;Речной теплоход «Родина» (Готман)&quot;' />
+				<Option parameters='&quot;Free!Ship\Fregate type 23-11&quot; «Аврора» &quot;A-1206 Cruise-2&quot; &quot;Free!Ship/Wolfson Twin keel yacht&quot;  &quot;СРТМК «Василий Яковенко»-502ЭМ&quot; &quot;2006 Плавниковый подзор&quot; &quot;DTMB-5415 US Navy Combatant(keel)&quot; DD(X)-ONR5613 &quot;A-1204 Траулер-83+слип&quot; &quot;Эскадренный броненосец «Цесаревич»&quot; &quot;Г-5 Туполев&quot; &quot;A-1202 Морской спасатель - научно-исследовательское судно&quot; &quot;Крейсер «Рюрик»-II-1905&quot; &quot;EFF04 для Курил&quot; &quot;Крейсер «Варяг»-58&quot; &quot;Буксир «Арктикаборг»&quot; &quot;A-1200 Early&quot; Examples\Куб-5 &quot;БПК «Стерегущий»-61&quot; &quot;OSU Regional Class Research Vessel&quot; &quot;Буксир «Витязь»&quot; &quot;Речной теплоход «Родина» (Готман)&quot;' />
 				<Option projectCompilerOptionsRelation="0" />
 				<Option projectLinkerOptionsRelation="2" />
 			</Target>
@@ -25,6 +25,12 @@
 				<Option compiler="gcc-mingw64" />
 				<Option parameters='«Аврора» &quot;Эскадренный броненосец «Цесаревич».vsl&quot;' />
 				<Option projectCompilerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-m64" />
+				</Compiler>
+				<Linker>
+					<Add option="-m64" />
+				</Linker>
 			</Target>
 			<Target title="Aurora-stable">
 				<Option output="../../Work/Aurora-stable" prefix_auto="1" extension_auto="1" />
@@ -34,6 +40,9 @@
 				<Option compiler="gnu_gcc_stable" />
 				<Option parameters='&quot;БПК «Стерегущий»-61&quot;' />
 				<Option projectCompilerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-Wno-narrowing" />
+				</Compiler>
 				<Linker>
 					<Add library="pthread" />
 					<Add library="dl" />
@@ -47,6 +56,9 @@
 				<Option compiler="gnu_gcc_nightly" />
 				<Option parameters='&quot;OSU Regional Class Research Vessel.vsl&quot;' />
 				<Option projectCompilerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-Wno-narrowing" />
+				</Compiler>
 				<Linker>
 					<Add library="pthread" />
 				</Linker>

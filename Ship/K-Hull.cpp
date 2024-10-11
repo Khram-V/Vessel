@@ -219,7 +219,7 @@ int Hull::Read_from_Frames()          // Здесь продолжается
 }
 //        Запись корпуса в формате "по контурам штевней и шпангоутов"
 //                                                        2001-11-30
-static Real e6( _Real R ){ return round( R*1e6 )/1e6; }
+//static Real e6( _Real R ){ return round( R*1e6 )/1e6; }
 
 int Hull::Write()
 { Real T; long D;
@@ -234,16 +234,17 @@ int Hull::Write()
     FPutS( "©~75\\24.Khram.Калининград",";" );
     FPutS( "·",";" );
 //  fprintf( Fh,"\x1E  < %s >\n",Name );
-#define G " %.5lg %.5lg"
+//#define G " %.5lg %.5lg"
+#define G " %7.5lf %7.5lf"
     FPutS( " признак и название","\x1E < %s >",Name );
     FPutS( " количество шпангоутов и номер миделя"," %d %d",Ns,Ms );
     FPutS( " длина ширина осадка [заглубление]"," %.5lg %.5lg %.5lg",
-                                  e6(Length),e6(Breadth),e6(Draught) );
+                                  Length,Breadth,Draught );
     //! Ахтерштевень
                              fprintf( Fh,"\n%3d",Asx.N+1 );
-    for( i=0; i<=Asx.N; i++ )fprintf( Fh,G,e6(Asx(i)),e6(Asx[i]) );
+    for( i=0; i<=Asx.N; i++ )fprintf( Fh,G,Asx(i),Asx[i] );
                              fprintf( Fh,"\n%3d",Asy.N+1 );
-    for( i=0; i<=Asy.N; i++ )fprintf( Fh,G,e6(Asy(i)),e6(Asy[i]) );
+    for( i=0; i<=Asy.N; i++ )fprintf( Fh,G,Asy(i),Asy[i] );
                              fprintf( Fh,"\n" );
     //! Шпангоуты
     //
@@ -252,14 +253,14 @@ int Hull::Write()
       if( n>0 )
       { if( F[k].y[n]<1e-6 && F[k].z[n]==F[k].z[n-1] )--n;
         if( F[k].y[0]<1e-6 && F[k].z[0]==F[k].z[1] )i=1;
-      }                 fprintf( Fh,"\n%3d %-6.5lg",n+1-i,e6(F[k].X) );
-      for( ; i<=n; i++ )fprintf( Fh," " G,e6(F[k].z[i]),e6(F[k].y[i]));
-    }                   fprintf( Fh,"\n" );
+      }                fprintf( Fh,"\n%3d %-6.5lg",n-i,F[k].X );
+      for( ; i<n; i++ )fprintf( Fh," " G,F[k].z[i],F[k].y[i] );
+    }                  fprintf( Fh,"\n" );
     //! Форштевень
                              fprintf( Fh,"\n%3d",Sty.N+1 );
-    for( i=0; i<=Sty.N; i++ )fprintf( Fh,G,e6(Sty(i)),e6(Sty[i]) );
+    for( i=0; i<=Sty.N; i++ )fprintf( Fh,G,Sty(i),Sty[i] );
                              fprintf( Fh,"\n%3d",Stx.N+1 );
-    for( i=0; i<=Stx.N; i++ )fprintf( Fh,G,e6(Stx(i)),e6(Stx[i]) );
+    for( i=0; i<=Stx.N; i++ )fprintf( Fh,G,Stx(i),Stx[i] );
                              fprintf( Fh,"\n\n" );
     FPutS( "водоизмещение",            "; W=%.5lg м³",Volume );
     FPutS( "смоченная поверхность",    "; S=%.5lg м²",Surface );

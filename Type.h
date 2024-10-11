@@ -88,7 +88,7 @@ char* fext ( char*, const char* Ext=0 ); // c принудительной за�
 //FILE *FileOpen                         // ++ кодировка длинных строк FileOpen
 //( char *fn, const char *tp, const char *ex, const char *ch, const char *tl );
 FILE *FileOpen                           // ++ кодировка длинных строк FileOpen
-  ( WCHAR*, const WCHAR*, const WCHAR*, const WCHAR*, const WCHAR* );
+  ( char* vName, const WCHAR*, const WCHAR*, const WCHAR*, const WCHAR* );
 char *getString( FILE *F );              // Чтение строки на статическом адресе
 char *getString( FILE *F, int t );       // неограниченной длины +(-)табуляторы
 #endif                                   // результат - в подстрочках getString

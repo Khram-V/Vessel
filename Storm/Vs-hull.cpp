@@ -94,15 +94,25 @@ static void Alliance( Flex &S, Flex &Y, _Real X )          // St ? Stern : Stem
   { if( !i && !j  )
     { V.y=Y[0].y;                   // начальная точка по минимальной аппликате
       V.x=S[0].x;
-      if( fabs( S[0].z-Y[0].z )<eps ){ V.z=S[0].z; ++i; ++j; }  // здесь x-мера
-      else if( S[0].z<Y[0].z )V.z=S[i++].z; else V.z=Y[j++].z;  //   расстояния
+      if( fabs( S[0].z-Y[0].z )<eps ){ V.z=S[0].z; i=j=1; }   // здесь 1-я мера
+      else if( S[0].z<Y[0].z )V.z=S[i++].z; else V.z=Y[j++].z;  //   дистанции
     } else
-    if( i>=S.len ){ V.y=Y[j].y; V.z=Y[j].z; ++j; } else       // ?? прямой угол
-    if( j>=Y.len ){ V.x=S[i].x; V.z=S[i].z; ++i; } else       // ? интерполяция
+    if( i>=S.len ){ V.y=Y[j].y; V.z=Y[j].z; j++; } else       // ?? прямой угол
+    if( j>=Y.len ){ V.x=S[i].x; V.z=S[i].z; i++; } else       // ? интерполяция
+#if 1
+    { S[i].y=Y[j].y;
+      Y[j].x=S[i].x;
+      if( abs( S[i]-Y[j] )<eps ){ V=S[i++]; j++; } else
+      if( abs( S[i]-V )<abs( Y[j]-V ) )
+      { V=S[i]; V.y=Inter( V.z,Y[j-1].z,Y[j].z,Y[j-1].y,Y[j].y ); i++; } else
+      { V=Y[j]; V.x=Inter( V.z,S[i-1].z,S[i].z,S[i-1].x,S[i].x ); j++; }
+    }
+#else
     if( fabs( S[i].z-Y[j].z )<eps ){ V=S[i++]; V.y=Y[j++].y; } else
     if( fabs( V.z-S[i].z ) < fabs( V.z-Y[j].z ) ) // интерполяция на интервалах
       { V=S[i]; V.y=Inter( V.z,Y[j-1].z,Y[j].z,Y[j-1].y,Y[j].y ); ++i; } else
       { V=Y[j]; V.x=Inter( V.z,S[i-1].z,S[i].z,S[i-1].x,S[i].x ); ++j; }
+#endif
   }
   if( F.len ){ //V=F[0];  if( V.y ){ V.y=0.0; F/=V; }  // так, на всякий случай
                //V=F[-1]; if( V.y ){ V.y=0.0; F+=V; }  //   обнуление оконцовок
@@ -126,30 +136,14 @@ unsigned& uList::operator+=( unsigned p ) // выбор [k] обраткой и 
 { if(len>=n)m=(unsigned*)realloc(m,(n+=96)*sizeof(unsigned));return m[len++]=p;
 }
 static Flex L,R;               // левый и правый шпангоуты для поисковой шпации
+//static Vector blr={0,0,0};
 static bool Span( int l, int r )
 {
-     return dir( R[r+1]-L[l] ).x > dir( R[r]-L[l+1] ).x;
-//   return abs( R[r+1]-L[l] )<abs( R[r]-L[l+1] );
+  Vector LR=R[r]-L[l+1],RL=R[r+1]-L[l]; LR.z*=2; RL.z*=2; //LR.y/=2; RL.y/=2; LR.x=RL.x=0;
+//  return norm( RL )<norm( LR );
+//  return fabs( RL%dir(R[r+1]-R[r]) )<fabs( LR%dir(L[l+1]-L[l] ) );
+  return dir( RL ).x>dir( LR ).x;
 }
-/*          W = dir( R[zr+1]-L[zl] );         // подъём к правой стороне шпации
-            V = dir( R[zr]-L[zl+1] );         // +по левому кормовому шпангоуту
-//          lfr = norm( W.x,W.y )>norm( V.x,V.y );   // по длине гипотенузы
-//          lfr = norm(W.y,W.x)>norm(V.y,V.x);// длинная диагональ вправо-вверх
-//          lfr = sqr( W.z )<sqr( V.z );      // самоумножение для отмены знака
-//          lfr = W.z<-V.z;                   /// ???
-            lfr = abs( R[zr+1]-L[zl] )<abs( R[zr]-L[zl+1] );
-            lfr = W.x>V.x;
-
-          W=dir( R[sr+1]-L[sl] );        // обработка перпендикулярных
-          V=dir( R[sr]-L[sl+1] );        // пересечений под кормовым подзором
-//        if( L[sl].x<Keel[0]+Length/5 && L[sl].z<0 ) // на 20% может быть руль
-//          if( fabs( dir( R[sr+1]-R[sr] )%dir( L[sl+1]-L[sl] ) )<0.1 )
-//            W.z/=8,V.z/=8;                             // условное обнуление
-//        if( abs( R[sr+1]-L[sl] )<abs( R[sr]-L[sl+1] ) )
-//        if( norm( W.x,W.y ) > norm( V.x,V.y ) )        // по длине гипотенузы
-//        if( sqr( W.z )<sqr( V.z ) )
-*/
-//
 //   Считывание корпуса отмечается успехом, либо полным завершением программы
 //
 bool Hull::Read( const char* FName,    // здесь имя приходит в кодировке W-1251
@@ -171,7 +165,7 @@ bool Hull::Read( const char* FName,    // здесь имя приходит в 
     } goto Bk;                       // здесь продолжается серия проверок
   }                                  //  FileTitle[0]='?'
 Ok:
-  Str=stringData( Fh );            // Длинная строка в буфере входного файла
+  Str=stringData( Fh );              // Длинная строка в буфере входного файла
   if( *Str++==30 ){                  //  '\30=▲\x1E'
    Vector V;                         // векторы шпангоутных контуров по шпациям
    Real x,y,z; int i,j,k,l,m,n;      // ... точки по циклам двойной вложенности
@@ -217,10 +211,10 @@ Ok:
     for( V.x=0,i=0; i<k; i++ )V.z=strtod( s,&s ),V.y=strtod( s,&s ),R+=V;
     n=strtol( stringData( Fh ),&s,0 );
     for( V.y=0,i=0; i<n; i++ )V.z=strtod( s,&s ),V.x=strtod( s,&s ),Stem+=V;
-                                            //
-    fclose( Fh );                           // работа с файлом данных завершена
-    Alliance( Stern,L,Keel[1] );            // первая перестройка штевней после
-    Alliance( Stem,R,Keel[Nframes] );       // считывания всех данных о корпусе
+                                         //
+    fclose( Fh );                        // работа с файлом данных завершена
+    Alliance( Stern,L,Keel[1] );         // первая перестройка штевней после
+    Alliance( Stem,R,Keel[Nframes] );    // считывания всех данных о корпусе
     //
     //   Экстремумы по килевой линии и дополнение крайних шпангоутов
     //       ~~ крайние точки на килевой или палубной аппликате
@@ -239,7 +233,7 @@ Ok:
     for( Keel[n+1]=Keel[n],i=0; i<Stem.len; i++ )
     { const Vector &S=Stem[i];
       if( S.x>Keel[n+1] )Keel[n+1]=S.x;  // экстремум абсциссы по форштевню
-      if( S.x>=Keel[n] )Frame[n+1]+=S;    // с образованием свободного шпангоута
+      if( S.x>=Keel[n] )Frame[n+1]+=S;   // с образованием свободного шпангоута
     }                                    //        который может и не сложиться
 
     if( !Frame[n+1].len ){ for( z=i=0; i<Frame[n].len; i++ )z+=Frame[n][i].z;
@@ -313,19 +307,19 @@ Ok:
       //
       //   здесь выполняется выборка точек в новые контуры числовых шпангоутов,
       //   и вышибаются рассогласования у килевой линии до первых значимых хорд
-      //       ширина всех шпаций теперь не предустанавливается одинаковой в 1м
+      //      ширина всех шпаций теперь (не)предустанавливается одинаковой в 1м
       //
       for( x=Keel[n-1],k=0; k<Frame[n-1].len; k++ )  // слева без левых загибов
-       if( (V=Frame[n-1][k]).x>=x ){ L+=V; lf+=unsigned( k )|LeftFrame; }
+       if( ( V=Frame[n-1][k] ).x>=x ){ L+=V; lf+=unsigned( k )|LeftFrame; }
       for( x=Keel[n],k=0; k<Frame[n].len; k++ )// справа без правых искривлений
-       if( (V=Frame[n][k]).x<=x ){ R+=V; rf+=unsigned( k ); }
+       if( ( V=Frame[n][k] ).x<=x ){ R+=V; rf+=unsigned( k ); }
       //
       //     исправления, как бы для согласования и выравнивания геометрических
       //     особенностей со сверкой нулевого контура в диаметральной плоскости
       //
-      for( x=Keel[n-1],i=0; i<L.len; i++ )L[i].x=x;
+      for( x=Keel[n-1],i=0; i<L.len; i++ )L[i].x=x; //!=0.0
 //     if( L[i].x>x )L[i].y=0.0,L[i].x=x; else if( L[i].z>0.0 )L[i].y/=2.0;
-      for( x=Keel[n],i=0; i<R.len; i++ )R[i].x=x;
+      for( x=Keel[n],i=0; i<R.len; i++ )R[i].x=x;   //!=1.0 ∀ Keel[n]-Keel[n-1]
 //     if( R[i].x<x )R[i].y=0.0,R[i].x=x; else if( R[i].z>0.0 )R[i].y/=2.0;
       //
       //   сброс повторяющихся точек в подводной части корпуса,
@@ -340,9 +334,8 @@ Ok:
       //
      int sl=1,sr=1;   // индексы поиска по контурам шпангоутов от третьих точек
       Ins( n )=lf[0],Ins( n )=rf[0];   // левая точка впереди - это существенно
-      //
-      //  предустановка верхней границы по палубе или конструктивной ватерлинии
-      //
+//    Ins( n )=lf[1],Ins( n )=rf[1]; sl=sr=2;
+//if(0)
       if( L.len>1 && R.len>1 ) // четырёхугольник отодвигается от диаметральной
       { if( norm( L[1]-L[0] )>=norm( R[1]-R[0] ) )       // плоскости (временно)
         { Ins( n )=lf[1]; Ins( n )=rf[1];                 // обновление выборки
@@ -356,32 +349,32 @@ Ok:
             else Ins( n )=rf[sr=i];
         }
       } else                                           // веер из треугольников
-      { for( i=1; i<L.len; i++ )Ins( n )=lf[i];        //  либо далее до другой
+      { for( i=1; i<L.len; i++ )Ins( n )=lf[i];         // либо далее до другой
         for( i=1; i<R.len; i++ )Ins( n )=rf[i]; continue; // к следующей шпации
       }
-     int wl=sl,wr=sr;  // обратные индексные отсчеты по уровню ватерлинии
+      //  предустановка верхней границы по палубе или конструктивной ватерлинии
+      //
+     int wl=sl,wr=sr;        // обратные индексные отсчеты по уровню ватерлинии
       for( wl=L.len-1; wl>sl; wl-- )if( L[wl].z<=0.0 )break;
       for( wr=R.len-1; wr>sr; wr-- )if( R[wr].z<=0.0 )break;
       //
-      //!          метка последовательного построения сначала подводных обводов
+      //! метка простого последовательного построения сначала подводных обводов
       //            и затем надводного борта с множеством сломов на надстройках
       while( sl<wl || sr<wr )               // завершающий веер треугольников
       if( sl>=wl )Ins( n )=rf[++sr]; else   // установка обоих точек для нового
       if( sr>=wr )Ins( n )=lf[++sl]; else   // четырехугольника, по возможности
       if( Span( sl,sr ) )Ins( n )=rf[++sr]; // на выходе строго sl==wl и sr==wr
-                 else    Ins( n )=lf[++sl];
-     int zr=sr,zl=sl;
-      wl=L.len;
-      wr=R.len;
-      //!         перенастройка и продолжение оптимизации линий бортовых сломов
-      //                         опорные точки s# уже занесены в обшивку
-      //                         контрольные z# только ожидают обработки
-      //                         ограничивающие w# к ватерлинии и палубе
+                 else    Ins( n )=lf[++sl]; //! смачиваемая поверхность корпуса
+      //
+      ///          ! перенастройка и продолжение оптимизации по бортовым сломам
+     int zl=sl,zr=sr;                // опорные точки s# уже занесены в обшивку
+      wl=L.len;                      // контрольные z# только ожидают обработки
+      wr=R.len;                      // ограничивающие w# к ватерлинии и палубе
       do
       { //       предварительный просмотр поверхности с поиском бортовых сломов
         // выбирается углы хорд относительно обоих локалей шпангоутных контуров
         //
-       const Real C12=0.9;
+       const Real C24=0.9135454576;
         if( sl==zl && sr==zr )                // обход начальных предустановок
         { int l=wl-zl,r=wr-zr;                // поиске всего от киля до палубы
           while( l>0 || r>0 )                 //    по индексам бортовых сломов
@@ -391,7 +384,7 @@ Ok:
             if( lfr )goto Rst;                //...подтягивается к правой точке
        Lst: if( l>0 )
             { if( ++zl>=wl-1 )zl=wl,l=0; else
-              if( L[zl-1]==L[zl] || dir(L[zl+1]-L[zl])%dir(L[zl]-L[zl-1])<C12 )
+              if( L[zl-1]==L[zl] || dir(L[zl+1]-L[zl])%dir(L[zl]-L[zl-1])<C24 )
                 { l=0; if( r>0 )r=2; }
               else --l; //if( l>=0 )--l;
               continue;
@@ -399,7 +392,7 @@ Ok:
             if( lfr )continue;
        Rst: if( r>0 )
             { if( ++zr>=wr-1 )zr=wr,r=0; else // на точку ниже последнего слома
-              if( R[zr-1]==R[zr] || dir(R[zr+1]-R[zr])%dir(R[zr]-R[zr-1])<C12 )
+              if( R[zr-1]==R[zr] || dir(R[zr+1]-R[zr])%dir(R[zr]-R[zr-1])<C24 )
                 { r=0; if( l>0 )l=2; }
               else --r; // if( r>=0 )--r;
               continue;
@@ -409,7 +402,7 @@ Ok:
 #if 0     ///      это надо встроить как-то внутрь, в рекурсию поиска и анализа
           // теперь выбор допустимо малого угла отклонения ребра от горизонтали
           //
-     const Real S20=0.12; //0.3420201433;
+     const Real S20=0.3420201433;
      Vector W=R[zr]-L[zl];         // исправление индекса с нарушением отсчётчика
           if( !l && r<0 )for( i=zr-1; i>sr; i-- )
             { if( norm( V=R[i]-L[zl] )<norm( W ) )W=V,zr=i; else break; } else
@@ -426,6 +419,9 @@ Ok:
         }
         // с поиском новой и наиболее параллельной грани в текущих ограничениях
         //
+
+//zl=wl,zr=wr;
+
         while( sl<zl || sr<zr )             // завершающий веер треугольников
         if( sl>=zl )Ins( n )=rf[++sr]; else // установка обоих точек для нового
         if( sr>=zr )Ins( n )=lf[++sl]; else // четырехугольника, по возможности
@@ -455,11 +451,11 @@ Bk: textcolor( YELLOW,RED ),
    C48=0.6691306064,C66=0.40673664307,C72=0.30901699437,C75=0.2588190451,
    C78=0.2079116908,C82=0.139173101,C84=0.1045284633,C86=0.06975647374 ...
    cos(78°)=sin(12°) ==> S04=C86,S06=C84,S08=C82,S12=C78,S18=C72,S24=C66 ...
-
-        { if( (y=norm(R[sr+1]-L[sl]))>(x=norm(R[sr]-L[sl+1])) ) /// без фокусов
-          {                            Ins( n )=lf[++sl];       // с ускорением
-            if( norm(R[sr+1]-L[sl])<x )Ins( n )=rf[++sr];
-          } else {                     Ins( n )=rf[++sr];
-            if( norm(R[sr]-L[sl+1])<y )Ins( n )=lf[++sl];
-        } }
+   {
+     if( (y=norm(R[sr+1]-L[sl]))>(x=norm(R[sr]-L[sl+1])) ) /// без фокусов
+     {                            Ins( n )=lf[++sl];       // с ускорением
+       if( norm(R[sr+1]-L[sl])<x )Ins( n )=rf[++sr];
+     } else {                     Ins( n )=rf[++sr];
+       if( norm(R[sr]-L[sl+1])<y )Ins( n )=lf[++sl];
+   } }
 */
