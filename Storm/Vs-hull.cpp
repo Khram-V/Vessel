@@ -136,13 +136,21 @@ unsigned& uList::operator+=( unsigned p ) // выбор [k] обраткой и 
 { if(len>=n)m=(unsigned*)realloc(m,(n+=96)*sizeof(unsigned));return m[len++]=p;
 }
 static Flex L,R;               // левый и правый шпангоуты для поисковой шпации
-//static Vector blr={0,0,0};
 static bool Span( int l, int r )
-{
-  Vector LR=R[r]-L[l+1],RL=R[r+1]-L[l]; LR.z*=2; RL.z*=2; //LR.y/=2; RL.y/=2; LR.x=RL.x=0;
-//  return norm( RL )<norm( LR );
-//  return fabs( RL%dir(R[r+1]-R[r]) )<fabs( LR%dir(L[l+1]-L[l] ) );
-  return dir( RL ).x>dir( LR ).x;
+#if 1
+{ //return fabs( dir(R[r+1]-R[r])%dir(R[r+1]-L[l]) )
+  //     < fabs( dir(L[l+1]-L[l])%dir(L[l+1]-R[r]) );
+  //return dir( R[r+1]-L[l] ).x > dir( R[r]-L[l+1] ).x;
+    return norm( R[r+1]-L[l] ) < norm( R[r]-L[l+1] );
+#else
+{ static Vector blr={0,0,-1};
+ Vector Base =R[r]-L[l], Right=dir( Base*(R[r+1]-R[r]) ),
+                         Left =dir( Base*(L[l+1]-L[l]) );
+  if( Right%blr>Left%blr ){ if( Right%blr>0.999 ){ blr=Right; return true; } }
+                     else { if( Left%blr>0.999 ){ blr=Left; return false; } }
+  if( dir( R[r+1]-L[l] ).x >= dir( R[r]-L[l+1] ).x ){ blr=Right; return true; }
+                                               else { blr=Left; return false; }
+#endif
 }
 //   Считывание корпуса отмечается успехом, либо полным завершением программы
 //
@@ -310,7 +318,7 @@ Ok:
       //      ширина всех шпаций теперь (не)предустанавливается одинаковой в 1м
       //
       for( x=Keel[n-1],k=0; k<Frame[n-1].len; k++ )  // слева без левых загибов
-       if( ( V=Frame[n-1][k] ).x>=x ){ L+=V; lf+=unsigned( k )|LeftFrame; }
+       if( ( V=Frame[n-1][k]).x>=x){ L+=V; lf+=unsigned(k)|LeftFrame; }
       for( x=Keel[n],k=0; k<Frame[n].len; k++ )// справа без правых искривлений
        if( ( V=Frame[n][k] ).x<=x ){ R+=V; rf+=unsigned( k ); }
       //
@@ -363,10 +371,19 @@ Ok:
       while( sl<wl || sr<wr )               // завершающий веер треугольников
       if( sl>=wl )Ins( n )=rf[++sr]; else   // установка обоих точек для нового
       if( sr>=wr )Ins( n )=lf[++sl]; else   // четырехугольника, по возможности
-      if( Span( sl,sr ) )Ins( n )=rf[++sr]; // на выходе строго sl==wl и sr==wr
-                 else    Ins( n )=lf[++sl]; //! смачиваемая поверхность корпуса
+      { if( Span( sl,sr ) )Ins( n )=rf[++sr]; // на выходе строго sl==wl и sr==wr
+                   else    Ins( n )=lf[++sl]; //! смачиваемая поверхность корпуса
+        if( sl>2 && (dir( L[sl]-L[sl-1] )%dir( L[sl+1]-L[sl] ))<=0 //>2 от киля
+         || sr>2 && (dir( R[sr]-R[sr-1] )%dir( R[sr+1]-R[sr] ))<=0 )break;
+      }
+      for( int l=wl,r=wr,s=0; l>sl || r>sr; )
+      if( l<=sl )Ins( n,s-- )=rf[r--]; else   // установка обоих точек для нового
+      if( r<=sr )Ins( n,s-- )=lf[l--]; else   // четырехугольника, по возможности
+      if( !Span( l-1,r-1 ) )Ins( n,s-- )=rf[r--];
+                      else  Ins( n,s-- )=lf[l--];
+      sl=wl; sr=wr;
       //
-      ///          ! перенастройка и продолжение оптимизации по бортовым сломам
+      ///          !.перенастройка и продолжение оптимизации по бортовым сломам
      int zl=sl,zr=sr;                // опорные точки s# уже занесены в обшивку
       wl=L.len;                      // контрольные z# только ожидают обработки
       wr=R.len;                      // ограничивающие w# к ватерлинии и палубе
@@ -374,19 +391,19 @@ Ok:
       { //       предварительный просмотр поверхности с поиском бортовых сломов
         // выбирается углы хорд относительно обоих локалей шпангоутных контуров
         //
-       const Real C24=0.9135454576;
+       const Real C24=0.8; //0.9135454576;
         if( sl==zl && sr==zr )                // обход начальных предустановок
         { int l=wl-zl,r=wr-zr;                // поиске всего от киля до палубы
           while( l>0 || r>0 )                 //    по индексам бортовых сломов
           { if( zl>=wl-2 || zr>=wr-2 )        // палуба перекрывается без каких
               { zl=wl; zr=wr; break; }        //  - либо дополнительных условий
             lfr=Span( zl,zr );
-            if( lfr )goto Rst;                //...подтягивается к правой точке
+            if( lfr )goto Rst;                // ..подтягивается к правой точке
        Lst: if( l>0 )
             { if( ++zl>=wl-1 )zl=wl,l=0; else
               if( L[zl-1]==L[zl] || dir(L[zl+1]-L[zl])%dir(L[zl]-L[zl-1])<C24 )
                 { l=0; if( r>0 )r=2; }
-              else --l; //if( l>=0 )--l;
+              else if( l>=0 )--l;
               continue;
             }
             if( lfr )continue;
@@ -394,7 +411,7 @@ Ok:
             { if( ++zr>=wr-1 )zr=wr,r=0; else // на точку ниже последнего слома
               if( R[zr-1]==R[zr] || dir(R[zr+1]-R[zr])%dir(R[zr]-R[zr-1])<C24 )
                 { r=0; if( l>0 )l=2; }
-              else --r; // if( r>=0 )--r;
+              else if( r>=0 )--r;
               continue;
             }   // точка слома, три попытки слева, левый отстаёт ниже горизонта
             if( lfr )goto Lst;
@@ -427,7 +444,7 @@ Ok:
         if( sr>=zr )Ins( n )=lf[++sl]; else // четырехугольника, по возможности
         if( Span( sl,sr ) )Ins( n )=rf[++sr];    // по абсциссе или её проекции
                       else Ins( n )=lf[++sl];    // то проще не бывает
-        // if( dir( R[sr]-L[sl] ).x<0.9396926208 ){ zl=sl; zr=sr; break; }
+          // if( dir( R[sr]-L[sl] ).x<0.9396926208 ){ zl=sl; zr=sr; continue; }
         //
         //  особая перепроверка (=пропуск) зараз всех смежных совпадающих точек
         //

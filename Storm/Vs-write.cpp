@@ -6,6 +6,7 @@
 #include "Aurora.h"       // объекты и производные операции с корпусом на волне
 static int fColor=-1;
 static FILE *F=NULL;
+static Real T=0.0,St=0.0;    // действующее смещение для приведения к оригиналу
 static void printF( Vector V )
 { e6( V ); if( V.y<0 )V.y=0; fprintf( F,"v %lg %lg %lg\n",V.x,V.z,V.y );
                              fprintf( F,"v %lg %lg %lg\n",V.x,V.z,-V.y );
@@ -20,10 +21,11 @@ static void crossDC( Vector A,Vector B,Vector C )
 { e6( A ); e6( B ); e6( C );
   if( fabs( A.y )<eps && fabs( B.y )<eps && fabs( C.y )<eps )return;
   fprintf(F,"31 4 1 0 0 %d\n%lg %lg %lg\n%lg %lg %lg\n%lg %lg %lg\n%lg %lg %lg\n",
-  A.z<=0&&B.z<=0&&C.z<=0?3:9,A.x,A.z,A.y,B.x,B.z,B.y,C.x,C.z,C.y,A.x,A.z,A.y );
+  A.z<=0&&B.z<=0&&C.z<=0?3:9,
+         A.x+St,A.z+T,A.y,B.x+St,B.z+T,B.y,C.x+St,C.z+T,C.y,A.x+St,A.z+T,A.y );
 }
 Hull& Hull::Write( int format ) // Wavefront Technologies 4 Advanced Visualizer
-{ int i,j,k,n;
+{ int i,j,k,n; T=Ofs.z; St=Ofs.x;
   if( format==1 )        // здесь тексты сохраняются в рабочем формате UTF-8
   { if( !(F=_wfopen( U2W( fext( FileName,"obj" ) ),L"wb" )) )return *this;
    Point P,Q,q; int L[Nframes+2];
@@ -77,24 +79,24 @@ Hull& Hull::Write( int format ) // Wavefront Technologies 4 Advanced Visualizer
     //
     //  во первой строке письма общие размерения графического изображения
     //
-    fprintf( F,"%g %g %g %g\n",                      // здесь задаются масштабы
-                Keel[0],-Draught,Keel[Nframes-1]-Keel[0],Draught*2 );
+    fprintf( F,"%g 0 %g %g\n",                      // здесь задаются масштабы
+                Keel[0],Keel[Nframes+1]-Keel[0],T*2 );
     fprintf( F,"20 0 0 0 0 0\n1.0,0.1\n1.0\n*\n; ANSI-1251 DesignCAD Russian\n"
                "23 5 0 0 0 0\n%s\nGrid\nFrames\nStern and Stem line\n"
                "Aft and Bow breadth\n21 1\n",UtA( fname( FileName) ) );
-    fprintf( F,"; Baseline\n1 %d 0.5 0 3 3 0 1 1\n",Nframes+2 );  // разметка
-    for( i=0; i<Nframes+2; i++ )fprintf( F,"%lg %lg 0\n",Keel[i],Draught );
+    fprintf( F,"; Baseline\n1 %d 0.5 0 3 3 0 1 1\n",Nframes+2 );    // разметка
+    for( i=0; i<Nframes+2; i++ )fprintf( F,"%lg %lg 0\n",Keel[i],T );
     fprintf( F,"; Frames\n" );
     for( i=1; i<=Nframes; i++ )
       fprintf( F,"1 2 0.5 0 1 14 0 1 1\n%lg %lg 0\n%lg %lg 0\n",
-      Keel[i],Frame[i][0].z+Draught,Keel[i],Frame[i][Frame[i].len-1].z+Draught);
+      Keel[i],Frame[i][0].z+T,Keel[i],Frame[i][Frame[i].len-1].z+T);
     fprintf( F,"; Plane\n1 5 0.5 0 1 14 0 1 1\n"
      "%lg %lg %lg\n%lg %lg %lg\n%lg %lg %lg\n%lg %lg %lg\n%lg %lg %lg\n",
-     Keel[0],Draught,Breadth/2,Keel[Nframes+1],Draught,Breadth/2,Keel[Nframes+1],
-     Draught,-Breadth/2,Keel[0],Draught,-Breadth/2,Keel[0],Draught,Breadth/2 );
+     Keel[0],T,Breadth/2,Keel[Nframes+1],T,Breadth/2,Keel[Nframes+1],
+     T,-Breadth/2,Keel[0],T,-Breadth/2,Keel[0],T,Breadth/2 );
     fprintf( F,"; Board box\n"
      "1 4 0.5 0 1 14 0 1 1\n%lg %lg 0\n%lg 0 0\n%lg 0 0\n%lg %lg 0\n",
-     Keel[0],Draught,Keel[0],Keel[Nframes+1],Keel[Nframes+1],Draught );
+     Keel[0],T,Keel[0],Keel[Nframes+1],Keel[Nframes+1],T );
     fprintf( F,"21 2\n; %d Frames\n",Nframes );
     for( j=0,k=1; k<=Nframes; )
     { for( i=n=0; i<Frame[k].len; i++ )if( Frame[k][i].x==Keel[k] )n++;
@@ -102,64 +104,66 @@ Hull& Hull::Write( int format ) // Wavefront Technologies 4 Advanced Visualizer
       for( i=n=0; i<Frame[k].len; i++ )if( Frame[k][i].x==Keel[k] )
       { Real S=Frame[k][i].y;
         if( k-Mid<=0 && j==0 )S=-S;
-        fprintf( F,"%lg %lg %lg\n",S,Frame[k][i].z+Draught,Frame[k][i].x );
+        fprintf( F,"%lg %lg %lg\n",S,Frame[k][i].z+T,Frame[k][i].x );
       } if( k-Mid==0 && j==0 )++j; else k++;
     }
 
     fprintf( F,"21 3\n; Stern\n1 %d 1 0 0 8 0 1 3\n",n=Stern.len );
     for( i=0; i<n; i++ )
-      fprintf( F,"%g %g %g\n",Stern[i].x,Stern[i].z+Draught,-Stern[i].y );
+      fprintf( F,"%g %g %g\n",Stern[i].x,Stern[i].z+T,-Stern[i].y );
     fprintf( F,"; Stem\n1 %d 1 0 0 8 0 1 3\n",n=Stem.len );
     for( i=0; i<n; i++ )
-      fprintf( F,"%g %g %g\n",Stem[i].x,Stem[i].z+Draught,Stem[i].y );
+      fprintf( F,"%g %g %g\n",Stem[i].x,Stem[i].z+T,Stem[i].y );
 
     fprintf( F,"21 4\n; Stern wide\n1 %d 0.5 0 1 8 0 1 4\n",n=Stern.len );
     for( i=0; i<n; i++ )
-      fprintf( F,"%g %g %g\n",-Stern[i].y,Stern[i].z+Draught,Stern[i].x );
+      fprintf( F,"%g %g %g\n",-Stern[i].y,Stern[i].z+T,Stern[i].x );
     fprintf( F,"; Stem wide\n1 %d 0.5 0 1 8 0 1 4\n",n=Stem.len );
     for( i=0; i<n; i++ )
-      fprintf( F,"%g %g %g\n",Stem[i].y,Stem[i].z+Draught,Stem[i].x );
+      fprintf( F,"%g %g %g\n",Stem[i].y,Stem[i].z+T,Stem[i].x );
   }                                  ///
   else                               /// варианты красивой трехмерной картинки
   if( format>2 && format<5 )         ///
   { if( !(F=_wfopen( U2W( fext( FileName,"dc3" ) ),L"wb" )) )return *this;
-    fprintf( F,"%g %g %g %g 0 %g %g\n",
-     Keel[0],-Draught,Keel[Nframes+1]-Keel[0],Draught*2,Breadth/-2,Breadth/2 );
+    fprintf( F,"%g 0 %g %g 0 %g %g\n",
+     Keel[0]+St,Keel[Nframes+1]-Keel[0],T*2,Breadth/-2,Breadth );
+//  fprintf( F,"%g %g %g %g 0 %g %g\n",
+//   Keel[0],-T,Keel[Nframes+1]-Keel[0],T*2,Breadth/-2,Breadth/2 );
 
     fprintf( F,"20 0 0 0 0 0\n1.0,0.1\n1.0\n*\n; ANSI-1251 DesignCAD Russian\n"
                "23 6 0 0 0 0\n%s\nGrid\nPortside\nStarboard\n"
                "Stern and Stem line\nHull plating\n21 1\n; Baseline\n"
                "1 %d 0.5 0 3 3 0 1 1\n",UtA( fname( FileName ) ),Nframes+2 );
-    for( i=0; i<Nframes+2; i++ )fprintf( F,"%g 0 0\n",Keel[i] );
+    for( i=0; i<Nframes+2; i++ )fprintf( F,"%g 0 0\n",Keel[i]+St );
     fprintf( F,"; Frames\n" );
     for( i=1; i<=Nframes; i++ )
     fprintf( F,"1 2 0.5 0 1 14 0 1 1\n%lg %lg 0\n%lg %lg 0\n",
-             Keel[i],Frame[i][0].z,Keel[i],Frame[i][Frame[i].len-1].z );
+             Keel[i]+St,Frame[i][0].z+T,Keel[i]+St,Frame[i][Frame[i].len-1].z+T );
     fprintf( F,"; Plane\n1 5 0.5 0 1 14 0 1 1\n%lg 0 %lg\n%lg 0 %lg\n"
-               "%lg 0 %lg\n%lg 0 %lg\n%lg 0 %lg\n",Keel[0],Breadth/2,
-             Keel[Nframes+1],Breadth/2,Keel[Nframes+1],-Breadth/2,
-             Keel[0],-Breadth/2,Keel[0],Breadth/2 );
-    fprintf( F,"; Board box\n1 4 0.5 0 1 14 0 1 1\n%lg 0 0\n%lg %lg 0\n"
-               "%lg %lg 0\n%lg 0 0\n",Keel[0],Keel[0],-Draught,Keel[Nframes+1],
-             -Draught,Keel[Nframes+1] );
+               "%lg 0 %lg\n%lg 0 %lg\n%lg 0 %lg\n",Keel[0]+St,Breadth/2,
+             Keel[Nframes+1]+St,Breadth/2,Keel[Nframes+1]+St,-Breadth/2,
+             Keel[0]+St,-Breadth/2,Keel[0]+St,Breadth/2 );
+    fprintf( F,"; Board box\n1 4 0.5 0 1 14 0 1 1\n%lg 0 0\n%lg 0 0\n"
+               "%lg 0 0\n%lg 0 0\n",Keel[0]+St,Keel[0]+St,Keel[Nframes+1]+St,
+             Keel[Nframes+1]+St );
 
     fprintf( F,"21 2\n; Starboard + gap\n" ); // борт без изъятий, но с минусом
     for( k=0; k<Nframes+2; k++ )
     { fprintf( F,"; Frame(%d)\n1 %d 1 0 0 12 0 1 2\n",k,n=Frame[k].len );
       for( i=0; i<n; i++ )
-        fprintf( F,"%g %g %g\n",Frame[k][i].x,Frame[k][i].z,Frame[k][i].y );
+      fprintf( F,"%g %g %g\n",Frame[k][i].x+St,Frame[k][i].z+T,Frame[k][i].y );
     }
     fprintf( F,"21 3\n; Portside\n" );    // правый борт с погрызенными концами
     for( k=1; k<=Nframes; k++ )
     { for( i=n=0; i<Frame[k].len; i++ )if( Frame[k][i].x==Keel[k] )n++;
       fprintf( F,"; Frame(%d)\n1 %d 1 0 0 12 0 1 3\n",k,n );
       for( i=0; i<Frame[k].len; i++ )if( Frame[k][i].x==Keel[k] )
-      fprintf( F,"%g %g %g\n",Frame[k][i].x,Frame[k][i].z,-Frame[k][i].y );
+      fprintf( F,"%g %g %g\n",Frame[k][i].x+St,Frame[k][i].z+T,-Frame[k][i].y );
     }
     fprintf( F,"21 4\n; Stern\n1 %d 1 0 0 1 0 1 4\n",n=Stern.len );
-    for( i=0; i<n; i++)fprintf(F,"%g %g %g\n",Stern[i].x,Stern[i].z,Stern[i].y);
+    for( i=0; i<n; i++)fprintf(F,"%g %g %g\n",Stern[i].x+St,Stern[i].z+T,Stern[i].y);
     fprintf( F,"; Stem\n1 %d 1 0 0 1 0 1 4\n",n=Stem.len );
-    for( i=0; i<n; i++)fprintf(F,"%g %g %g\n",Stem[i].x,Stem[i].z,Stem[i].y );
+    for( i=0; i<n; i++)fprintf(F,"%g %g %g\n",Stem[i].x+St,Stem[i].z+T,Stem[i].y );
 
     if( format>3 )     //! здесь добавлена обшивка корпуса в качестве украшения
     { fprintf( F,"21 5\n; Hull plating\n" ); Vector P,Q,q;      // -- то будет и шпация

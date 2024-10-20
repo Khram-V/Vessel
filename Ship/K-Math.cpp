@@ -314,7 +314,8 @@ void Draw_Hull( int ids, Plane &_W )                         // Проекция
     for( k=0,y=-0.4*Breadth; k<=8; k++,y+=Breadth/10 )            // -- батоксы
     { if( k!=4 )glEnable( GL_LINE_STIPPLE ); else glDisable( GL_LINE_STIPPLE );
       line( y,0,y,z );
-    } glDisable( GL_LINE_STIPPLE ); Win.AlfaVector( 18 );
+    } glDisable( GL_LINE_STIPPLE );
+      Win.AlfaVector( _W.Height/32,1 );
     __Water Win.Text( _North_East,Breadth/2,Draught,0,"ВЛ" );
     __Deck  Win.Text( _South_West,0,0,0,"ДП" );
     if( ids>1 )                                          // Разметка ватерлиний
