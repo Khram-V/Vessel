@@ -146,12 +146,12 @@ Part_of_hull:    // разделение корпуса по уровням на
     // завершение геометрической графики просто белая конструктивная ватерлиния
     //
     if( onlyDraw ){ color( !Trim?silver:cyan ); glLineWidth( 5 );
-     const Real aL=Breadth/64;
+     const Real aL=Draught/12;
       for( i=0; i<WaterLine.len; i+=3 )
          line( out( WaterLine[i+1] ),out( WaterLine[i+2] ) ); glLineWidth( 1 );
       for( i=0; i<wL.len; i+=3 ){ Vector q=(wL[i+1]+wL[i+2])/2;
          arrow( out( wL[i+1] ),out( wL[i+2] ),aL,navy );
-         arrow( out( q ),out( q+wL[i]*(aL*3) ),aL,gray );
+         arrow( out( q ),out( q+dir( wL[i] )*(aL*3) ),aL,gray );
       }
     }
     // действующая ватерлиния выстраивается из фрагментов пересечения

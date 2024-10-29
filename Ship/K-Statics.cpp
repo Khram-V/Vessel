@@ -482,7 +482,7 @@ bool WinStability::Draw()
  Real P=Breadth*(wS->uz-wS->az)/(Depth-Do)/2;
   if( P<W )wS->ux = wS->ax+W+P,
            wS->ax = wS->ax+W-P;
-  MPL->Area( 0,2,28,-38 );           // восстановление маленького окошка мышки
+  MPL->Area( 0,2,20,-2*HiText );     // восстановление маленького окошка мышки
   if( !stLD )                        // изображение чертежа в проекции "Корпус"
   { wS->Set( Breadth/-2,Do, Breadth/2,Depth ); Draw_Hull( 2,*wS ); } else
   { stLD->Stability_Lines();// Быстрая прорисовка плеч статической остойчивости

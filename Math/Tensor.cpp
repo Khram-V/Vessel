@@ -9,12 +9,12 @@
 // ... или арифметико-логические операции с векторами в (не)дружественной среде
 //
 //                                                             встречный вектор
-Vector operator - ( _Vector a ){ return (Vector){ -a.x,-a.y,-a.z }; }
-Vector operator * ( _Vector c,_Real w ){ return (Vector){ c.x*w,c.y*w,c.z*w }; }
-Vector operator * ( _Real w,_Vector c ){ return (Vector){ w*c.x,w*c.y,w*c.z }; }
-Vector operator / ( _Vector c,_Real w ){ return (Vector){ c.x/w,c.y/w,c.z/w }; }
-Vector operator + (_Vector c,_Vector e){ return (Vector){c.x+e.x,c.y+e.y,c.z+e.z}; }
-Vector operator - (_Vector c,_Vector e){ return (Vector){c.x-e.x,c.y-e.y,c.z-e.z}; }
+Vector operator - ( Vector a ){ a.x=-a.x; a.y=-a.y; a.z=-a.z; return a; }       // (Vector){ -a.x,-a.y,-a.z }; }
+Vector operator * ( Vector c,_Real w ){ c.x*=w; c.y*=w; c.z*=w; return c; }     // (Vector){ c.x*w,c.y*w,c.z*w }; }
+Vector operator * ( _Real w,Vector c ){ c.x*=w; c.y*=w; c.z*=w; return c; }     //  return (Vector){ w*c.x,w*c.y,w*c.z }; }
+Vector operator / ( Vector c,_Real w ){ c.x/=w; c.y/=w; c.z/=w; return c; }     //  return (Vector){ c.x/w,c.y/w,c.z/w }; }
+Vector operator + ( Vector c,_Vector e){ c.x+=e.x,c.y+=e.y,c.z+=e.z; return c; } // (Vector){c.x+e.x,c.y+e.y,c.z+e.z}; }
+Vector operator - ( Vector c,_Vector e){ c.x-=e.x,c.y-=e.y,c.z-=e.z; return c; } // (Vector){c.x-e.x,c.y-e.y,c.z-e.z}; }
 
 bool operator + ( _Vector a ){ return a.x!=0 || a.y!=0.0 || a.z!=0.0; }
 bool operator ! ( _Vector a ){ return a.x==0 && a.y==0.0 && a.z==0.0; }
@@ -29,14 +29,12 @@ bool operator !=( _Vector a,_Vector b ){ return a.x!=b.x||a.y!=b.y||a.z!=b.z; }
 //                                или = скалярное произведение проекции вектора
 //
 Real operator % ( _Vector a,_Vector b ){ return a.x*b.x+a.y*b.y+a.z*b.z; }
-Vector operator & ( Vector a,_Vector b )
-       { a.x*=b.x,a.y*=b.y,a.z*=b.z; return a; } // return (Vector){ a.x*b.x,a.y*b.y,a.z*b.z }; }
-Vector operator * ( _Vector a,_Vector b )
-       { return (Vector){ a.y*b.z-a.z*b.y,a.z*b.x-a.x*b.z,a.x*b.y-a.y*b.x }; }
 Vector& Vector::operator*=( _Vector d )  // произведение ортогонального вектора
   { Real a=y*d.z-z*d.y,b=z*d.x-x*d.z; z=x*d.y-y*d.x; x=a; y=b; return *this; }
+Vector operator * ( Vector a,_Vector b ){ return a*=b; }
                 // покомпонентное произведение/сопоставление скалярных поправок
 Vector& Vector::operator&=( _Vector d ){ x*=d.x,y*=d.y,z*=d.z; return *this; }
+Vector operator & ( Vector a,_Vector b ){ return a&=b; }
   //
   //      Три поворота вектора относительно совместной координатной системы
   //
@@ -53,53 +51,20 @@ const Real  sqr( _Real a ){ return a*a; }
 const Real  abs( _Real a ){ return fabs( a ); }
 const Real norm( _Real a,_Real b ){ return a*a + b*b; }
 const Real norm( _Real a,_Real b,_Real c ){ return a*a + b*b + c*c; }
-const Real norm( _Vector a ){ return a.x*a.x + a.y*a.y + a.z*a.z; }
-Real   abs(_Vector a ){ Real n=norm(a); if( n>0 )return sqrt( n ); return 0; }
-Vector dir(_Vector a ){ Real n=norm(a); if( n>0 )return a/sqrt(n); return Zero;}
-Vector In3(_Vector A,_Vector B,_Vector C,_Real x)// Кривая в трёх точках
-{ return (A*(x-1)*x+C*x*(x+1))/2-B*(x+1)*(x-1); }// с координатами A:-1,B:0,C:1
-Vector In2(_Vector A,_Vector B,_Real x )  // Прямая линия по двух точкам
-{ return A*(1-x) + B*x; }                        // единичных координат A:0,B:1
-
-/*                                                          встречный вектор
-Vector operator - ( Vector a ){ a.x=-a.x,a.y=-a.y,a.z=-a.z; return a; }
-Vector operator * ( Vector c, _Real w  ){ return c*=w; }
-Vector operator * ( _Real w, Vector c  ){ return c*=w; }
-Vector operator / ( Vector c, _Real w  ){ return c/=w; }
-Vector operator + ( Vector c,_Vector e ){ return c+=e; }
-Vector operator - ( Vector c,_Vector e ){ return c-=e; }
-bool operator ! ( _Vector a ){ return a.x==0 && a.y==0.0 && a.z==0.0; }
-bool operator==(_Vector a,_Vector b){return a.x==b.x&&a.y==b.y&&a.z==b.z;}
-bool operator!=(_Vector a,_Vector b){return a.x!=b.x||a.y!=b.y||a.z!=b.z;}
+const Real norm(_Vector a ){ return a.x*a.x + a.y*a.y + a.z*a.z; }
+const Real  abs(_Vector a ){ Real n=norm(a); if(n>0)return sqrt(n); return 0; }
+Vector dir( _Vector a ){ Real n=norm(a); if(n>0)return a/sqrt(n); return Zero; }
+Vector In3( _Vector A, _Vector B, _Vector C, _Real x ) // Кривая в трёх точках
+ { return (A*(x-1)*x + C*x*(x+1))/2 - B*(x+1)*(x-1); } // в точках A:-1,B:0,C:1
+Vector In2( _Vector A, _Vector B, _Real x )      // Прямая линия по двух точкам
+ { return A*(1-x) + B*x; }                       // единичных координат A:0,B:1
 //
-//   * - нормаль - векторное произведение для ориентированной площади основания
-//   & - покомпонентное перемножение, изменение масштабов или внесение поправок
-//   % - проекция от скалярного произведения векторов - сброс косого скольжения
-//                                    = скалярное произведение проекции вектора
-Real operator % (_Vector a,_Vector b){ return a.x*b.x+a.y*b.y+a.z*b.z; }
-    // %-скалярное, &-покомпонентное и *-векторное умножение свободных векторов
-Vector operator * ( Vector a,_Vector b ){ return a*=b; }
-//      { return (Vector){ a.y*b.z-a.z*b.y,a.z*b.x-a.x*b.z,a.x*b.y-a.y*b.x }; }
-//
-//     Элементарные и раскрываемые операции-функции
-//
-Real   sqr( _Real a ){ return a*a; }
-Real   abs( _Real a ){ return fabs( a ); }
-Real  norm( _Vector a ){ return a.x*a.x + a.y*a.y + a.z*a.z; }
-Real   abs( _Vector a ){ Real n=norm( a ); return n>0.0?sqrt( n ):0.0; }
-Vector dir( _Vector a ){ Real n=norm( a ); return n>0.0?a/sqrt( n )
-                                                    : (Vector){0,0,0}; }
-Vector In3(_Vector A,_Vector B,_Vector C,_Real x)// Кривая в трёх точках
-{ return (A*(x-1)*x+C*x*(x+1))/2-B*(x+1)*(x-1); }// с координатами A:-1,B:0,C:2
-Vector In2(_Vector A,_Vector B,_Real x )  // Прямая линия по двух точкам
-{ return A*(1-x) + B*x; }                        // единичных координат A:0,B:1
-*/
-
 //    В геометрических построениях и физических операциях тензоры
 //        служат для фиксации физических полей в локальных базисах,
 //    и - для взаимного преобразования координат векторных отсчетов
 //                           и пространственных физических объектов
 #include "Tensor.h"
+//
 // const Real r=0.70710678118654752440084436210485; // sqrt(1/2)
 // const Real q=0.57735026918962576450914878050196; // sqrt(1/3)
 //
@@ -150,7 +115,7 @@ Tensor& Tensor::operator*=( _Real s )           // - простое измене
 Tensor& Tensor::operator/=( _Real s )           // - или то же, но наоборот
       { x/=s; y/=s; z/=s; d/=(s*s*s); xi*=s,yi*=s,zi*=s; return *this; }
 Tensor& Tensor::operator*=( _Matrix m )  // подъем к абсолютной системе отсчета
-      {  *this = Matrix::operator*=( m ); return det(); }
+      { *this = Matrix::operator*=( m ); return det(); }
 Tensor& Tensor::operator /= ( _Tensor r ){           // преобразование тензоров
 #if 1                                                //! ?как бы надо домножать
    x=(Vector){ x.x*r.xi.x + x.y*r.yi.x + x.z*r.zi.x, //!  - только на обратный!
@@ -171,7 +136,7 @@ Tensor& Tensor::operator /= ( _Tensor r ){           // преобразован
 }
 //   Переход из локального базиса к абсолютной системе координат
 //
-Vector operator * ( _Matrix m, _Vector v ){ return (Vector)
+Vector operator * ( _Matrix m, Vector v ){ return v=(Vector)
 #if 1
        { m.x.x*v.x + m.y.x*v.y + m.z.x*v.z,      // умножение вектора справа
          m.x.y*v.x + m.y.y*v.y + m.z.y*v.z,      // на собственный тензор слева
@@ -180,14 +145,14 @@ Vector operator * ( _Matrix m, _Vector v ){ return (Vector)
        { m.x % v, m.y % v, m.z % v };            // вектор локальный справа с
 #endif
      }                                           // и опусканием на АСК из ЛСК
-Vector operator * ( _Vector v, _Matrix m )       // или проекции в базисные оси
-     { return (Vector){ v%m.x, v%m.y, v%m.z }; }
+Vector operator * ( Vector v, _Matrix m )       // или проекции в базисные оси
+     { return v=(Vector){ v%m.x, v%m.y, v%m.z }; }
 //
 //   Трансформация вектора для перехода в локальный ортогональный базис
 //               ( дуальную систему координат )
 //
-Vector operator / ( _Vector v, _Tensor m )       // подъем индексов в операции
-     { return (Vector)                           // произведения с лок.базисом
+Vector operator / ( Vector v, _Tensor m )       // подъем индексов в операции
+     { return v=(Vector)                           // произведения с лок.базисом
   #if 0
        { v.x*m.xi.x + v.y*m.yi.x + v.z*m.zi.x,   // умножение левого вектора на
          v.x*m.xi.y + v.y*m.yi.y + v.z*m.zi.y,   // обратный тензор справа

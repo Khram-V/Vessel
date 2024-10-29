@@ -54,12 +54,11 @@ const Vector Zero={ 0,0,0 },Zenit={ 0,0,1 };
 //                                                             встречный вектор
 bool   operator ! ( _Vector ), operator + ( _Vector ),
        operator ==( _Vector,_Vector ), operator !=( _Vector,_Vector );
-Vector operator - ( _Vector ),
-       operator / ( _Vector,_Real ),
-       operator * ( _Vector,_Real ),   operator * ( _Real,_Vector ),
-       operator + ( _Vector,_Vector ), operator - ( _Vector,_Vector ),
-       operator & ( Vector,_Vector ),  operator * ( _Vector,_Vector );
-//     { return (Vector){ a.y*b.z-a.z*b.y,a.z*b.x-a.x*b.z,a.x*b.y-a.y*b.x }; }
+Vector operator - ( Vector ),
+       operator / ( Vector,_Real ),
+       operator * ( Vector,_Real ),   operator * ( _Real,Vector ),
+       operator + ( Vector,_Vector ), operator - ( Vector,_Vector ),
+       operator & ( Vector,_Vector ), operator * ( Vector,_Vector );
 //
 //   * - нормаль - векторное произведение для ориентированной площади основания
 //   & - покомпонентное перемножение, изменение масштабов или внесение поправок
@@ -82,7 +81,7 @@ struct Point     // Координатная точка в масштабах а
  friend Vector operator - (_Point c,_Point e )
              { return (Vector){ c.X-e.X,c.Y-e.Y,c.Z-e.Z }; }
 //operator Vector(){ return *((Vector*)this); }
- operator Real*(){ return (Real*)this; }     // для внешних операций и графики
+ operator Real*(){ return (Real*)this; }      // для внешних операций и графики
 };
 //
 //     Элементарные и раскрываемые операции-функции
@@ -92,8 +91,8 @@ const Real  abs(_Real a );                // { return fabs( a ); }
 const Real norm(_Real a,_Real b );        // { return a*a + b*b; }
 const Real norm(_Real a,_Real b,_Real c); // { return a*a + b*b + c*c; }
 const Real norm(_Vector a );              // { return a.x*a.x+a.y*a.y+a.z*a.z;}
-Real   abs(_Vector a );                  // { return sqrt( norm( a ) ); }
-Vector dir(_Vector a );                  // { return a/sqrt( norm( a ) ); }
+const Real  abs(_Vector a );              // { return sqrt( norm( a ) ); }
+Vector dir(_Vector a );                   // { return a/sqrt( norm( a ) ); }
 Vector In3(_Vector A,_Vector B,_Vector C,_Real x ); // Кривая в трёх точках
 //{return(A*(x-1)*x+C*x*(x+1))/2-B*(x+1)*(x-1);} // с координатами A:-1,B:0,C:1
 Vector In2(_Vector A,_Vector B,_Real x );        // Прямая линия по двух точкам
