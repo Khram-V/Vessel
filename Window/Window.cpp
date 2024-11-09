@@ -127,17 +127,17 @@ bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
       { case VK_BACK  : Key=_BkSp; break;      // 8 -> _BkSp(14)
         case VK_TAB   : Key=_Tab;  break;      // 9 -> _Tab(30)
         case VK_CANCEL: while( First )First->Close();
-             //         PostQuitMessage( VK_CANCEL ); //exit( VK_CANCEL );
-                        return true;           // 3 -> просто на выход
+                        PostQuitMessage( VK_CANCEL ); //exit( VK_CANCEL );
+                        return false;          // 3 -> просто на выход
       } PutChar( Key );                        // и ещё одна запись в буфер
     }   break;
-//  case WM_QUIT: while( First )First->Close(); exit( 16 );
     case WM_CLOSE: Close();         // =16 - сигнал о возможности закрытия окна
       DestroyWindow( hWnd ); break; // внутри идёт запрос закрытия окна Windows
     case WM_DESTROY:     // =2 здесь должны быть закрыты все внутренние объекты
          Close(); break; // безусловно (вторично) срабатывает деструктор Window
-    default: return false;                     //  => DefWindowProc
-  }          return true;                      // return 0 на выход
+    case WM_QUIT: while( First )First->Close();   // exit( 16 );
+   default:return false;                          //  => DefWindowProc
+  }        return true;                           // на выход
 }
 //!   Конструктор создает окно OpenGL, и ... не образует цикла прерываний ...
 //     площадка Place в основании окна ортогонализуется и пересохраняется
@@ -218,7 +218,7 @@ Window::Window( const char *_title, int x,int y, int w,int h )
    Up=NULL;                          // верхний фрагмент в списке наложений
    Site=this;                        // связанный Place ссылается на Window
    Activate().AlfaVector().Clear();  // исходный шрифт и настройка площадки
-   chY=Height-Th;                    // позиция текстового курсора сверху/слева
+   chY=Height-AlfaHeight();          // позиция текстового курсора сверху/слева
 }
 Window::~Window(){ Close(); }        // закрытие окна может не разрушать Window
 
@@ -265,7 +265,7 @@ Window& Window::Locate( int X,int Y, int W,int H )     // по правилам 
     MoveWindow( hWnd,WindowX,WindowY,W,H,true );
     hDC=GetDC( hWnd );
 //  UpdateWindow( hWnd );
-    Activate().AlfaVector();   // размерения окна и переадаптированный шрифт
+    Activate(); //.AlfaVector(); // размерения окна и переадаптированный шрифт
 //  chY=Height-Th;             // позиция текстового курсора сверху/слева
     Refresh();                 // на выходе сброс привязки к текущему контексту
   } return *this;

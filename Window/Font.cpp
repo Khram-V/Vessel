@@ -1,11 +1,12 @@
 //
-// Два варианта шрифтов без включения проприетарные стандарты MicroSoft:Windows
+// Два варианта шрифтов без включения проприетарных буквочек MicroSoft:Windows
 //  или обновлённый вариант (независимых) начертаний векторных и растровых букв
 #include "Window.h"                 // аппаратное окружение и стандартная среда
                                     // программирования MinGW_Microsoft-Windows
 typedef unsigned short fixed;
 
 #define _Design_len 9633           // допустимое количество букв в _Design_font
+#define LFont Font &L=Ft?*Ft:*(Site->Ft)
 #include "Sym_Design.c"            //  Borland.chr + DesignCAD.vct Complex font
 
 static struct Design_Letters
@@ -55,30 +56,35 @@ static struct Design_Letters
 //     ... или destructor с нулевым аргументом
 //
 Place& Place::AlfaBit( unsigned char *DispCCCP )      // старый советский растр
-{ if( (Bit=DispCCCP )!=NULL ){ Tw=Bit[0]+1;
-                               Th=Bit[1]+2; } else Tw=Th=Thin=1; return *this;
+{ if( !DispCCCP ){ if( Ft ){ free( Ft ); Ft=NULL; } } else     // отмена шрифта
+  { if( !Ft )Ft=(Font*)calloc( 1,sizeof( Font ) );
+    if( Ft ){ LFont; L.Bit=DispCCCP; L.Tw=L.Bit[0]+1;
+                                     L.Th=L.Bit[1]+2; }
+  } return *this;
 }
 //!  Векторный шрифт из подборки Borland.chr + DesignCad.vfn
 //
-Place& Place::AlfaVector( _Real H,_Real T )
-{ Real Scale=1.0;
-  if( Bit )Bit=NULL; else
-  { Scale=Th/Design.H; chX*=Scale; chY=(chY+Design.B)*Scale;
-  }
-  if( H<=0 || H==Design.H )Th=Design.H,Tw=Design.W;
-                else Th=H,Tw=(H*Design.W)/Design.H;
-  Thin=T; Scale=Th/Design.H; chX/=Scale; chY=chY/Scale-Design.B;
-  return *this;
+Place& Place::AlfaVector( _Real H, _Real T )
+{ if( !Ft )Ft=(Font*)calloc( 1,sizeof( Font ) );
+  { LFont; Real Scale=1.0;
+    if( L.Bit )L.Bit=NULL; else
+      { Scale=L.Th/Design.H; chX*=Scale; chY=(chY+Design.B)*Scale; }
+    if( H<=0 || H==Design.H )L.Th=Design.H,L.Tw=Design.W;
+                        else L.Th=H,L.Tw=(H*Design.W)/Design.H;
+    L.Thin=T; Scale=L.Th/Design.H; chX/=Scale; chY=chY/Scale-Design.B;
+  } return *this;
 }
 //   Определение размеров изображения текст !!! необходим многострочный вариант
 //
+Real Place::AlfaHeight(){ LFont; return L.Th; } // условно-расчётная высота и
+Real Place::AlfaWidth(){ LFont; return L.Tw; } // ширина одной буквочки шрифта
 SIZE Place::AlfaRect( const char *S )         // на выход подаются строки UTF-8
-{ SIZE F;
-  if( !Bit )Design.Rect( F,S ); else
-  { int w,l; char* V=(char*)S; unsigned u; F.cy=Th,F.cx=w=0;
+{ LFont; SIZE F;
+  if( !(L.Bit) )Design.Rect( F,S ); else      // размер со шрифтом без масштаба
+  { int w,l; char* V=(char*)S; unsigned u; F.cy=L.Th,F.cx=w=0;
     for( l=0;; l++ )
     { V=UtC( u,V ); if( !u )break;
-      if( u=='\n' ){ F.cx=max( w,(int)F.cx ); w=0; F.cy+=Th; } else w+=Tw;
+      if( u=='\n' ){ F.cx=max( w,(int)F.cx ); w=0; F.cy+=L.Th; } else w+=L.Tw;
     } F.cx=max( w,(int)F.cx );
   } return F;
 }
@@ -103,58 +109,56 @@ void _OutBitText( const char *str, byte *bit, Real &X,Real &Y,Real bX )
                            ); X+=w; }         // сдвиг позиции и растра символа
    glPopClientAttrib();                       // подготовка к следующей строчке
 }
-Place& Place::String( const char *T )
-{ TextContext St; Real X;                  // исходная строка не изменяется
-  if( !Bit  )                              //! Вектор DesingCAD.vct-Borland.chr
-  { Real Scale=Real( Th )/Design.H,X=chX;
+void Place::String( const char *T )
+{ LFont; TextContext St; Real X;               // исходная строка не изменяется
+  if( !(L.Bit)  )                              //! Вектор DesingCAD.vct-Borland.chr
+  { Real Scale=Real( L.Th )/Design.H,X=chX;
     RasterSector Sv( pX,pY,Width,Height,Scale );
     if( bX<0 ){ SIZE l; Design.Rect( l,T ); X=-bX-l.cx; } else X=bX;
-    Design.Write( (char*)T,chX,chY,X,Thin );
+    Design.Write( (char*)T,chX,chY,X,L.Thin );
   } else
   { char *str=UtA( T,true );                //! три варианта растра DOS-866-ОЕМ
     RasterSector Sv( pX,pY,Width,Height );  //    раньше был ещё и Windows-1251
     if( bX>=0 )X=bX; else { X=-bX-AlfaRect( T ).cx; }
-    glRasterPos2i( chX,chY-Th );
-    _OutBitText( str,Bit,chX,chY,X );
-  } return *this;
-}
-Place& Place::String( const char *T, Real x,Real y )
-{ if( y>0 )chY=Height-Th*y; else chY=3-Th*(y+1);
-  if( x>0 )chX=(x-1)*Tw; else chX=Width+x*Tw;
-  if( Bit ){ if( y>0 )chY+=Th; }
-      else { Real Scale=Th/Design.H; chX/=Scale,chY=(chY+Th/8)/Scale-Design.B; }
+    glRasterPos2i( chX,chY-L.Th );
+    _OutBitText( str,L.Bit,chX,chY,X );
+} }
+void Place::String( const char *T, Real x,Real y )
+{ LFont;
+  if( y>0 )chY=Height-L.Th*y; else chY=3-L.Th*(y+1);
+  if( x>0 )chX=(x-1)*L.Tw; else chX=Width+x*L.Tw;
+  if( L.Bit ){ if( y>0 )chY+=L.Th; } else
+    { Real Scale=L.Th/Design.H; chX/=Scale,chY=(chY+L.Th/8)/Scale-Design.B; }
   bX=chX;
   if( x<=0 || y<=0 ){ SIZE l=AlfaRect( T ); // во внутренних размерениях шрифта
     if( x<=0 )chX-=l.cx,bX=-bX;
     if( y<=0 )chY+=l.cy;
   } String( T );
-  return *this;
 }
 //!    Прорисовка плоско/горизонтального текста по предварительному определению
 //!         размеров букв и смещением надписи относительно точки в плоскости XY
 //
-Place& Place::String( Course Dir, const Real *P, const char* T )
-{ TextContext St; SIZE sz;
-  Real dx,dy; char *str=(char*)T;
-   if( Bit )str=UtA( T,true );                // выбор DOS-866 или Windows-1251
-   glRasterPos3d( P[0],P[1],P[2] );           // плоская надпись со смещением
-   sz=AlfaRect( T );      dx=-sz.cx/2;        // разбор типа записи внутри...
-   if( Dir&_East  )dx= 4; dy=-sz.cy/6;        // сдвиги и переносы строк
-   if( Dir&_West  )dx=-sz.cx - 4;             // здесь отключены
-   if( Dir&_North )dy= sz.cy/5+3;
-   if( Dir&_South )dy=-sz.cy + 3;
-   if( Bit )
-   { glBitmap( 0,0,0,0,dx,dy,NULL ); _OutBitText( str,Bit,dx,dy,1 ); } else
-   { static int P[4]={ 0,0,0,0 };              // для выборки новой позиции chX
-     Real Scale=(Real)Th/Design.H;
-     glGetIntegerv( GL_CURRENT_RASTER_POSITION,P );     //dy-=Design.H;
-                      P[0]+=dx*Scale; P[1]+=(dy-Design.B)*Scale;
-//   RasterSector Sv( pX,pY,Width,Height,Scale );
-//   RasterSector Sv( P[0],P[1],P[0]+1,P[1]+1,Real( Th )/Design.H );
-     RasterSector Sv( P[0],P[1],P[0]+Width,P[1]+Height,Scale );
-     Design.Write( str,dx=0,dy=0,1,Thin );
-   } return *this;
-}
+void Place::String( Course Dir, const Real *P, const char* T )
+{ LFont; TextContext St; SIZE sz;
+ Real dx,dy; char *str=(char*)T;
+  if( L.Bit )str=UtA( T,true );              // выбор DOS-866 или Windows-1251
+  glRasterPos3d( P[0],P[1],P[2] );           // плоская надпись со смещением
+  sz=AlfaRect( T );      dx=-sz.cx/2;        // разбор типа записи внутри...
+  if( Dir&_East  )dx= 4; dy=-sz.cy/6;        // сдвиги и переносы строк
+  if( Dir&_West  )dx=-sz.cx - 4;             // здесь отключены
+  if( Dir&_North )dy= sz.cy/5+3;
+  if( Dir&_South )dy=-sz.cy + 3;
+  if( L.Bit )
+  { glBitmap( 0,0,0,0,dx,dy,NULL ); _OutBitText( str,L.Bit,dx,dy,1 ); } else
+  { static int P[4]={ 0,0,0,0 };              // для выборки новой позиции chX
+    Real Scale=(Real)(L.Th)/Design.H;
+    glGetIntegerv( GL_CURRENT_RASTER_POSITION,P );     //dy-=Design.H;
+                     P[0]+=dx*Scale; P[1]+=(dy-Design.B)*Scale;
+//  RasterSector Sv( pX,pY,Width,Height,Scale );
+//  RasterSector Sv( P[0],P[1],P[0]+1,P[1]+1,Real( Th )/Design.H );
+    RasterSector Sv( P[0],P[1],P[0]+Width,P[1]+Height,Scale );
+    Design.Write( str,dx=0,dy=0,1,L.Thin );
+} }
 #include <stdio.h>   // блок для четырёх вариантов текстовых надписей в формате
 #include <stdarg.h>  // с реентерабельной\стековой подстрочкой переменной длины
 #define Arg va_list a; va_start( a,fmt ); int l=vsnprintf( 0,0,fmt,a )+2; \

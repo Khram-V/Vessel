@@ -12,8 +12,7 @@
 				<Option object_output="Dev/Obj/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
-				<Option use_console_runner="0" />
-				<Option parameters="*.VSL /R /B" />
+				<Option parameters="*.VSL /R /B+4" />
 				<Compiler>
 					<Add option="-fexpensive-optimizations" />
 					<Add option="-Os" />

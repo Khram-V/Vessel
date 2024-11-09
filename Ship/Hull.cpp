@@ -29,7 +29,7 @@ const char
 MainDraw Win;
 MainDraw::MainDraw():
           Window(" Теория и мореходные качества корабля",-12,12,500,160 ){}
-
+                                               // контрольная высота буквочек
 Plane wH( "Корпус",     "Y","Z",&Win ),        // Окно проекций: корпус,
       wM( "Бок",        "X","Z",&Win ),        //   бок
       wW( "Полуширота", "X","Y",&Win );        //    и полуширота
@@ -50,15 +50,15 @@ static void Hull_Help()
              *Plus[]={ "<Enter> "," масштаб по ширине окна",
                        "<Space> "," шпангоуты сплайн\\линии",
                        "<Esc>/<ctrlC>","   завершение",0
-                     }; Win.Help( Name,Cmds,Plus );
+                     }; Win.Help( Name,Cmds,Plus,0,1 );
 }
 void Hull_Wave( const int Type );  // волнообразование и волновое сопротивление
 void Hull_Statics();  // Остойчивость и кривые элементов теоретического чертежа
 
-Plane::Plane( const char *i, const char *x, const char *z, Window *Win ):
-       Place( Win,0 ),iD( i ),sX( x ),sZ( z ),W( Win->Width ),H( Win->Height )
+Plane::Plane( const char *i, const char *x, const char *z, Window *Wm ):
+       Place( Wm,0 ),iD( i ),sX( x ),sZ( z ),W( Wm->Width ),H( Wm->Height )
        { ax=az=0; uX=ux=Width;
-         aX=aZ=0.0; uZ=uz=Height; dx=dz=1.0; }     // Signs=0;
+         aX=aZ=0.0; uZ=uz=Height; dx=dz=1.0; } // Signs=0;
 Plane& Plane::Focus(){ glMatrixMode( GL_PROJECTION ); glLoadIdentity();
          glOrtho( aX-ax*dx, uX+( W-ux )*dx,        // left, right
                   aZ-az*dz, uZ+( H-uz )*dz,0,1 ); // bottom, top
@@ -96,7 +96,8 @@ void MainDraw::Loft( bool rShape )          // общая разметка гр�
   { Real YX=(Depth-Do+Breadth/2)/Lmx;
      if( YX>Y/X ){ X=Y/YX; TW=int(X+Up+Left+Bord*2); } // Перенос и перерисовка
             else { Y=X*YX; TH=int(Y+Up+Band+Down+Bord*2); }// графического поля
-     Activate().Clear().Show();
+//   AlfaVector( hText=TH/40 ).Activate().Clear().Show();
+     AlfaVector( Up );
      Locate( mTW-TW,(mTH-TH)/3,TW,TH );
   }   wW.ax=wM.ax = Left+Bord;  wW.az = wW.uz = Down+Bord;
       wW.ux=wM.ux = TW-Up-Bord; wW.uz+= int( Y/(1.0+2.0*(Depth-Do)/Breadth) );
@@ -108,8 +109,8 @@ void MainDraw::Loft( bool rShape )          // общая разметка гр�
       wH.ax-=wH.ux;             // Здесь "корпус" вписывается на мидель в "бок"
       wH.ux=wH.ux*2+wH.ax;
       wH.Set( Breadth/-2,Do,Breadth/2,Depth );
-      MPL.AlfaVector( 18,0 ).Area( 0,22,20,-36 );        // это мышка
-      TPL.AlfaVector( 16,0 ).Area( 0,0,50,1 );           //  и таймер
+      MPL.AlfaVector( 14,0 ).Area( 0,18,20,-28 );                  // это мышка
+      TPL.AlfaVector( 14,0 ).Area( 0,1,50,-15 );                   //  и таймер
 }
 static bool Wid=false,              // перерисовка на полный или заданный экран
           First=false;              // блокировка при неготовности конструктора
@@ -118,8 +119,10 @@ bool MainDraw::Draw()               // Здесь также будет прив
   if( Active&true )Loft( Wid ); else       // Активный корпус просто размечается
   { while( Kh.Read() );             // При вызове без параметров будет Hull.vsl
       Loft( Active=true );          // Степановские, польские или новые корпуса
-    } Building(); gl_BLUE;
-      AlfaVector( 16,1 ).Print( 5,-5,"L = %.3g",Length );
+  }   //AlfaVector( hText=Height/36 );
+      Building(); gl_BLUE;
+      //AlfaVector( hText*1.2,1.2 );
+      Print( 5,-5,"L = %.3g",Length );
   if( fabs( Length-Lmx )>Length/300 )Print( " \\ %.3g",Lmx );
   if( fabs( Length-Lwl )>Length/300 )Print( " / %.3g",Lwl );
       Print( 5,-4,"B = %.3g",Breadth );
@@ -169,11 +172,8 @@ void glInitial()
 int main() // int ans, char *argv[], char *envp[] )
 { feclearexcept( FE_ALL_EXCEPT );
   glClearColor( 0.85,0.95,0.97,1 );
-  glClear( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT );
+  glClear( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT ); // Уединенное приветствие
   glInitial();
-  //
-  //  Уединенное приветствие
-  //
   gl_BLUE; Win.AlfaVector( 24,2 ).Print( 2,1.25,"Корабль - " );
            Win.AlfaVector( 20,1 ).Print("морская гидромеханика\n" );
   gl_CYAN; Win.AlfaVector( 16,2 )

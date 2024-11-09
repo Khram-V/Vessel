@@ -22,6 +22,14 @@ void logMeta(){ if( VIL ){ const Hull &S=*Vessel;
                S.Metacenter.z-S.Buoyancy.z,S.hX ); } }
 void logHydro(){ if( VIL ){ const byte St=Vessel->Statum;
      fprintf(VIL,"\n  ⇒ Гидромеханика[%d]: %s"+logTime(),St,Model[St]); } }
+void logStock()
+{ Hull &H=*Vessel; textcolor( LIGHTBLUE );
+  print(59,24,"%s, и/сток: Kv=%g",H.lFlow?"В потоке волн":"Над гребнями",H.Kv);
+  if( VIL )
+  fprintf( VIL,"\n  ⇒ %s\n  ⇒ фактор исток/сток в условиях непротекания: kV=%g ",
+    H.lFlow?"Увлечение корпуса кинематикой скоростей волновых потоков"
+           :"Чистая динамика хода без прямого влияния волновых потоков",H.Kv );
+}
 void logDamp()
 { Hull &H=*Vessel; H.DampInit(); textcolor( BROWN );
   print(56,22,"μ√:│ ξ%.1f∫%.2f η%.1f∫%.2f ζ%.1f∫%.2f │ ",H.muF.x,H.nF.x,H.muF.y,H.nF.y,H.muF.z,H.nF.z );
@@ -199,31 +207,32 @@ Hull& Hull::wPrint( bool log ) // информация по смоченному
   print( 59,15,   "| %5.2f %-5.2f %-5.2f | Y %s  ",y.x,y.y,y.z,DtoA(atan2( x.z,x.x)*_Rd,-1)),
   print( 59,16,   "| %5.2f %-5.2f %-5.2f | Z %s  ",z.x,z.y,z.z,DtoA(atan2(-x.y,x.x)*_Rd,-1));
   if( log )
-  { char *s=DtoA( Trim*_Rd,2 ); while( *s==' ' )++s; logDamp();
-    textcolor( WHITE ); print( 1,7,"  >>> %s \n"
-      "  >>> { L=%g, B=%g, T=%g, Ψ=%s\\δd≈%.0fсм }∧%g  №〈A.%d<%+d+>%d.Ф 〉∨%g ",
-         ShipName,Length,Breadth,Draught,s,asin( Trim )*Length*50,
-         Ofs.z-Draught,Stern.len,Nframes,Stem.len,Kv );
+  { char *s=DtoA( Trim*_Rd,2 ); while( *s==' ' )++s; //logDamp();
+    textcolor( WHITE ); print( 1,7,"  >>> %s \n  >>> "
+      "{ L=%g, B=%g, T=%g, Ψ=%s\\δd≈%.0fсм }∧%g  №〈A.%d<%+d+>%d.Ф 〉 ",  //∨%g ",
+      ShipName,Length,Breadth,Draught,s,asin( Trim )*Length*50,Ofs.z-Draught,
+      Stern.len,Nframes,Stem.len );                                     //,Kv );
     print(52,17,"inMass:"
                 "│ %7.0f  %-8.1f  %-9.1f │ ",inMass.x.x,inMass.x.y,inMass.x.z),
     print(59,18,"│ %7.1f  %-8.0f  %-9.1f │ ",inMass.y.x,inMass.y.y,inMass.y.z),
     print(59,19,"│ %7.1f  %-8.1f  %-9.0f │ ",inMass.z.x,inMass.z.y,inMass.z.z);
-
-    textcolor( CYAN ); print( 1,38,fname( fext( FileName ) ) );
-    if( !VIL ){ textcolor( MAGENTA ); print( " <= без протокола" ); } else
-    if( Educt&0xFF )
-    { textcolor( GREEN ); print( " <=%s: %s%s; %s%s%s{%s%s%s}",
-      Educt&0x200?"кратко":"полно",Educt&1?" ход,":"",Educt&2?" курс":"",
-      Educt&4?" вертикаль,":"",Educt&8?" борт,":"",Educt&16?" киль ":"",
-      Educt&32?"корма,":"",Educt&64?"мидель,":"",Educt&128?"нос":"" );
-      logTime(); fprintf( VIL,"\n\n  ⇒ %s \n"
-      "  ⇒ { L=%g, B=%g, T=%g, Ψ=%s\\δd=%.0fсм }^%g  №〈а.%d<шп[%d]>%d.ф〉\n"
-      "  ⇒ { δ=%.2f, W=%.1f m³, S=%.1f m², F=%.1f m² }\n"
-      "  ⇒ С{ x=%.1f, z=%.2f }, zG=%.2f, r=%.2f, h=%.2f [м]",
-      ShipName,Length,Breadth,Draught,DtoA(Trim*_Rd,2),asin(Trim)*Length*50,
-      Ofs.z-Draught,Stern.len,Nframes,Stem.len,Volume/Length/Breadth/Draught,
-      Volume,Surface,Floatage,Buoyancy.x,Buoyancy.z,Gravity.z,
-      Metacenter.z-Buoyancy.z,hX );
-      if( F.Kt<2 )logDamp(),logHydro(); fprintf( VIL,"\n" );
-  } } return *this;
+    textcolor( CYAN );
+    print( 1,38,fname( fext( FileName ) ) );
+    if( !VIL ){ textcolor( DARKGRAY ); print( " <= без протокола" ); } else
+    { textcolor( Educt&0xFF?LIGHTCYAN:DARKGRAY );
+      print( " [%s] %cход%cкурс;%cвертикаль%cборт%cкиль{%cкорма%cмидель%cнос}",
+      Educt&0x200?"пики":"∀⇐δt",Educt&1?'+':'-',Educt&2?'+':'-',  // = все dt
+      Educt&4?'+':'-',Educt&8?'+':'-',Educt&16?'+':'-',Educt&32?'+':'-',
+      Educt&64?'+':'-',Educt&128?'+':'-' ); logTime();
+      fprintf( VIL,"\n\n  ⇒ %s \n"
+        "  ⇒ { L=%g, B=%g, T=%g, Ψ=%s\\δd=%.0fсм }^%g  №〈а.%d<шп[%d]>%d.ф〉\n"
+        "  ⇒ { δ=%.2f, W=%.1f m³, S=%.1f m², F=%.1f m² }\n"
+        "  ⇒ С{ x=%.1f, z=%.2f }, zG=%.2f, r=%.2f, h=%.2f [м]\n",
+        ShipName,Length,Breadth,Draught,DtoA(Trim*_Rd,2),asin(Trim)*Length*50,
+        Ofs.z-Draught,Stern.len,Nframes,Stem.len,Volume/Length/Breadth/Draught,
+        Volume,Surface,Floatage,Buoyancy.x,Buoyancy.z,Gravity.z,
+        Metacenter.z-Buoyancy.z,hX );
+  } }
+  if( F.Kt<2 )logStock(),logDamp(),logHydro(); //fprintf( VIL,"\n" );
+  return *this;
 }

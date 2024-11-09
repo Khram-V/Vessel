@@ -6,8 +6,8 @@
 //                если < 0 - в пикселях и нормальных отсчетах, Y - снизу вверх
 //     отсутствие шрифта - подключение окна (не приводит к размеру точки [1x1])
 //
-Place& Place::Area( int X,int Y, int W,int H )   // достаточно сделать шаг
-{ Real fw=Tw,fh=Th;                         // единичным и далее по Place,
+Place& Place::Area( int X,int Y, int W,int H )     // достаточно сделать шаг
+{ Real fw=AlfaWidth(),fh=AlfaHeight(),Tw=fw,Th=fh; // единичным, далее по Place
 // всё по горизонтали
    if( !W )W=Site->Width;  else if( W<0 )W=-W,fw=1; else W=W*fw; // связанной с
    if( X>0 )X=(X-1)*fw; else X = Site->Width - W + X*fw;      // базовой Window

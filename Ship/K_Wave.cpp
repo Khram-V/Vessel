@@ -58,7 +58,8 @@ Real WaveRes( Real **Hull,      // Корпус
 //
 void Plaze::Drawing()
 { int i,k;
-  mcWin->Activate().Clear();     //. теперь и мышка уж умеет сбивать активность
+  mcWin-> // AlfaVector( H/32 ).
+         Activate().Clear();      // теперь и мышка уж умеет сбивать активность
   //
   //! сначала верхнее окошко с волновым профилем
   //
@@ -167,12 +168,12 @@ void Plaze::Drawing()
   //
   gl_BLUE;
   for( Fn=0.1; Fn<mFn; Fn+=0.1 )
-  mcWin->Text( Fn<0.15?_South_East:_South_West,Fn,0,0,"%3.1f",Fn );
+  mcWin->Text( Fn<0.15?_South_East:_South_West,Fn,-0.02,0,"%3.1f",Fn );
   mResw->Print(-1,0,Type==-3?"Ада Готман":Type==-2?"А.Н.Шебалов"
                             :"Штормовая мореходность");
-  if( Type>-3 )gl_MAGENTA,mResw->Print( 2,1,"R/D=%0.3g Н/кг",mv ),
+  if( Type>-3 )gl_MAGENTA,mResw->Print( 2,1.2,"R/D=%0.3g Н/кг",mv ),
                gl_GREEN,  mResw->Print(  "\n Cw =%0.3g",mm );
-      else     gl_MAGENTA,mResw->Print( 2,1,"%0.3g главная часть ",mv ),
+      else     gl_MAGENTA,mResw->Print( 2,1.2,"%0.3g главная часть ",mv ),
                gl_GREEN,  mResw->Print(  "\n %0.3g Мичелл ",mm ),
                gl_BLUE,   mResw->Print(  "\n %0.3g остаточное ",mr );
   mcWin->Save().Refresh(); // наверняка можно сработать только над окном Window
@@ -200,7 +201,7 @@ static bool Mouse_in_Window( int x, int y )
     glBegin( GL_LINES ); glVertex2d( X,0.0 ),glVertex2d( X,1.0 ); glEnd();
     M->Show();
   }
-  if( M ){ gl_LIGHTRED; MPL->Clear().Print( 0,1,"%s  -  %s %.2f, %s %.2f ",
+  if( M ){ gl_LIGHTRED; MPL->Clear().Print( 0,1,"%s - %s %.2f, %s %.2f ",
                              M->iD,M->sX,M->wX(x),M->sZ,M->wZ(y) ).Show(); }
   return false;
 }
@@ -215,9 +216,9 @@ static bool Mouse_Click( int State, int x, int y )
 }
 static bool FullDraw()
 { if( mcWin->Ready() )
-  { mcWin->Activate();
-    H=mcWin->Height;             // полный пересчет местоположения страничек на
+  { H=mcWin->Height;             // полный пересчет местоположения страничек на
     W=mcWin->Width;              // случай изменения размеров графического окна
+    mcWin->Activate();
     mResw->ax=mWave->ax=mLine->ax=0;
     mHull->ux=mWave->ux=mLine->ux=W;
     mHull->ax=mResw->ux=(2*W)/3; // -- здесь настройка размерений всех картинок
@@ -225,39 +226,40 @@ static bool FullDraw()
     mHull->uz=mResw->uz=mLine->az=mHull->az+(W-mHull->ax)*(Draught-Do)/Breadth;
     mLine->uz=mWave->az=mHull->uz+(W*Breadth)/Lmx/2;
     mWave->uz=H;
-    MPL->Area( 0,1,51,-22 );       // информационная подстрочка
+    MPL->AlfaVector( 14 ).Area( 0,1,54,-16 );    // информационная подстрочка
     PL->Drawing();
   } return false;
 }
 static void HelpWave()
-{ const char *Name[]={ " Wave ","  Волнообразование и",
-                                "сопротивление движению",
-                                "корабля на тихой воде",0 },
-             *Cmds[]={ "F1 ","     краткая справка",
+{ const char *Name[]={ "ShipWave"," Волнообразование и",
+                                  "сопротивление движению",
+                                  "корабля на тихой воде",0 },
+             *Cmds[]={ "F1 ","   краткая справка",
                        "F7 ","по \"Штормовой мореходности\"",
                        "F8 ","из Корабелки + А.Н.Шебалов",
                        "F9 ","++ остаточное от А.Ш.Готман",0 },
              *Plus[]={ "(LMouse)  ","+ волновое излучение",
-                       "<Space>   ","  сброс профилей волн",
-                       "<Enter>   ","обновить изображение",
-                       "<Tab>     ","  иная модель Мичелла",
+                       "<Space> ","сброс волновых профилей",
+                       "<Enter> "," обновление изображения",
+                       "<Tab> ","выбор иной модели Мичелла",
                        "<Esc>/<ctrlC> ","   завершение",0
-                     }; mcWin->Help( Name,Cmds,Plus,2 );
+                     }; mcWin->Help( Name,Cmds,Plus,1,1 );
 }
 void Hull_Wave( const int _Type )
 { int ans;
  Type=_Type;
- Window Win(" Simple Wave Resistance of ship",0,0,W,H ); mcWin=&Win;  // единое
+ Window Win( " Simple Wave Resistance of ship",0,0,W,H );
+        Win.AlfaVector( H/40 );  mcWin=&Win;            // единое
  Plane Hull("Корпус",    "Y","Z",mcWin ); mHull=&Hull;  // окно проекции корпус
  Plane Line("Полуширота","X","Y",mcWin ); mLine=&Line;  // проекция полуширота
  Plane Resw("Волновое сопротивление","Fn","Wr",mcWin ); mResw=&Resw; // Мичелл
  Plane Wave("Интенсивность излучения","X","Aw",mcWin ); mWave=&Wave; // и волны
  Place Mous( mcWin,PlaceAbove ); MPL=&Mous;    // красная строчка с информацией
- Plaze Ship(64,96,Draught);         // Рабочая таблица плазовых ординат корпуса
+ Plaze Ship( 64,96,Draught );       // Рабочая таблица плазовых ординат корпуса
    PL=&Ship;                        //  для простых или ускоренных перерасчётов
 //V=PL.V/( Lwl*Draught*Bwl );                      == коэффициент общей полноты
   glClearColor( 0.95,1,0.9,1 ); glInitial();
-  Win.Activate().AlfaVector( 18,1 )       // привязанная к текущему окну
+  Win.Activate()                          // привязанная к текущему окну
      .Mouse( Mouse_in_Window )            // графическое окно волнообразования
      .Mouse( Mouse_Click )
      .Clear();

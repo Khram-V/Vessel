@@ -104,25 +104,27 @@ bool View::KeyBoard( byte key )   // к спуску из внешних вир�
    glEnable( GL_DITHER );               // Предопределение графической среды
    glEnable( GL_ALPHA_TEST );
    glEnable( GL_BLEND );
-   glFogi( GL_FOG_MODE,GL_EXP2 );   glFogf( GL_FOG_DENSITY,0.0016 );// glFogf( GL_FOG_START,-Distance );// glFogf( GL_FOG_END,Distance );   glHint( GL_FOG_HINT,GL_NICEST );   glEnable( GL_FOG );// glEnable( GL_STENCIL_TEST );#if 1   glLightModelfv( GL_LIGHT_MODEL_AMBIENT,(const float[]){ 0.5,0.7,0.6,0.75 } );
+   glFogi( GL_FOG_MODE,GL_EXP2 );   glFogf( GL_FOG_DENSITY,0.0016 );// glFogf( GL_FOG_START,-Distance );// glFogf( GL_FOG_END,Distance );   glHint( GL_FOG_HINT,GL_NICEST );   glEnable( GL_FOG );// glEnable( GL_STENCIL_TEST );#if 1   glLightModelfv( GL_LIGHT_MODEL_AMBIENT,(const float[]){ 0.5,0.6,0.7,0.8 } );
 // glLightModeli( GL_LIGHT_MODEL_COLOR_CONTROL,GL_SEPARATE_SPECULAR_COLOR );
    glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER,true );
    glLightModeli( GL_LIGHT_MODEL_TWO_SIDE,true );
    glMaterialfv( GL_FRONT_AND_BACK,GL_AMBIENT, (const float[]){.2,.2,.2,1.} );
    glMaterialfv( GL_FRONT_AND_BACK,GL_DIFFUSE, (const float[]){.8,.8,.8,1.} );
-   glMaterialfv( GL_FRONT_AND_BACK,GL_SPECULAR,(const float[]){.5,.5,.5,.5} );
+   glMaterialfv( GL_FRONT_AND_BACK,GL_SPECULAR,(const float[]){.1,.1,.1,.1} );
    glMaterialfv( GL_FRONT_AND_BACK,GL_EMISSION,(const float[]){.1,.1,.1,.1} );
-   glMateriali( GL_FRONT_AND_BACK,GL_SHININESS,127 ); // степень отсветки
+   glMaterialf( GL_FRONT_AND_BACK,GL_SHININESS,0.5 );       // степень отсветки
    glLightfv( GL_LIGHT0,GL_AMBIENT, (const float[]){.1,.3,.2,.6}); // окружение
    glLightfv( GL_LIGHT0,GL_DIFFUSE, (const float[]){.6,.8, 1, 1}); // рассеяние
    glLightfv( GL_LIGHT0,GL_SPECULAR,(const float[]){.8,.9, 1, 1}); // отражение
    glLightfv( GL_LIGHT0,GL_EMISSION,(const float[]){.6,.6,.6, 1}); // излучение
-   glLightfv( GL_LIGHT0,GL_POSITION,(const float[]){-2000,20,-100,1});
+   glLightfv( GL_LIGHT0,GL_POSITION,(const float[]){ -50,-20,-200,1} );
+   glLightfv( GL_LIGHT0,GL_SPOT_DIRECTION,(const float[]){0,0,0,0});
    glLightfv( GL_LIGHT1,GL_AMBIENT, (const float[]){.1,.2,.3,.8}); // окружение
    glLightfv( GL_LIGHT1,GL_DIFFUSE, (const float[]){.8, 1, 1, 1}); // рассеяние
    glLightfv( GL_LIGHT1,GL_SPECULAR,(const float[]){.6,.8,.9, 1}); // отражение
    glLightfv( GL_LIGHT1,GL_EMISSION,(const float[]){.6,.6,.6, 1}); // излучение
-   glLightfv( GL_LIGHT1,GL_POSITION,(const float[]){2000,100,10,1});
+   glLightfv( GL_LIGHT1,GL_POSITION,(const float[]){ 50,20,200,1} );
+   glLightfv( GL_LIGHT1,GL_SPOT_DIRECTION,(const float[]){0,0,0,0} );
 #endif   glColorMaterial( GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE );
    glEnable( GL_COLOR_MATERIAL );
    glEnable( GL_LIGHTING );

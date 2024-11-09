@@ -28,7 +28,7 @@ Hull& Hull::Config()
                         "Контуры шпангоутов при поверхности ватерлинии",
                         "Смоченная обшивка под поверхностью ватерлинии",
                         "Обшивка корабельного корпуса и надводный борт" };
-  Real D=Draught,sTime=sT/60;
+  Real D=Draught,sTime=sT/60,_V=Kv; bool _Flow=lFlow;
   Mlist Menu[]={ { 1,0,"   Гидростатика и динамика корпуса" }             // 0
    , { 2,34 }        // варианты гидромеханики корабля и морских волн == 1
    , { 1,6,"Начальная метацентрическая высота: h=%-+5.3lf",&hX},{0,0," м"}// 2,3
@@ -37,21 +37,26 @@ Hull& Hull::Config()
                            {0,4,"  z=%-4.2lf",&muF.z }                    // 6
    , { 1,4,"  бортовая: %-4.2lf",&muM.x},{0,4," килевая: %-4.2lf",&muM.y} // 7,8
                                        ,{0,4," рыскание: %-4.2lf",&muM.z} // 9
-   , { 1,6,"Практическая осадка:    %6.2lf",&D },{ 0,0," м" }          // 10,11
-   , { 1,34 }      // закраска или контуры триангуляционного покрытия     12
-   , { 1,34 }      // признаки вариантов прорисовки корпуса               13
-   , { 1,5,"Протяжённость кинематической выборки %-5.4lg",&sTime},{0,0,"мин"} // 14,15
+   , { 1,5,"Доля сток/исток модели непротекания: кV=%5.2lf",&Kv }         // 10
+   , { 1,28 }      // ключ вовлечения корпуса в потоки под гребнями волн   = 11
+   , { 0,5," Осадка: %5.2lf",&D },{ 0,0," м" }                         // 12,13
+   , { 1,34 }      // закраска или контуры триангуляционного покрытия     14
+   , { 1,34 }      // признаки вариантов прорисовки корпуса               15
+   , { 1,5,"Протяжённость графической прорисовки %-5.4lg",&sTime},{0,0,"мин"} // 16,17
    };
   TextMenu T( Mlist(Menu),this,1,1 ); int ans=-1; Real h=hX;
   Vector DF=muF,DM=muM;
   do
-  { Menu[13].Msg=(char*)HView[DrawMode&3]; // выбор метода прорисовки корпуса
-    Menu[12].Msg=DrawMode&4 ? "Контуры рёбер триангуляционного покрытия"
+  { Menu[15].Msg=(char*)HView[DrawMode&3]; // выбор метода прорисовки корпуса
+    Menu[14].Msg=DrawMode&4 ? "Контуры рёбер триангуляционного покрытия"
                             : "Закрашиваемая поверхность корабельной обшивки";
+    Menu[11].Msg=lFlow ? "Вовлечение в кинематику волн."
+                       : "Свободная динамика на волнах.";
     Menu[1].Msg=Model[Statum];
     ans=T.Answer( ans );
-    if( ans==12 )DrawMode=(DrawMode&~12)|(((DrawMode&12)+4)&12); else
-    if( ans==13 )DrawMode=(DrawMode&~3)|((DrawMode-1)&3); else
+    if( ans==11 )lFlow^=true; else
+    if( ans==14 )DrawMode=(DrawMode&~12)|(((DrawMode&12)+4)&12); else
+    if( ans==15 )DrawMode=(DrawMode&~3)|((DrawMode-1)&3); else
     if( ans==1 )Model_Config( this );
     if( h!=hX )// сдвиг центра масс и пересчет тензора инерции под новую высоту
     { Vector G=Gravity; Gravity.z+=h-hX; h=hX; inMass=Steiner(inMass,G,Gravity);
@@ -65,7 +70,8 @@ Hull& Hull::Config()
       Initial().Floating(); //Storm->Kt=sKt;
       wPrint( true );
     }                                          // факторы демпфирования сдвигов
-    if( DM!=muM || DF!=muF ){ DM=muM; DF=muF; logDamp(); }
+    if( _V!=Kv || _Flow!=lFlow ){ logStock(); _V=Kv,_Flow=lFlow; }
+    if( DM!=muM || DF!=muF ){ logDamp(); DM=muM; DF=muF; }
     sT=max( 0.5,sTime )*60; sTime=sT/60.0;      // протяжённость графиков качки
   } while( ans!=_Esc );
   return *this;
@@ -178,11 +184,11 @@ Hull& Hull::Get( char *s )
       if( memcmp( s,"м/с",strlen("м/с") ) ){ AtoA( s,cSp ); cSp*=W; } // и Фруд
       if( cSp/W>0.8 )cSp=0.8*W;                                 // cSp => Speed
     }
-    if( z && *z )                   //! изменение или переназначение осадки
+    if( z && *z )                       //! изменение или переназначение осадки
     { if( z=strchr( s=z,',' ) )*z++=0;
-      if( strcut( s ) )             // изменение осадки или её переназначение
+      if( strcut( s ) )               // изменение осадки или её переназначение
       { bool c=strpbrk( s,"+-" )!=0; D=strtod( s,&s ); AtoM( s,D );
-        if( c )D+=Draught;          // отсрочка пересчитывания из-за getString
+        if( c )D+=Draught;           // отсрочка пересчитывания из-за getString
       }
       if( z && *z )            //! установка дифферента по динамической статике
       { if( z=strchr( s=z,',' ) )*z++=0;
@@ -196,16 +202,29 @@ Hull& Hull::Get( char *s )
           }
           if( sin( fabs( Trim )*Length/2.0>Draught ) )       // ограничение
             Trim=asin( 2*copysign( Draught,Trim )/Length );  // макс.дифферента
-        }
-        if( z && *z )  // считывание начальной/исходной метацентрической высоты
-        { if( z=strchr( s=z,',' ) )*z++=0;
-          if( strcut( s ) ){ hX=strtod( s,&s );
-            if( wcspbrk( U2W( s ),L"м") )AtoM( s,hX ); // в абсолютных метрах
-            else { AtoA( s,hX ); hX*=Breadth; }      // или относительно ширины
+          if( z && *z )  // считывание начальной/исходной метацентрической высоты
+          { if( z=strchr( s=z,',' ) )*z++=0;
+            if( strcut( s ) ){ hX=strtod( s,&s );
+              if( wcspbrk( U2W( s ),L"м") )AtoM( s,hX ); // в абсолютных метрах
+              else { AtoA( s,hX ); hX*=Breadth; }      // или относительно ширины
+            }
+            if( z && *z )      //! выбор модели штормовой гидромеханики корабля
+            { if( z=strchr( s=z,',' ) )*z++=0;
+              if( strcut( s ) )Statum=byte( minmax( 0,atoi( s ),4 ) );
+              if( z && *z )  //! фактор ослабления и/сток парадокса Д'Аламбера
+              { if( z=strchr( s=z,',' ) )*z++=0;
+                if( strcut( s ) )Kv=minmax( 0.0,strtod( s,&s ),1.0 );
+                if( z && *z )    //! ключ вовлечения корпуса в волновые потоки
+                if( strcut( s=z ) )
+                { while( *s<=' ' )++s;
+                  if( *s=='1' || !memcmp( strlwr( s ),"true",4 ) )lFlow=true;
+                  if( *s=='0' || !memcmp( strlwr( s ),"false",5 ) )lFlow=false;
+                }
+              }
+            }
           }
-          if( z && *z )        //! выбор модели штормовой гидромеханики корабля
-          if( strcut( s=z ) )Statum=byte( minmax( 0,atoi( s ),4 ) );
-      } }
+        }
+      }
       if( D>0 && D!=Draught )     // изменение конструктивной осадки парохода
       if( !Read( FileName,D ) )Break("Ошибка смены осадки: %s",FileName);
   } } return Initial();

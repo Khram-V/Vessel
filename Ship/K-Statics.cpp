@@ -133,10 +133,9 @@ sy=(y+iy)/dX/2;
     { xCW[k]=cX/S; //+Xo;        // Центр площади ватерлинии
       Jy[k]=(R*2*dX-cX*cX/S);    // /Vol[k]->Продольный метацентрический радиус
       Jx[k]= r*2*dX/3;           // /Vol[k]->Поперечный --//--
-    }
-  }                              //
+  } }
   Srf[0]=S=Swl[0];               // Площадь смоченной поверхности
-  for( k=1; k<nZ; k++ )          //
+  for( k=1; k<nZ; k++ )
   { S+=( Y[k][0]+Y[k-1][0]+Y[k][nX-1]+Y[k-1][nX-1] )*dZ;// без двойки два борта
     if( k==1 )
     for( i=1; i<nX; i++ )
@@ -189,16 +188,14 @@ static void Graphic_for_Element
    Y=wC->Z( y );
   uY=wC->Z( y-up*2 )-Y;
   if( up )
-  { Real x=int( I/dL )*dL; stWin->AlfaVector( HiText*0.8,1 );
+  { Real x=int( I/dL )*dL; stWin->AlfaVector( HiText*0.8 );
     line( I,Y,I+L,Y );
     for( int i=0; x<I+L+dL/5; i++,x+=dL/5 )    // Разметка шкалы
     { line( x,Y,x,i%5?Y+uY/3:Y+uY );
       if( i>0 && i%5==0 )
       stWin->Text(up>0?_South_West:_North_West,x,Y+uY/5,0,"%.9g",e5(x));
-    } stWin->AlfaVector( HiText,2 )
-            .Text(up>0?_South_East:_North_East,I,Y+uY/5,0,Label )
-            .AlfaVector( HiText,1 );
-
+    } stWin->AlfaVector( HiText )
+            .Text(up>0?_South_East:_North_East,I,Y+uY/5,0,Label );
   }
   if( C )
   { glBegin( GL_LINE_STRIP );
@@ -251,7 +248,6 @@ void Hydrostatic::Graphics()
    .Print(-3,-5," %s \n Длина / ширина / осадка:   %1.0f / %0.1f / %0.1f \n"
                 " Водоизмещение / смоченная обшивка:  %0.1f / %0.1f",
                 Kh.Name,Length,Breadth,Draught,Volume,Surface );
-  stWin->AlfaVector( HiText,1 );
   //
   //  отметка аппликат метацентров и центров величины для расчетных ватерлиний
   //
@@ -260,7 +256,9 @@ void Hydrostatic::Graphics()
   { glBegin( GL_LINE_STRIP );
     for( k=0; k<nZ; k++)glVertex2d((i<nX/2)?-Y[k][i]:Y[k][i],k*dZ+Do); glEnd();
   }
-  Draw_Hull( 2,*wS );     // переход к двойному изображению в проекции "Корпус"
+  stWin->AlfaVector( HiText*0.75 );
+  Draw_Hull( 2,*stWin );  // переход к двойному изображению в проекции "Корпус"
+  stWin->AlfaVector( HiText );
   glEnable( GL_POINT_SMOOTH );
   for( k=w1*2; k<=wN*2; k++ )
   { j=(k*dW-Do)/dZ; Real zm=zM[j],zc=zCV[j],a=0.66;        // для всех посадок
@@ -301,19 +299,21 @@ void Hydrostatic::Axis_Statics( _Real A,bool clear )
                Mode==2 ? "Центр тяжести над ватерлинией:  Zg-T = %4.2f м" :
                          "Аппликата фиксирована: Zg = %4.2f м", Zmet );
   gl_BLACK;
-  stWin->AlfaVector( HiText*0.9,1 ); i = A*180.0/M_PI>90?6: A*180.0/M_PI>45?3:2;
+  stWin->AlfaVector( HiText*0.9 );
+  i = A*180.0/M_PI>90?6: A*180.0/M_PI>45?3:2;
   for( k=0; k<=36 && k*dA<A; k++ )
    if( !(k%i) )stWin->Text( _South,k*dA,wT->Z( wT->z( Lmin )-2 ),0,"%i",k*5 );
   for( z=dz; z<=Lmax; z+=dz )stWin->Text( _North_East,wT->X( 6 ),z,0,"%.3g",z );
   for( z=-dz; z>Lmin+dz; z-=dz )stWin->Text(_South_East,wT->X(3),z,0,"%.3g",z );
+  stWin->AlfaVector( HiText );
 }
 //   Расчёт плеч статической остойчивости формы
 //
 void Hydrostatic::Stability()
-{ int  j,                // Индекс угла накренения
-       k;                // Индекс контрольной осадки (*cos)
- Real  Z,A,dA,           // Ведущие аргументы
-       V,Mx,My;          // Объемные сумматоры моментов элементарной площадки
+{ int  j,                  // Индекс угла накренения
+       k;                  // Индекс контрольной осадки (*cos)
+ Real  Z,A,dA,             // Ведущие аргументы
+       V,Mx,My;            // Объемные сумматоры моментов элементарной площадки
 //const Real DM=Depth-Do;
   stWin->Activate(); wT->Set( 0.0,Lmin=-Depth,A=M_PI*Amax/180.0,Lmax=Depth );
   Axis_Statics( A ); dA=A/=nA;          // Шаг по углу накренения
@@ -430,7 +430,7 @@ static bool Mouse_in_Window( int x, int y )
 glEnable( GL_COLOR_LOGIC_OP );
 glLogicOp( GL_XOR ); => GL_COPY | GL_SET
 */
-  if( M ){ gl_LIGHTRED; MPL->Print( 1,1,"%s \n%s=%.2f, %s=%.2f ",
+  if( M ){ gl_LIGHTRED; MPL->Print( 0,0,"%s \n%s=%.2f, %s=%.2f ",
                         M->iD,M->sX,M->wX(x),M->sZ,M->wZ(y) ); } MPL->Show();
   return false;
 }
@@ -461,7 +461,6 @@ int Hydrostatic::Stability_Menu()
     wN=minmax( 1,wN,9 ); if( w1>wN )w1=wN=(w1+wN)/2;
   } return ans;
 }
-//
 //!    параллельная работа внешних и графических устройств
 //
 static Hydrostatic *stLD=NULL;
@@ -482,9 +481,9 @@ bool WinStability::Draw()
  Real P=Breadth*(wS->uz-wS->az)/(Depth-Do)/2;
   if( P<W )wS->ux = wS->ax+W+P,
            wS->ax = wS->ax+W-P;
-  MPL->Area( 0,2,20,-2*HiText );     // восстановление маленького окошка мышки
+  MPL->Area( 0,2,20,-30 ); //2*MPL->Th ); // восстановление маленького окошка мышки
   if( !stLD )                        // изображение чертежа в проекции "Корпус"
-  { wS->Set( Breadth/-2,Do, Breadth/2,Depth ); Draw_Hull( 2,*wS ); } else
+  { wS->Set( Breadth/-2,Do,Breadth/2,Depth ); Draw_Hull( 2,*this ); } else
   { stLD->Stability_Lines();// Быстрая прорисовка плеч статической остойчивости
     stLD->Graphics();     // Прорисовка кривых элементов теоретического чертежа
   }

@@ -21,12 +21,12 @@ void Window::Help
   if( Plus )while( Plus[p] )p++; if( p )h++; h+=n+(p+1)/2+(t+1)/2+1;
   for( c=1; c<n; c++ )if( (k=i+P.AlfaRect( Name[c] ).cx+1)>l )l=k;
   { TextContext TX;  // до запроса клавиатуры восстанавливается контекст OpenGL
-    P.Area( X,Y,3+(l+4)/P.Tw,h ).Activate( true );      // текст по строкам
-    glColor4f( .6,.8, 1, .6),glRecti( 0,P.Height,P.Width,0 );  //    и столбцам
-    glColor4f(.98,.98,.9,.8),glRecti( 3,P.Height-3,P.Width-3,12 );
+    P.Area( X,Y,3+(l+4)/P.AlfaWidth(),h ).Activate( true ); // текст по строкам
+    glColor4f( .6,.8, 1, .6),glRecti( 0,P.Height-3,P.Width,0 );  //    и столбцам
+    glColor4f(.98,.98,.9,.8),glRecti( 3,P.Height-6,P.Width-3,12 );
     glColor3f( 0,0,0.8 );    P.Print( 2,2,Name[0] );
     glColor3f( 0,0,0 );      P.Print( Name[1] );
-    for( c=3,k=2; k<n; k++  )P.Print( 2+i/P.Tw,c++,Name[k] );
+    for( c=3,k=2; k<n; k++  )P.Print( 2+i/P.AlfaWidth(),c++,Name[k] );
     for( c++,k=0; k<t; k+=2 )glColor3f( 0,0,0 ),P.Print( 2,c++,Cmds[k] ),
                              glColor3f( 0,0,1 ),P.Print( Cmds[k+1] );
     for( c++,k=0; k<p; k+=2 )glColor3f( 0,.8,0 ),P.Print( 2,c++,Plus[k] ),

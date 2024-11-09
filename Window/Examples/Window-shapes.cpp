@@ -322,7 +322,8 @@ int main( int argc,char *argv[] )
     Tvm.SetTimer( 500,Clock );                    // часы в правом верхнем углу
     Tvm.WaitKey();      //! простая приостановка обязательно должна срабатывать
     { Place Zero( &Tvm,PlaceAbove ); glClearColor( 1,1,1,0.5 );
-      glColor3f(0,0,1); Zero.Area(12,-14,40,1).Clear().Print(1,1,"Строчка в окошке");
+      glColor3f(0,0,1);
+      Zero.AlfaVector( 18 ).Area(12,-14,40,1).Clear().Print(1,1,"Строчка в окошке");
       glColor3f(0,.5,0); Zero.AlfaVector( 12 ).Print( " со сменой шрифта" );
       Zero.Show(); Tvm.WaitKey();
     }

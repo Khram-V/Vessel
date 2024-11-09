@@ -58,8 +58,8 @@ Hull& Hull::Contour_Lines()      // рисуем контуры габаритн
 //! общая навигационная информация о состоянии корабля
 //
 const static byte Rumb[]=
- { _North,_North_East,_East,_South_East,_South,_South_West,_West,_North_West };
-
+  { _North,_North_East,_East,_South_East,_South,_South_West,_West,_North_West
+  };
 static Tensor B;     // единичный масштаб пространственного тензора
 static void P( _Real x,_Real y ){ glVertex3dv( B*(Vector){ x,y } ); }
 static Real i90( _Real r ){ return r>_Ph ? _Pi-r : ( r<-_Ph ? -_Pi-r : r ); }
@@ -82,8 +82,8 @@ Hull& Hull::NavigaInform( Window *Win )
  bool GMod = (DrawMode&8)==0;  // режим с разделением графиков качки и ходкости
  Place Compass( Win,PlaceOrtho );  // | PlaceAbove ~~ случай единичной разметки
  TextContext TS( true );
-  Compass.AlfaVector( Win==this?Th:S.Th );
-  if( Win!=this || !GMod )Compass.Area( 0,-Compass.Th/2,1.25*l,l );
+  Compass.AlfaVector( Win==this?AlfaHeight():S.AlfaHeight() );
+  if( Win!=this || !GMod )Compass.Area( 0,-Compass.AlfaHeight()/2,1.25*l,l );
                     else  Compass.Area( 2,-6,28,20 );
                           Compass.Activate( true );
   //
@@ -103,7 +103,6 @@ Hull& Hull::NavigaInform( Window *Win )
   if( right )Compass.Print( 1,3,"Заштилело" );
   //
   //                                  стрелка-указатель заданного курса корабля
-  //
   B.axiZ( _Ph-Course )/=L;
   for( i=0; i<2; i++ )                              // стрелка выбранного курса
   { if( !i ){ glLineWidth( 2 ); color( blue,0,.75 ); glBegin( GL_LINE_LOOP ); }
@@ -111,8 +110,7 @@ Hull& Hull::NavigaInform( Window *Win )
     P(.75,0),P(.4,-.05),P(.5,-.01),P(-.75,-.05),
     P(-.6,0),P(-.75,.05),P(.5,.01),P(.4,.05); glEnd();
   }
-  //  подпись - текущий курс в градусах и скорость в узлах
-  //
+  //                       подпись - текущий курс в градусах и скорость в узлах
   for( i=0; i<32; i++ )
   { Real D=Real( i )*_Ph/8.0;                              //! картушка компаса
     Vector V=(Vector){ sin( D ),cos( D ),0 }/-L; bool big=(i%4)==0;
@@ -138,7 +136,7 @@ Hull& Hull::NavigaInform( Window *Win )
     dot( B*(R-W) ),dot( B*(R-N) );
     dot( B*(R+W/1.5) ),dot( B*(R+N) ); glEnd(); spot( B*R,6,lightmagenta );
   }
-  //   кренометр по границе круга картушки полупрозрачным треугольничком
+  //          кренометр по границе круга картушки полупрозрачным треугольничком
   //
   B.axiZ( C.x-_Ph )/=L;
   for( i=0; i<2; i++ )
@@ -175,7 +173,8 @@ Hull& Hull::NavigaInform( Window *Win )
   //  в центре картушки подписывается текущий курс и действующая скорость судна
   //
   color( lightblue,-0.25 );
-  Text( _Down,(Point){0},"%s %3.1fуз",DtoA( atan2(-x.y,x.x )*_Rd,-1 ),Speed*3600/_Mile );
+  Text( _Down,(Point){0},
+        "%s %3.1fуз",DtoA( atan2(-x.y,x.x )*_Rd,-1 ),Speed*3600/_Mile );
 //  Text( _Center,(Point){0},"%s ",DtoA( atan2(-x.y,x.x )*_Rd,-1 ) );
 //  Text( _Down,(Point){0},"%3.1f узл",Speed*3600/_Mile );
   //   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -201,8 +200,8 @@ Hull& Hull::NavigaInform( Window *Win )
 //       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    Vector Max,Min;                              // экстремумы графиков качки
    Compass.Area( 29,-1,0,7 ).Activate( true );  // семь строк от нижней границы
-   Real Lp=Real(Compass.Width)/Compass.Height,  // размеры информационного окна
-      Lt=12.0*Real(Compass.Tw)/Compass.Height;  // и удвоенный отступ справа
+   Real Lt=12*Compass.AlfaWidth()/Compass.Height, // и удвоенный отступ справа
+        Lp=Lt+Compass.Width/Compass.Height;     // размеры информационного окна
     //
     //   здесь надо выделить временной интервал записи графиков в экранном поле
     //
@@ -240,11 +239,11 @@ Hull& Hull::NavigaInform( Window *Win )
     //
    const Real dT=(l-k)*Ts; int j=dT<60?5:6;    // интервал времени эксперимента
     U=dT<60?AxisStep(dT)/5:AxisStep(dT/60)*10; // поминутный шаг шкалы времени
-    color( cyan,0.25 );   line(  (Point){ -Lp,0 },(Point){ Lp-Lt,0  } );
+    color( cyan,0.25 );   line( (Point){ -Lp,0 }, (Point){ Lp-Lt,0  } );
     color( green,0.25 ); liney( (Point){ -Lp,.5 },(Point){ Lp-Lt,.5 } );
     color( green,-0.25 ); line( (Point){ -Lp,-1 },(Point){ Lp-Lt,-1 } );
                           line( (Point){ -Lp,1  },(Point){ Lp,1 } );
-    Compass.AlfaVector( Compass.Th*0.85,1 );
+    Compass.AlfaVector( Compass.AlfaHeight()*0.85,1 );
     for( i=0; i*U<dT+0.1; i++ )
     { Real mX = -Lp + i*U*L/Ts;
       liney( (Point){ mX,1 },(Point){ mX,i%j?0.92:0.85 } );
@@ -256,8 +255,8 @@ Hull& Hull::NavigaInform( Window *Win )
     //
     //   закрашенный профиль волны с корпусом судна на вертикальной качке
     //
-    color( lightgreen,.7,.8 );
-    rectangle( (Point){Lp-Lt,-.5},(Point){Lp,.46} ); glLineWidth( 2 );
+    color( lightgreen,.7,.8 ); rectangle( (Point){Lp-Lt,-.5},(Point){Lp,.46} );
+    glLineWidth( 2 );
     glBegin( GL_QUAD_STRIP );
     for( i=k; i<=l; i++ )
     { color( aqua,.2 ); glVertex3d( -Lp+(i-k)*L,(Mix[i].z*2-Min.z)/Max.z-.5,0);
@@ -292,7 +291,7 @@ Hull& Hull::NavigaInform( Window *Win )
 ///
 ///     площадка графиков скорости хода, рыскания и трёх вертикальных ускорений
 ///     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Compass.AlfaVector( Compass.Th/0.85,1 );
+    Compass.AlfaVector( Compass.AlfaHeight()/0.85,1 );
     if( GMod )
     { Compass.Area( 29,-8,0,7 ).Activate( true );  // и ещё +7 строчек вверх
       color( green,0.25 ); liney( (Point){ -Lp,1 },(Point){ Lp-Lt,1 } );
@@ -324,7 +323,7 @@ Hull& Hull::NavigaInform( Window *Win )
                    if( maxM<H )maxM=H; else if( minM>H )minM=H; } A1=A2,A2=A3;
     } glEnd();
     glLineWidth( 1 );
-    Compass.AlfaVector( Compass.Th*0.85,1 );
+    Compass.AlfaVector( Compass.AlfaHeight()*0.85,1 );
     if( GMod )     // центральная подпись для ускорений в средней части корпуса
     { color( lightcyan,.75,.3 ); rectangle( (Point){Lp-Lt,-1},(Point){Lp,1} );
       color( blue );       Compass.Print(    0,4.5,"St)" );
@@ -399,6 +398,9 @@ bool Hull::Draw()                  // Виртуальная процедура 
   AlfaVector( Height/WinLines ); Drawing();               //   рисунок в памяти
   color( blue );
   Print( 2,1,"%s\n { %s }\n %s",sname( FileName ),ShipName,Model[Statum] );
+  if( Statum>3 && Storm->Exp.wave )           // подводные волновые воздействия
+    { color( green ); Print( lFlow?", увлечение волной":", над волной" ); }
+  color( gray );  Print( ", и/сток(%g) ",Kv );
   Save().Refresh(); Recurse=false; return false;
 }
 /*
