@@ -101,9 +101,10 @@ const char
 //
 struct _One: public Window
 { DWORD cw,dw,cnt;
-  _One():Window( "One::First OpenGL window" ),dw(0),cnt(0){};
+  _One():Window( "One::First OpenGL window",100,100,800,600 ),dw(0),cnt(0)
+        { Icon( "Flag" ); };
   virtual ~_One(){ print( 1,15,"One::Destructor \n" ); gotoxy( 1,21 ); }
-  virtual bool KeyBoard( byte key )
+  virtual bool KeyBoard( fixed key )
   { if( key==_F1 ){ Help( Nam1,Cmds,Plus ); return true; } return false;
   }                      // остальное в очередь ожиданий для get- или waitKey()
   virtual bool Timer()
@@ -120,7 +121,7 @@ struct _One: public Window
 //     Второй блок с освобожденные от графической среды функциями
 //
 static Window *Win2=NULL;    // случай свободной процедуры со ссылкой на Window
-static bool FreeHelp( byte Keyb )
+static bool FreeHelp( fixed Keyb )
 { if( Win2 && Keyb==_F1 ){ Win2->Help( Nam2,Cmds,Plus ); return true; }
                                                          return false; }
 static bool SecondTimer()
@@ -139,7 +140,7 @@ static bool MousePress( int State, int x,int y )
 //  сначала строится кинематика в цикле затем включаются таймеры для двух окон
 //
 int main( int argc, char **argv )
-{ Real theta=0.0f; byte Key=0; int oTv=0;
+{ Real theta=0.0f; fixed Key=0; int oTv=0;
 #pragma omp parallel
   { static int np=0;
     printf("Hello world: %d => Thread_num %d, num_threads %d, max_threads %d\n",

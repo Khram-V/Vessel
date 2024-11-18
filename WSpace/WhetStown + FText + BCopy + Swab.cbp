@@ -147,10 +147,9 @@
 			<Option target="DC3-Interpolation-Extrapolation" />
 			<Option target="Design_Fonts" />
 		</Unit>
-		<Unit filename="../Tools/Math.Rc">
-			<Option compilerVar="CPP" />
-			<Option target="C-WhetStones" />
-			<Option target="Design_Fonts" />
+		<Unit filename="../Tools/RusFlag.rc">
+			<Option compilerVar="WINDRES" />
+			<Option target="FText" />
 		</Unit>
 		<Unit filename="../Tools/StrCpy.cpp">
 			<Option target="DC3-Interpolation-Extrapolation" />

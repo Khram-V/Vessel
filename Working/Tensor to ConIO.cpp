@@ -1,10 +1,10 @@
 //
 // Вспомогательные утилиты, не имеющие прямого отношения к сути решаемой задачи
 //
-#include <StdIO.h>
 #include "..\Type.h"
 #include "..\Math\Complex.h"
 #include "..\Window\ConIO.h"
+#include <StdIO.h>
 
 bool Power_root( complex*,int );  // Коэффициенты->корни полинома и его порядок
 void Power_Vietta(complex*,int);  // Восстановление комплексного полинома

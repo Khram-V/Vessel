@@ -33,7 +33,7 @@ protected:
    int mx,my;        // растровые координаты курсора мышки в окне
 public: View( const char* Title,int X=0,int Y=0,int W=0,int H=0,_Real Size=1 );
 //     ~View(){}     // - в продолжение последовательности виртуальных операций
-virtual bool KeyBoard( byte Keyb );
+virtual bool KeyBoard( fixed Keyb );
 virtual bool Draw();
 };
 /*

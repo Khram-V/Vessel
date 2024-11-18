@@ -17,7 +17,8 @@ void One_Flight_Step_of_Point( Array&,int );
 //                                  Пространственные размерности видимого поля
 static const Real vX=16,vY=16,vZ=16,Screen_Size=max( max( vX,vY ),vZ );   // 4;
 static View Win                     // пространство, отображаемое на экране ЭВМ
- ( "Моделирование корпускулярных взаимодействий",0,0,1600,1000,Screen_Size*2 );
+ ( "Моделирование корпускулярных взаимодействий",
+   0,0,1600,1000,Screen_Size*2 );
 //
 //    Объединение геометрических фигур для динамического выбора и перенастройки
 //
@@ -149,7 +150,7 @@ static bool timer_drawing()                       // моделирование 
 //        Win.Draw();
            return false;
 }
-static bool keyboard( byte key )
+static bool keyboard( fixed key )
 { switch( key )
   { case _Esc: exit( 0 );                         // выход из программы
     case _F1:
@@ -185,7 +186,7 @@ static bool keyboard( byte key )
 //        Particle_volume=1.0;        // Win.Distance=-2*Screen_Size,
 //  case _BkSp:(Mxl=(Point){0,0,0}).Identity(); break; //cx=cy=cz=0; break;
    default :
-    { byte Typ=MTyp,Sts=Win.ScanStatus();
+    { fixed Typ=MTyp,Sts=Win.ScanStatus();
       switch( key )
       { case ' ':
           if( Sts&CTRL )++Typ%=(Dipole+1); else   // закраска граней модели
@@ -221,7 +222,7 @@ int main( int argc, char *argv[], char *envp[] )
 { int key=0;
     View_initial();
     glPolygonMode( GL_FRONT_AND_BACK,GL_FILL );
-    Win.Window::Draw( display );
+    Win.Window::Icon( "Math" ).Draw( display );
     Win.Window::KeyBoard( keyboard );
     Win.SetTimer( 100,timer_drawing );          // 50 без перегрузки процессора
 //  Win.Alfabet( 22,"Courier" );

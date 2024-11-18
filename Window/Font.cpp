@@ -1,10 +1,8 @@
 //
 // Два варианта шрифтов без включения проприетарных буквочек MicroSoft:Windows
 //  или обновлённый вариант (независимых) начертаний векторных и растровых букв
-#include "Window.h"                 // аппаратное окружение и стандартная среда
-                                    // программирования MinGW_Microsoft-Windows
-typedef unsigned short fixed;
-
+#include "Window.h"                // аппаратное окружение и стандартная среда
+                                   // программирования MinGW_Microsoft-Windows
 #define _Design_len 9633           // допустимое количество букв в _Design_font
 #define LFont Font &L=Ft?*Ft:*(Site->Ft)
 #include "Sym_Design.c"            //  Borland.chr + DesignCAD.vct Complex font
@@ -17,10 +15,10 @@ static struct Design_Letters
     Af=(fixed*)calloc( sizeof( fixed ),_Design_len );
     W=*V++; H=*V++; B=*V++; V++;
     for( i=0;; )
-    { v=UtC( u,V );                    // c пропуском ширины и высоты буквы
-      if( !u )break; i+=v-V;           // c нулевым символом на выход
-      if( u<_Design_len )Af[u]=i;      // смещение от начала массива векторов
-          u=(v[0]+1)*2; V=v+u; i+=u;   // собственно буквочка пропускается и
+    { v=UtC( u,V );                      // c пропуском ширины и высоты буквы
+      if( !u )break; i+=v-V;             // c нулевым символом на выход
+      if( u<_Design_len )Af[u]=i;        // смещение от начала массива векторов
+          u=(v[0]+1)*2; V=v+u; i+=u;     // собственно буквочка пропускается и
   } }
   int Rect( SIZE &F, const char *S )
   { int i,w,l=Ulen( S ); char *V=(char*)S; unsigned u; F.cy=H; F.cx=w=0;
@@ -90,38 +88,41 @@ SIZE Place::AlfaRect( const char *S )         // на выход подаютс�
 }
 //!   Работа с текстами в стиле Microsoft-Windows
 //                              растровый шрифт DOS-OEM(866)alt из эпохи CCCP
+char* UtOEM( char &s, char *U, unsigned &u );   // UTF-8 -> Russian-OEM(866)alt
 static
 void _OutBitText( const char *str, byte *bit, Real &X,Real &Y,Real bX )
-{ int w=bit[0]+1,h=bit[1]+2; char c; // в разборе текста контролируется
+{ int w=bit[0]+1,h=bit[1]+2; char b,*s=(char*)str;    // в разборе контролируется
+  unsigned u; fixed c;
    glPushClientAttrib( GL_CLIENT_PIXEL_STORE_BIT ); // переход на новую строку
-   glPixelStorei( GL_UNPACK_SWAP_BYTES,false );     // Step through the string,
-   glPixelStorei( GL_UNPACK_LSB_FIRST,false );      //  drawing each character.
-   glPixelStorei( GL_UNPACK_ROW_LENGTH, 0 );        // A newline will simply
-   glPixelStorei( GL_UNPACK_SKIP_ROWS,  0 );        // translate the next
-   glPixelStorei( GL_UNPACK_SKIP_PIXELS,0 );        // character's insertion
+   glPixelStorei( GL_UNPACK_SWAP_BYTES,false );    // Step through the string,
+   glPixelStorei( GL_UNPACK_LSB_FIRST,false );    //  drawing each character.
+   glPixelStorei( GL_UNPACK_ROW_LENGTH, 0 );      // A newline will simply
+   glPixelStorei( GL_UNPACK_SKIP_ROWS,  0 );      // translate the next
+   glPixelStorei( GL_UNPACK_SKIP_PIXELS,0 );      // character's insertion
    glPixelStorei( GL_UNPACK_ALIGNMENT,  1 );      // point back to the start of
-   while( ( c = *str++ )!=0 )                     // the line and down one line
-    if( c=='\n' ){ glBitmap( 0,0,0,0,-X+bX,-h,NULL ); X=bX; Y-=h; } else
-                 { glBitmap( w-1,h-2,         // Bitmap's width and height
+   while( *s )                                    // the line and down one line
+   { s=UtOEM( b,s,u ); c=b;
+     if( c==255 ){ if( u==1025 )c=256; else if( u==1105 )c=257; } // continue
+     if( c=='\n' ){ glBitmap( 0,0,0,0,-X+bX,-h,NULL ); X=bX; Y-=h; } else
+                  { glBitmap( w-1,h-2,        // Bitmap's width and height
                               -1,1,           // The origin in the font glyph
-                               w,0,           // смещение до новой позиции
-                               bit+2+c*(h-2)  //  + 2 байта и номер Х на высоту
+                              w,0,            //      смещение до новой позиции
+                              bit+2+c*(h-2)   //  + 2 байта и номер Х на высоту
                            ); X+=w; }         // сдвиг позиции и растра символа
-   glPopClientAttrib();                       // подготовка к следующей строчке
+   } glPopClientAttrib();                     // подготовка к следующей строчке
 }
 void Place::String( const char *T )
-{ LFont; TextContext St; Real X;               // исходная строка не изменяется
-  if( !(L.Bit)  )                              //! Вектор DesingCAD.vct-Borland.chr
+{ LFont; TextContext St; Real X;            // исходная строка не изменяется
+  if( !(L.Bit)  )                          //! Вектор DesingCAD.vct-Borland.chr
   { Real Scale=Real( L.Th )/Design.H,X=chX;
     RasterSector Sv( pX,pY,Width,Height,Scale );
     if( bX<0 ){ SIZE l; Design.Rect( l,T ); X=-bX-l.cx; } else X=bX;
     Design.Write( (char*)T,chX,chY,X,L.Thin );
-  } else
-  { char *str=UtA( T,true );                //! три варианта растра DOS-866-ОЕМ
-    RasterSector Sv( pX,pY,Width,Height );  //    раньше был ещё и Windows-1251
+  } else                                    //! три варианта растра DOS-866-ОЕМ
+  { RasterSector Sv( pX,pY,Width,Height );  //    раньше был ещё и Windows-1251
     if( bX>=0 )X=bX; else { X=-bX-AlfaRect( T ).cx; }
     glRasterPos2i( chX,chY-L.Th );
-    _OutBitText( str,L.Bit,chX,chY,X );
+    _OutBitText( T,L.Bit,chX,chY,X );
 } }
 void Place::String( const char *T, Real x,Real y )
 { LFont;
@@ -141,7 +142,7 @@ void Place::String( const char *T, Real x,Real y )
 void Place::String( Course Dir, const Real *P, const char* T )
 { LFont; TextContext St; SIZE sz;
  Real dx,dy; char *str=(char*)T;
-  if( L.Bit )str=UtA( T,true );              // выбор DOS-866 или Windows-1251
+//if( L.Bit )str=UtOEM( T );                 // выбор DOS-866 строчки в буфер
   glRasterPos3d( P[0],P[1],P[2] );           // плоская надпись со смещением
   sz=AlfaRect( T );      dx=-sz.cx/2;        // разбор типа записи внутри...
   if( Dir&_East  )dx= 4; dy=-sz.cy/6;        // сдвиги и переносы строк

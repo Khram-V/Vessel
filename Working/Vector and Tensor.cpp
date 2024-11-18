@@ -2,10 +2,10 @@
  **     Первый пакет математических процедур
  **       с использованием языка программирования OpenGL + Window-Place + С++
  **         простейший вариант отработки консольных команд с мышиной вознёй
- **                      (c)2013, В.Храмушин, Санкт-Петербургский университет
+ **                    (c)2013, В.Храмушин, Санкт-Петербургский университет
  **/
+#include <StdIO.h>
 #include <GL\GLU.h>
-#include <stdio.h>
 #include "..\Math\Tensor.h"
 #include "..\Window\Window.h"
 #include "..\Window\ConIO.h"
@@ -22,7 +22,7 @@ void put( int x,int y, COLORS c, const char *Fmt,... );
 //    Определение основных рабочих параметров
 //
 const Real Screen_Size=2.6;
-static Window Win( "Tensor Parameters in Window-Place + ConIO + OpenGL/C++" );
+static Window Win( "Tensor Parameters in Window-Place + ConIO + OpenGL/C++" ); //,12,12,1200,600,"Math" );
 static Base Tv( Screen_Size );     // пространство, отображаемое на экране ЭВМ
 //
 //    Определение графического окна
@@ -138,6 +138,7 @@ int main( int argc, char** argv )  // начальная настройка ко
    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
    glHint( GL_FOG_HINT, GL_NICEST );
 */ glEnable( GL_DEPTH_TEST );      // разборка перекрытий объектов по глубине
+   Win.Icon( "Math" );
    Win.Mouse( Mouse );             // возможно, если особо на скору руку.
    Win.Mouse( Motion );            // но в ограниченном случае
  int key=0,stat=0; Real com=0.0,cx=0,cy=0,cz=0;

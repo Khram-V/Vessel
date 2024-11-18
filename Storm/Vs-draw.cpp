@@ -172,22 +172,22 @@ Hull& Hull::NavigaInform( Window *Win )
   //
   //  в центре картушки подписывается текущий курс и действующая скорость судна
   //
-  color( lightblue,-0.25 );
-  Text( _Down,(Point){0},
+  color( lightblue,-0.25 ),Text( _Down,(Point){0},
         "%s %3.1fуз",DtoA( atan2(-x.y,x.x )*_Rd,-1 ),Speed*3600/_Mile );
 //  Text( _Center,(Point){0},"%s ",DtoA( atan2(-x.y,x.x )*_Rd,-1 ) );
 //  Text( _Down,(Point){0},"%3.1f узл",Speed*3600/_Mile );
   //   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   //!  графики качки в окне аксонометрической проекции корпуса корабля !!
   //   ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-  color( navy ); Win->Print( 1,0," Time%s +%.2g\"/%.2g\n"
-                                 " Speed %.1f от %.1f узл\n"
-                                 "    Fr %.2f ~ %.1f длин\n"
-                                 " Volume %.0f << %.0f\n"
-                                 " Surface %.0f << %.0f\n"
-                                 " Floatable %.0f << %.0f\n"
-                                 " Metacenter %.1f << %.1f\n"
-                                 "            h %.1f << %.1f",
+  color( Win==Vessel?navy:gray );
+  Win->Print( 1,0," Time%s +%.2g\"/%.2g\n"
+                  " Speed %.1f от %.1f узл\n"
+                  "    Fr %.2f ~ %.1f длин\n"
+                  " Volume %.0f << %.0f\n"
+                  " Surface %.0f << %.0f\n"
+                  " Floatable %.0f << %.0f\n"
+                  " Metacenter %.1f << %.1f\n"
+                  "            h %.1f << %.1f",
            DtoA( S.Trun/3600,S.Trun>3600?2:(S.Trun>60?3:-3) ),TimeStep,
            tKrat,Speed*3600/_Mile,cSp*3600/_Mile,Speed/sqrt(_g*Length),
            sqr(Speed)*_Pd/_g/Length,Volume,iV,Surface,iS,Floatage,iF,

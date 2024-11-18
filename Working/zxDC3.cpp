@@ -1,12 +1,13 @@
 /**
  *  переинтерполяция ватерлиний к шпангоутам
  */
-#include <StdIO.h>
 #include "..\Type.h"
 #include "..\Math\Vector.h"
 #include "..\Window\ConIO.h"
+#include <StdIO.h>
 #include "Contour.h"
 
+char *getString( FILE *F );              // Чтение строки на статическом адресе
 const Real LW=1.0; // пусть это будет размер шпации
 inline bool operator != ( _Point A,_Point B ){ return abs( A-B )>1e-12; }
 Real e6( _Real R ){ return round( R*1e6 )/1e6; }

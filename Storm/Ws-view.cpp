@@ -141,8 +141,10 @@ bool Field::Draw()
       { glBegin( GL_QUAD_STRIP );            // раскраска общего волнового поля
         for( int x=0; x<mX; x+=k )           // в оттенках сине-зеленого цветов
         { Vector &p=Ws[y][x],&q=Ws[y+k][x];
-          color( colors(Clr[y+k][x]),0,Exp.view&2?1:0.75 ),dot( q );
-          color( colors(Clr[y][x]),  0,Exp.view&2?1:0.75 ),dot( p );
+          if( Exp.view&2 )color( colors(Clr[y+k][x]),0.1,1 ),dot( q ),
+                          color( colors(Clr[y][x]),  0.1,1 ),dot( p );
+                    else  color( colors(Clr[y+k][x]),0,0.9 ),dot( q ),
+                          color( colors(Clr[y][x]),  0,0.9 ),dot( p );
           if( x<mX-k )glNormal3dv( (q-p)*(Ws[y][x+k]-p) );
         } glEnd();
     } } glLineWidth( 1 );     // восстановление толщины обычных контурных линий

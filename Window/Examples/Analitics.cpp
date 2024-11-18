@@ -4,11 +4,11 @@
  *   (Window-Place + OpenGL/С++)
  *   (c)2008, В.Храмушин, Сахалинский государственный университет
  **/
-#include "..\Window\View.h"
+#include "..\View.h"
 //
 //      Собственно программа, работающая с графическим пакетом OpenGL
 //
-static byte KeyFunction='0';
+static fixed KeyFunction='0';
 const Real Sz=3.0;               // полуразмер сеточного квадрата, вмещающегося
                                  // в 80% стандартного графического поля [-1:1]
 Window Win( "Аналитические функции: Vector - Window-Place - OpenGL/C++",0,0,1600,1000 );
@@ -140,12 +140,12 @@ int main() // int argc, char** argv )
 { //
   //  подготовка и инициализация графического экрана
   //
- byte key=0;
+ fixed key=0;
   //
   //   Утилиты Window обеспечивают взаимодействие с операционной системой
   //
   View_initial();
-  Win.Draw( drawing ).Alfabet( 48,"Times",600,false ).Activate( true );
+  Win.Icon( "Flag" ).Draw( drawing ).AlfaVector( 48 ).Activate( true );
   glClearColor( 1,0.98,0.95,0.8 );
   glScaled( .8/Sz,.8/Sz,1 );
   do

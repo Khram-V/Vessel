@@ -81,6 +81,7 @@ static LRESULT CALLBACK WindowInterruptProcedure
   { if( Win->InterruptProcedure( message,wParam,lParam ) )return 0;
   } return DefWindowProcW( hWind,message,wParam,lParam );
 }
+#include <wchar.h>
 bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
 { if( message>=WM_MOUSEFIRST && message<=WM_MOUSELAST )
   { if( message==WM_MOUSEWHEEL )    //! отделение запросов мышки от всех прочих
@@ -102,7 +103,8 @@ bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
     case WM_SYSKEYUP  : break;                  // 261
     case WM_KEYDOWN   :                         // 256
     case WM_SYSKEYDOWN:                         // 260
-    { byte Key=0;       WinExecute( hWnd );     // на входе чистый ключ
+    { fixed Key=0;
+      WinExecute( hWnd );                       // на входе чистый ключ
       switch( wParam )                          // командные перекодировки
       { case VK_PRIOR : Key=_North_East; break; // 33
         case VK_NEXT  : Key=_South_East; break; // 34
@@ -122,14 +124,14 @@ bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
 //  case WM_TIMER: if( idEvent==wParam )       // 275 -> внутренняя процедура
 //                 { PutTimer(); return true; } break;
     case WM_CHAR:                              // 258 = WM_CHAR message handler
-    { byte Key;
+    { WPARAM Key;
       switch( Key=wParam )
       { case VK_BACK  : Key=_BkSp; break;      // 8 -> _BkSp(14)
         case VK_TAB   : Key=_Tab;  break;      // 9 -> _Tab(30)
         case VK_CANCEL: while( First )First->Close();
-                        PostQuitMessage( VK_CANCEL ); //exit( VK_CANCEL );
-                        return false;          // 3 -> просто на выход
-      } PutChar( Key );                        // и ещё одна запись в буфер
+                        PostQuitMessage( VK_CANCEL ); // exit( VK_CANCEL );
+                        return false;                 // 3 -> просто на выход
+      } PutChar( Key );                 // и ещё одна запись в буфер UniCode-16
     }   break;
     case WM_CLOSE: Close();         // =16 - сигнал о возможности закрытия окна
       DestroyWindow( hWnd ); break; // внутри идёт запрос закрытия окна Windows
@@ -180,7 +182,7 @@ Window::Window( const char *_title, int x,int y, int w,int h )
 // wc.hbrBackground=NULL; // GetStockObject( BLACK_BRUSH ) цвет заполнения окна
 // wc.lpszMenuName =NULL;                   // имя главного меню
    wc.lpszClassName=ws;                     // имя класса окна
-   if( (atom=RegisterClassW( &wc ))==0 )printf( "\n!\7RegisterClass\n " );
+   atom=RegisterClassW( &wc );              // ==0 => "\n!\7RegisterClass\n "
    Locate( x,y,w,h );                       // -- без hWnd - только размерности
    hWnd = CreateWindowW                     // Create main window
    ( wc.lpszClassName,                      // имя класса окна
@@ -273,7 +275,7 @@ Window& Window::Locate( int X,int Y, int W,int H )     // по правилам 
 //!  Блок накопления данных клавиатуры в текущем кольцевом буфере класса Window
 //!      (надо бы его спрятать, конечно, но в С++ ? - странно)
 //
-static byte WinAsyncKeyStates( byte code=0 )            // простой опрос
+static fixed WinAsyncKeyStates( fixed code=0 )          // простой опрос
 { if( GetAsyncKeyState( VK_LSHIFT   ) )code|=LEFT;      // состояния клавиатуры
   if( GetAsyncKeyState( VK_RSHIFT   ) )code|=RIGHT;     // с установкой
   if( GetAsyncKeyState( VK_LCONTROL ) )code|=LCTRL;     // командных аккордов
@@ -282,7 +284,7 @@ static byte WinAsyncKeyStates( byte code=0 )            // простой опр
   if( GetAsyncKeyState( VK_RMENU    ) )code|=R_ALT; return code;
 }
 #define lKey 0x3F               // маска(длина) клавиатурного буфера=64 символа
-void Window::PutChar( byte Key )         // занесение одного символа и его кода
+void Window::PutChar( fixed Key )     // занесение одного символа и его кода
 { KeyBuffer[++KeyPas&=lKey].Key=Key;          // в кольцевой буфер для символов
   KeyBuffer[KeyPas].Code=WinAsyncKeyStates();  // и клавиш управляющих аккордов
   if( KeyPas==KeyPos ){ MessageBeep(MB_OK); ++KeyPos&=lKey; }  // сброс-перебор
@@ -293,25 +295,28 @@ void Window::PutChar( byte Key )         // занесение одного си
       if( !KeyBoard( KeyBuffer[++KeyPos&=lKey].Key ) ){ KeyPos=oK; break; }
   } } WinExecute();  // при отказе возвращается обратно в цикл ожидания очереди
 }                    // новый символ единожды опробовается к считыванию (=true)
-bool Window::KeyBoard( byte key ) // виртуальная процедура обработки прерываний
-{ if( extKey ){ glContext S( this ); // установка графического контента OpenGL
+bool Window::KeyBoard( fixed key )// виртуальная процедура обработки прерываний
+{ if( extKey ){ glContext S( this );  // установка графического контента OpenGL
               return extKey( key ); // true - символ принят, false - к возврату
   } return false; //!KeyPas!=KeyPos; либо все недочитанные символы сбрасываются
 }
+//#define retkey return wctob( KeyBuffer[KeyPos].Key );
+//#define retkey { fixed r=KeyBuffer[KeyPos].Key; return r<128?r:wctob( r ); }
+//
 //!  Обращение к клавиатуре через активное и контекстно настроенное окно Window
 //                  ! осторожно, здесь предполагается отсутствие вызовов OpenGL
-byte Window::WaitKey()    // стандартный цикл ожидания нового символа в Windows
+fixed Window::WaitKey()    // стандартный цикл ожидания нового символа в Windows
 { onKey=true;  while( KeyPos==KeyPas )                   // || isTimer>0 )
                     { if( !WinRequest() )WaitMessage();  // ожидание символа כל
-                      if( !Site )return onKey=false; }   //    в том же окне
-  onKey=false; return KeyBuffer[ ++KeyPos&=lKey ].Key;
-}
-byte Window::GetKey()          // запрос появления нового символа на клавиатуре
+                      if( !Site )return onKey=false; }   //  в том же окне
+  onKey=false; return KeyBuffer[ ++KeyPos&=lKey ].Key;   //   wctob( key )=>
+}                                                        //    Uni16=>Win1251
+fixed Window::GetKey()         // запрос появления нового символа на клавиатуре
    { if( KeyPas==KeyPos )return 0; return KeyBuffer[ ++KeyPos&=lKey ].Key; }
 #undef lKey
-byte Window::ScanKey()         // просто проверка текущей активности клавиатуры
+fixed Window::ScanKey()        // просто проверка текущей активности клавиатуры
    { return KeyPas==KeyPos ? 0 : KeyBuffer[KeyPos].Key; }
-byte Window::ScanStatus()      // обновление в случае отсутствия новых запросов
+fixed Window::ScanStatus()      // обновление в случае отсутствия новых запросов
    { if( KeyPas==KeyPos )return WinAsyncKeyStates();
                          return KeyBuffer[KeyPos].Code;
    }
@@ -446,6 +451,11 @@ Window& Window::Title( const char* A )
     SetWindowTextW( hWnd,U2W( strcat(strcat(strcpy(S,Caption),"  ↔  " ),A) ) );
   } return *this;
 }
+Window& Window::Icon( const char* A )
+{ if( Caption ){ HICON hIcon=LoadIcon(GetModuleHandle(NULL),A); // ~~ hInstance
+    SendMessage( hWnd,WM_SETICON,ICON_BIG,(LPARAM)hIcon );      //   ICON_SMALL
+  } return *this;
+}
 void Break( const char Msg[],... )    // Случай аварийного завершения программы
 { va_list V; va_start( V,Msg );       // или приостановка с первым символом "~"
  char str[vsprintf( 0,Msg,V )+4]; vsprintf( str,Msg,V ); va_end( V );
@@ -454,8 +464,8 @@ void Break( const char Msg[],... )    // Случай аварийного за�
   if( *Msg!='~' )exit( MB_OK );
 }
 #if 0
-/*Window& Above(){ SetForegroundWindow( hWnd ); SetFocus( hWnd );
-  SetActiveWindow( hWnd ); ShowWindow( hWnd,SW_SHOWNA ); return Refresh(); } */
+Window& Above(){ SetForegroundWindow( hWnd ); SetFocus( hWnd );
+  SetActiveWindow( hWnd ); ShowWindow( hWnd,SW_SHOWNA ); return Refresh(); }
 //while( isTimer>0 )if( !WinRequest() )WaitMessage(); glFinish(); WinExecute();
 //while( isTimer>0 )if( !WinRequest( hWnd ) )WaitMessage();
 #endif

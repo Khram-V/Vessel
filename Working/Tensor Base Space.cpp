@@ -126,7 +126,7 @@ int main( int argc, char** argv )
 {   textsize( 80,25 );
     Sp=(Point){ Sp.nX/-2.0,Sp.nY/-2.0,Sp.nZ/-2.0 };
     View_initial();
-    Win.Place::Draw( drawing );
+    Win.Icon( "Math" ).Place::Draw( drawing );
     Win.Draw();
   //glFrontFace( GL_CW );      // CCW видимы грани с обходом по часовой стрелке
   int key=0;

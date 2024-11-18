@@ -1,489 +1,502 @@
 [Project]
-FileName = Aurora on Stormy Waves.dev
-Name = Aurora
-UnitCount = 30
-Type = 0
-Ver = 3
-ObjFiles = 
-Includes = 
-Libs = 
-PrivateResource = 
-ResourceIncludes = 
-MakeIncludes = 
-Compiler = 
-CppCompiler = -funsigned-char -finput-charset=utf-8
-Linker = -lopengl32 -lglu32_@@_
-IsCpp = 1
-Icon = 
-ExeOutput = Dev
-ObjectOutput = Dev/Obj
-LogOutput = Dev
-LogOutputEnabled = 1
-OverrideOutput = 1
-OverrideOutputName = Aurora-dev.exe
-HostApplication = 
-UseCustomMakefile = 0
-CustomMakefile = 
-UsePrecompiledHeader = 0
-PrecompiledHeader = 
-CommandLine = 
-Folders = 
-IncludeVersionInfo = 0
-SupportXPThemes = 0
-CompilerSet = 0
-StaticLink = 0
-AddCharset = 1
-UseUTF8 = 1
-Bins = 
-ResourceCommand = 
-ExecEncoding = UTF-8
-Encoding = UTF-8
-ModelType = 1
-ClassBrowserType = 0
-AllowParallelBuilding = true
-ParellelBuildingJobs = 8
-
+FileName=Aurora on Stormy Waves.dev
+Name=Aurora
+UnitCount=31
+Type=0
+Ver=2
+ObjFiles=
+Includes=
+Libs=
+PrivateResource=
+ResourceIncludes=
+MakeIncludes=
+Compiler=
+CppCompiler=-funsigned-char -finput-charset=utf-8
+Linker=-lopengl32 -lglu32_@@_
+IsCpp=1
+Icon=
+ExeOutput=Dev
+ObjectOutput=Dev/Obj
+LogOutput=Dev
+LogOutputEnabled=1
+OverrideOutput=1
+OverrideOutputName=Aurora-dev.exe
+HostApplication=
+UseCustomMakefile=0
+CustomMakefile=
+UsePrecompiledHeader=0
+PrecompiledHeader=
+CommandLine=
+Folders=
+IncludeVersionInfo=0
+SupportXPThemes=0
+CompilerSet=0
+StaticLink=0
+AddCharset=1
+UseUTF8=1
+Bins=
+ResourceCommand=
+ExecEncoding=UTF-8
+Encoding=UTF-8
+ModelType=1
+ClassBrowserType=0
+AllowParallelBuilding=true
+ParellelBuildingJobs=8
+CompilerSettings=
 
 [VersionInfo]
-Major = 1
-Minor = 0
-Release = 0
-Build = 0
-LanguageID = 1033
-CharsetID = 1252
-CompanyName = 
-FileVersion = 1.0.0.0
-FileDescription = Developed using the Dev-C++ IDE
-InternalName = 
-LegalCopyright = 
-LegalTrademarks = 
-OriginalFilename = Aurora-dev.exe
-ProductName = Aurora
-ProductVersion = 1.0.0.0
-AutoIncBuildNr = 0
-SyncProduct = 1
-
+Major=1
+Minor=0
+Release=0
+Build=0
+LanguageID=1033
+CharsetID=1252
+CompanyName=
+FileVersion=1.0.0.0
+FileDescription=Developed using the Dev-C++ IDE
+InternalName=
+LegalCopyright=
+LegalTrademarks=
+OriginalFilename=Aurora-dev.exe
+ProductName=Aurora
+ProductVersion=1.0.0.0
+AutoIncBuildNr=0
+SyncProduct=1
 
 [Unit1]
-FileName = ../Storm/Vs-view.cpp
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Storm\Vs-view.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit2]
-FileName = ../Window/Window.h
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Window\Window.h
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit3]
-FileName = ../Tools/Allocate.h
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Tools\Allocate.h
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit4]
-FileName = ../Tools/FileOpen.cpp
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Tools\FileOpen.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit5]
-FileName = ../Storm/Vs-regst.cpp
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Storm\Vs-regst.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit6]
-FileName = ../Window/UniCode.cpp
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Window\UniCode.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=0
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit7]
-FileName = ../Type.h
-CompileCpp = 0
-Folder = 
-Compile = 0
-Link = 0
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Type.h
+CompileCpp=0
+Folder=
+Compile=0
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit8]
-FileName = ../Storm/Vs-write.cpp
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Storm\Vs-write.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit9]
-FileName = ../Storm/Flex.cpp
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Storm\Flex.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit10]
-FileName = ../Window/Window_Help.cpp
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Window\Window_Help.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit11]
-FileName = ../Storm/Aurora.cpp
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Storm\Aurora.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit12]
-FileName = ../Math/Vector.h
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Math\Vector.h
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit13]
-FileName = ../Tools/Allocate.cpp
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Tools\Allocate.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit14]
-FileName = ../Window/ConIO.h
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Window\ConIO.h
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit15]
-FileName = ../Window/View.h
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Window\View.h
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit16]
-FileName = ../Storm/Vs-math.cpp
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Storm\Vs-math.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=0
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit17]
-FileName = ../Storm/Vs-draw.cpp
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Storm\Vs-draw.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit18]
-FileName = ../Storm/Ws-field.cpp
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Storm\Ws-field.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit19]
-FileName = ../Math/Tensor.cpp
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Math\Tensor.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit20]
-FileName = ../Window/ConIO.cpp
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Window\ConIO.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit21]
-FileName = ../Window/View.cpp
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Window\View.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit22]
-FileName = ../Storm/Aurora.h
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Storm\Aurora.h
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit23]
-FileName = ../Storm/Ws-view.cpp
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Storm\Ws-view.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit24]
-FileName = ../Window/Window_Menu.cpp
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Window\Window_Menu.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit26]
-FileName = ../Storm/Vs-hull.cpp
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Storm\Vs-hull.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit25]
-FileName = ../Storm/Vs-conf.cpp
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Storm\Vs-conf.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit27]
-FileName = ../Window/Window.cpp
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Window\Window.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit28]
-FileName = ../Tools/StrCpy.cpp
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-Encoding = 3
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Tools\StrCpy.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+Encoding=3
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
 
 [Unit29]
-FileName = ../Window/Julian.cpp
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Window\Julian.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
+Encoding=0
 
 [Unit30]
-FileName = ../Math/Tensor.h
-CompileCpp = 1
-Folder = 
-Compile = 1
-Link = 1
-Priority = 1000
-OverrideBuildCmd = 0
-BuildCmd = 
-FileEncoding = PROJECT
-RealEncoding = UTF-8
-
+FileName=..\Math\Tensor.h
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+FileEncoding=PROJECT
+RealEncoding=UTF-8
+DetectEncoding=1
+Encoding=0
 
 [CompilerSettings]
-cc_cmd_opt_optimize = s
-cc_cmd_opt_std = 
-link_cmd_opt_stack_size = 12
-link_cmd_opt_strip_exe = on
+cc_cmd_opt_optimize=s
+cc_cmd_opt_std=
+link_cmd_opt_stack_size=12
+link_cmd_opt_strip_exe=on
+
+[Unit31]
+FileName=..\Tools\Version.Rc
+Folder=Resources
+Compile=1
+Link=0
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+DetectEncoding=0
+Encoding=0
+

@@ -26,6 +26,7 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option use_console_runner="0" />
+				<Option projectCompilerOptionsRelation="0" />
 			</Target>
 			<Target title="Tensor Base Space">
 				<Option platforms="Windows;" />
@@ -52,13 +53,6 @@
 		<Compiler>
 			<Add option="-Os" />
 			<Add option="-funsigned-char" />
-			<Add option="-fopenmp" />
-			<Add option="-mthreads" />
-			<Add option="-fno-enforce-eh-specs" />
-			<Add option="-fno-exceptions" />
-			<Add option="-ffast-math" />
-			<Add option="-funsafe-math-optimizations" />
-			<Add option="-fno-trapping-math" />
 		</Compiler>
 		<Linker>
 			<Add option="-s" />
@@ -109,7 +103,11 @@
 		<Unit filename="../Type.h" />
 		<Unit filename="../Window/ConIO.cpp" />
 		<Unit filename="../Window/ConIO.h" />
+		<Unit filename="../Window/Font.cpp" />
 		<Unit filename="../Window/Julian.cpp" />
+		<Unit filename="../Window/Sym_CCCP.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../Window/UniCode.cpp" />
 		<Unit filename="../Window/View.cpp">
 			<Option target="Tensor Base Space" />

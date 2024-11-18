@@ -24,7 +24,8 @@ const int nA=180,         // Количество углов накренени�
           Bord=16;        // Пустые обрамления в графическом окне
 
 struct WinStability: public Window
-{ WinStability( int W,int H ): Window( " Ship Hull Hydrostatics",0,0,W,H ){}
+{ WinStability( int W,int H ):
+  Window( " Ship Hull Hydrostatics", 0,0,W,H ){}
  virtual bool Draw();     // главная процедура для прорисовки всех результатов
 };
 static WinStability *stWin=0;

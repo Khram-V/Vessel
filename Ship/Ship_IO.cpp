@@ -54,7 +54,8 @@ static void readText( char **src )
 { if( *src )free( *src ); // на входе-выходе просто адрес = строчка - недотрога
   if( !isBin )*src=strdup( getString( F ) ); else
   { int l=0; fread( &l,1,4,F );                Str[0]=0; //print(" l=%d ",l);
-    for( int i=0; i<l; i++ )Str[i]=fgetc( F ); Str[l]=0; *src=strdup( AtU( Str ) );
+    for( int i=0; i<l; i++ )Str[i]=fgetc( F ); Str[l]=0;
+    *src=strdup( WintU( Str ) );
   }
 }
 

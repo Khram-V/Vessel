@@ -1,10 +1,11 @@
 #ifndef __Type_h__
-#define __Type_h__     /// _ подборка констант и типичных операций ¹²³ⁿªº_
-#include <math.h>      //  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
-#include <stdlib.h>    // …∞ₒₐₓₑₔ‘’„“”«»‹›•∙×±≥≤÷≈≡≠∂δ∆∇∧∀∨⇒⇔↦←↑→↓↔↕↨∏∑∩∫ƒєæΘ
-typedef double Real;   // просто число ко всем арифметическим операциям §µ₪א®™
+#define __Type_h__      /// _ подборка констант и типичных операций ¹²³ⁿªº_
+#include <math.h>       //  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+#include <stdlib.h>     //…∞ₒₐₓₑₔ‘’„“”«»‹›•∙×±≥≤÷≈≡≠∂δ∆∇∧∀∨⇒⇯⇐⇔↦←↑→↓↔↕↨∏∑∩∫ƒєæΘ
+typedef double Real;    // просто число ко всем арифметическим операциям §µ₪א®™
 typedef const Real& _Real;   // числовая ссылка–константа, процедурный параметр
-struct Event; typedef const Event& _Event; // Обобщение / синтез даты и времени
+typedef unsigned short fixed; // маска логических операция и выборов управления
+struct Event; typedef const Event& _Event; // обобщение \ синтез даты и времени
                                                      // ©75 ⇒ Сахалин ↔ יְרוּשָׁלַיִם
 //    a 6378245 [м]  Сфероид Красовского морских карт России
 //    b 6356863.0188 SN\ϕ Эллипсоид Красовского
@@ -92,24 +93,22 @@ FILE *FileOpen                           // ++ кодировка длинных
 char *getString( FILE *F );              // Чтение строки на статическом адресе
 char *getString( FILE *F, int t );       // неограниченной длины +(-)табуляторы
 #endif                                   // результат - в подстрочках getString
-int  Usize( const char *A, bool=false ); // длина на выходе из DOS/Win в UTF-8
+//int  Usize( const char *A, bool=false ); // длина на выходе из DOS/Win в UTF-8
 int  Ulen( const char* UTF );            // количество позиций в строке UTF-8
 char* Uget( const char *U );             // однократная выборка UTF-8 символа
-char* Uset( const char *UTF, int k );    // установка на индекс -1 конец строки
+char* Uset( const char *UTF, int k );    // установка на индекс,-1 конец строки
 char* Uset( int &k, const char *U );     //  ++ с подтверждением местоположения
 char* Uset( char* U,int k,const char* S,bool ins=false ); // вставка S на U[k]
-//char* UtR( char &s, char *U );         // символ UTF-8 -> Russian-OEM(866)alt
-//char* UtW( char &s, char *U );         // символ UTF-8 -> Russian-Win-1251
-const char* RtU( const char R );         // получение UTF-8 кода из символа OEM
-const char* WtU( const char W );         // получение UTF-8 кода из Win-1251
-char* UlA( char* U, bool oem=false );    // Конвертация из Unicode на месте
-char* UtA( const char* U,bool R=false ); // Преобразование строк в буфере ввода
-char* AtU( const char* A,bool R=false ); // для OEM-866(true) и Win-1251(false)
-char* W2U( const wchar_t* WU );          // чисто Windows прилады перекодировок
-wchar_t* U2W( const char* U8 );          // UTF-8 -> UTF-16(LE)=Unicode-Windows
+char* UtOEM( const char *U );            // строчка в буфер Russian-OEM(866)alt
+char* UtWin( const char *U );            // строчка в буфер Russian-Windows1251
+char* OEMtU( const char *U );            // для считывание DOS-OEM(866) текстов
+char* WintU( const char *U );            // и старые тексты Russian-Windows1251
 const char* CtU( unsigned u );           // UniCode -> UTF-8 (int->string)
 char* UtC( unsigned &u, const char *U ); // UTF-8 -> UniCode  продвижение буквы
 unsigned UtC( const char *U );           // + на всякий случай
+
+char* W2U( const wchar_t* WU );          // чисто Windows прилады перекодировок
+wchar_t* U2W( const char* U8 );          // UTF-8 -> UTF-16(LE)=Unicode-Windows
 
 //template<class T>inline const T abs(const T &A){ return A<0?-A:A; }
 template<class T>inline const T &minmax( const T &a, const T &b, const T &c )

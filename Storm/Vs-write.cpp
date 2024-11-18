@@ -83,7 +83,7 @@ Hull& Hull::Write( int format ) // Wavefront Technologies 4 Advanced Visualizer
                 Keel[0],Keel[Nframes+1]-Keel[0],T*2 );
     fprintf( F,"20 0 0 0 0 0\n1.0,0.1\n1.0\n*\n; ANSI-1251 DesignCAD Russian\n"
                "23 5 0 0 0 0\n%s\nGrid\nFrames\nStern and Stem line\n"
-               "Aft and Bow breadth\n21 1\n",UtA( fname( FileName) ) );
+               "Aft and Bow breadth\n21 1\n",UtWin( fname( FileName) ) );
     fprintf( F,"; Baseline\n1 %d 0.5 0 3 3 0 1 1\n",Nframes+2 );    // разметка
     for( i=0; i<Nframes+2; i++ )fprintf( F,"%lg %lg 0\n",Keel[i],T );
     fprintf( F,"; Frames\n" );
@@ -133,7 +133,7 @@ Hull& Hull::Write( int format ) // Wavefront Technologies 4 Advanced Visualizer
     fprintf( F,"20 0 0 0 0 0\n1.0,0.1\n1.0\n*\n; ANSI-1251 DesignCAD Russian\n"
                "23 6 0 0 0 0\n%s\nGrid\nPortside\nStarboard\n"
                "Stern and Stem line\nHull plating\n21 1\n; Baseline\n"
-               "1 %d 0.5 0 3 3 0 1 1\n",UtA( fname( FileName ) ),Nframes+2 );
+               "1 %d 0.5 0 3 3 0 1 1\n",UtWin( fname( FileName ) ),Nframes+2 );
     for( i=0; i<Nframes+2; i++ )fprintf( F,"%g 0 0\n",Keel[i]+St );
     fprintf( F,"; Frames\n" );
     for( i=1; i<=Nframes; i++ )
@@ -190,9 +190,9 @@ Hull& Hull::Write( int format ) // Wavefront Technologies 4 Advanced Visualizer
   }
   { int D,m,d,y; char c='#',*sm,*sw,*sn=sname( FileName );
     julday( D=julday(),m,d,y ); sm=(char*)_Mnt[m-1],sw=(char*)_Day[D%7];
-    if( format!=1 ){ c=';'; sn=UtA( sn ); } fprintf( F,"%c\n%c %s\n",c,c,sn );
-    if( format!=1 )sm=UtA( sm ); fprintf( F,"%c %04d.%s.%02d ",c,y,sm,d );
-    if( format!=1 )sw=UtA( sw ); fprintf( F,"%s%s\n",sw,DtoA(onetime(),3,":"));
+    if( format!=1 ){ c=';'; sn=UtWin(sn); } fprintf( F,"%c\n%c %s\n",c,c,sn );
+    if( format!=1 )sm=UtWin(sm); fprintf( F,"%c %04d.%s.%02d ",c,y,sm,d );
+    if( format!=1 )sw=UtWin(sw); fprintf( F,"%s%s\n",sw,DtoA(onetime(),3,":"));
   } fclose( F ); return *this;
 }
 /*      &Entity_Type,       Собственно тип объекта

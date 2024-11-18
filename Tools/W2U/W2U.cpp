@@ -1,42 +1,38 @@
-От: https://www.cnblogs.com/ziwuge/archive/2011/11/05/2236968.html https://www.cnblogs.com/gakusei/articles/1585211.html
- Простое сопоставление, не проверено, не отвечает за результаты
+
+!! Простое сопоставление, не проверено, не отвечает за результаты
  
  Функциональный прототип:
 int MultiByteToWideChar( 
-　　　　UINT CodePage, 
-　　　　DWORD dwFlags, 
-　　　　LPCSTR lpMultiByteStr, 
-　　　　int cchMultiByte, 
-　　　　LPWSTR lpWideCharStr, 
-　　　　int cchWideChar 
-　　); 
+    UINT CodePage, 
+    DWORD dwFlags, 
+    LPCSTR lpMultiByteStr, 
+    int cchMultiByte, 
+    LPWSTR lpWideCharStr, 
+    int cchWideChar 
+  ); 
 int WideCharToMultiByte(
-　　　　UINT CodePage, 
-　　　　DWORD dwFlags, 
-　　　　LPWSTR lpWideCharStr, 
-　　　　int cchWideChar, 
-　　　　LPCSTR lpMultiByteStr, 
-　　　　int cchMultiByte, 
-　　　　LPCSTR lpDefaultChar, 
-　　　　PBOOL pfUsedDefaultChar 
-　　);
- 
+    UINT CodePage, 
+    DWORD dwFlags, 
+    LPWSTR lpWideCharStr, 
+    int cchWideChar, 
+    LPCSTR lpMultiByteStr, 
+    int cchMultiByte, 
+    LPCSTR lpDefaultChar, 
+    PBOOL pfUsedDefaultChar 
+  );
  
  В случае рассмотрения вопроса о безопасном использовании используются следующие общие шаги:
-　　MultiByteToWideChar：
+  MultiByteToWideChar：
  1) Вызовите MultiByteToWideChar, передайте NULL для параметра lpWideCharStr, 0 для параметра cchWideChar и -1 для параметра cchMultiByte;
  2) Выделите память, достаточную для хранения преобразованной строки Юникода, ее размер - это значение, возвращаемое последним вызовом MultiByteToWideChar, умноженное на sizeof (wchar_t);
  3) Снова вызовите MultiByteToWideChar, на этот раз передав адрес буфера в качестве значения параметра lpWideCharStr и умножив возвращаемое значение первого вызова MultiByteToWideChar на sizeof (wchar_t) как значение параметра cchWideChar
  4) Используйте преобразованную строку символов;
  5) Освободить блок памяти, занятый строкой Unicode.
  
-　　WideCharToMultiByte：
+  WideCharToMultiByte：
  Предпринятые шаги аналогичны предыдущим, с той лишь разницей, что возвращаемое значение - это непосредственно число байтов, необходимое для успешного преобразования, поэтому умножение не требуется.
  
  Во второй главе «Windows Core Programming» (символьная и строковая обработка) упоминается много символов и строк стандартных методов обработки, таких как проблемы строковых функций, в конце концов, следует ли использовать библиотеку C или использовать MS для реализации пояса суффикс _s.
- 
- 
-　
  
  Параметры MultiByteToWideChar и WideCharToMultiByte подробно
  Следующая часть взята из: http://www.cnblogs.com/wanghao111/archive/2009/05/25/1489021.html#2270293
@@ -133,113 +129,113 @@ int APIENTRY WinMain(HINSTANCE hInstance,
  Использование кодовой страницы CP_ACP реализует преобразование между ANSI и Unicode.
  Используйте кодовую страницу CP_UTF8 для достижения преобразования между UTF-8 и Unicode.
  Вот реализация кода:
-1.  ANSI to Unicode
+1.  ANSI to Unicode
 wstring ANSIToUnicode( const string& str )
 {
- int  len = 0;
- len = str.length();
- int  unicodeLen = ::MultiByteToWideChar( CP_ACP,
-            0,
-            str.c_str(),
-            -1,
-            NULL,
-            0 );  
- wchar_t *  pUnicode;  
- pUnicode = new  wchar_t[unicodeLen+1];  
- memset(pUnicode,0,(unicodeLen+1)*sizeof(wchar_t));  
- ::MultiByteToWideChar( CP_ACP,
-         0,
-         str.c_str(),
-         -1,
-         (LPWSTR)pUnicode,
-         unicodeLen );  
- wstring  rt;  
- rt = ( wchar_t* )pUnicode;
- delete  pUnicode; 
- 
- return  rt;  
+ int  len = 0;
+ len = str.length();
+ int  unicodeLen = ::MultiByteToWideChar( CP_ACP,
+            0,
+            str.c_str(),
+            -1,
+            NULL,
+            0 );  
+ wchar_t *  pUnicode;  
+ pUnicode = new  wchar_t[unicodeLen+1];  
+ memset(pUnicode,0,(unicodeLen+1)*sizeof(wchar_t));  
+ ::MultiByteToWideChar( CP_ACP,
+         0,
+         str.c_str(),
+         -1,
+         (LPWSTR)pUnicode,
+         unicodeLen );  
+ wstring  rt;  
+ rt = ( wchar_t* )pUnicode;
+ delete  pUnicode; 
+ 
+ return  rt;  
 }
-2.  Unicode to ANSI
+2.  Unicode to ANSI
 string UnicodeToANSI( const wstring& str )
 {
- char*     pElementText;
- int    iTextLen;
- // wide char to multi char
- iTextLen = WideCharToMultiByte( CP_ACP,
-         0,
-         str.c_str(),
-         -1,
-         NULL,
-         0,
+ char*     pElementText;
+ int    iTextLen;
+ // wide char to multi char
+ iTextLen = WideCharToMultiByte( CP_ACP,
+         0,
+         str.c_str(),
+         -1,
+         NULL,
+         0,
 NULL,
-         NULL );
- pElementText = new char[iTextLen + 1];
- memset( ( void* )pElementText, 0, sizeof( char ) * ( iTextLen + 1 ) );
- ::WideCharToMultiByte( CP_ACP,
-         0,
-         str.c_str(),
-         -1,
-         pElementText,
-         iTextLen,
-         NULL,
-         NULL );
- string strText;
- strText = pElementText;
- delete[] pElementText;
- return strText;
+         NULL );
+ pElementText = new char[iTextLen + 1];
+ memset( ( void* )pElementText, 0, sizeof( char ) * ( iTextLen + 1 ) );
+ ::WideCharToMultiByte( CP_ACP,
+         0,
+         str.c_str(),
+         -1,
+         pElementText,
+         iTextLen,
+         NULL,
+         NULL );
+ string strText;
+ strText = pElementText;
+ delete[] pElementText;
+ return strText;
 }
-3.  UTF-8 to Unicode
+3.  UTF-8 to Unicode
 wstring UTF8ToUnicode( const string& str )
 {
- int  len = 0;
- len = str.length();
- int  unicodeLen = ::MultiByteToWideChar( CP_UTF8,
-            0,
-            str.c_str(),
-            -1,
-            NULL,
-            0 );  
- wchar_t *  pUnicode;  
- pUnicode = new  wchar_t[unicodeLen+1];  
- memset(pUnicode,0,(unicodeLen+1)*sizeof(wchar_t));  
- ::MultiByteToWideChar( CP_UTF8,
-         0,
-         str.c_str(),
-         -1,
-         (LPWSTR)pUnicode,
-         unicodeLen );  
- wstring  rt;  
- rt = ( wchar_t* )pUnicode;
- delete  pUnicode; 
- 
- return  rt;  
+ int  len = 0;
+ len = str.length();
+ int  unicodeLen = ::MultiByteToWideChar( CP_UTF8,
+            0,
+            str.c_str(),
+            -1,
+            NULL,
+            0 );  
+ wchar_t *  pUnicode;  
+ pUnicode = new  wchar_t[unicodeLen+1];  
+ memset(pUnicode,0,(unicodeLen+1)*sizeof(wchar_t));  
+ ::MultiByteToWideChar( CP_UTF8,
+         0,
+         str.c_str(),
+         -1,
+         (LPWSTR)pUnicode,
+         unicodeLen );  
+ wstring  rt;  
+ rt = ( wchar_t* )pUnicode;
+ delete  pUnicode; 
+ 
+ return  rt;  
 }
-4.  Unicode to UTF-8    
+4.  Unicode to UTF-8    
 string UnicodeToUTF8( const wstring& str )
 {
- char*     pElementText;
- int    iTextLen;
- // wide char to multi char
- iTextLen = WideCharToMultiByte( CP_UTF8,
-         0,
-         str.c_str(),
-         -1,
-         NULL,
-         0,
-         NULL,
-         NULL );
- pElementText = new char[iTextLen + 1];
- memset( ( void* )pElementText, 0, sizeof( char ) * ( iTextLen + 1 ) );
- ::WideCharToMultiByte( CP_UTF8,
-         0,
-         str.c_str(),
-         -1,
-         pElementText,
-         iTextLen,
-         NULL,
-         NULL );
- string strText;
- strText = pElementText;
- delete[] pElementText;
- return strText;
+ char*     pElementText;
+ int    iTextLen;
+ // wide char to multi char
+ iTextLen = WideCharToMultiByte( CP_UTF8,
+         0,
+         str.c_str(),
+         -1,
+         NULL,
+         0,
+         NULL,
+         NULL );
+ pElementText = new char[iTextLen + 1];
+ memset( ( void* )pElementText, 0, sizeof( char ) * ( iTextLen + 1 ) );
+ ::WideCharToMultiByte( CP_UTF8,
+         0,
+         str.c_str(),
+         -1,
+         pElementText,
+         iTextLen,
+         NULL,
+         NULL );
+ string strText;
+ strText = pElementText;
+ delete[] pElementText;
+ return strText;
 }

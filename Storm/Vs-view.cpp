@@ -192,13 +192,16 @@ Hull& Hull::Drawing( byte type )  // 0 - DrawMode; 1 - корпус; 2 + про�
   //
   //  исходные и действующие центры и плечи гидростатических сил и моментов
   //
- Point P,Q,S,W,C=out( vB ),F=out( vF ),K=out( vC ),M=C; M.Z=vM.x;  // метацентр
- colors c = vM.z>=hX ? green : ( vM.z<0 ? red:yellow );
+ Point P,Q,S,W,C=out( vB ),F=out( vF ),M=C,K=F; M.Z=vM.x;  // метацентр
+ colors c = vM.z>=hX ? green : ( vM.z<0 ? red:yellow );    // K=out( vC ),
   //
   //  оси корабельных координат - векторы локального базиса от центра величины
   //
 // Vector R=Buoyancy; R.z=vB.z;
 // Point O=out( R );
+  if( iV<Volume/36 )K=out( Gravity ); else    // на вылете - центр тяжести
+  if( iF<Floatage/36  )K=out( Buoyancy );     // на погружение - центр величины
+                                              // либо центр площади ватерлинии
   Text( _Up,arrow( K-z*Draught*2, K+z*Draught*3,ArLen,blue ),"z" );
   Text( _Up,arrow( K+Breadth*y,   K-y*Breadth,  ArLen ),     "y" );
   Text( _Up,arrow( K+x*Length*-.6,K+x*Length*.6,ArLen ),     "x" );

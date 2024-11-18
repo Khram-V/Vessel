@@ -7,6 +7,7 @@ int main( int argc, char **argv )
 {
   Ship Hull;
   Window Graphics( "Ship",0,0,600,400 );
+//       Graphics.Icon( "Ship" );
   texttitle( "FREE!Ship" );
   if( argc>1 )Hull.ReadFile( argv[1] );   // Ship.Alfabet( 28,"Times New Roman" ).Print( "__" );
   do

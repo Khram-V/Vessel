@@ -97,8 +97,8 @@ int main( int l, char **Av )
       for( l=0; !feof( Fi ); l++ )
       { char *s=getString( Fi );                  // строчка из буфера FileOpen
         fprintf( Fo,"src: '%s' \n",s );
-        fprintf( Fo,"oem: '%s' \n",s=UtA( s,true ) );
-        fprintf( Fo,"bak: '%s' \n\n",s=AtU( s,true ) );
+//      fprintf( Fo,"oem: '%s' \n",s=UtA( s,true ) );
+//      fprintf( Fo,"bak: '%s' \n\n",s=AtU( s,true ) );
       } fprintf( Fo,"\n\n lCount=%d\n",l ); fclose( Fo );
     }    printf( " = %d\n",l );                 return 0;
   }      printf( "\7\n?«%s» not found",Av[1] ); return -1;

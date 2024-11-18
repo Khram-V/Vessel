@@ -3,7 +3,7 @@
 //
 #include <windows.h>
 
-Ship ICON "Ship.ico"
+Icon ICON "Icon/Ship.ico"
 //
 // Russian resources
 //

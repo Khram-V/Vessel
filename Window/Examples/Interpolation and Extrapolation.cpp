@@ -4,16 +4,16 @@
  *  языка графических построений  Window-Place + OpenGL + С++
  *                                                         ©2010-15, В.Храмушин
  */
-#include "..\Math\Function.h"
-#include "..\Math\Hermite.h"
-#include "..\Window\View.h"
+#include "..\..\Math\Function.h"
+#include "..\..\Math\Hermite.h"
+#include "..\View.h"
 //
 //      Собственно программа, работающая с графическим пакетом OpenGL
 //
-const int Npt=10;                         // =10 длина интерполируемого массива
+const int Npt=12;                         // =10 длина интерполируемого массива
 static int index=Npt/2;                            // номер подвижного узла
-static Real X[]={ 0, 1,2,3,  4,5,6,7,  8,9 },     // аргумент и
-            Y[]={ -0.2,1.45,2,1.9,3,4,3,1.45,1.5,-1.05 }; // значения в узлах
+static Real X[]={ 0, 1,2,3,  4,5,6,7,8,9,10,11 }, // аргумент и
+            Y[]={ -0.2,1.45,2,1.9,3,4,3,1.45,1.5,1.35,-1,.5 }; // значения в узлах
 static Function F1( Npt ),F2( Npt ),            // функция без Х и c аргументом
                 FX( Npt ),FY( Npt );           // и их раздельное представление
 static Real xMin,xMax,yMin,yMax;
@@ -124,7 +124,7 @@ int main( int argc,char** argv )
     //
     View_initial();
     glDisable( GL_BLEND );
-    Win.Alfabet( 22,"Times",800,1 );
+    Win.Icon( "Flag" ).AlfaVector( 22,1 );
     Win.Draw( drawing );
     glClearColor( 0.5,0.8,1,1 );  // glMatrixMode(GL_PROJECTION);
     glOrtho(-2,Npt+1,-7,6,-1,1 ); // glMatrixMode(GL_MODELVIEW),glLoadIdentity()
@@ -141,8 +141,11 @@ int main( int argc,char** argv )
 //      case _North_East: com=1.1;  break; // PgUp
 //      case _South_East: com=0.9;  break; // PgDn
         case _Esc: case 'q': exit( 2 ); break;    // жесткий выход из программы
-       default: if( key>='0' && key<='9' )               // выбор номера точки
-           index=minmax( 1,key=='0'?10:key-'0',Npt )-1;  // на графиках функции
+       default: if( key=='0' )index=9; else
+                if( key=='-' || key=='_' )index=10; else
+                if( key=='=' || key=='+' )index=11; else // выбор номера точки
+                if( key<='9' && key>='1' )index=key-'1'; // на графиках функции
+                 // index=minmax(1,key=='0'?10:key-'0',Npt)-1;
       }
       switch( key )
       { case _North:case _South: F1[index]+=com; Y[index]+=com; // вверх-вниз

@@ -1,5 +1,8 @@
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
+Icon ICON "Icon/FreeShip.ico"
+Flag ICON "Icon/RusFlag.ico"
+Ship ICON "Icon/Ship.ico"
+/*
 VS_VERSION_INFO  VERSIONINFO
   FILEVERSION    1,0,0,1
   PRODUCTVERSION 1,0,0,1
@@ -9,22 +12,19 @@ VS_VERSION_INFO  VERSIONINFO
 #else
   FILEFLAGS      0x0L  // final version
 #endif
-  FILEOS         VOS_NT_WINDOWS32
-  FILETYPE       VFT_APP
-  FILESUBTYPE    VFT2_UNKNOWN // not used
 {
   BLOCK "StringFileInfo"
   {
     BLOCK "040904E4" // Lang=US English, CharSet=Windows Multilingual
     {
-      VALUE "Build",            "October 2019\0"
+      VALUE "Build",            "November 2024\0"
       VALUE "Comments",         "Free for personal use only.\0"
       VALUE "CompanyName",      "First Company\0"
       VALUE "Developer",        "The Developer\0"
       VALUE "FileDescription",  "Application implementing something\0"
       VALUE "FileVersion",      "1.0.000\0"
       VALUE "InternalName",     "AppInternalName\0"
-      VALUE "LegalCopyright",   "Copyright (C) 2019 Company\0"
+      VALUE "LegalCopyright",   "Copyright (C) 2024 Company\0"
       VALUE "LegalTrademarks",  "All rights reserved.\0"
       VALUE "OriginalFilename", "The.exe\0"
       VALUE "PrivateBuild",     "\0"
@@ -40,3 +40,4 @@ VS_VERSION_INFO  VERSIONINFO
     VALUE "Translation", 0x409, 1251 // 1252 = 0x04E4
   }
 }
+*/

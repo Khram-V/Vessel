@@ -245,12 +245,8 @@
 			<Option target="Window Shapes" />
 			<Option target="GLFW Shapes" />
 		</Unit>
-		<Unit filename="../Tools/Math.Rc">
+		<Unit filename="../Tools/RusFlag.rc">
 			<Option compilerVar="WINDRES" />
-			<Option target="Window Shapes" />
-			<Option target="Window Trial" />
-			<Option target="GLFW Shapes" />
-			<Option target="GLFW Trial" />
 		</Unit>
 		<Unit filename="../Tools/StrCpy.cpp">
 			<Option target="A-lib32" />
@@ -289,6 +285,12 @@
 			<Option target="GLFW Shapes" />
 			<Option target="GLFW Trial" />
 		</Unit>
+		<Unit filename="../Window/Examples/Analitics.cpp">
+			<Option target="Analitic Field Space" />
+		</Unit>
+		<Unit filename="../Window/Examples/Interpolation and Extrapolation.cpp">
+			<Option target="Interpolation-Extrapolation" />
+		</Unit>
 		<Unit filename="../Window/Examples/UtC.cpp">
 			<Option target="UTF-8-Unicode-OEM(866)alt" />
 		</Unit>
@@ -303,6 +305,8 @@
 		<Unit filename="../Window/Font.cpp">
 			<Option target="Window Trial" />
 			<Option target="Window Shapes" />
+			<Option target="A-lib32" />
+			<Option target="A-lib64" />
 		</Unit>
 		<Unit filename="../Window/Font.h">
 			<Option target="Window Trial" />
@@ -378,12 +382,6 @@
 			<Option target="A-lib64" />
 			<Option target="Window Shapes" />
 			<Option target="A-lib32" />
-		</Unit>
-		<Unit filename="../Working/Analitics.cpp">
-			<Option target="Analitic Field Space" />
-		</Unit>
-		<Unit filename="../Working/Interpolation and Extrapolation.cpp">
-			<Option target="Interpolation-Extrapolation" />
 		</Unit>
 		<Extensions>
 			<wxsmith version="1">

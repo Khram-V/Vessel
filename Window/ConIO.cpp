@@ -20,8 +20,9 @@ void texttitle( const char* title )         //GetConsoleTitleA( S,sizeof(S ) );
 int print( short x,short y, const char *fmt,... ){ gotoxy( x,y ); ArgStr( x ) }int print( const char *fmt,... ){ int n; ArgStr( n ) } // CharToOem( str,str )void textcolor( COLORS clr,COLORS cbk ){ textattr( clr|cbk<<4 ); }
 void textcolor( COLORS clr ){ textattr( clr|(__BACK<<4) ); }
 ////   Неявная и не особо управляемая инициализация нового окна текстовой консоли//                              Rus-Windows/Cyr(1251) DOS/OEM(866) UTF-8(65001)//#include <locale.h>
-static bool CtrlHandler( DWORD fdwCtrlType ){ //ExitProcess( 0 );
-                    fclose( stdout ); FreeConsole(); exit( 0 ); return false; }
+static bool CtrlHandler( DWORD fdwCtrlType ){             // ExitProcess( 0 );
+                         fclose( stdout ); FreeConsole(); // exit( 0 );
+                         return false; }
 static struct _ScreenSave_{ _ScreenSave_(){ FreeConsole(),AllocConsole(); // отсоединение с пересозданием
                   *stderr=*stdout=*freopen( "CONOUT$","w",stdout ); // == "CON"
 //                *stdin=*freopen( "CONIN$","r",stdin );
@@ -30,11 +31,12 @@ static struct _ScreenSave_{ _ScreenSave_(){ FreeConsole(),AllocConsole(); // о
                   StdOut=GetStdHandle( STD_OUTPUT_HANDLE );//                StdOut=CreateConsoleScreenBuffer( GENERIC_WRITE,FILE_SHARE_WRITE,0,CONSOLE_TEXTMODE_BUFFER,0 );
                   SetConsoleMode( StdOut,ENABLE_PROCESSED_OUTPUT );
                   SetConsoleCtrlHandler( (PHANDLER_ROUTINE)CtrlHandler,true );
-                  GetConsoleScreenBufferInfo( StdOut,&Screen );                  SetConsoleCP( CP_UTF8 );                  SetConsoleOutputCP( CP_UTF8 );
-//                FlushConsoleInputBuffer( StdOut ); // GENERIC_WRITE
+                  GetConsoleScreenBufferInfo( StdOut,&Screen );                  SetConsoleCP( CP_UTF8 );               //    1251
+                  SetConsoleOutputCP( CP_UTF8 );         //    1251
+//                FlushConsoleInputBuffer( StdOut );     ~~ GENERIC_WRITE
 //                EnableWindow( GetConsoleWindow(),false );
                   clrscr();
-//                setlocale( LC_CTYPE,"" );
+//                setlocale( LC_ALL,".1251" );           // LC_TYPE
 //                setlocale( LC_ALL,".UTF8" );
                 }#if 0
  ~_ScreenSave_(){ SetConsoleWindowInfo( StdOut,true,&(Screen.srWindow) );                  SetConsoleScreenBufferSize( StdOut,Screen.dwSize );                  SetConsoleTextAttribute( StdOut,Screen.wAttributes );                  Screen.dwCursorPosition.Y=Screen.srWindow.Bottom-2;

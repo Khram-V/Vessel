@@ -50,7 +50,7 @@ byte Mekhanik_Status=4,  //  режим гидро\механики хода и 
                 ?? х10 - разблокировка графики с включением надводного борта */
 ///   Аксонометрический вид корпуса корабля и профилей морских волн
 Hull::Hull(): View     // в прицепе View окошко графической визуализации OpenGL
-( Title_Hull,-12,12,412,136 ),   //  Xpm( 4 ),Ypm( 4 ), Xpm( 64 ),Ypm( 72 )
+( Title_Hull, -12,12, 412,136 ), // Xpm( 4 ),Ypm( 4 ), Xpm( 64 ),Ypm( 72 )
   FileName( 0 ),ShipName( 0 ),   // Исходный Файл и название исходного проекта
   Keel( 0 ),Frame( 0 ),Shell( 0 ), // шпангоуты + штевни и обечайка по шпациям
   lFlow( true ),                 // ключ вовлечения корабля в волновой поток
@@ -91,13 +91,13 @@ Hull::Hull(): View     // в прицепе View окошко графическ
   color(cyan); AlfaVector( 15,1.5 ).Print( 6,2,
                    "\nМореходные качества корабля -"
                    "\n  вычислительный эксперимент" );
-  color(lightgreen ); AlfaVector( 13,0 ).Print( 8,5,
+  color(lightgreen); AlfaVector( 13,0 ).Print( 8,5,
                    "\n    ©1975-2024 Калининград - Сахалин - יְרוּשָׁלַיִם" );
-  color(lightred );   AlfaVector( 13,1 ).Print( -2,-1.8,
+  color(lightred); AlfaVector( 13,1 ).Print( -2,-1.8,
                    "Сообразованные архитектура и обводы корпуса\n"
                    " - эффективность всепогодного мореплавания" );
-  color(yellow); AlfaVector( 9,1 )
-                .Print( -1,0,"©75 Василий Храмушин" ).Save().Show();
+  color(yellow); AlfaVector( 9,1 ).Print( -1,0,
+                   "©75 Василий Храмушин" ).Save().Show();
 #else
 //#include "../Window/Sym_CCCP.c"
   color( navy ); AlfaBit( _8x16 ).Print( 2,1,"Aurora  ~  " );
@@ -332,7 +332,7 @@ Hull& Hull::Original()
 }
 //!    Интерактивное управление выполняющимся вычислительным экспериментом
 ///
-static bool AllKeyb( byte Keyb )
+static bool AllKeyb( fixed Keyb )
 { Hull &Ship=*Vessel;                    // Field &Sea=*Storm;
   switch( Keyb )
   { case _BkSp:                          // временное прекращение\возобновление
@@ -362,7 +362,7 @@ static bool AllKeyb( byte Keyb )
   } return true;                  // и все иные запросы клавиатуры сбрасываются
 }
 static int Write_choice( Window* Win )
-{ byte ans=1;
+{ fixed ans=1;
   Mlist Menu[]={ { 1,0," Выходной формат модели корпуса корабля" },
                  { 2,47,"Wavefront Technologies Advanced Visualizer .obj" },
                  { 1,47,"Шпангоуты и контуры диаметральной плоскости.dc2" },
@@ -390,7 +390,7 @@ static const char
            " <Del>+<Shift> ","    исходный обзор",
            " <BkSp> ","  прекращение волнения",0
          };
-bool Hull::KeyBoard( byte Keyb )                     // С краткой подсказкой по
+bool Hull::KeyBoard( fixed Keyb )                     // С краткой подсказкой по
 { const static char                                  // настройкам и методам
      *Id[]={"Ship","  Целевое проектирование,   ",  // визуализации корпуса и
                    "  теория и штормовая",          // всего вычислительного
@@ -422,7 +422,7 @@ bool Hull::KeyBoard( byte Keyb )                     // С краткой под
    default: return View::KeyBoard( Keyb );             // и направления взгляда
   } Draw(); return true;                               // иначе команда принята
 }
-bool Field::KeyBoard( byte Keyb )
+bool Field::KeyBoard( fixed Keyb )
 { const static char                                     // Краткая подсказка по
      *Id[]={ "Sea",":","Вычислительный эксперимент",    // настройкам всего
                        "штормового маневрирования",     // вычислительного

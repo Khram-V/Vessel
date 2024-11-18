@@ -1,5 +1,5 @@
 //
-//  DesignCAD complex font
+//  DesignCAD complex Русский+Ελληνικά+English
 //
 static const
 signed char _Design_font[]={  15, 29, 8, 0,

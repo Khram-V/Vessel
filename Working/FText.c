@@ -9,6 +9,12 @@
 #include <StdIO.h>
 #include <Windows.h>
 #define Blength 65528u            // 2^16-8 Минимальная длина буферной добавки
+
+static char *LS=NULL;
+char* W2U( const wchar_t *str )
+{ int iL=WideCharToMultiByte( CP_UTF8,0,str,-1,NULL,0,NULL,NULL ); LS[iL]=0;
+         WideCharToMultiByte( CP_UTF8,0,str,-1,LS,iL,NULL,NULL ); return LS;
+}
 //
 //  Грубое отсечение всех управляющих кодов и концевых пробелов в строке
 //
@@ -64,7 +70,7 @@ static void Help( void )
           "\0     (c)92-24 V.Khramushin\n"
         ); exit( 2 );
 }
-int main( int Ac, char **Av )
+int main()                   // int Ac, char **Av
 {
  BOOL R=TRUE;                // если FALSE, то -  переносы строк без <CR>
 //    B=TRUE;                //
@@ -74,12 +80,14 @@ int main( int Ac, char **Av )
                              // =0 то лишь расчистка лишних пробелов и нулей
 //    C=0,c=0,U=0,           // Перекодировка русских слов: L=Large; S=Small
       Kn,i,k,l; //,NF,nF=1;  // Количество файлов
- FILE *Fi;                   // файл только один на чтение и затем - под запись
- WIN32_FIND_DATA FileData;   // Блок-заголовок конкретного файла
+ FILE *Fi;                  // файл только один на чтение и затем - под запись
+ WIN32_FIND_DATAW FileData;  // Блок-заголовок конкретного файла
  HANDLE hSearch;             // Ссылка на файловый список по директории
  DWORD  dwAttrs=0,           // Признак разрешения записи
         FileLength=0;        // Длина файла
  char *inS,*S; //,*s;        // -- и всего не понемножку
+ int Ac; WCHAR **Av=CommandLineToArgvW( GetCommandLineW(),&Ac );
+     LS=(char*)calloc( 1,4096 );
 //
 //      Контроль количества параметров
 //
@@ -92,22 +100,22 @@ int main( int Ac, char **Av )
 //     Выбор ключей из списка параметров
 //
   for( l=k=1; k<Ac; )
-  { if( Av[k][0]=='-' || Av[k][0]=='/' )
+  { if( Av[k][0]==L'-' || Av[k][0]==L'/' )
     { switch( Av[k][1]|0x20 )
-      { case 'r': R=FALSE; break;
-        case 't': T=8; sscanf( Av[k]+2,"%d",&T ); if( T==0 )T=-1; break;
-        case 'b': B=0; sscanf( Av[k]+2,"%d",&B );                 break;
-        case 's': sscanf( Av[k]+2,"%d",&E );                      break;
-       default  : printf( "\n\7?Incorrect switch: /%c\n",Av[k][1] ); Help();
+      { case L'r': R=FALSE; break;
+        case L't': T=8; swscanf( Av[k]+2,L"%d",&T ); if( T==0 )T=-1; break;
+        case L'b': B=0; swscanf( Av[k]+2,L"%d",&B );                 break;
+        case L's': swscanf( Av[k]+2,L"%d",&E );                      break;
+       default  : printf( "\n\7?Incorrect switch: /%c\n",W2U( Av[k] )[1] );
+       Help();
       }
     } else l++; k++; if( l<k )Av[l]=Av[k];
   } Ac=l;
 //
 //      Печать информации о режимах работы
 //
-  char St[MAX_PATH*2];                      // строка кодировки для Far-manager
-   AnsiToOem( Av[Kn],St ); printf( "%s[%d] /S%+d /T%+d /B<%+d> /R<%s>\n",
-                                          St,Ac,E,T,B,!R?"cr":"-cr+lf" );
+   printf( "%s[%d] /S%+d /T%+d /B<%+d> /R<%s>\n",
+            W2U( Av[Kn] ),Ac,E,T,B,!R?"cr":"-cr+lf" );
 /* if( E  )printf( "/S%+d ",E );
    if( T  )printf( "/T%+d ",T );
    if( !B )printf( "/B%+d ",B );
@@ -117,27 +125,23 @@ int main( int Ac, char **Av )
 //      Начало цикла по списку имен в параметрах
 //
   for( Kn=1; Kn<Ac; Kn++ )                   // по списку из разбора параметров
-  {
-    BOOL done,fFinished=FALSE;
-    AnsiToOem( Av[Kn],St );
-    printf( ">%3d: %-24s",Kn,St );           // печатается маска поиска файлов
+  { BOOL done,fFinished=FALSE;
+    printf( ">%3d: %-24s\n",Kn,W2U( Av[Kn] ) );      // печатается маска поиска
 //
 //                  Считывание списка имен по маске файлов в оперативную память
 //
-    if( (hSearch=FindFirstFile( Av[Kn],&FileData ))==INVALID_HANDLE_VALUE )
-      continue;
+    hSearch=FindFirstFileW( Av[Kn],&FileData );
+    if( hSearch==INVALID_HANDLE_VALUE )continue;
 //
 //               Начало цикла по обработке списка файлов из разделов директории
 //
     while( !fFinished )                     // Подготовка основного имени файла
-    { dwAttrs = GetFileAttributes( FileData.cFileName );
+    { dwAttrs = GetFileAttributesW( FileData.cFileName );
       done = !( dwAttrs&FILE_ATTRIBUTE_READONLY );          // доступ по записи
-//    AnsiToOem( FileData.cFileName,St );
-//    printf( "%12s %8ld Read %s ",St,
-      printf( " %8ld Read %s ",FileLength=( FileData.nFileSizeHigh*MAXDWORD )
-                               + FileData.nFileSizeLow,done?"Write":"Only" );
+      printf( "%8ld Read%s ",FileLength=( FileData.nFileSizeHigh*MAXDWORD )
+                           + FileData.nFileSizeLow,done?"/Write":"(only)" );
       if( done && FileLength )
-      { if( (Fi=fopen( FileData.cFileName,"rb" ))!=NULL )
+      { if( (Fi=_wfopen( FileData.cFileName,L"rb" ))!=NULL )
         { int Len,m,e=0,t=abs( T );
           long ni=0,no=0; S=OutPut( 0 ); ic=0;      //! установка нового буфера
           while( (inS=getString( Fi ))!=NULL )
@@ -215,85 +219,18 @@ int main( int Ac, char **Av )
             }
           } fclose( Fi );
             S=OutPut( 0 );              // установка буфера в начало под запись
-          if( (Fi=fopen( FileData.cFileName,"wb" ))!=NULL )fwrite( S,1,no,Fi );
-               fclose( Fi );          printf( " %6lu/%-4lu",no,ni );
+          if( (Fi=_wfopen( FileData.cFileName,L"wb" ))!=NULL )fwrite( S,1,no,Fi );
+               fclose( Fi );
+               printf( " %6lu/%-4lu ⇐ %s  ",no,ni,W2U( FileData.cFileName ) );
         } else printf( "Shut" );
       }        printf( "\n" );
 
-      if( !FindNextFile( hSearch,&FileData ) )
+      if( !FindNextFileW( hSearch,&FileData ) )
       { if( GetLastError() == ERROR_NO_MORE_FILES )
-        { //printf( "No more %s files. Search completed.",Av[Kn] );
-            fFinished = TRUE;
-        }   else
-        {   printf("Couldn't find next file."); return 7;
-        }
+        { fFinished = TRUE;
+        //printf( "No more %s files. Search completed.",W2U( Av[Kn] ) );
+        } else{ printf("\7 Couldn't find next file."); return 7; }
       }
-    } FindClose( hSearch );                         // Закрываем цепочку поиска
+    } FindClose( hSearch );                       // Закрывается цепочка поиска
   } return 0;
 }
-#if 0
-/* Поиск файлов и изменение атрибутов.
-
-Следующий пример копирует все текстовые файлы из текущей директории в новую
-директорию с именем \TEXTRO, которая создаётся функцией CreateDirectory. При
-необходимости, файлам в новой директории присваивается атрибут "только чтение".
-
-Поиск файлов .TXT в текущей директории производится функциями FindFirstFile и
-FindNextFile. Каждый файл .TXT копируется в директорию \TEXTRO. После того,
-как файл скопирован, функция GetFileAttributes проверяет, является ли файл
-только для чтения. Если атрибута "только чтение" не установлено, то приложение
-устанавливает этот атрибут функцией SetFileAttributes.
-
-После копирования файлов .TXT, хэндл поиска закрывается функцией FindClose.
-*/
-#include <windows.h>
-#include <stdio.h>
-void main_block()
-{
-WIN32_FIND_DATA FileData;
-HANDLE hSearch;
-DWORD dwAttrs;
-char szDirPath[] = "c:\\TEXTRO\\";
-char szNewPath[MAX_PATH];
-char szHome[MAX_PATH];
-
-BOOL fFinished = FALSE;
-
-if( !CreateDirectory( szDirPath,NULL ) )          // Создаём новую директорию.
-{   printf("Couldn't create new directory."); return;
-}
-// Начинаем поиск файлов .TXT в текущей директории.
-
-hSearch = FindFirstFile("*.txt", &FileData);
-
-if( hSearch == INVALID_HANDLE_VALUE )
-{   printf( "No .TXT files found." ); return;
-}
-// Копируем каждый файл .TXT в новую директорию и изменяем его
-// атрибут на "только чтение", если он уже не установлен.
-
-while (!fFinished)
-{   lstrcpy(szNewPath, szDirPath);
-    lstrcat(szNewPath, FileData.cFileName);
-    if( CopyFile( FileData.cFileName, szNewPath, FALSE ) )
-    {   dwAttrs = GetFileAttributes(FileData.cFileName);
-        if( !( dwAttrs & FILE_ATTRIBUTE_READONLY ) )
-        {   SetFileAttributes( szNewPath,dwAttrs | FILE_ATTRIBUTE_READONLY );
-        }
-    }   else
-    {   printf("Couldn't copy file.");
-        return;
-    }
-    if( !FindNextFile( hSearch,&FileData ) )
-    {   if( GetLastError() == ERROR_NO_MORE_FILES )
-        {   MessageBox(hwnd, "No more .TXT files.","Search completed.", MB_OK);
-            fFinished = TRUE;
-        }   else
-        {   printf("Couldn't find next file.");
-            return;
-        }
-    }
-}
-FindClose(hSearch); // Закрываем хэндл поиска.
-}
-#endif

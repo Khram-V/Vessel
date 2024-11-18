@@ -133,7 +133,7 @@ Rep: ins=GetKeyState( VK_INSERT );            // признак 1-вставки
                     Uset( StK,-1," ",true ); ked=K; break;
        case _Blank: if( !Ls[K].dat ){ ked=-1; goto Fin; }
       default: if( Ls[K].dat && ans>=' ' )
-             { Uset( StK,kurs,WtU( ans ),ins ); ked=K; if( kurs<l )++kurs; }
+             { Uset( StK,kurs,CtU( ans ),ins ); ked=K; if( kurs<l )++kurs; }
      }
      if( ked!=-1 && ked!=K ){ K=ked; Get( Ls,ked ); }     // будет новое число?
      Draw();
@@ -153,7 +153,7 @@ bool TextMenu::Draw()            // картинка со списком стр�
     { mlist &L=((mlist*)M)[k]; int i=Mestr( &L ),l=i+L.X;
       glColor3f( 0,0.25,0.5 ); Print( L.X+1,L.Y+1,St );
       if( L.lf )
-      { glColor3f( k==ked?0.7:1,1,k==K?0:1 ); glRectf( l,L.Y,l+L.lf,L.Y+1 );
+      { glColor3f( k==ked?0.7:1,1,k==K?0:1 ); glRectf( l,L.Y-.2,l+L.lf,L.Y+1 );
         glColor3f( 0,0,0.75 ); Print( l+1,L.Y+1,k==ked?StK:Uset( St,i ) );
         if( k==K )if( L.dat )
         { glColor3f( 1,0,0 ); kurs=minmax( 0,kurs,L.lf-1 );

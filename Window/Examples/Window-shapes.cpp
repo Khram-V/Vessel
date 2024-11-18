@@ -73,8 +73,9 @@ static const entry table[] =
 //
 static struct Pro:Window
 { Pro():
-  Window( "Window Shapes example / типа того в UTF-8 ‏יְרוּשָׁלַיִם",0,0,1200,600 ){}
-   virtual bool KeyBoard( byte );
+  Window( "Window Shapes example / типа того в UTF-8 ‏יְרוּשָׁלַיִם",0,0,1200,600 )
+   {} // Icon( "Flag" ); }
+   virtual bool KeyBoard( fixed );
 } Tvm;
 static Real Amax=123.5;
 static Mlist Menu_a[]=
@@ -85,9 +86,9 @@ static Mlist Menu_a[]=
 , { 1,3,"depth (Sierpinski Sponge): %d",&depth }
 , { 1,3,"     slices: %d",&slices },{ 0,3,",  stacks: %d",&stacks }
 };
-bool Pro::KeyBoard( byte key )
+bool Pro::KeyBoard( fixed key )
 { textcolor( LIGHTGREEN,BLACK ),
-  print(2,7,"Key = %d\\x%X = '%s' + <%X>",key,key,WtU(key),ScanStatus() );
+  print(2,7,"Key = %d\\x%X = '%s' + <%X>",key,key,CtU(key),ScanStatus() );
   switch( key )
   { case 'I': case 'i': show_info^=true;         break;
     case '=': case '+': slices++;                break;
@@ -343,13 +344,13 @@ int main( int argc,char *argv[] )
 //     .Area( 0,0,0,0 )
        .Activate( true )
        ;
-    Tvm.AlfaVector( 12 );
+    Tvm.Icon( "Flag" ).AlfaVector( 12 );
     while( Tvm.Ready() )
-    { byte ans=Tvm.GetKey();
+    { fixed ans=Tvm.GetKey();
       if( ans==_Esc )break;
-      if( ans ){ textcolor( YELLOW );
+      if( ans ){ textcolor( YELLOW,BLUE );
                  print( 2,8,"Key = %d\\x%X = '%s' + <%X> ",
-                         ans,ans,WtU(ans),Tvm.ScanStatus() ); }
+                         ans,ans,CtU(ans),Tvm.ScanStatus() ); }
       display( Tvm ); WaitTime( 1000 );
     }
   //Tvm.KillTimer();
