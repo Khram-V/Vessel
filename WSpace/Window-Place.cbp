@@ -308,10 +308,6 @@
 			<Option target="A-lib32" />
 			<Option target="A-lib64" />
 		</Unit>
-		<Unit filename="../Window/Font.h">
-			<Option target="Window Trial" />
-			<Option target="Window Shapes" />
-		</Unit>
 		<Unit filename="../Window/Julian.cpp">
 			<Option target="A-lib64" />
 			<Option target="Window Shapes" />

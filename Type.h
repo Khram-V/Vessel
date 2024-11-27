@@ -1,8 +1,8 @@
 #ifndef __Type_h__
-#define __Type_h__      /// _ подборка констант и типичных операций ¹²³ⁿªº_
-#include <math.h>       //  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
-#include <stdlib.h>     //…∞ₒₐₓₑₔ‘’„“”«»‹›•∙×±≥≤÷≈≡≠∂δ∆∇∧∀∨⇒⇯⇐⇔↦←↑→↓↔↕↨∏∑∩∫ƒєæΘ
-typedef double Real;    // просто число ко всем арифметическим операциям §µ₪א®™
+#define __Type_h__     /// _ подборка констант и типичных операций ¹²³ⁿªº_
+#include <math.h>      //  ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+#include <stdlib.h>    //…∞ₒₐₓₑₔ‘’„“”«»‹›•∙×±≥≤÷≈≡≠∂δ∆∇∧∀∨⇒⇯⇐⇔↦←↑→↓↔↕↨∏∑∩∫ƒєæϑΘ
+typedef double Real;   // просто число ко всем арифметическим операциям §µ₪א®™
 typedef const Real& _Real;   // числовая ссылка–константа, процедурный параметр
 typedef unsigned short fixed; // маска логических операция и выборов управления
 struct Event; typedef const Event& _Event; // обобщение \ синтез даты и времени
@@ -72,7 +72,7 @@ public: string(); ~string();          // начальная установка=2
 };
 //    Операции с угловыми градусами и разметкой шага шкал включены в julian.cpp
 //
-Real AxisStep( Real );                    // Step for Axis Estimation
+Real AxisStep( Real );                    // ϑ - Step for Axis Estimation
 char* DtoA( Real,int=0,const char* ="°"); // (±)ⁿ123°45'67"00 как круговая мера
 char* AtoD( char*, Real& );               // (°)÷(:) с возможной заменой на ':'
 template<class real>int find( const real *A, const real &Ar, int len );

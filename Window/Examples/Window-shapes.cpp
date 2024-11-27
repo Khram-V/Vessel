@@ -4,7 +4,7 @@
        подсказок и меню настройки параметров объёмных геометрических фигур
 */
 static const char
- *Name[]={ "Window-Place ",
+ *Name[]={ "«Window-Place» ",
   " Контекстно-зависимая","  объектная библиотека","  интерактивной графики ",0 },
  *Cmds[]={ " i I  "," Show info",
            "=+ -_ ","Increase/Decrease slices",
@@ -12,9 +12,9 @@ static const char
            "9( 0) ","Decr./Incr. depth (Sierpinski Sponge)",
            "up/down ","Increase/Decrease \"outer radius\"",
            "left/right ","Decrease/Increase \"inner radius\"",0 },
- *Plus[]={ "F1 ","справка",
-           "F2 ","меню настроек",
-           "F3 ","графический шрифт",
+ *Plus[]={ "F1 ","справка        «ммм» . «mmm»",
+           "F2 ","меню настроек  «МММ» . «MMM»",
+           "F3 ","графический шрифт   , H«ёЁё»HЁ",
            "PgUp/PgDn ","Next shape-drawing function",
            "Esc/<altX>/<ctrlC>"," стоп ",0
          },
@@ -79,7 +79,7 @@ static struct Pro:Window
 } Tvm;
 static Real Amax=123.5;
 static Mlist Menu_a[]=
-{ { 0,0,"   <<<-  меню конфигурации  ->>>" }
+{ { 0,0,"   «««-  меню конфигурации  -»»»" }
 , { 2,2,"Номер графического объекта [0 < %d",&function_index },{ 0,0,"> 12" }
 , { 1,4,"внутренний:%4.1f",&irad},{0,4," и внешний:%4.1f",&orad},{0,0," радиусы"}
 , { 1,14,"Максимальный угол крена %-3°",&Amax }

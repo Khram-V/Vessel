@@ -63,6 +63,7 @@ const static byte Rumb[]=
 static Tensor B;     // единичный масштаб пространственного тензора
 static void P( _Real x,_Real y ){ glVertex3dv( B*(Vector){ x,y } ); }
 static Real i90( _Real r ){ return r>_Ph ? _Pi-r : ( r<-_Ph ? -_Pi-r : r ); }
+
 static void DirWave( const Waves &W, colors C, Place &D )
 { if( W.Height )
   { Real H=W.Height/Vessel->Length*4,L=W.Length/Vessel->Length; B=W;
@@ -70,11 +71,12 @@ static void DirWave( const Waves &W, colors C, Place &D )
     P(0,0),P(-H,-L+H),P(0,-L),P(H,-L+H),P(-H,L),P(0,L-H),P(H,L); glEnd();
     color( C ); if( (H=angle( H=atan2( W.x.y,-W.x.x )))<0.0 )H+=_Pd;
    char S[24],*s=S;
-    snprintf( S,23,"%3s:%3.1f/%3.1f\n",
+    snprintf( S,23,"\n%3s:%3.1f/%3.1f",
               Rmbs[int(H*32/_Pd+0.49)%32],W.Height,W.Length/W.Cw );
     if( s=strchr( S,'.' ) ){ *s=',';
       if( s=strchr( s,'.' ) )*s='\"'; } D.Print( S );
-} }
+  }
+}
 Hull& Hull::NavigaInform( Window *Win )
 { Field &S=*Storm;
  Vector C=Head[-1]; C.z+=_Ph;    // крен, дифферент и курс корабля(в геобазисе)
@@ -96,11 +98,11 @@ Hull& Hull::NavigaInform( Window *Win )
   glScaled( 0.9*L,0.9*L,1 ); circle( (Point){0},1/L );
  bool left=int( 2+Course/_Ph )&1;
  int right=(S.Wind.Height!=0)+(S.Swell.Height!=0)+(S.Surge.Height!=0);
-  color(navy); Compass.Print( left?-1:1,right?4-right:3,right?"":" Штиль" );
+  color(navy); Compass.Print( left?-1:1,(GMod&&Win==this)+(right?3.1-right:2),right?"":" Штиль" );
   if( S.Exp.wave&3 )DirWave( S.Wind,green,Compass ),        // ветровая волна
                     DirWave( S.Swell,blue,Compass ),        // свежая зыбь
                     DirWave( S.Surge,cyan,Compass ); else   // реликтовый накат
-  if( right )Compass.Print( 1,3,"Заштилело" );
+  if( right )Compass.Print( 1,2+2*(GMod&&Win==this),"Заштилело" );
   //
   //                                  стрелка-указатель заданного курса корабля
   B.axiZ( _Ph-Course )/=L;
@@ -128,7 +130,7 @@ Hull& Hull::NavigaInform( Window *Win )
  Real U,H; B.axiZ( C.z )/=L; //B=Tensor(*this)*B;
   angle( H=Hull::Course+Head[-1].z );   // текущее отклонение от заданого курса
   { const Vector R=(Vector){ -0.85 },N=(Vector){ 0,0.025 }; Vector W;
-    line( B*(Vector){0,-0.8},B*(Vector){0,0.8},magenta ); glLineWidth(2);
+    line( B*(Vector){0,-0.8},B*(Vector){0,0.8},blue ); glLineWidth(2);
     spot( arrow( B*(Vector){-1},B*(Vector){0.975},0.26/L ),5,blue );
     if( fabs( H )<_Pi/32 )W=(Vector){ 0.2 }; else   // полрумба в доле градуса°
     if( dCs<_Pi/45 )W=(Vector){ 0.2,0.06 }; else W=(Vector){ 0.18,0.125 };
@@ -142,7 +144,7 @@ Hull& Hull::NavigaInform( Window *Win )
   for( i=0; i<2; i++ )
   { if( !i ){ glLineWidth(3); color( yellow,0,0.3 ); glBegin( GL_LINE_LOOP ); }
        else { glLineWidth(1); color( red,0,0.2 ); glBegin( GL_POLYGON ); }
-    P(1,0),P(.92,.12),P(.91,.05),P(.75,0),P(.91,-.05),P(.92,-.12); glEnd();
+        P(1,0),P(.92,.12),P(.91,.05),P(.75,0),P(.91,-.05),P(.92,-.12); glEnd();
   }
   //   треугольник расходящейся волны Кельвина отмечает скорость хода корабля
   //

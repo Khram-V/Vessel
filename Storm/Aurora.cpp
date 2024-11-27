@@ -66,7 +66,7 @@ Hull::Hull(): View     // в прицепе View окошко графическ
   Locate( Zero ),                // прямая ссылка на текущее местоположение [м]
   Route(),Rate(),Head(),Whirl(),Mix() // конструкторы для кинематики во времени
 { Vessel=this;                  // ссылка на корпус, пусть будет внешний доступ
-  Nframes=Mid=0; Length=Breadth=Draught=1.0; vC=vR=vS=vD=vP=Zero;
+  Nframes=Mid=0; Length=Breadth=Draught=1.0; vC=vR=vS=vP=Zero;
   nF=muF=(Vector){ 0.1,0.8,0.6 }; // демпфер по абсциссе, ординате и аппликате
   nM=muM=(Vector){ 0.2,0.6,0.8 }; // ... по бортовой, килевой качке и рысканию
   Ofs=Zero; mx=my=0;              // и мышку тоже в исходное

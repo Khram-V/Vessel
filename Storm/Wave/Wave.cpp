@@ -130,7 +130,7 @@ Waves& Waves::Config()         // Height = 1.134*Lw*Hw/_Pd/2.0
     if( Change ){ Initial(); Change=false; }
   } return *this;
 }
-bool Waves::KeyBoard( byte Keyb )
+bool Waves::KeyBoard( fixed Keyb )
 { const char
    *Name[]={ "Wave","    Моделирование",          // Краткая подсказка по
                     "нестационарной плоской ",    // настройкам и визуализации

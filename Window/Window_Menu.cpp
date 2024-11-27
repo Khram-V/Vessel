@@ -153,14 +153,14 @@ bool TextMenu::Draw()            // картинка со списком стр�
     { mlist &L=((mlist*)M)[k]; int i=Mestr( &L ),l=i+L.X;
       glColor3f( 0,0.25,0.5 ); Print( L.X+1,L.Y+1,St );
       if( L.lf )
-      { glColor3f( k==ked?0.7:1,1,k==K?0:1 ); glRectf( l,L.Y-.2,l+L.lf,L.Y+1 );
+      { glColor3f( k==ked?0.7:1,1,k==K?0:1 ); glRectf( l,L.Y-.1,l+L.lf,L.Y+1 );
         glColor3f( 0,0,0.75 ); Print( l+1,L.Y+1,k==ked?StK:Uset( St,i ) );
         if( k==K )if( L.dat )
         { glColor3f( 1,0,0 ); kurs=minmax( 0,kurs,L.lf-1 );
           glBegin( GL_LINE_STRIP );
-                   glVertex2f( l+kurs-0.1,L.Y+0.9 );      // текстовый курсор
+                   glVertex2f( l+kurs-0.1,L.Y+0.8 );      // текстовый курсор
           if( ins )glVertex2f( l+kurs-0.1,L.Y );         // изменяемого символа
-              else glVertex2f( l+kurs+1,L.Y+0.9 ); glEnd();
+              else glVertex2f( l+kurs+1,L.Y+0.8 ); glEnd();
           if( ked==-1 )strcpy( StK,Uset( St,i ) );     // изменяемая подстрочка
   } } } } Show(); return false;
 }

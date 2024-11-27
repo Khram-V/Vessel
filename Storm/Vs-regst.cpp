@@ -192,7 +192,7 @@ Hull& Hull::wPrint( bool log ) // информация по смоченному
   textcolor( LIGHTCYAN ),
   print( 27,15,"vF:{%6.1f,%.1f,%-6.1f}  ",vF.x,vF.y,vF.z ),
   print( 27,16,"vW:{%6.1f,%.1f,%-6.1f}  ",vW.x,vW.y,vW.z ),
-  print( 27,17,"vD:{%6.1f,%.1f,%-6.1f}  ",vD.x,vD.y,vD.z );
+  print( 27,17,"vC:{%6.1f,%.1f,%-6.1f}  ",vC.x,vC.y,vC.z );
   if( Statum )textcolor( GREEN ),
               print( 27,18,"vS:{%6.1f,%.1f,%-6.1f}  ",vS.x,vS.y,vS.z ),
               print( 27,19,"vR:{%6.1f,%.1f,%-6.1f}  ",vR.x,vR.y,vR.z );

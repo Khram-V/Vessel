@@ -102,7 +102,10 @@ void _OutBitText( const char *str, byte *bit, Real &X,Real &Y,Real bX )
    glPixelStorei( GL_UNPACK_ALIGNMENT,  1 );      // point back to the start of
    while( *s )                                    // the line and down one line
    { s=UtOEM( b,s,u ); c=b;
-     if( c==255 ){ if( u==1025 )c=256; else if( u==1105 )c=257; } // continue
+     if( c==255 )
+     { if( u==1025 )c=256; else if( u==1105 )c=257; else
+       if( u==171 )c=258; else if( u==187 )c=259;   // continue
+     }
      if( c=='\n' ){ glBitmap( 0,0,0,0,-X+bX,-h,NULL ); X=bX; Y-=h; } else
                   { glBitmap( w-1,h-2,        // Bitmap's width and height
                               -1,1,           // The origin in the font glyph

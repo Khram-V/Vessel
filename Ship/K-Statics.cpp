@@ -60,7 +60,7 @@ struct Hydrostatic        // подборка гидростатических �
   void Stability_Lines();
   void Axis_Statics( _Real A, bool clear=true );
   int  Stability_Menu();
-  Real In( Real z, Real *F );
+  Real In( Real z, Real *F ); // линейная интерполяция на равномерном интервале
 };
 Real Hydrostatic::In( Real z, Real *F ) // nZ>2 всегда
 { int k=minmax(0,int(z/=dZ),nZ-2); Real *f=F+k; return f[0]+(f[1]-f[0])*(z-k);

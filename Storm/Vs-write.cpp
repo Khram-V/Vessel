@@ -126,10 +126,7 @@ Hull& Hull::Write( int format ) // Wavefront Technologies 4 Advanced Visualizer
   if( format>2 && format<5 )         ///
   { if( !(F=_wfopen( U2W( fext( FileName,"dc3" ) ),L"wb" )) )return *this;
     fprintf( F,"%g 0 %g %g 0 %g %g\n",
-     Keel[0]+St,Keel[Nframes+1]-Keel[0],T*2,Breadth/-2,Breadth );
-//  fprintf( F,"%g %g %g %g 0 %g %g\n",
-//   Keel[0],-T,Keel[Nframes+1]-Keel[0],T*2,Breadth/-2,Breadth/2 );
-
+             Keel[0]+St,Keel[Nframes+1]-Keel[0],T*2,Breadth/-2,Breadth );
     fprintf( F,"20 0 0 0 0 0\n1.0,0.1\n1.0\n*\n; ANSI-1251 DesignCAD Russian\n"
                "23 6 0 0 0 0\n%s\nGrid\nPortside\nStarboard\n"
                "Stern and Stem line\nHull plating\n21 1\n; Baseline\n"
@@ -188,7 +185,7 @@ Hull& Hull::Write( int format ) // Wavefront Technologies 4 Advanced Visualizer
             if( Shell[k][i]&LeftFrame )Q=P; else q=P;        // перед кормовым
     } } } }                                                  // перпендикуляром
   }
-  { int D,m,d,y; char c='#',*sm,*sw,*sn=sname( FileName );
+  { int D,m,d,y; char c='#',*sm,*sw,*sn=sname( FileName );  // UtWin - в локали
     julday( D=julday(),m,d,y ); sm=(char*)_Mnt[m-1],sw=(char*)_Day[D%7];
     if( format!=1 ){ c=';'; sn=UtWin(sn); } fprintf( F,"%c\n%c %s\n",c,c,sn );
     if( format!=1 )sm=UtWin(sm); fprintf( F,"%c %04d.%s.%02d ",c,y,sm,d );
