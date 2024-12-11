@@ -70,7 +70,8 @@ Hull& Hull::Config()
       Initial().Floating(); //Storm->Kt=sKt;
       wPrint( true );
     }                                          // факторы демпфирования сдвигов
-    if( _V!=Kv || _Flow!=lFlow ){ logStock(); _V=Kv,_Flow=lFlow; }
+    if( _V!=Kv || _Flow!=lFlow )
+      { _V=(Kv=minmax( 0.0,Kv,1.0 )); _Flow=lFlow; logStock(); }
     if( DM!=muM || DF!=muF ){ logDamp(); DM=muM; DF=muF; }
     sT=max( 0.5,sTime )*60; sTime=sT/60.0;      // протяжённость графиков качки
   } while( ans!=_Esc );
@@ -202,7 +203,7 @@ Hull& Hull::Get( char *s )
           }
           if( sin( fabs( Trim )*Length/2.0>Draught ) )       // ограничение
             Trim=asin( 2*copysign( Draught,Trim )/Length );  // макс.дифферента
-          if( z && *z )  // считывание начальной/исходной метацентрической высоты
+          if( z && *z )//!считывание начальной/исходной метацентрической высоты
           { if( z=strchr( s=z,',' ) )*z++=0;
             if( strcut( s ) ){ hX=strtod( s,&s );
               if( wcspbrk( U2W( s ),L"м") )AtoM( s,hX ); // в абсолютных метрах
@@ -238,7 +239,7 @@ Hull& Hull::GetDam( char *s )
   if( z )
   { if( z=strchr( s=z,',' ) )*z++=0; // к фактору компенсации парадокса Даламбера
     sscanf( s,"%lg%lg%lg",&muM.x,&muM.y,&muM.z );
-    if( z ){ sscanf( s=z,"%lg",&Kv ); Kv=minmax( 0.0,Kv,1.0 ); }
+//  if( z ){ sscanf( s=z,"%lg",&Kv ); Kv=minmax( 0.0,Kv,1.0 ); }
   } DampInit(); return *this;
 }
 Hull& Hull::GetExp( char *s )  // выборка ключевых слов с произвольным порядком
@@ -320,17 +321,16 @@ Waves::Get( char *s, Real &L, Real &H, Real &D )  // характеристик�
       }
       if( z && *z ) // номер начальной фазы первого вступления волнового фронта
       { if( strcut( s=z ) )Phase=strtod( s,&s );
-      }
-    }
+    } }
   } return *this;
 }
 //  уточнение коэффициентов углового и поступательного демпфирования
 //                    инициируется после первого геометрического цикла при Kt=0
 Hull& Hull::DampInit()
-{ nM=muM*Ts; /* &/inMass */ nM.x = (1.0-exp( -nM.x ))/nM.x; //! Ts/2
+{ nM=Ts*muM; /* &/inMass */ nM.x = (1.0-exp( -nM.x ))/nM.x; //! Ts/2
                             nM.y = (1.0-exp( -nM.y ))/nM.y;
                             nM.z = (1.0-exp( -nM.z ))/nM.z;
-  nF=muF*Ts; /* &/Volume */ nF.x = (1.0-exp( -nF.x ))/nF.x;
+  nF=Ts*muF; /* &/Volume */ nF.x = (1.0-exp( -nF.x ))/nF.x;
                             nF.y = (1.0-exp( -nF.y ))/nF.y;
                             nF.z = (1.0-exp( -nF.z ))/nF.z; return *this;
 }

@@ -1,7 +1,8 @@
 //
 //      Несколько независимых информационных процедур без предустановок
 //      отрабатываются в текущем/произвольном графическом окне OpenGL
-//                                                    2021-03-23 יְרוּשָׁלַיִם
+//
+//                                                           2021-03-23 יְרוּשָׁלַיִם
 //
 #include "Aurora.h"       // объекты и производные операции с корпусом на волне
 
@@ -21,8 +22,8 @@ Hull& Hull::Contour_Lines()      // рисуем контуры габаритн
  const Real &Trun=F.Trun,
       D=-1.5*Draught,dP=D/9,dQ=dP/6;    // профильное заглубление и детальность
  Real S=hypot( F.Long,F.Wide ),dS=F.dS; // дистанция и шаг разметки профиля
- Vector Ahead=x;    Ahead.z=0;    Ahead=S*dir( Ahead );
- Vector Traverse=y; Traverse.z=0; Traverse=S*dir( Traverse );
+ Vector Ahead=x;    Ahead.z=0;    Ahead=dir( Ahead )*S;
+ Vector Traverse=y; Traverse.z=0; Traverse=dir( Traverse )*S;
  Vector R,V,P; R.x=fabs( F.Long/Ahead.x )/2;
                R.y=fabs( F.Long/Traverse.x )/2;
   Ahead *= R.x<0.5 ? R.x : F.Wide/fabs( Ahead.y )/2;
@@ -34,22 +35,22 @@ Hull& Hull::Contour_Lines()      // рисуем контуры габаритн
   for( Real w=0; w>=D; w+=dP )
   { S=abs( Ahead ); glBegin( GL_LINE_STRIP );
     for( Real s=0; s<S*2; s+=dS )              // профили волн по курсу корабля
-    { R = -Ahead + ( s/S )*Ahead; R.z=w; dot( F.Wave( Trun,R ) ); } glEnd();
+    { R = -Ahead + Ahead*( s/S ); R.z=w; dot( F.Wave( Trun,R ) ); } glEnd();
     S=abs( Traverse ); glBegin( GL_LINE_STRIP );
     for( Real s=0; s<S*2; s+=dS )                   // профили волн по траверзу
-    { R = -Traverse + ( s/S )*Traverse; R.z=w; dot( F.Wave(Trun,R)); } glEnd();
+    { R = -Traverse + Traverse*( s/S ); R.z=w; dot( F.Wave(Trun,R)); } glEnd();
   }
   // пусть будет еще лишняя сотня кривых линий вертикальных граней жидких ячеек
   //                                          0.01
   dS=( S=abs( Traverse ) )/120.0; glLineWidth( 0.1 ); // длина и шаг профиля и
   for( Real s=0; s<S*2; s+=dS )           //! зелёные стрелки скоростей течений
-  { R=( s/S )*Traverse-Traverse; color( lightgreen ); glBegin( GL_LINE_STRIP );
+  { R=Traverse*( s/S )-Traverse; color( lightgreen ); glBegin( GL_LINE_STRIP );
     for( R.z=0; R.z>=D; R.z+=dQ )dot( F.Wave(Trun,R) ); glEnd(); color( green );
     for( R.z=0; R.z>=D; R.z+=dP ){ P=F.WaveV(Trun,R,V); arrow(P,P+V,abs(V)/6); }
   }
   dS=( S=abs( Ahead ) )/120.0;
   for( Real s=0; s<S*2; s+=dS )
-  { R=( s/S )*Ahead-Ahead; color( lightgreen ); glBegin( GL_LINE_STRIP );
+  { R=Ahead*( s/S )-Ahead; color( lightgreen ); glBegin( GL_LINE_STRIP );
     for( R.z=0; R.z>=D; R.z+=dQ )dot( F.Wave(Trun,R) ); glEnd(); color( green );
     for( R.z=0; R.z>=D; R.z+=dP ){ P=F.WaveV(Trun,R,V); arrow(P,P+V,abs(V)/6); }
   } glLineWidth( 1 ); return *this;
@@ -59,14 +60,14 @@ Hull& Hull::Contour_Lines()      // рисуем контуры габаритн
 const static byte Rumb[]=
   { _North,_North_East,_East,_South_East,_South,_South_West,_West,_North_West
   };
-static Matrix B={{0},1};         // единичный масштаб пространственного тензора
-static void P( _Real x,_Real y ){ glVertex3dv( B.LtA( (Vector){ x,y } ) ); }
+static Matrix B;     // единичный масштаб пространственного тензора
+static void P( _Real x,_Real y ){ glVertex3dv( B*(Vector){ x,y } ); }
 static Real i90( _Real r ){ return r>_Ph ? _Pi-r : ( r<-_Ph ? -_Pi-r : r ); }
 
 static void DirWave( const Waves &W, colors C, Place &D )
 { if( W.Height )
   { Real H=W.Height/Vessel->Length*4,L=W.Length/Vessel->Length; B=W;
-    if( H/L<0.06 )H=L*0.06; color( C,0,0.6 ); glBegin( GL_POLYGON );
+    if( H/L<.06 )H=L*.06; color( C,0,.6 ); glBegin( GL_POLYGON );
     P(0,0),P(-H,-L+H),P(0,-L),P(H,-L+H),P(-H,L),P(0,L-H),P(H,L); glEnd();
     color( C ); if( (H=angle( H=atan2( W.x.y,-W.x.x )))<0.0 )H+=_Pd;
    char S[24],*s=S;
@@ -93,8 +94,8 @@ Hull& Hull::NavigaInform( Window *Win )
   //                                                        амплитуда=>высота/2
  Real L=min( 1.0,Length     // условная высота и длина стрелки волны в картушке
       / max( max( S.Wind.Length,S.Swell.Length ),S.Surge.Length ) );
-  glTranslated( 0,-0.1,0 ); color( cyan,0,.1 ); // круг картушки 110% корпуса
-  glScaled( 0.9*L,0.9*L,1 ); circle( (Point){0},1.0/L );
+  glTranslated( 0,-0.1,0 ); color( white,0,.33 ); // круг картушки 110% корпуса
+  glScaled( 0.9*L,0.9*L,1 ); circle( (Point){0},1/L );
  bool left=int( 2+Course/_Ph )&1;
  int right=(S.Wind.Height!=0)+(S.Swell.Height!=0)+(S.Surge.Height!=0);
   color(navy); Compass.Print( left?-1:1,(GMod&&Win==this)+(right?3.1-right:2),right?"":" Штиль" );
@@ -106,7 +107,7 @@ Hull& Hull::NavigaInform( Window *Win )
   //                                  стрелка-указатель заданного курса корабля
   B.axiZ( _Ph-Course )/=L;
   for( i=0; i<2; i++ )                              // стрелка выбранного курса
-  { if( !i ){ glLineWidth( 2 ); color( gray,0,.75 ); glBegin( GL_LINE_LOOP ); }
+  { if( !i ){ glLineWidth( 2 ); color( blue,0,.75 ); glBegin( GL_LINE_LOOP ); }
        else { glLineWidth( 1 ); color( yellow,0,.3 ); glBegin( GL_POLYGON ); }
     P(.75,0),P(.4,-.05),P(.5,-.01),P(-.75,-.05),
     P(-.6,0),P(-.75,.05),P(.5,.01),P(.4,.05); glEnd();
@@ -116,8 +117,8 @@ Hull& Hull::NavigaInform( Window *Win )
   { Real D=Real( i )*_Ph/8.0;                              //! картушка компаса
     Vector V=(Vector){ sin( D ),cos( D ),0 }/-L; bool big=(i%4)==0;
     if( fabs( angle( D-Course,_Pi ) )<_Ph/8.1 )color( navy );
-                                          else color( green,.25,0.5 );
-    arrow( spot( 0.8*V,big?10:6 ),V,abs( V )*(big?0.15:0.1) );
+                                          else color( green,0,0.5 );
+    arrow( spot( V*0.8,big?10:6 ),V,abs( V )*(big?0.15:0.1) );
     if( Win!=this || !GMod )
     if( !(i&1) )
     if( (!left && (i<11 || i>15)) || (left && (i<17 || i>21 ) ) )
@@ -126,21 +127,20 @@ Hull& Hull::NavigaInform( Window *Win )
   } }
   //  контроль положения руля весьма полезен для понимания маневров на волнении
   //
- Real U,H; B.axiZ( C.z );               // в том же масштабе
+ Real U,H; B.axiZ( C.z )/=L; //B=Tensor(*this)*B;
   angle( H=Hull::Course+Head[-1].z );   // текущее отклонение от заданого курса
   { const Vector R=(Vector){ -0.85 },N=(Vector){ 0,0.025 }; Vector W;
-    line(B.LtA((Vector){0,-.8}),B.LtA((Vector){0,.8}),lightblue); glLineWidth(2);
-    spot( arrow( B.LtA((Vector){-1}),B.LtA((Vector){0.975}),0.26/L ),5,blue );
+    line( B*(Vector){0,-0.8},B*(Vector){0,0.8},blue ); glLineWidth(2);
+    spot( arrow( B*(Vector){-1},B*(Vector){0.975},0.26/L ),5,blue );
     if( fabs( H )<_Pi/32 )W=(Vector){ 0.2 }; else   // полрумба в доле градуса°
     if( dCs<_Pi/45 )W=(Vector){ 0.2,0.06 }; else W=(Vector){ 0.18,0.125 };
     if( H<0 )W.y=-W.y; glBegin( GL_POLYGON );
-    dot( B.LtA( (R-W) ) ),dot( B.LtA( (R-N) ) );
-    dot( B.LtA( (R+W/1.5) ) ),dot( B.LtA( (R+N) ) ); glEnd();
-    spot(B.LtA(R),6,lightmagenta );
+    dot( B*(R-W) ),dot( B*(R-N) );
+    dot( B*(R+W/1.5) ),dot( B*(R+N) ); glEnd(); spot( B*R,6,lightmagenta );
   }
   //          кренометр по границе круга картушки полупрозрачным треугольничком
   //
-  B.axiZ( C.x-_Ph );
+  B.axiZ( C.x-_Ph )/=L;
   for( i=0; i<2; i++ )
   { if( !i ){ glLineWidth(3); color( yellow,0,0.3 ); glBegin( GL_LINE_LOOP ); }
        else { glLineWidth(1); color( red,0,0.2 ); glBegin( GL_POLYGON ); }
@@ -148,7 +148,7 @@ Hull& Hull::NavigaInform( Window *Win )
   }
   //   треугольник расходящейся волны Кельвина отмечает скорость хода корабля
   //
-  B.axiZ( C.z )*=L/Length/2;
+  B.axiZ( C.z )/=Length/2;
   L=copysign( Speed*Speed,Speed )*_Pd/_g; // длина поперечной корабельной волны
   H=L*sqrt( 0.125 );          // ширина в основании расходящихся волн Кельвина
   C=WaterLine[Speed>0?-1:0]; // точка входа форштевня на действующей ватерлинии
@@ -160,23 +160,24 @@ Hull& Hull::NavigaInform( Window *Win )
   }
   //   контрольная полупрозрачная плоскость для чисто конструктивной ватерлинии
   //
-  B.axiZ(-_Ph ).Scale=Length/2; // фиксируется масштаб в половину длины корпуса
-  B*=Matrix(*this);
   glBegin( GL_TRIANGLES ); //GL_POLYGON ); //GL_TRIANGLE_FAN );
   for( i=0; i<WaterLine.len; i+=3 )
   { color( lightcyan,0,0.5 ); dot( (Point){0} ); color( lightblue,0,0.5 );
-                              dot( B.AtL( WaterLine[i+1] ) );
-                              dot( B.AtL( WaterLine[i+2] ) ); } glEnd();
+                              dot( B*WaterLine[i+1] );
+                              dot( B*WaterLine[i+2] ); } glEnd();
   //
   //  поверхность действующей и сильно искривлённой ватерлинии
   //
-  color( magenta,-0.25 );
-  for( i=0; i<wL.len; i+=3 )line( B.AtL( wL[i+1] ),B.AtL( wL[i+2] ) );
+  B.axiZ( -_Ph )/=Length/2;
+  B=Matrix(*this)*B; color( magenta,-0.25 );
+  for( i=0; i<wL.len; i+=3 )line( B*wL[i+1],B*wL[i+2] );
   //
   //  в центре картушки подписывается текущий курс и действующая скорость судна
   //
   color( lightblue,-0.25 ),Text( _Down,(Point){0},
         "%s %3.1fуз",DtoA( atan2(-x.y,x.x )*_Rd,-1 ),Speed*3600/_Mile );
+//  Text( _Center,(Point){0},"%s ",DtoA( atan2(-x.y,x.x )*_Rd,-1 ) );
+//  Text( _Down,(Point){0},"%3.1f узл",Speed*3600/_Mile );
   //   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   //!  графики качки в окне аксонометрической проекции корпуса корабля !!
   //   ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░

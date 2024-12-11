@@ -19,7 +19,6 @@ static bool drawHull=false, // прорисовка корпуса | гидро�
 
 Vertex::Vertex( _Vector _a_ ) // { *this=V; }  // конструктор и собственно
  { w=Storm->Value( Point::operator=(Vessel->out( Vector::operator=(_a_) )) ); }
-Vertex& Vertex::operator = ( _Vector _a_ ){ return *this = _a_; }
 
 void Hull::drawTriangle(_Vertex a,_Vertex b,_Vertex c ) // отработка трёх точек
 { if( !drawHull )Three( Level,a,b,c );    // единожды производится динамический
@@ -60,15 +59,17 @@ if( Level<0 )
 //!  сборка сортировкой двух фрагментов ватерлинии в интервале одной шпации
 //           (здесь надо найти локализованное решение по выбору ориентации)
 //
-void Hull::waterPoints( _Vector N,_Vector Q,_Vector P ){ wL+=N; /// dir( N )??
-  if( (Tensor(*this)*(N*(P-Q))).z>=0 ){ wL+=Q; wL+=P; } else { wL+=P; wL+=Q; }
+void Hull::waterPoints( _Vector N,_Vector Q,_Vector P )
+{ //if( Q==P )return;
+  wL+=N; /// dir( N )??
+  if( LtA( N*(P-Q) ).z>=0 ){ wL+=Q; wL+=P; } else { wL+=P; wL+=Q; }
 }
 void Hull::divideTriangle
 ( _Vertex T,_Real t, _Vertex R,_Real r, _Vertex L,_Real l )
-{ _Vertex rR=(Vector)T+(R-T)*(t/(t-r)),       // правая точка пересечения ребра
-          lL=(Vector)T+(L-T)*(t/(t-l)); Level=t>=0?-1:1;// треугольника и левая
-  if( rR!=lL )waterPoints( (lL-T)*(T-rR),lL,rR ); // +++
-          drawTriangle( T,rR,lL );
+{ _Vertex rR=(Vector)T+(t/(t-r))*(R-T),       // правая точка пересечения ребра
+          lL=(Vector)T+(t/(t-l))*(L-T); Level=t>=0?-1:1;// треугольника и левая
+  if( rR!=lL )waterPoints( (lL-T)*(T-rR),lL,rR ),       //   +++
+              drawTriangle( T,rR,lL );
   if( !l && !r )return;                 Level=t<0?-1:1;
   if( !l )drawTriangle( L,rR,R ); else
   if( !r )drawTriangle( R,L,lL ); else
@@ -77,6 +78,7 @@ void Hull::divideTriangle
 }
 void Hull::Triangle( Vertex a,Vertex b,Vertex c )     // обработка треугольника
 { if( a.y || b.y || c.y )            // ~~ далее точки на базисе открытого моря
+//if( a!=b && a!=c && b!=c  )
   { Real aZ=a.w-a.Z,                 // (+)погружение (-)борт над водой = метка
          bZ=b.w-b.Z,                 // обшивке под/над действующей ватерлинией
          cZ=c.w-c.Z;                 // WL на подъем или спуск?
@@ -120,7 +122,7 @@ Part_of_hull:    // разделение корпуса по уровням на
   //   собственно цикл покрытия оболочки бортовой обшивки
   //   по шпациям между теоретическими шпангоутами корпуса
   //
-  for( k=0; k<=Nframes; k++ )                    // штевни и шпангоуты Nframes
+  for( k=0; k<=Nframes; k++ )  // штевни и шпангоуты Nframes
   if( Shell[k] )              // -- есть ли сам корпус, не пропущена ли шпация?
   if( Shell[k][0]>=3 )       // в шпации присутствует хотя бы один треугольник?
   { for( int Board=-1; Board<2; Board+=2 )
@@ -135,24 +137,51 @@ Part_of_hull:    // разделение корпуса по уровням на
   //! Ватерлиния выведена из расчетного блока по форме и объему обводов корпуса
               // без ватерлинии будет теоретический центр => ноль на ватерлинии
   if( !Part ) //   теоретическая и действующая ватерлиния готовятся с нормалями
-  { Vector wM={ 0,0,0 }; Real l,L=0.0; Level=0;
-    for( i=0; i<wL.len; i+=3 )
-      { l=abs( wL[i+2]-wL[i+1] ); L+=l; wM += 0.5*l*( wL[i+1]+wL[i+2] ); }
-    if( L>eps )wM/=L;
-    for( i=0; i<wL.len; i+=3 )drawTriangle( wL[i+1],wL[i+2],wM );
+  { static Flex W; Vector wM,fM; Real l,L; bool C; const Real dw=1e-4; // 0.1мм
     if( !Storm->Kt )             // конструктивная или теоретическая ватерлиния
-      for( WaterLine.len=i=0; i<wL.len; i++ )WaterLine += wL[i];
-    //
+      for( WaterLine.len=i=0; i<wL.len; i++ )WaterLine+=wL[i]; Level=0;
+    while( wL.len )
+    { W.len=0; C=false;
+      W+=wL[-2],W+=wL[-1]; i=(wL.len-=3)-3;
+      while( !C && i>=0 )
+      { if( abs( W[0]-wL[i+1] )<dw )W/=wL[i+2]; else
+        if( abs( W[0]-wL[i+2] )<dw )W/=wL[i+1]; else
+        if( abs( W[-1]-wL[i+1] )<dw )W+=wL[i+2]; else
+        if( abs( W[-1]-wL[i+2] )<dw )W+=wL[i+1]; else { i-=3; continue; }
+        if( onlyDraw )                  // стрелочки вдоль и поперёк ватерлинии
+        { const Real aL=Draught/18; Vector q=(wL[i+1]+wL[i+2])/2;
+          arrow( out( wL[i+1] ),out( wL[i+2] ),aL,navy );
+          arrow( out( q ),out( q+(aL*3)*dir( wL[i] ) ),aL,gray );
+        }
+        wL.Delete( i ),wL.Delete( i ),wL.Delete( i );
+        C = W.len>2 && abs( W[0]-W[-1] )<dw; if( C )break;  i=wL.len-3;
+      }
+
+//Break( "~выборка wL=%d(%d) W=%d C=%d i=%d(%d)",wL.len,wL.len/3,W.len,C,i,i/3 );
+
+      if( !C )W+=W[0];;
+      L=0.0; wM=0.0; fM=0.0;    // co разделением разрывных контуров ватерлинии
+      for( i=0; i<W.len-1; i++ )
+        { L+=(l=abs( W[i]-W[i+1] )); wM+=l*( W[i]+W[i+1] ); } // длина контура
+      if( L>eps )wM/=2*L;                                   // центр ватерлинии
+      for( i=0; i<W.len-1; i++ )fM+=(W[i]-wM)*(W[i+1]-wM); // площадь для знака
+      if( Zenit%( LtA( fM ) )<0.0 )           // ориентация по вертикали
+          for( i=0; i<W.len-1; i++ )drawTriangle( W[i+1],W[i],wM ); else
+          for( i=0; i<W.len-1; i++ )drawTriangle( W[i],W[i+1],wM );
+    }
+//    else
+//    { wM=0.0; L=0.0;          // без слияния контуров ватерлинии - простенько
+//      for( i=0; i<wL.len; i+=3 )
+//      { l=abs( wL[i+2]-wL[i+1] ); L+=l; wM += 0.5*l*( wL[i+1]+wL[i+2] ); }
+//      if( L>eps )wM/=L;
+//      for( i=0; i<wL.len; i+=3 )drawTriangle( wL[i+1],wL[i+2],wM );
+//    }
     // завершение геометрической графики просто белая конструктивная ватерлиния
     //
-    if( onlyDraw ){ color( !Trim?silver:cyan ); glLineWidth( 5 );
-     const Real aL=Draught/18;
+    if( onlyDraw )
+    { color( !Trim?silver:cyan ); glLineWidth( 5 );
       for( i=0; i<WaterLine.len; i+=3 )
          line( out( WaterLine[i+1] ),out( WaterLine[i+2] ) ); glLineWidth( 1 );
-      for( i=0; i<wL.len; i+=3 ){ Vector q=(wL[i+1]+wL[i+2])/2;
-         arrow( out( wL[i+1] ),out( wL[i+2] ),aL,navy );
-         arrow( out( q ),out( q+dir( wL[i] )*(aL*3) ),aL,gray );
-      }
     }
     // действующая ватерлиния выстраивается из фрагментов пересечения
     // треугольников в шпациях, с нормалями и стрелками вперед по курсу корабля
@@ -162,7 +191,7 @@ Part_of_hull:    // разделение корпуса по уровням на
       color( lightblue,DrawMode&3?0.0:0.3 ); Wline( wR ) Wline( wL )
 */  //
     //! собственно блок моделирования отражения потоков/волн от корпуса корабля
-/*  else
+/** else
     if( Storm->Exp.wave>1 )      // отражение локальных скоростей от ватерлинии
     { for( i=0; i<wR.len-2; i+=2 )Storm->Slicks( out(wR[i]),out(wR[i+2]),x ); // dir( (wR[i+1]+wR[i+3])*0.5 ) );
       for( i=0; i<wL.len-2; i+=2 )Storm->Slicks( out(wL[i]),out(wL[i+2]),x ); // dir( (wL[i+1]+wL[i+3])*0.5 ) );
@@ -202,9 +231,9 @@ Hull& Hull::Drawing( byte type )  // 0 - DrawMode; 1 - корпус; 2 + про�
   if( iV<Volume/36 )K=out( Gravity ); else    // на вылете - центр тяжести
   if( iF<Floatage/36  )K=out( Buoyancy );     // на погружение - центр величины
                                               // либо центр площади ватерлинии
-  Text( _Up,arrow( K-z*Draught*2, K+z*Draught*3,ArLen,blue ),"z" );
-  Text( _Up,arrow( K+Breadth*y,   K-y*Breadth,  ArLen ),     "y" );
-  Text( _Up,arrow( K+x*Length*-.6,K+x*Length*.6,ArLen ),     "x" );
+  Text( _Up,arrow( K-2*Draught*z,  K+3*Draught*z,ArLen,blue ),"z" );
+  Text( _Up,arrow( K+Breadth*y,    K-Breadth*y,  ArLen ),     "y" );
+  Text( _Up,arrow( K-0.6*Length*x,K+0.6*Length*x,ArLen ),     "x" );
                   // белый центр гидродинамических пар сил и реакций - моментов
 //arrow( spot( K,12,blue ),spot( out( vD ),36,maroon ),ArLen ); /// 12,white
 //arrow( spot( K,24,white ),spot( out( vD ),24,lightmagenta ),ArLen/3 );

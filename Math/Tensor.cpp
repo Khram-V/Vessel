@@ -13,8 +13,8 @@ Vector operator - ( Vector a ){ a.x=-a.x; a.y=-a.y; a.z=-a.z; return a; }       
 Vector operator * ( Vector c,_Real w ){ c.x*=w; c.y*=w; c.z*=w; return c; }     // (Vector){ c.x*w,c.y*w,c.z*w }; }
 Vector operator * ( _Real w,Vector c ){ c.x*=w; c.y*=w; c.z*=w; return c; }     //  return (Vector){ w*c.x,w*c.y,w*c.z }; }
 Vector operator / ( Vector c,_Real w ){ c.x/=w; c.y/=w; c.z/=w; return c; }     //  return (Vector){ c.x/w,c.y/w,c.z/w }; }
-Vector operator + ( Vector c,_Vector e){ c.x+=e.x,c.y+=e.y,c.z+=e.z; return c; } // (Vector){c.x+e.x,c.y+e.y,c.z+e.z}; }
-Vector operator - ( Vector c,_Vector e){ c.x-=e.x,c.y-=e.y,c.z-=e.z; return c; } // (Vector){c.x-e.x,c.y-e.y,c.z-e.z}; }
+Vector operator + ( Vector c,_Vector e){c.x+=e.x,c.y+=e.y,c.z+=e.z; return c; } // (Vector){c.x+e.x,c.y+e.y,c.z+e.z}; }
+Vector operator - ( Vector c,_Vector e){c.x-=e.x,c.y-=e.y,c.z-=e.z; return c; } // (Vector){c.x-e.x,c.y-e.y,c.z-e.z}; }
 
 bool operator + ( _Vector a ){ return a.x!=0 || a.y!=0.0 || a.z!=0.0; }
 bool operator ! ( _Vector a ){ return a.x==0 && a.y==0.0 && a.z==0.0; }
@@ -128,15 +128,18 @@ Tensor& Tensor::operator /= ( _Tensor r ){           // преобразован
                z.x*r.xi.y + z.y*r.yi.y + z.z*r.zi.y,    // * локальный - справа
                z.x*r.xi.z + z.y*r.yi.z + z.z*r.zi.z };
 #else
-    x=(Vector){x%r.xi,x%r.yi,x%r.zi},
-    y=(Vector){y%r.xi,y%r.yi,y%r.zi},
-    z=(Vector){z%r.xi,z%r.yi,z%r.zi};
+    x=(Vector){ x%r.xi,x%r.yi,x%r.zi },
+    y=(Vector){ y%r.xi,y%r.yi,y%r.zi },
+    z=(Vector){ z%r.xi,z%r.yi,z%r.zi };
 #endif
   return det();
 }
 //   Переход из локального базиса к абсолютной системе координат
 //
-Vector operator * ( _Matrix m, Vector v ){ return v=(Vector)
+Vector operator * ( Vector v, _Matrix m )         // и опусканием на АСК из ЛСК
+   { return v=(Vector){ v%m.x, v%m.y, v%m.z }; } // или проекции в базисные оси
+Vector operator * ( _Matrix m, Vector v )//{ return m.L2A ); }
+{ return v=(Vector)
 #if 1
        { m.x.x*v.x + m.y.x*v.y + m.z.x*v.z,      // умножение вектора справа
          m.x.y*v.x + m.y.y*v.y + m.z.y*v.z,      // на собственный тензор слева
@@ -144,15 +147,15 @@ Vector operator * ( _Matrix m, Vector v ){ return v=(Vector)
 #else
        { m.x % v, m.y % v, m.z % v };            // вектор локальный справа с
 #endif
-     }                                           // и опусканием на АСК из ЛСК
-Vector operator * ( Vector v, _Matrix m )       // или проекции в базисные оси
-     { return v=(Vector){ v%m.x, v%m.y, v%m.z }; }
+       }
+/*
 //
 //   Трансформация вектора для перехода в локальный ортогональный базис
 //               ( дуальную систему координат )
 //
-Vector operator / ( Vector v, _Tensor m )       // подъем индексов в операции
-     { return v=(Vector)                           // произведения с лок.базисом
+//Vector operator / ( Vector v, _Tensor m ){ return m.AtL( v ); }
+                                                 // подъем индексов в операции
+   { return v=(Vector)                           // произведения с лок.базисом
   #if 0
        { v.x*m.xi.x + v.y*m.yi.x + v.z*m.zi.x,   // умножение левого вектора на
          v.x*m.xi.y + v.y*m.yi.y + v.z*m.zi.y,   // обратный тензор справа
@@ -161,6 +164,7 @@ Vector operator / ( Vector v, _Tensor m )       // подъем индексов
        { v % m.xi, v % m.yi, v % m.zi };         // и снова - есть вопросы ???
   #endif
      }
+*/
 //Vector& Vector::operator /= ( _Tensor m ){ return *this=Vector(*this)/m; }
 //   { const Vector v=*this; x=v%m.xi; y=v%m.yi; z=v%m.zi; return *this; }
 
@@ -175,7 +179,14 @@ Matrix rolY( _Real a )
    { const Real c=cos(a),s=sin(a); return (Matrix){{c,0,s},{0,1,0},{-s,0,c}}; }
 Matrix rolZ( _Real a )
    { const Real c=cos(a),s=sin(a); return (Matrix){{c,-s,0},{s,c,0},{0,0,1}}; }
-
+//
+//  Две ключевые процедуры возврата из МБ в КБ (A2L) и обратно из КБ в МБ (L2A)
+//
+Vector Tensor::AtL( _Vector A ) const { return (Vector){ A%xi,A%yi,A%zi }; }
+Vector Tensor::LtA( _Vector A ) const { return (Vector) // { x%A,y%A,z%A }
+                  { x.x*A.x+y.x*A.y+z.x*A.z,     // умножение вектора справа
+                    x.y*A.x+y.y*A.y+z.y*A.z,     // на собственный тензор слева
+                    x.z*A.x+y.z*A.y+z.z*A.z }; } // - возврат из ЛСК в АСК
 Tensor& Tensor::axiX( _Real a )
     { x.x=1,x.y=x.z=y.x=z.x=0,y.y=z.z=cos(a),z.y=-(y.z=sin(a)); return det(); }
 Tensor& Tensor::axiY( _Real a )
@@ -194,8 +205,10 @@ Tensor& Tensor::rotZ( _Real a ){ return Tensor::operator *= ( rolZ( a ) ); }
 //
 //    Переходы в локальной Vector-in и глобальной Point-out системах координат
 //
-Point Base::out( _Vector a ){ return (Point)*this + (Matrix)*this * a; }
-Vector Base::in( _Point A ){ return Vector( A-(Point)*this ) / (Tensor)*this; }
+Point Base::out( _Vector a ){ return Point(*this) + LtA( a ); }
+Vector Base::in( _Point A ){ return AtL( A-Point(*this) ); }
+//Point Base::out( _Vector a ){ return (Point)*this + (Matrix)*this * a; }
+//Vector Base::in( _Point A ){ return Vector( A-(Point)*this ) / (Tensor)*this; }
 //
 //    Полные повороты движущегося объекта в пространстве относительно осей:
 //      x(a)- крен на левый борт вниз, правое крыло вверх;

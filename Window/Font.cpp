@@ -32,7 +32,7 @@ static struct Design_Letters
   }
   void Write( char *S,Real &X,Real &Y,Real bX,Real Thin ) // здесь только UTF-8
   { unsigned u,x; int lw,y; signed char *Bit=(signed char*)_Design_font+4;
-    glGetIntegerv( GL_LINE_WIDTH,&lw ); glLineWidth( Thin ); // толщина букв
+    glGetIntegerv( GL_LINE_WIDTH,&lw ); glLineWidth( Thin );    // толщина букв
     do
     { S=UtC( u,S );
       if( !u )break;
@@ -43,7 +43,7 @@ static struct Design_Letters
           glBegin( GL_LINE_STRIP );
           for( int i=0; i<n; i++ )
           { x=2+*(byte*)T++; y=B+*(signed char*)T++;     //! под размер 8+21=29
-            if( x&0x80 ){ glEnd(); glBegin( GL_LINE_STRIP ); }     //== H-B=21
+            if( x&0x80 ){ glEnd(); glBegin( GL_LINE_STRIP ); }     // == H-B=21
             glVertex2d( (x&0x7F)+X,y+Y );
           } glEnd(); X+=w;
     } } } while( *S ); glLineWidth( lw );
@@ -51,7 +51,7 @@ static struct Design_Letters
 } Design;
 //
 //!    Начальная установка базового шрифта, связанного с текущим окном OpenGL
-//     ... или destructor с нулевым аргументом
+//       ... или destructor с нулевым аргументом
 //
 Place& Place::AlfaBit( unsigned char *DispCCCP )      // старый советский растр
 { if( !DispCCCP ){ if( Ft ){ free( Ft ); Ft=NULL; } } else     // отмена шрифта
@@ -102,9 +102,9 @@ void _OutBitText( const char *str, byte *bit, Real &X,Real &Y,Real bX )
    glPixelStorei( GL_UNPACK_ALIGNMENT,  1 );      // point back to the start of
    while( *s )                                    // the line and down one line
    { s=UtOEM( b,s,u ); c=b;
-     if( c==255 )
-     { if( u==1025 )c=256; else if( u==1105 )c=257; else
-       if( u==171 )c=258; else if( u==187 )c=259;   // continue
+     if( c==255 )               // в OEM здесь чисто, в DispCCCP ≡ пробел '‥'
+     { if( u==1025 )c=256; else if( u==1105 )c=257; else  // 'Ё'+'ё'
+       if( u==171 )c=258; else if( u==187 )c=259;         // '«'+'»' - continue
      }
      if( c=='\n' ){ glBitmap( 0,0,0,0,-X+bX,-h,NULL ); X=bX; Y-=h; } else
                   { glBitmap( w-1,h-2,        // Bitmap's width and height

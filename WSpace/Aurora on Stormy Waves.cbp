@@ -93,12 +93,8 @@
 			<Add library="glu32" />
 			<Add library="gomp" />
 		</Linker>
-		<Unit filename="../Math/Tensor.cpp" />
-		<Unit filename="../Math/Tensor.h">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
-		<Unit filename="../Math/Vector.h">
-			<Option target="&lt;{~None~}&gt;" />
+		<Unit filename="../Math/Tensor.cpp">
+			<Option target="Waves Profile" />
 		</Unit>
 		<Unit filename="../Storm/Aurora.cpp">
 			<Option target="Aurora" />
@@ -124,6 +120,7 @@
 			<Option target="Aurora-night" />
 			<Option target="Aurora-eq" />
 		</Unit>
+		<Unit filename="../Storm/Flex.h" />
 		<Unit filename="../Storm/Vs-conf.cpp">
 			<Option target="Aurora" />
 			<Option target="Aurora-stable" />
