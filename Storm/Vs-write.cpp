@@ -11,9 +11,9 @@ static void printF( Vector V )
 { e6( V ); if( V.y<0 )V.y=0; fprintf( F,"v %lg %lg %lg\n",V.x,V.z,V.y );
                              fprintf( F,"v %lg %lg %lg\n",V.x,V.z,-V.y );
 }
-static void crossPoint( _Point A,_Point B,_Point C, int a,int b,int c )
-{ if( fabs( A.Y )<eps && fabs( B.Y )<eps && fabs( C.Y )<eps )return;
-  int l=A.Z<=0 && B.Z<=0 && C.Z<=0; // A.Z+B.Z+C.Z<=0.0;
+static void crossPoint( _Vector A,_Vector B,_Vector C, int a,int b,int c )
+{ if( fabs( A.y )<eps && fabs( B.y )<eps && fabs( C.y )<eps )return;
+  int l=A.z<=0 && B.z<=0 && C.z<=0; // A.Z+B.Z+C.Z<=0.0;
   if( fColor!=l )fprintf( F,"usemtl %s\n",(fColor=l)?"green":"gray" );
                  fprintf( F,"f %d %d %d\n",a,b,c );
 }
@@ -28,7 +28,7 @@ Hull& Hull::Write( int format ) // Wavefront Technologies 4 Advanced Visualizer
 { int i,j,k,n; T=Ofs.z; St=Ofs.x;
   if( format==1 )        // здесь тексты сохраняются в рабочем формате UTF-8
   { if( !(F=_wfopen( U2W( fext( FileName,"obj" ) ),L"wb" )) )return *this;
-   Point P,Q,q; int L[Nframes+2];
+   Vector P,Q,q; int L[Nframes+2];
     memset( L,0,sizeof(int)*(Nframes+2) ); fColor=-1;
     //
     //     последовательная запись всего массива опорных точек в текстовый файл
@@ -50,10 +50,10 @@ Hull& Hull::Write( int format ) // Wavefront Technologies 4 Advanced Visualizer
     for( k=-1; k<2; k+=2 )
     { bool b=k<0; Flex &S=b?Stern:Stem; n=b?0:L[Nframes+2];
       fprintf( F,b?"# Stern\n":"# Stem\n" );
-      for( i=0; i<S.len; i++ ){ Q=*((Point*)(&(S[i]))); //if( !b )Q.Y=-Q.Y;
+      for( i=0; i<S.len; i++ ){ Q=S[i];                    //if( !b )Q.Y=-Q.Y;
         if( i>0 )
-        { if( P.Y )crossPoint( P,P,Q, n+(i+1)*2 -!b, n+(i+1)*2 + b, b+n+i*2 );
-          if( Q.Y )crossPoint( Q,P,Q, n+i*2     -!b, n+(i+1)*2 -!b, b+n+i*2 );
+        { if( P.z )crossPoint( P,P,Q, n+(i+1)*2 -!b, n+(i+1)*2 + b, b+n+i*2 );
+          if( Q.z )crossPoint( Q,P,Q, n+i*2     -!b, n+(i+1)*2 -!b, b+n+i*2 );
         } P=Q;
     } }
     for( k=0; k<=Nframes; k++ )                         // Nframes+1 шпангоутов

@@ -53,9 +53,9 @@ Waves& Waves::View( _Real z, int k, bool shadow )
         color( colcel( p.z ) ); p.z+=z; dot( p ); p=pi;
       } glEnd(); y+=d;
   } } const Real x=Ds*Mx/2,y=Ds*My/2;
-  liney( (Point){-x,0,z},(Point){-x,y,z},lightgray ), // граничная рамка для
-  liney( (Point){-x,y,z},(Point){ x,y,z} ),           // контроля контура волны
-  liney( (Point){ x,y,z},(Point){ x,0,z} ); return *this;
+  liney( (Vector){-x,0,z},(Vector){-x,y,z},lightgray ), // граничная рамка для
+  liney( (Vector){-x,y,z},(Vector){ x,y,z} ),         // контроля контура волны
+  liney( (Vector){ x,y,z},(Vector){ x,0,z} ); return *this;
 }
 //     Пусть прорисовка идет вместе с настройкой графической площадки\сцены
 //
@@ -76,25 +76,25 @@ bool Field::Draw()
   glMatrixMode( GL_PROJECTION );     // размерах фрагмента экрана сброс текущих
   glLoadIdentity();                  // матричных координат, настройка обзора и
   gluPerspective( 16.2,Real( Width )/Height,-63,63 );     // экранных пропорций
-  gluLookAt( 0,0,Distance,look.x,look.y,look.z,0,1,0 );  // точка обзора
+  gluLookAt( 0,0,Distance,lookX,lookY,lookZ,0,1,0 );     // точка обзора
   glMatrixMode( GL_MODELVIEW ); glLoadIdentity();       // в исходное положение
   glClearColor( BkColor,1 );                      // цвет фона окна и
   glClear( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT );   // полная расчистка
-  glRotated( eye.y-90,1,0,0 );                          // поставить на киль
-  glRotated( eye.z,   0,1,0 );                          // дифферент
-  glRotated( eye.x,   0,0,1 );                          // рыскание
+  glRotated( eyeY-90,1,0,0 );                          // поставить на киль
+  glRotated( eyeZ,   0,1,0 );                          // дифферент
+  glRotated( eyeX,   0,0,1 );                          // рыскание
   AlfaVector(Height/WinLines);
   //
   //   рисуем оси координат и габаритный прямоугольный параллелограмм
   //
   axis( *this,Long*0.52,Wide*0.53,30,"N","W","n" );
-//liney( (Point){Long/2, Wide/2,10},(Point){Long/-2,Wide/2,10},lightgray );
-//liney( (Point){Long/-2,Wide/2,10},(Point){Long/-2,0,10} );
-//liney( (Point){Long/2, Wide/2,10},(Point){Long/2, 0,10} );
-//liney( (Point){Long/2,0,10},      (Point){Long/-2,0,10} );
-  liney( (Point){Long/2, Wide/2,0}, (Point){Long/-2,Wide/2,0},lightblue );
-  liney( (Point){Long/-2,Wide/2,0}, (Point){Long/-2,0,0} );
-  liney( (Point){Long/2, Wide/2,0}, (Point){Long/2,0,0} );
+//liney( (Vector){Long/2, Wide/2,10},(Vector){Long/-2,Wide/2,10},lightgray );
+//liney( (Vector){Long/-2,Wide/2,10},(Vector){Long/-2,0,10} );
+//liney( (Vector){Long/2, Wide/2,10},(Vector){Long/2, 0,10} );
+//liney( (Vector){Long/2,0,10},      (Vector){Long/-2,0,10} );
+  liney( (Vector){Long/2, Wide/2,0}, (Vector){Long/-2,Wide/2,0},lightblue );
+  liney( (Vector){Long/-2,Wide/2,0}, (Vector){Long/-2,0,0} );
+  liney( (Vector){Long/2, Wide/2,0}, (Vector){Long/2,0,0} );
   //
   // сначала корпус корабля, тогда будет позволительно делать прозрачность воды
   //
@@ -106,13 +106,14 @@ bool Field::Draw()
   //
   glPolygonMode( GL_FRONT,Exp.draw?GL_LINE:GL_FILL );
   glPolygonMode( GL_BACK,GL_LINE ); // POINT );
+
   if( ( Exp.draw )!=3 )
   { int k=max( Exp.draw&2?mY/100:1,1 ); // поля волн надо для палитры раскраски
     if( Exp.wave==1)Wind.Ghost(Trun),Swell.Ghost(Trun),Surge.Ghost(Trun);
     glLineWidth( 0.01 ); // тончайшие линии на случай прорисовки контуров ячеек
     if( Exp.view&2 )
-    { liney((Point){Long/2,Wide/2,0},(Point){Long/2,Wide/2,Long/-4},lightblue);
-      liney((Point){Long/-2,Wide/2,0},(Point){Long/-2,Wide/2,Long/-4},lightblue);
+    { liney((Vector){Long/2,Wide/2,0},(Vector){Long/2,Wide/2,Long/-4},lightblue);
+      liney((Vector){Long/-2,Wide/2,0},(Vector){Long/-2,Wide/2,Long/-4},lightblue);
       Surge.View( Long/-4,    k,!(Exp.view&1) );   // -200 {от 800·600}
       Swell.View( Long/-5.333,k,!(Exp.view&1) );   // -150 три разделённые
        Wind.View( Long/-8,    k,!(Exp.view&1) );   // -100 структуры волн
@@ -127,7 +128,7 @@ bool Field::Draw()
         color( p.z>0?Surf:Subw,-0.1,Exp.view&2?1:0.75 ),dot( p );
       } glEnd();
     } else
-    { static int nx=0,ny=0,**Clr=NULL;             //  сборная цветовая матрица
+    { static int nx=0,ny=0,**Clr=NULL;       //  сборная цветовая матрица
       if( mY>ny || mX>nx )Clr=(int**)Allocate( ny=mY,(nx=mX)*sizeof(int),Clr );
 #pragma omp parallel for
       for(int y=0;y<mY;y++) // выборка расцветки волновых склонов выполняется с
@@ -137,17 +138,22 @@ bool Field::Draw()
             C =   ColorSelect( C,Swell.Color( Swell.Amd( W ).z ) );
         Clr[y][x]=ColorSelect( C,Surge.Color( Surge.Amd( W ).z ) )+black+1;
       }
-      for( int y=0; y<mY-k; y+=k )           // темная вода в световых оттенках
-      { glBegin( GL_QUAD_STRIP );            // раскраска общего волнового поля
-        for( int x=0; x<mX; x+=k )           // в оттенках сине-зеленого цветов
-        { Vector &p=Ws[y][x],&q=Ws[y+k][x];
-          if( Exp.view&2 )color( colors(Clr[y+k][x]),0.1,1 ),dot( q ),
-                          color( colors(Clr[y][x]),  0.1,1 ),dot( p );
-                    else  color( colors(Clr[y+k][x]),0,0.9 ),dot( q ),
-                          color( colors(Clr[y][x]),  0,0.9 ),dot( p );
-          if( x<mX-k )glNormal3dv( (q-p)*(Ws[y][x+k]-p) );
-        } glEnd();
-    } } glLineWidth( 1 );     // восстановление толщины обычных контурных линий
+     bool f2=Exp.view&2 && !Exp.draw;          // Тёмная вода на четыре уровня
+      while( true )
+      { for( int y=0; y<mY-k; y+=k )           // тёмная вода в световых оттенках
+        { glBegin( GL_QUAD_STRIP );            // раскраска общего волнового поля
+          for( int x=0; x<mX; x+=k )           // в оттенках сине-зеленого цветов
+          { Vector &p=Ws[y][x],&q=Ws[y+k][x];
+            if( x<mX-k )glNormal3dv( (q-p)*(Ws[y][x+k]-p) );
+            if( Exp.view&2 )color( colors(Clr[y+k][x]),0.1,1 ),dot( q ),
+                            color( colors(Clr[y][x]),  0.1,1 ),dot( p );
+                      else  color( colors(Clr[y+k][x]),0,0.9 ),dot( q ),
+                            color( colors(Clr[y][x]),  0,0.9 ),dot( p );
+          } glEnd();
+        }
+        if( f2 ){ glPolygonMode( GL_FRONT,GL_LINE ); f2=0; continue; } else break;
+      } // восстановление закраски полигонов толщины обычных контурных линий
+    } glPolygonMode( GL_FRONT_AND_BACK,GL_FILL ); glLineWidth( 1 );
   }
 //! Информационная табличка c режимами проведения вычислительного эксперимента
 //

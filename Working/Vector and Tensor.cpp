@@ -6,9 +6,9 @@
  **/
 #include <StdIO.h>
 #include <GL\GLU.h>
-#include "..\Math\Tensor.h"
 #include "..\Window\Window.h"
 #include "..\Window\ConIO.h"
+#include "..\Math\Tensor.h"
 
 const GLubyte white[]={ 255,255,255 },   red[]={ 255,  0,  0 },
               green[]={   0,192,  0 },  blue[]={   0,  0,255 },

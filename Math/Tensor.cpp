@@ -241,7 +241,7 @@ Matrix Euler( _Real a,_Real b,_Real c )   // а-вперед; b-вправо; с
             -sin( a )*sin( c )+cos( a )*cos( b )*cos( c ),-cos( a )*sin( b ) },
    (Vector){ sin( b )*sin( c ),sin( b )*cos( c ),cos( b ) } };
 }
-//    Смещение базисных осей для тензора инерции (иначе по Гюйгенсу-Штейнеру)
+/*    Смещение базисных осей для тензора инерции (иначе по Гюйгенсу-Штейнеру)
 //    M - тензор инерции; С - координаты центра масс; R - новая точка отсчета
 //
 static Matrix SH( _Vector A )
@@ -252,7 +252,7 @@ static Matrix SH( _Vector A )
 Matrix Steiner( _Matrix M,_Vector C ){ return M-SH( C ); }   // просто к центру
 Matrix Steiner( _Matrix M,_Vector C,_Vector R )  // Сначала к базисному центру,
               { return M - SH( C ) + SH( R ); } // затем к новой точке вращения
-/*
+ *
 Matrix& Matrix::Krylov(_Real a,_Real b,_Real c ) // крен - дифферент - рыскание
 { x.x=cos( b )*cos( c ),x.y=sin( a )*sin( b )*cos( c ) - cos( a )*sin( c ),
                         x.z=cos( a )*sin( b )*cos( c ) + sin( a )*sin( c );

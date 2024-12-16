@@ -5,7 +5,14 @@
  *   (c)2008, В.Храмушин, Сахалинский государственный университет
  **/
 #include "..\View.h"
-//
+#include "..\..\Math\Vector.h"
+static Vector arrow( Vector a, Vector b,_Real l, const colors clr=empty )
+{ Vector d=a-b; d*=l/abs( d );
+  Vector e={ d.z/5,d.x/5,d.y/5 },f={ e.z,e.x,e.y },g=b+d/2; line( a,d+=b,clr );
+   glBegin( GL_LINE_LOOP ),dot( g ),dot( d+e ),dot( b ),dot( d-e ),
+                           dot( g ),dot( d+f ),dot( b ),dot( d-f ),
+                           dot( g ),glEnd(); return b;
+}
 //      Собственно программа, работающая с графическим пакетом OpenGL
 //
 static fixed KeyFunction='0';

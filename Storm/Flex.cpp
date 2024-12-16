@@ -35,21 +35,9 @@ Vector operator / ( _Vector v,_Matrix m )        // подъем индексо�
 }
 
 Matrix& Matrix::operator *= ( _Matrix r ){           // преобразование тензоров
-#if 0                                                //! ?как бы надо домножать
-    x=(Vector){ x.x*r.x.x + x.y*r.y.x + x.z*r.z.x,   //! ?? только на обратный!
-                x.x*r.x.y + x.y*r.y.y + x.z*r.z.y,   // использовано тензорное
-                x.x*r.x.z + x.y*r.y.z + x.z*r.z.z }, // правило суммирования
-    y=(Vector){ y.x*r.x.x + y.y*r.y.x + y.z*r.z.x,   // немых индексов
-                y.x*r.x.y + y.y*r.y.y + y.z*r.z.y,   // : абсолютный базис с
-                y.x*r.x.z + y.y*r.y.z + y.z*r.z.z }, //   нижними индексами
-    z=(Vector){ z.x*r.x.x + z.y*r.y.x + z.z*r.z.x,   //   расположен слева,
-                z.x*r.x.y + z.y*r.y.y + z.z*r.z.y,   // * локальный - справа
-                z.x*r.x.z + z.y*r.y.z + z.z*r.z.z };
-#else
     x=(Vector){ x%r.x,x%r.y,x%r.z }, // !! - странно, что даже при такой записи
     y=(Vector){ y%r.x,y%r.y,y%r.z }, // матриц, все равно получается сложение
     z=(Vector){ z%r.x,z%r.y,z%r.z }; // произведений абы как - по столбцам *(-)
-#endif
 //  Scale*=r.Scale;                  // без влияния на действующий масштаб
   return *this;
 }
@@ -79,14 +67,6 @@ Vector Matrix::LtA( _Vector A ) const { return Scale*(Vector)
                   { x.x*A.x+y.x*A.y+z.x*A.z,     // умножение вектора справа
                     x.y*A.x+y.y*A.y+z.y*A.z,     // на собственный тензор слева
                     x.z*A.x+y.z*A.y+z.z*A.z }; } // - возврат из ЛСК в АСК
-Base::Base(){ X=Y=Z=0.0; Identity(); }
-Point Base::out( _Vector a ){ return Point(*this) + LtA( a ); }
-Vector Base::in( _Point A ){ return AtL( A-Point(*this) ); }
-
-Vector operator - ( _Vector a,_Vertex b ){ return a-(Vector)b; } // к ускорению
-Vector operator + ( _Vector a,_Vertex b ){ return a+(Vector)b; }
-bool  operator != ( _Vertex a,_Vertex b )
-                  { return a.x!=b.x || a.y!=b.y || a.z!=b.z; }
 //
 //     Смещение базисных осей для тензора инерции (иначе по Гюйгенсу-Штейнеру)
 //     M - тензор инерции; С - координаты центра масс; R - новая точка отсчета
@@ -114,6 +94,26 @@ Real& angle( Real &A ){ return A=remainder( A,_Pd  ); }           // -180°÷180
 Real angle( _Real A,_Real B ){ return remainder( A-B,_Pd ); }     // A-B: -п÷п
 Vector& angle( Vector &A){ angle( A.x ),angle( A.y ),angle( A.z ); return A; }
 Vector operator ~(_Vector v){ return (Vector){v.x,-v.y,v.z}; } // другого борта
+//
+//    ... из точки (a) в точку (b) с объемной стрелкой в долях её длины
+//
+const Real* arrow( const Real *_a,const Real *_b,_Real l, const colors clr )
+{ Vector &a=*(Vector*)_a,&b=*(Vector*)_b,d=a-b; d*=l/abs( d );
+  Vector e={ d.z/5,d.x/5,d.y/5 },f={ e.z,e.x,e.y },g=b+d/2; line( a,d+=b,clr );
+   glBegin( GL_LINE_LOOP ),dot( g ),dot( d+e ),dot( b ),dot( d-e ),
+                           dot( g ),dot( d+f ),dot( b ),dot( d-f ),
+                           dot( g ),glEnd(); return _b;
+}
+void axis( Place &P,_Real L,_Real Y,_Real Z,
+  const char *x,const char *y,const char *z, const colors clr )
+{ const Real l=L/100;
+   arrow( (Vector){ 0,0,-Z },(Vector){ 0,0,Z },l,clr ),
+   arrow( (Vector){ 0,-Y,0 },(Vector){ 0,Y,0 },l ),
+   arrow( (Vector){ -L,0,0 },(Vector){ L,0,0 },l ); color( clr,-0.5 );
+  P.Text( _North,0,0,Z,z )
+   .Text( _North,0,Y+l,0,y )
+   .Text( _North_East,L+l,0,0,x );
+}
 //
 //! Процедуры интерполяции и быстрой работы с расширяемыми последовательностями
 //

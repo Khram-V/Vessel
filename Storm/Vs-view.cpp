@@ -17,10 +17,10 @@ static bool drawHull=false, // прорисовка корпуса | гидро�
             Part=false;     // false= днище и ватерлиния; true= надводный борт
 //atic Real ArLen=0.1;      // относительная длина для стрелок на шпациях
 
-Vertex::Vertex( _Vector _a_ ) // { *this=V; }  // конструктор и собственно
- { w=Storm->Value( Point::operator=(Vessel->out( Vector::operator=(_a_) )) ); }
+//Vertex::Vertex( _Vector _a_ ) // { *this=V; }  // конструктор и собственно
+// { w=Storm->Value( Point::operator=(Vessel->out( Vector::operator=(_a_) )) ); }
 
-void Hull::drawTriangle(_Vertex a,_Vertex b,_Vertex c ) // отработка трёх точек
+void Hull::drawTriangle(_Vector a,_Vector b,_Vector c ) // отработка трёх точек
 { if( !drawHull )Three( Level,a,b,c );    // единожды производится динамический
   else                                    //  перерасчет характеристик обводов
   { const byte Mode=DrawMode&3;           //  для полупрозрачной картинки нужна
@@ -33,11 +33,12 @@ void Hull::drawTriangle(_Vertex a,_Vertex b,_Vertex c ) // отработка т
                !Level ? (Mode&&Mode<3?0.7:0.2 ) :        // прозрачность борта
                  ( Level>0 ? ( Mode>2?0.8:0.2 ) :        // настраивается по
                              ( Mode>1?0.9:0.2 ) ) );     // режиму визуализации
-   const Point &A=(Point)a,&B=(Point)b,&C=(Point)c; glNormal3dv( (B-A)*(C-A) );
+   const Vector A=out( a ),B=out( b ),C=out( c ); glNormal3dv( (B-A)*(C-A) );
     glBegin( DrawMode&4?GL_LINE_LOOP:GL_TRIANGLES );    // контуры или покрытия
-    glVertex3dv( (Real*)( &A ) ),                       // dir ( ?? )
-    glVertex3dv( (Real*)( &B ) ),
-    glVertex3dv( (Real*)( &C ) ); glEnd();
+    glVertex3dv( (Real*)&A ),                       // dir ( ?? )
+    glVertex3dv( (Real*)&B ),
+    glVertex3dv( (Real*)&C );
+    glEnd();
 #if 0  // здесь отладочная визуализация скоростей на элементарных треугольниках
 #define _(P) (*((Vector*)(&P)))                      // это стрелки ВЛ-нормалей
 /*if( !Level )
@@ -65,8 +66,8 @@ void Hull::waterPoints( _Vector N,_Vector Q,_Vector P )
   if( LtA( N*(P-Q) ).z>=0 ){ wL+=Q; wL+=P; } else { wL+=P; wL+=Q; }
 }
 void Hull::divideTriangle
-( _Vertex T,_Real t, _Vertex R,_Real r, _Vertex L,_Real l )
-{ _Vertex rR=(Vector)T+(t/(t-r))*(R-T),       // правая точка пересечения ребра
+( _Vector T,_Real t, _Vector R,_Real r, _Vector L,_Real l )
+{ _Vector rR=(Vector)T+(t/(t-r))*(R-T),       // правая точка пересечения ребра
           lL=(Vector)T+(t/(t-l))*(L-T); Level=t>=0?-1:1;// треугольника и левая
   if( rR!=lL )waterPoints( (lL-T)*(T-rR),lL,rR ),       //   +++
               drawTriangle( T,rR,lL );
@@ -76,12 +77,16 @@ void Hull::divideTriangle
   if( fabs( r )>fabs( l ) )drawTriangle( R,L,lL ),drawTriangle( R,lL,rR );
                       else drawTriangle( L,lL,rR ),drawTriangle( L,rR,R );
 }
-void Hull::Triangle( Vertex a,Vertex b,Vertex c )     // обработка треугольника
+void Hull::Triangle( Vector a,Vector b,Vector c )     // обработка треугольника
 { if( a.y || b.y || c.y )            // ~~ далее точки на базисе открытого моря
 //if( a!=b && a!=c && b!=c  )
-  { Real aZ=a.w-a.Z,                 // (+)погружение (-)борт над водой = метка
-         bZ=b.w-b.Z,                 // обшивке под/над действующей ватерлинией
-         cZ=c.w-c.Z;                 // WL на подъем или спуск?
+  { Vector A=out( a ),B=out( b ),C=out( c );
+    Real aZ=Storm->Value( A )-A.z,   // (+)погружение (-)борт над водой = метка
+         bZ=Storm->Value( B )-B.z,   // обшивке под/над действующей ватерлинией
+         cZ=Storm->Value( C )-C.z;   // WL на подъем или спуск?
+//  Real aZ=a.w-a.Z,                 // (+)погружение (-)борт над водой = метка
+//       bZ=b.w-b.Z,                 // обшивке под/над действующей ватерлинией
+//       cZ=c.w-c.Z;                 // WL на подъем или спуск?
 //  if( aZ==0.0 && bZ==0.0 && cZ==0.0 )return;       // значит будут повторения
 //  wLine = a.z>=0.0 && b.z>=0.0 && c.z>=0.0 ? 1:-1; //  действующая ватерлиния
     wLine = a.z+b.z+c.z>=0 ? 1:-1; // здесь пересечений ватерлинии не ожидается
@@ -221,7 +226,7 @@ Hull& Hull::Drawing( byte type )  // 0 - DrawMode; 1 - корпус; 2 + про�
   //
   //  исходные и действующие центры и плечи гидростатических сил и моментов
   //
- Point P,Q,S,W,C=out( vB ),F=out( vF ),M=C,K=F; M.Z=vM.x;  // метацентр
+ Vector P,Q,S,W,C=out( vB ),F=out( vF ),M=C,K=F; M.z=vM.x;  // метацентр
  colors c = vM.z>=hX ? green : ( vM.z<0 ? red:yellow );    // K=out( vC ),
   //
   //  оси корабельных координат - векторы локального базиса от центра величины
@@ -247,7 +252,7 @@ Hull& Hull::Drawing( byte type )  // 0 - DrawMode; 1 - корпус; 2 + про�
   glBegin( GL_POLYGON );
     dot( P=out( Buoyancy),lightblue ); // исходный центр величины тихой воды
     dot( Q=out( Gravity ),gray );      // центр тяжести после загрузки в порту
-    S=Q; S.Z+=hX; dot( S,c );          // начальный метацентр по тихой воде
+    S=Q; S.z+=hX; dot( S,c );          // начальный метацентр по тихой воде
     dot( W=out( Floatable ),cyan );    // исходный центр площади ватерлинии
 //  dot( K,white );                    // центр динамической реакции корабля
   glEnd();
@@ -262,8 +267,9 @@ Hull& Hull::Drawing( byte type )  // 0 - DrawMode; 1 - корпус; 2 + про�
 
   Text( _Down,spot( C,12,blue ),"C" );     // действующий центр величины
   if( C!=P )arrow( spot( P,18 ),C,ArLen ); //   динамика центра величины
-//                 spot( out( vP ),24,lightmagenta );
-  Text( _Down,spot( out( vP ),36,lightmagenta ),"P" );     // действующий центр величины
+  Text( _Up,spot( out( vC ),18,black ),"R" );          // динамический центр
+  Text( _Down,spot( out( vP ),36,lightmagenta ),"P" ); // центр давлений (ЦБС)
+//            spot( out( vP ),24,lightmagenta );
 
   Text( _Up,spot( M,12,c ),"m " );         // действующий метацентр
   if( S!=M )arrow( spot( S,18 ),M,ArLen ); //  кинематика метацентра тихой воды

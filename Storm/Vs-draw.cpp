@@ -19,7 +19,9 @@ Hull& Hull::Contour_Lines()      // рисуем контуры габаритн
 //
  Field &F=*Storm;
  const Real &Trun=F.Trun,
-      D=-1.5*Draught,dP=D/9,dQ=dP/6;    // профильное заглубление и детальность
+      D=-hypot( Draught,Breadth/2 ),
+//      D=-1.5*hypot( Draught,Breadth ),
+      dP=D/9,dQ=dP/6;    // профильное заглубление и детальность
  Real S=hypot( F.Long,F.Wide ),dS=F.dS; // дистанция и шаг разметки профиля
  Vector Ahead=x;    Ahead.z=0;    Ahead=S*dir( Ahead );
  Vector Traverse=y; Traverse.z=0; Traverse=S*dir( Traverse );
@@ -94,7 +96,7 @@ Hull& Hull::NavigaInform( Window *Win )
  Real L=min( 1.0,Length     // условная высота и длина стрелки волны в картушке
       / max( max( S.Wind.Length,S.Swell.Length ),S.Surge.Length ) );
   glTranslated( 0,-0.1,0 ); color( cyan,0,.1 ); // круг картушки 110% корпуса
-  glScaled( 0.9*L,0.9*L,1 ); circle( (Point){0},1.0/L );
+  glScaled( 0.9*L,0.9*L,1 ); circle( (Vector){0},1.0/L );
  bool left=int( 2+Course/_Ph )&1;
  int right=(S.Wind.Height!=0)+(S.Swell.Height!=0)+(S.Surge.Height!=0);
   color(navy); Compass.Print( left?-1:1,(GMod&&Win==this)+(right?3.1-right:2),right?"":" Штиль" );
@@ -104,7 +106,7 @@ Hull& Hull::NavigaInform( Window *Win )
   if( right )Compass.Print( 1,2+2*(GMod&&Win==this),"Заштилело" );
   //
   //                                  стрелка-указатель заданного курса корабля
-  B.axiZ( _Ph-Course )/=L;
+  B.axiZ( _Ph-Course ).Scale=1.0/L;
   for( i=0; i<2; i++ )                              // стрелка выбранного курса
   { if( !i ){ glLineWidth( 2 ); color( gray,0,.75 ); glBegin( GL_LINE_LOOP ); }
        else { glLineWidth( 1 ); color( yellow,0,.3 ); glBegin( GL_POLYGON ); }
@@ -164,7 +166,7 @@ Hull& Hull::NavigaInform( Window *Win )
   B*=Matrix(*this);
   glBegin( GL_TRIANGLES ); //GL_POLYGON ); //GL_TRIANGLE_FAN );
   for( i=0; i<WaterLine.len; i+=3 )
-  { color( lightcyan,0,0.5 ); dot( (Point){0} ); color( lightblue,0,0.5 );
+  { color( lightcyan,0,0.5 ); dot( (Vector){0} ); color( lightblue,0,0.5 );
                               dot( B.AtL( WaterLine[i+1] ) );
                               dot( B.AtL( WaterLine[i+2] ) ); } glEnd();
   //
@@ -175,7 +177,7 @@ Hull& Hull::NavigaInform( Window *Win )
   //
   //  в центре картушки подписывается текущий курс и действующая скорость судна
   //
-  color( lightblue,-0.25 ),Text( _Down,(Point){0},
+  color( lightblue,-0.25 ),Text( _Down,(Vector){0},
         "%s %3.1fуз",DtoA( atan2(-x.y,x.x )*_Rd,-1 ),Speed*3600/_Mile );
   //   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   //!  графики качки в окне аксонометрической проекции корпуса корабля !!
@@ -226,37 +228,38 @@ Hull& Hull::NavigaInform( Window *Win )
         Hy=max( Max.y,-Min.y );
     H=max( Hx,Hy );  // общее дальнейшее масштабирование х-крена и у-дифферента
     U=10.0*_dR/H;    //        ↓↓↓ - надо поправить, чтоб без тени повторений
-//  color( lightcyan,.8,.75 ); rectangle( (Point){-Lp,-1},(Point){Lp-Lt,1} );
+//  color( lightcyan,.8,.75 ); rectangle( (Vector){-Lp,-1},(Vector){Lp-Lt,1} );
     if( U<1.0 )
     { color( lightgreen,0.0,0.2 );        // <10° - комфортная радость на борту
-      rectangle( (Point){-Lp,U},(Point){Lp-Lt,min(1.0,2*U)} );
-      rectangle( (Point){-Lp,-U},(Point){Lp-Lt,max(-1.0,-2*U)} );
+      rectangle( (Vector){-Lp,U},(Vector){Lp-Lt,min(1.0,2*U)} );
+      rectangle( (Vector){-Lp,-U},(Vector){Lp-Lt,max(-1.0,-2*U)} );
       if( U<0.5 ){ color( lightblue,0.7,0.5 );// >20° невыносимые условия качки
-        rectangle( (Point){-Lp,2*U},(Point){Lp-Lt,1} );
-        rectangle( (Point){-Lp,-2*U},(Point){Lp-Lt,-1} ); }
+        rectangle( (Vector){-Lp,2*U},(Vector){Lp-Lt,1} );
+        rectangle( (Vector){-Lp,-2*U},(Vector){Lp-Lt,-1} ); }
     }
     //
     //   разметка шкалы времени
     //
    const Real dT=(l-k)*Ts; int j=dT<60?5:6;    // интервал времени эксперимента
     U=dT<60?AxisStep(dT)/5:AxisStep(dT/60)*10; // поминутный шаг шкалы времени
-    color( cyan,0.25 );   line( (Point){ -Lp,0 }, (Point){ Lp-Lt,0  } );
-    color( green,0.25 ); liney( (Point){ -Lp,.5 },(Point){ Lp-Lt,.5 } );
-    color( green,-0.25 ); line( (Point){ -Lp,-1 },(Point){ Lp-Lt,-1 } );
-                          line( (Point){ -Lp,1  },(Point){ Lp,1 } );
+    color( cyan,0.25 );   line( (Vector){ -Lp,0 }, (Vector){ Lp-Lt,0  } );
+    color( green,0.25 ); liney( (Vector){ -Lp,.5 },(Vector){ Lp-Lt,.5 } );
+    color( green,-0.25 ); line( (Vector){ -Lp,-1 },(Vector){ Lp-Lt,-1 } );
+                          line( (Vector){ -Lp,1  },(Vector){ Lp,1 } );
     Compass.AlfaVector( Compass.AlfaHeight()*0.85,1 );
     for( i=0; i*U<dT+0.1; i++ )
     { Real mX = -Lp + i*U*L/Ts;
-      liney( (Point){ mX,1 },(Point){ mX,i%j?0.92:0.85 } );
+      liney( (Vector){ mX,1 },(Vector){ mX,i%j?0.92:0.85 } );
       //if( mX<Lp-Lt*1.2 )
       if( i && !( i%j ) )
-        Compass.Text( _South,(Point){ mX,-1 },DtoA( i*U/3600,3 ) );     //!-0.8
+        Compass.Text( _South,(Vector){ mX,-1 },DtoA( i*U/3600,3 ) );     //!-0.8
     } if( --i%j>1 )
-      Compass.Text( _South_West,(Point){ Lp,-1 },DtoA( dT/3600,3 ) );
+      Compass.Text( _South_West,(Vector){ Lp,-1 },DtoA( dT/3600,3 ) );
     //
     //   закрашенный профиль волны с корпусом судна на вертикальной качке
     //
-    color( lightgreen,.7,.8 ); rectangle( (Point){Lp-Lt,-.5},(Point){Lp,.46} );
+    color( lightgreen,.7,.8 );
+    rectangle( (Vector){Lp-Lt,-.5},(Vector){Lp,.46} );
     glLineWidth( 2 );
     glBegin( GL_QUAD_STRIP );
     for( i=k; i<=l; i++ )
@@ -295,10 +298,10 @@ Hull& Hull::NavigaInform( Window *Win )
     Compass.AlfaVector( Compass.AlfaHeight()/0.85,1 );
     if( GMod )
     { Compass.Area( 29,-8,0,7 ).Activate( true );  // и ещё +7 строчек вверх
-      color( green,0.25 ); liney( (Point){ -Lp,1 },(Point){ Lp-Lt,1 } );
+      color( green,0.25 ); liney( (Vector){ -Lp,1 },(Vector){ Lp-Lt,1 } );
       for( i=0; i*U<dT; i++ )
       { const Real mX = -Lp + i*U*L/Ts;         // новая шкала разметки времени
-        liney( (Point){ mX,1 },(Point){ mX,i%(dT<60?5:6)?0.95:0.9 } );
+        liney( (Vector){ mX,1 },(Vector){ mX,i%(dT<60?5:6)?0.95:0.9 } );
     } }
     // и три ускорения свободного падения по наблюдениям в оконечностях корпуса
     //
@@ -326,14 +329,14 @@ Hull& Hull::NavigaInform( Window *Win )
     glLineWidth( 1 );
     Compass.AlfaVector( Compass.AlfaHeight()*0.85,1 );
     if( GMod )     // центральная подпись для ускорений в средней части корпуса
-    { color( lightcyan,.75,.3 ); rectangle( (Point){Lp-Lt,-1},(Point){Lp,1} );
+    { color( lightcyan,.75,.3 ); rectangle( (Vector){Lp-Lt,-1},(Vector){Lp,1} );
       color( blue );       Compass.Print(    0,4.5,"St)" );
       color( green );      Compass.Print( -3.8,4.5,"(As·" );
       color( yellow,-.6 ); Compass.Print(   -1,3.4,"%+3.1f",maxM )
                                   .Print(   -1,5.6,"%+3.1f",minM );
       color( yellow,-.4 );
-      liney( (Point){-Lp,0.5},(Point){Lp-Lt,0.5} );
-      line( (Point){-Lp},(Point){Lp-Lt},cyan );             // уровень среднего
+      liney( (Vector){-Lp,0.5},(Vector){Lp-Lt,0.5} );
+      line( (Vector){-Lp},(Vector){Lp-Lt},cyan );           // уровень среднего
     //
     //              график скорости хода и поступательной качки по ходу корабля
     //
@@ -390,11 +393,11 @@ bool Hull::Draw()                  // Виртуальная процедура 
   glClear( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT ); // расчистка всего экрана
   glMatrixMode( GL_PROJECTION ); glLoadIdentity(); // сброс матричных координат
   gluPerspective( 15,Real(Width)/Height,-1e6,1e1 ); // к перспективной проекции
-  gluLookAt( 0,0,Distance,look.x,look.y,look.z,0,1,0 ); // позиция точки обзора
+  gluLookAt( 0,0,Distance,lookX,lookY,lookZ,0,1,0 );    // позиция точки обзора
   glMatrixMode( GL_MODELVIEW ); glLoadIdentity();         // исходное состояние
-  glRotated( eye.y-90,1,0,0 );                            //  поставить на киль
-  glRotated( eye.x+atan2(x.x,x.y)*_Rd,0,0,1 );            //           рыскание
-  glRotated( eye.z,0,1,0 );                               //          дифферент
+  glRotated( eyeY-90,1,0,0 );                            //  поставить на киль
+  glRotated( eyeX+atan2(x.x,x.y)*_Rd,0,0,1 );            //           рыскание
+  glRotated( eyeZ,0,1,0 );                               //          дифферент
 //axis(*this,Length/1.8,Breadth/1.8,Draught,"X","Y","Z"); // Координатные оси и
   AlfaVector( Height/WinLines ); Drawing();               //   рисунок в памяти
   color( blue );

@@ -277,37 +277,37 @@ Waves& Waves::ThreeBoundary
 }
 //! Внутренний поисковый алгоритм для уроня моря на неравномерных сетках
 //
-static void APoint( Point &A, int &y,int &x, Vector **H, int My,int Mx )
+static void APoint( Vector &A, int &y,int &x, Vector **H, int My,int Mx )
 { Real Rx,Ry,Sx,Sy;
   int i,j,ix=0,jy=0,k;
   for( k=0; k<24; k++ )                         // ведется поиск до возврата
-  { Rx=A.X-H[y][x].x,Ry=A.Y-H[y][x].y;          // к любому предыдущему узлу
-    Sx=A.X-H[y][x+1].x,Sy=A.Y-H[y+1][x].y;      //
+  { Rx=A.x-H[y][x].x,Ry=A.y-H[y][x].y;          // к любому предыдущему узлу
+    Sx=A.x-H[y][x+1].x,Sy=A.y-H[y+1][x].y;      //
     if( Rx<0 && x>0 )i=-1; else if( Sx>0 && x<Mx-1 )i=1; else i=0;
     if( Ry<0 && y>0 )j=-1; else if( Sy>0 && y<My-1 )j=1; else j=0;
     if( i && j ){ if( (i<0?-Rx:Sx)>=(j<0?-Ry:Sy) )j=0; else i=0; }
     if( i*ix<0 || j*jy<0 )break;
     if( i )ix=i,x+=i; else if( j )jy=j,y+=j; else break;
-  } A.Y=Ry/( H[y+1][x].y-H[y][x].y );
-    A.X=Rx/( H[y][x+1].x-H[y][x].x );
+  } A.y=Ry/( H[y+1][x].y-H[y][x].y );
+    A.x=Rx/( H[y][x+1].x-H[y][x].x );
 }
 //!  Простая билинейная интерполяция волнового поля для одной конкретной точки
 //                                 \!-и должно оптимизироваться для всего поля
-Real Field::Value( Point A )
-{ Real Rx=(A.X+Long/2)/dS,
-       Ry=A.Y/dS+(mY-1)/2;
+Real Field::Value( Vector A )
+{ Real Rx=(A.x+Long/2)/dS,
+       Ry=A.y/dS+(mY-1)/2;
   int x=minmax( 0,int( floor( Rx ) ),mX-2 ),
       y=minmax( 0,int( floor( Ry ) ),mY-2 );
-  if( Exp.peak )APoint( A,y,x,Ws,mY,mX ); else A.X=Rx-x,A.Y=Ry-y;
-  return (1-A.X)*(Ws[y][x].z*(1-A.Y)+Ws[y+1][x].z*A.Y) // простые разности
-      + A.X*(Ws[y][x+1].z*(1-A.Y)+Ws[y+1][x+1].z*A.Y); // билинейных пересчётов
+  if( Exp.peak )APoint( A,y,x,Ws,mY,mX ); else A.x=Rx-x,A.y=Ry-y;
+  return (1-A.x)*(Ws[y][x].z*(1-A.y)+Ws[y+1][x].z*A.y) // простые разности
+      + A.x*(Ws[y][x+1].z*(1-A.y)+Ws[y+1][x+1].z*A.y); // билинейных пересчётов
 }
 //! дополнение морских координат уровнем поверхности воды
 //
 #if 1
-Vector Field::Locas( Point P ){ P.Z = Value( P ); return *(Vector*)(&P); }
+Vector Field::Locas( Vector P ){ P.z = Value( P ); return *(Vector*)(&P); }
 #else
-Vector Field::Locas( Point P )
+Vector Field::Locas( Vector P )
 { Vector &W=*(Vector*)(&P); W.z=0;
   W.z = Wind.Wave( Tlaps*3600,W ).z
      + Swell.Wave( Tlaps*3600,W ).z   // координаты хранятся в исходном массиве
@@ -347,7 +347,7 @@ static void Square( Vector** V, Vector N, int y,int x )
   V[y+1][x]  = N * ( N%V[y+1][x]   );
   V[y+1][x+1]= N * ( N%V[y+1][x+1] );
 }
-int Waves::Slick( _Point A, _Point B, _Vector N )
+int Waves::Slick( _Vector A, _Vector B, _Vector N )
 { Vector w; //D=dir( B-A );
   int y,x,dy,dx,ly,lx,k;                        // выбор маски местоположения
   Real Rx=Mx/2+A.X/Ds,Ry=My/2+A.Y/Ds;           //    и отражающей способности

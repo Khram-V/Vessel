@@ -114,7 +114,7 @@ Hull& Hull::Protocol()
       } shortEx = (Educt&0x200)!=0;  // режим записи только превышающих величин
       if( extFix( wV,V )       )if( Educt&1  )ev|=1;   // потеря скорости хода
       if( extFix( wC,angle(w)) )if( Educt&2  )ev|=2;   // рыскание
-      if( extFix( wZ,Z )       )if( Educt&4  )ev|=4;   // вертикальная,
+      if( extFix( wZ,Locate.z) )if( Educt&4  )ev|=4;   // вертикальная,
       if( extFix( wX,Dir.x )   )if( Educt&8  )ev|=8;   // бортовая и
       if( extFix( wY,Dir.y )   )if( Educt&16 )ev|=16;  // килевая качка
       if( extFix( wA,a )       )if( Educt&32 )ev|=32;  // ускорение ахтерштевня
@@ -132,7 +132,7 @@ Hull& Hull::Protocol()
           fprintf( VIL,dCs>_Pi/59?"Б" : dCs<_Pi/61?"M":"P" );
         }
         sprintf( str," %sζ%+4.1f∫%-+4.1f ",     // вертикальная качка и уровень
-                 ev&4?"•":"·",Z,S.Value( out( Zero ) ) ); i=Ulen( str );
+                 ev&4?"•":"·",Locate.z,S.Value( out( Zero ) ) ); i=Ulen( str );
         fprintf( VIL,str ); while( ++i<15 )fprintf( VIL," " );    // ++ пробелы
         sprintf( str," %sϑ%-+6.1f %sψ%-+6.1f ",                   // углы качки
                  ev&8?"•":"·",Dir.x*_Rd,ev&16?"•":"·",Dir.y*_Rd ); PtoG( str );

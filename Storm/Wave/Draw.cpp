@@ -6,6 +6,13 @@
 //
 #include "Wave.h"               // собственно графическая оболочка Window-Place
 
+static Vector arrow( Vector a, Vector b,_Real l, const colors clr=empty )
+{ Vector d=a-b; d*=l/abs( d );
+  Vector e={ d.z/5,d.x/5,d.y/5 },f={ e.z,e.x,e.y },g=b+d/2; line( a,d+=b,clr );
+   glBegin( GL_LINE_LOOP ),dot( g ),dot( d+e ),dot( b ),dot( d-e ),
+                           dot( g ),dot( d+f ),dot( b ),dot( d-f ),
+                           dot( g ),glEnd(); return b;
+}
 #define hX( H,s,y,z ) ( H[x]+vX( s,y,z ) )
 #define vX( s,y,z )  ((Vector){Long/-2+(x*Long)/Nx+s,y,z })
 #define curve(x,xo,xe,dx,v) \

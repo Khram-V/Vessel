@@ -143,7 +143,7 @@ int Hull::Read_from_Frames()          // Здесь продолжается
   { *c=0;
     while( *(++s)<=' ' )if( *s==0 )break;
     if( strcut( s )>0 )               // 3. ?поле имени не пустое
-    { int i,k=0,n=0; Real o;
+    { int i,j,k=0,n=0; Real o;
       strcpy( Name,s );  FGetS();
       sscanf( Str,"%d%d",&n,&k );     //
       if( n>1 && k>0 && k<=n )        // 4. количество шпангоутов >1
@@ -163,15 +163,12 @@ int Hull::Read_from_Frames()          // Здесь продолжается
         //
         for( k=0; k<Ns; k++ )
         { Frame &W=F[k];
-          FGetS(); W.allocate( (n=strtol( Str,&s,0 ))+2 ); W.X=strtod( s,&s );
-          for( i=0;; )  // { W.z[i]=MZ(strtod(s,&s)-o); W.y[i]=strtod(s,&s); }
+          FGetS(); W.allocate( (n=strtol(Str,&s,0))+2 ); W.X=strtod( s,&s );
+          for( i=j=0; j<n; i++,j++ ) // { W.z[i]=MZ(strtod(s,&s)-o); W.y[i]=strtod(s,&s); }
           { W.z[i]=MZ( strtod( s,&s )-o ); W.y[i]=strtod( s,&s );
-            if( i==0 )
-            { if( W.y[0]>0 ){ W.z[1]=W.z[0],W.y[1]=W.y[0],W.y[0]=0; i=1; n++; }
-            }
-            if( ++i==n )
-            { if( W.y[i-1]>0 ){ W.z[i]=W.z[i-1]; W.y[i]=0; n++; } break; }
-          } W.N=n-1;
+            if( j==0 )if( W.y[0]>0 ){ W.z[1]=W.z[0],W.y[1]=W.y[0],W.y[0]=0; i=1; }
+            if( j==n-1 )if( W.y[i]>0 ){ W.z[i+1]=W.z[i]; W.y[i+1]=0; i++; }
+          } W.N=i-1;
         }
         // Форштевень (табличные данные здесь заканчиваются, далее - строки)
         //
@@ -251,11 +248,14 @@ int Hull::Write()
     for( k=0; k<Ns; k++ )
     { int n=F[k].N; i=0;
       if( n>0 )
-      { if( F[k].y[n]<1e-6 && F[k].z[n]==F[k].z[n-1] )--n;
-        if( F[k].y[0]<1e-6 && F[k].z[0]==F[k].z[1] )i=1;
-      }                fprintf( Fh,"\n%3d %-6.5lg",n-i,F[k].X );
-      for( ; i<n; i++ )fprintf( Fh," " G,F[k].z[i],F[k].y[i] );
-    }                  fprintf( Fh,"\n" );
+      { if( F[k].y[n]<1e-6 && F[k].z[n]==F[k].z[n-1] ) // дополненный ноль
+        { n--;                                         // и его слом ширстрека
+          if( F[k].y[n]==F[k].y[n-1] && F[k].z[n]==F[k].z[n-1] )n--;
+        }
+        if( F[k].y[0]<1e-6 && F[k].z[0]==F[k].z[1] )i=1;  // и один ноль у киля
+      }                 fprintf( Fh,"\n%3d %-6.5lg",n-i+1,F[k].X );
+      for( ; i<=n; i++ )fprintf( Fh," " G,F[k].z[i],F[k].y[i] );
+    }                   fprintf( Fh,"\n" );
     //! Форштевень
                              fprintf( Fh,"\n%3d",Sty.N+1 );
     for( i=0; i<=Sty.N; i++ )fprintf( Fh,G,Sty(i),Sty[i] );

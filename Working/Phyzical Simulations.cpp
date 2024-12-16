@@ -13,7 +13,23 @@ Real Init_Flight_Points( Array& );           // на выходе размер �
 void One_Inter_Step_of_Point( Array&,bool );
 //           Блок расчета кинематики частицы под действием внешних сил и трения
 void One_Flight_Step_of_Point( Array&,int );
-//
+const Real* arrow( const Real *_a,const Real *_b,_Real l, const colors clr=empty )
+{ Vector &a=*(Vector*)_a,&b=*(Vector*)_b,d=a-b; d*=l/abs( d );
+  Vector e={ d.z/5,d.x/5,d.y/5 },f={ e.z,e.x,e.y },g=b+d/2; line( a,d+=b,clr );
+   glBegin( GL_LINE_LOOP ),dot( g ),dot( d+e ),dot( b ),dot( d-e ),
+                           dot( g ),dot( d+f ),dot( b ),dot( d-f ),
+                           dot( g ),glEnd(); return b;
+}
+static void axis( Place &P,_Real L,_Real Y,_Real Z,
+  const char *x,const char *y,const char *z, const colors clr=empty )
+{ const Real l=L/100;
+   arrow( (Vector){ 0,0,-Z },(Vector){ 0,0,Z },l,clr ),
+   arrow( (Vector){ 0,-Y,0 },(Vector){ 0,Y,0 },l ),
+   arrow( (Vector){ -L,0,0 },(Vector){ L,0,0 },l ); color( clr,-0.5 );
+  P.Text( _North,0,0,Z,z )
+   .Text( _North,0,Y+l,0,y )
+   .Text( _North_East,L+l,0,0,x );
+}
 //                                  Пространственные размерности видимого поля
 static const Real vX=16,vY=16,vZ=16,Screen_Size=max( max( vX,vY ),vZ );   // 4;
 static View Win                     // пространство, отображаемое на экране ЭВМ
