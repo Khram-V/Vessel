@@ -12,7 +12,7 @@ Place& Place::Area( int X,int Y, int W,int H )     // достаточно сд�
    if( !W )W=Site->Width;  else if( W<0 )W=-W,fw=1; else W=W*fw; // связанной с
    if( X>0 )X=(X-1)*fw; else X = Site->Width - W + X*fw;      // базовой Window
        X=minmax( 0,X,Site->Width-int( Tw ) );         // перерасчет с проверкой
-   if( X+W>Site->Width  )                             // жертвуем шириной окна
+   if( X+W>Site->Width  )                             //  жертвуем шириной окна
      { if( W==Site->Width )W-=X; else X=max( 0,Site->Width-W ); }
 // затем по вертикали
    if( !H )H=Site->Height; else if( H<0 )H=-H,fh=1; else H=H*fh; ++H;
@@ -37,13 +37,12 @@ RasterSector::RasterSector
   { PushMatrix();
     glLoadIdentity(); glMatrixMode( GL_PROJECTION ); //cX=cY=0;
     glLoadIdentity(); glViewport( pX,pY,W,H );
-    glOrtho( 0,W/Scale,0,H/Scale,0,1 );
-//  gluOrtho2D( cX-cX/Scale,W/Scale,
-//              cY-cY/Scale,H/Scale );              // gluOrtho2D( 0,W,0,H );
+    glOrtho( 0,W/Scale,0,H/Scale,0,1 );   // gluOrtho2D( 0,W/Scale,0,H/Scale );
     glMatrixMode( GL_MODELVIEW );
     glDisable( GL_DEPTH_TEST );
     glDisable( GL_LIGHTING );
   }
+
 RasterSector::~RasterSector(){ PopMatrix(); }
 
 TextContext::TextContext( bool b ): Base( b )
@@ -55,7 +54,6 @@ TextContext::TextContext( bool b ): Base( b )
   glDisable( GL_CULL_FACE );
   glDisable( GL_LIGHTING );
   glPolygonMode( GL_BACK,GL_FILL );
-//glListBase( FontBase );
 }
 TextContext::~TextContext(){ if( Base )PopMatrix(); else glPopAttrib(); }
 
@@ -69,7 +67,8 @@ Place& Place::Clear( bool back ) // очистка фоном/true или тек
                 glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
                 glClearColor( *c,c[1],c[2],c[3] );
   } glDisable( GL_SCISSOR_TEST );     // разблокирование графических фрагментов
-  glScissor( 0,0,0,0 ); return *this; //   и отключение обрезки
+  //glScissor( 0,0,0,0 );
+  return *this; //   и отключение обрезки
 }
 Place& Place::Show()                     //! прорисовка растрового фрагмента из
 { if( Site )
@@ -118,3 +117,7 @@ Window& Window::Refresh()    // сборка изображения с копи�
 }
 Place& Place::Refresh(){ Site->Refresh(); return *this; }// туда же на всё окно
 Window& Window::Above(){ SetForegroundWindow( hWnd ); return Refresh(); }
+
+//glEnable( GL_SCISSOR_TEST ); glScissor( pX,pY,W,H );
+//glDisable( GL_SCISSOR_TEST );
+//glListBase( FontBase );

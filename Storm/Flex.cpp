@@ -97,22 +97,21 @@ Vector operator ~(_Vector v){ return (Vector){v.x,-v.y,v.z}; } // другого
 //
 //    ... из точки (a) в точку (b) с объемной стрелкой в долях её длины
 //
-const Real* arrow( const Real *_a,const Real *_b,_Real l, const colors clr )
-{ Vector &a=*(Vector*)_a,&b=*(Vector*)_b,d=a-b; d*=l/abs( d );
+const Real* arrow( const Real *_a,const Real *_b, _Real l, const colors clr )
+{ Vector &a=*(Vector*)_a,&b=*(Vector*)_b,d=a-b; d*=l ;// abs( d );
   Vector e={ d.z/5,d.x/5,d.y/5 },f={ e.z,e.x,e.y },g=b+d/2; line( a,d+=b,clr );
    glBegin( GL_LINE_LOOP ),dot( g ),dot( d+e ),dot( b ),dot( d-e ),
                            dot( g ),dot( d+f ),dot( b ),dot( d-f ),
                            dot( g ),glEnd(); return _b;
 }
 void axis( Place &P,_Real L,_Real Y,_Real Z,
-  const char *x,const char *y,const char *z, const colors clr )
-{ const Real l=L/100;
-   arrow( (Vector){ 0,0,-Z },(Vector){ 0,0,Z },l,clr ),
-   arrow( (Vector){ 0,-Y,0 },(Vector){ 0,Y,0 },l ),
-   arrow( (Vector){ -L,0,0 },(Vector){ L,0,0 },l ); color( clr,-0.5 );
+  const char *x, const char *y, const char *z, const colors clr )
+{ arrow( (Vector){ 0,0,-Z },(Vector){ 0,0,Z },0.0l,clr ),
+  arrow( (Vector){ 0,-Y,0 },(Vector){ 0,Y,0 },0.01 ),
+  arrow( (Vector){ -L,0,0 },(Vector){ L,0,0 },0.0l ); color( clr,-0.5 );
   P.Text( _North,0,0,Z,z )
-   .Text( _North,0,Y+l,0,y )
-   .Text( _North_East,L+l,0,0,x );
+   .Text( _North,0,Y+L/100,0,y )
+   .Text( _North_East,L*1.01,0,0,x );
 }
 //
 //! Процедуры интерполяции и быстрой работы с расширяемыми последовательностями

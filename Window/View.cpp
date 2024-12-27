@@ -121,15 +121,15 @@ bool View::KeyBoard( fixed key )   // к спуску из внешних вир
    glLightfv( GL_LIGHT0,GL_DIFFUSE, (const float[]){.6,.8, 1,1 }); // рассеяние
    glLightfv( GL_LIGHT0,GL_SPECULAR,(const float[]){.8,.9, 1,1 }); // отражение
    glLightfv( GL_LIGHT0,GL_EMISSION,(const float[]){.6,.6,.6,1 }); // излучение
-   glLightfv( GL_LIGHT0,GL_POSITION,(const float[]){-D,-.05*D,-.1*D,0.5 });
-   glLightfv( GL_LIGHT0,GL_SPOT_DIRECTION,(const float[]){D, .02*D, .1*D,.5 });
+   glLightfv( GL_LIGHT0,GL_POSITION,(const float[]){-D,-.1*D,D,0.5 });
+   glLightfv( GL_LIGHT0,GL_SPOT_DIRECTION,(const float[]){D,.1*D,-D,.5 });
    glLighti ( GL_LIGHT0,GL_SPOT_CUTOFF,45 );
    glLightfv( GL_LIGHT1,GL_AMBIENT, (const float[]){.2,.3,.4,.8}); // окружение
    glLightfv( GL_LIGHT1,GL_DIFFUSE, (const float[]){.8, 1, 1,1 }); // рассеяние
    glLightfv( GL_LIGHT1,GL_SPECULAR,(const float[]){.6,.8,.9,1 }); // отражение
    glLightfv( GL_LIGHT1,GL_EMISSION,(const float[]){.6,.6,.6,1 }); // излучение
-   glLightfv( GL_LIGHT1,GL_POSITION,(const float[]){ D,-.05*D,-.1*D,0.5 });
-   glLightfv( GL_LIGHT1,GL_SPOT_DIRECTION,(const float[]){-D, .02*D, .1*D,.5 });
+   glLightfv( GL_LIGHT1,GL_POSITION,(const float[]){ D,-.1*D,D,0.5 });
+   glLightfv( GL_LIGHT1,GL_SPOT_DIRECTION,(const float[]){-D,.1*D,-D,.5 });
    glLighti ( GL_LIGHT1,GL_SPOT_CUTOFF,45 );
 #endif   glEnable( GL_COLOR_MATERIAL );
    glEnable( GL_LIGHTING );

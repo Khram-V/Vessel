@@ -20,8 +20,7 @@ Hull& Hull::Contour_Lines()      // рисуем контуры габаритн
  Field &F=*Storm;
  const Real &Trun=F.Trun,
       D=-hypot( Draught,Breadth/2 ),
-//      D=-1.5*hypot( Draught,Breadth ),
-      dP=D/9,dQ=dP/6;    // профильное заглубление и детальность
+      dP=D/9,dQ=dP/6;                   // профильное заглубление и детальность
  Real S=hypot( F.Long,F.Wide ),dS=F.dS; // дистанция и шаг разметки профиля
  Vector Ahead=x;    Ahead.z=0;    Ahead=S*dir( Ahead );
  Vector Traverse=y; Traverse.z=0; Traverse=S*dir( Traverse );
@@ -29,8 +28,10 @@ Hull& Hull::Contour_Lines()      // рисуем контуры габаритн
                R.y=fabs( F.Long/Traverse.x )/2;
   Ahead *= R.x<0.5 ? R.x : F.Wide/fabs( Ahead.y )/2;
   Traverse*=R.y<0.5 ? R.y : F.Wide/fabs( Traverse.y )/2;
-  glLineWidth( 0.01 ); arrow( -Traverse,Traverse,Length/240,lightcyan );
-                       arrow( -Ahead,Ahead,Length/240,yellow );
+//  glLineWidth( 0.01 ); arrow( -Traverse,Traverse,Length/240,lightcyan );
+//                       arrow( -Ahead,Ahead,Length/240,yellow );
+  glLineWidth( 0.01 ); arrow( -Traverse,Traverse,0.005,lightcyan );
+                       arrow( -Ahead,Ahead,0.005,yellow );
   glLineWidth( 1 );                           // ускоренная прорисовка без волн
   if( !F.Exp.wave )return *this; color( lightblue );
   for( Real w=0; w>=D; w+=dP )
@@ -45,15 +46,15 @@ Hull& Hull::Contour_Lines()      // рисуем контуры габаритн
   //                                          0.01
   dS=( S=abs( Traverse ) )/120.0; glLineWidth( 0.1 ); // длина и шаг профиля и
   for( Real s=0; s<S*2; s+=dS )           //! зелёные стрелки скоростей течений
-  { R=( s/S )*Traverse-Traverse; color( lightgreen ); glBegin( GL_LINE_STRIP );
+  { R=( s/S )*Traverse -Traverse; color( lightgreen ); glBegin( GL_LINE_STRIP );
     for( R.z=0; R.z>=D; R.z+=dQ )dot( F.Wave(Trun,R) ); glEnd(); color( green );
-    for( R.z=0; R.z>=D; R.z+=dP ){ P=F.WaveV(Trun,R,V); arrow(P,P+V,abs(V)/6); }
+    for( R.z=0; R.z>=D; R.z+=dP ){ P=F.WaveV(Trun,R,V); arrow(P,P+V,0.2 ); }   //abs(V)/6); }
   }
   dS=( S=abs( Ahead ) )/120.0;
   for( Real s=0; s<S*2; s+=dS )
   { R=( s/S )*Ahead-Ahead; color( lightgreen ); glBegin( GL_LINE_STRIP );
     for( R.z=0; R.z>=D; R.z+=dQ )dot( F.Wave(Trun,R) ); glEnd(); color( green );
-    for( R.z=0; R.z>=D; R.z+=dP ){ P=F.WaveV(Trun,R,V); arrow(P,P+V,abs(V)/6); }
+    for( R.z=0; R.z>=D; R.z+=dP ){ P=F.WaveV(Trun,R,V); arrow(P,P+V,0.2 ); }   //abs(V)/6); }
   } glLineWidth( 1 ); return *this;
 }
 //! общая навигационная информация о состоянии корабля
@@ -80,9 +81,9 @@ static void DirWave( const Waves &W, colors C, Place &D )
 }
 Hull& Hull::NavigaInform( Window *Win )
 { Field &S=*Storm;
- Vector C=Head[-1]; C.z+=_Ph;    // крен, дифферент и курс корабля(в геобазисе)
+ Vector C=Head[-1]; C.z+=_Ph;   // крен, дифферент и курс корабля (в геобазисе)
  int i,l=-0.18*hypot( Win->Width,Win->Height );       // размер из аксонометрии
- bool GMod = (DrawMode&8)==0;  // режим с разделением графиков качки и ходкости
+ bool GMod = Pic.kart==0;      // режим с разделением графиков качки и ходкости
  Place Compass( Win,PlaceOrtho );  // | PlaceAbove ~~ случай единичной разметки
  TextContext TS( true );
   Compass.AlfaVector( Win==this?AlfaHeight():S.AlfaHeight() );
@@ -119,7 +120,7 @@ Hull& Hull::NavigaInform( Window *Win )
     Vector V=(Vector){ sin( D ),cos( D ),0 }/-L; bool big=(i%4)==0;
     if( fabs( angle( D-Course,_Pi ) )<_Ph/8.1 )color( navy );
                                           else color( green,.25,0.5 );
-    arrow( spot( 0.8*V,big?10:6 ),V,abs( V )*(big?0.15:0.1) );
+    arrow( spot( 0.8*V,big?10:6 ),V,big?0.15:0.1 );
     if( Win!=this || !GMod )
     if( !(i&1) )
     if( (!left && (i<11 || i>15)) || (left && (i<17 || i>21 ) ) )
@@ -132,7 +133,7 @@ Hull& Hull::NavigaInform( Window *Win )
   angle( H=Hull::Course+Head[-1].z );   // текущее отклонение от заданого курса
   { const Vector R=(Vector){ -0.85 },N=(Vector){ 0,0.025 }; Vector W;
     line(B.LtA((Vector){0,-.8}),B.LtA((Vector){0,.8}),lightblue); glLineWidth(2);
-    spot( arrow( B.LtA((Vector){-1}),B.LtA((Vector){0.975}),0.26/L ),5,blue );
+    spot( arrow( B.LtA((Vector){-1}),B.LtA((Vector){0.975}),0.12 ),5,blue );
     if( fabs( H )<_Pi/32 )W=(Vector){ 0.2 }; else   // полрумба в доле градуса°
     if( dCs<_Pi/45 )W=(Vector){ 0.2,0.06 }; else W=(Vector){ 0.18,0.125 };
     if( H<0 )W.y=-W.y; glBegin( GL_POLYGON );
@@ -404,7 +405,7 @@ bool Hull::Draw()                  // Виртуальная процедура 
   Print( 2,1,"%s\n { %s }\n %s",sname( FileName ),ShipName,Model[Statum] );
   if( Statum>3 && Storm->Exp.wave )           // подводные волновые воздействия
     { color( green ); Print( lFlow?", увлечение волной":", над волной" ); }
-  color( gray );  Print( ", и/сток(%g) ",Kv );
+  color( gray );  Print( ", сток/ист(%g) ",Kv );
   Save().Refresh(); Recurse=false; return false;
 }
 /*

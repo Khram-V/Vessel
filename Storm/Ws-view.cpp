@@ -83,16 +83,16 @@ bool Field::Draw()
   glRotated( eyeY-90,1,0,0 );                          // поставить на киль
   glRotated( eyeZ,   0,1,0 );                          // дифферент
   glRotated( eyeX,   0,0,1 );                          // рыскание
-  AlfaVector(Height/WinLines);
+  AlfaVector( Height/WinLines );
   //
   //   рисуем оси координат и габаритный прямоугольный параллелограмм
   //
-  axis( *this,Long*0.52,Wide*0.53,30,"N","W","n" );
+  axis( *this, Long*0.52,Wide*0.53,30, "N","W","n" );
 //liney( (Vector){Long/2, Wide/2,10},(Vector){Long/-2,Wide/2,10},lightgray );
 //liney( (Vector){Long/-2,Wide/2,10},(Vector){Long/-2,0,10} );
 //liney( (Vector){Long/2, Wide/2,10},(Vector){Long/2, 0,10} );
 //liney( (Vector){Long/2,0,10},      (Vector){Long/-2,0,10} );
-  liney( (Vector){Long/2, Wide/2,0}, (Vector){Long/-2,Wide/2,0},lightblue );
+  liney( (Vector){Long/2, Wide/2,0}, (Vector){Long/-2,Wide/2,0}, lightblue );
   liney( (Vector){Long/-2,Wide/2,0}, (Vector){Long/-2,0,0} );
   liney( (Vector){Long/2, Wide/2,0}, (Vector){Long/2,0,0} );
   //
@@ -160,10 +160,11 @@ bool Field::Draw()
  Hull &V=*Vessel; _Real S=V.Speed,L=V.Length;
   V.NavigaInform( this );         // картушка морского волнения, курса+скорости
   color( navy );Print(2,1,Exp.peak?"Трохоидальные волны:":"В полных потоках:");
-  color( blue );Print( ModelWave[Exp.wave&3] );
-//color( blue ); Print( 2,1,"%s: %s",
-//   Exp.peak?"Трохоидальные волны":"В полных потоках",ModelWave[Exp.wave&3] );
-  color( black ); Print( 2,2,Model[V.Statum] ); Print( 2,3,
+  color( blue ); Print( ModelWave[Exp.wave&3] ),Print( 2,2,Model[V.Statum] );
+  if( V.Statum>3 && Exp.wave )                // подводные волновые воздействия
+  { color( green ); Print(V.lFlow?", увлечение волной":", над волной"); }
+    color( gray );  Print( ", сток/ист(%g) ",V.Kv );
+  Print( 2,3,
     "Курс %0.1f°, дрейф %0.1f°, скорость %0.1f узлов (Fr=%4.2f, Lw/L=%4.2f) ",
      V.Course*360/_Pd,angle(V.Course,-V.Head[-1].z)*360/_Pd,S*3600/_Mile,
      S/sqrt(_g*L),sqr(S)*_Pd/_g/L );

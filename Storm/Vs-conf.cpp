@@ -23,12 +23,32 @@
                    4 - тоже, но в пустых триангуляционных гранях
        демпфирование визуально отсчитывается от нуля(без) на увеличение(тормоз)
 */
-Hull& Hull::Config()
+void Hull::PicMode( int x, int y )
 { const char *HView[]={ "Полупрозрачная тень, гидростатические отметки",
                         "Контуры шпангоутов при поверхности ватерлинии",
                         "Смоченная обшивка под поверхностью ватерлинии",
                         "Обшивка корабельного корпуса и надводный борт" };
-  Real D=Draught,sTime=sT/60,_V=Kv; bool _Flow=lFlow;
+  const char *VView[]={ "Скорости течений по смоченной обшивке скрыты",
+                        "Касательные компоненты обтекающих скоростей",
+                        "Вихреисточники потока и непротекания корпуса",
+                        "Импульсы скоростей излучения и отражения волн" };
+  static Mlist Menu[]={ { 1,0," Варианты изображения корпуса + потоков" }
+   , { 2,34 }           // признаки вариантов прорисовки корпуса           1
+   , { 1,34 }           // стрелки вихреисточников или импульсов отражения 2
+   , { 1,34 } };        // закраска или контуры триангуляционного покрытия 3
+  TextMenu T( Mlist(Menu),this,x,y ); int ans=-1;
+Rep:
+  Menu[1].Msg=(char*)HView[Pic.hull]; // выбор метода прорисовки корпуса
+  Menu[2].Msg=(char*)VView[Pic.flow]; // стрелки обтекания и волнообразования
+  Menu[3].Msg=Pic.grid ? "Контуры рёбер триангуляционного покрытия"
+                       : "Закрашиваемая поверхность корабельной обшивки";
+  ans=T.Answer( ans ); if( ans==1 )Pic.hull--;  else
+                       if( ans==2 )Pic.flow++;  else
+                       if( ans==3 )Pic.grid^=1; else
+                       if( ans==_Esc )return; goto Rep;
+}
+void Hull::Config()
+{ Real D=Draught,sTime=sT/60,_V=Kv; bool _Flow=lFlow;
   Mlist Menu[]={ { 1,0,"   Гидростатика и динамика корпуса" }             // 0
    , { 2,34 }        // варианты гидромеханики корабля и морских волн == 1
    , { 1,6,"Начальная метацентрическая высота: h=%-+5.3lf",&hX},{0,0," м"}// 2,3
@@ -39,25 +59,20 @@ Hull& Hull::Config()
                                        ,{0,4," рыскание: %-4.2lf",&muM.z} // 9
    , { 1,5,"Доля сток/исток модели непротекания: кV=%5.2lf",&Kv }         // 10
    , { 1,28 }      // ключ вовлечения корпуса в потоки под гребнями волн   = 11
-   , { 0,5," Осадка: %5.2lf",&D },{ 0,0," м" }                         // 12,13
-   , { 1,34 }      // закраска или контуры триангуляционного покрытия     14
-   , { 1,34 }      // признаки вариантов прорисовки корпуса               15
-   , { 1,5,"Протяжённость графической прорисовки %-5.4lg",&sTime},{0,0,"мин"} // 16,17
+   , { 0,5, " Осадка: %5.2lf",&D },{ 0,0," м" }                        // 12,13
+   , { 1,12,"«Изображение корпуса» " }                                 // 14
+   , { 0,4, " Длина графиков %-4.3lg",&sTime },{0,0,"мин"}             // 15,16
    };
   TextMenu T( Mlist(Menu),this,1,1 ); int ans=-1; Real h=hX;
   Vector DF=muF,DM=muM;
   do
-  { Menu[15].Msg=(char*)HView[DrawMode&3]; // выбор метода прорисовки корпуса
-    Menu[14].Msg=DrawMode&4 ? "Контуры рёбер триангуляционного покрытия"
-                            : "Закрашиваемая поверхность корабельной обшивки";
-    Menu[11].Msg=lFlow ? "Вовлечение в кинематику волн."
+  { Menu[11].Msg=lFlow ? "Вовлечение в кинематику волн."
                        : "Свободная динамика на волнах.";
     Menu[1].Msg=Model[Statum];
     ans=T.Answer( ans );
-    if( ans==11 )lFlow^=true; else
-    if( ans==14 )DrawMode=(DrawMode&~12)|(((DrawMode&12)+4)&12); else
-    if( ans==15 )DrawMode=(DrawMode&~3)|((DrawMode-1)&3); else
-    if( ans==1 )Model_Config( this );
+    if( ans==1 || ans==_F8 )Model_Config( this ); else
+    if( ans==14 || ans==_F5 )PicMode( 40,6 ); else
+    if( ans==11 )lFlow^=true;
     if( h!=hX )// сдвиг центра масс и пересчет тензора инерции под новую высоту
     { Vector G=Gravity; Gravity.z+=h-hX; h=hX; inMass=Steiner(inMass,G,Gravity);
       logMeta();                      //! проверить !
@@ -75,7 +90,6 @@ Hull& Hull::Config()
     if( DM!=muM || DF!=muF ){ logDamp(); DM=muM; DF=muF; }
     sT=max( 0.5,sTime )*60; sTime=sT/60.0;      // протяжённость графиков качки
   } while( ans!=_Esc );
-  return *this;
 }
 //!    Ключи Exp.peak & .wave могут изменяться только здесь
 //        так как для этого нужен контроль состава структур
@@ -125,6 +139,7 @@ Field& Field::Config() // Height = 1.134*Lw*Hw/_Pd/2.0;
       case  2: Exp.peak^=true;  break;         // Initial() колебания или волны
       case  3: Exp.draw+=ScanStatus()&SHIFT?-1:1; break;
       case  4: Exp.view+=ScanStatus()&SHIFT?-1:1; break;
+      case _F8: Model_Config( this ); break;
 //    case  7: Wind.Height =h1*Wind.Length/hW;  break;
 //    case 12: Swell.Height=h2*Swell.Length/hW; break;
 //    case 17: Surge.Height=h3*Surge.Length/hW; break;

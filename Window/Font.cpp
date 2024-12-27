@@ -38,7 +38,8 @@ static struct Design_Letters
       if( !u )break;
       if( u<_Design_len )
       { if( u==' ' || u==160 )X+=W; else
-        if( u=='\n' ){ Y-=H,X=bX; } else if( Af[u]>0 )
+        if( u=='\n' ){ Y-=H,X=bX; } else
+        if( Af[u]>0 )
         { byte *T=(byte*)Bit+Af[u]; int n=*T++,w=*T++;
           glBegin( GL_LINE_STRIP );
           for( int i=0; i<n; i++ )
@@ -46,7 +47,9 @@ static struct Design_Letters
             if( x&0x80 ){ glEnd(); glBegin( GL_LINE_STRIP ); }     // == H-B=21
             glVertex2d( (x&0x7F)+X,y+Y );
           } glEnd(); X+=w;
-    } } } while( *S ); glLineWidth( lw );
+        }
+      }
+    } while( *S ); glLineWidth( lw );
   }
 } Design;
 //
@@ -91,8 +94,8 @@ SIZE Place::AlfaRect( const char *S )         // на выход подаютс�
 char* UtOEM( char &s, char *U, unsigned &u );   // UTF-8 -> Russian-OEM(866)alt
 static
 void _OutBitText( const char *str, byte *bit, Real &X,Real &Y,Real bX )
-{ int w=bit[0]+1,h=bit[1]+2; char b,*s=(char*)str;    // в разборе контролируется
-  unsigned u; fixed c;
+{ int w=bit[0]+1,h=bit[1]+2; char b,*s=(char*)str;  // в разборе контролируется
+  unsigned u; fixed c;                              //
    glPushClientAttrib( GL_CLIENT_PIXEL_STORE_BIT ); // переход на новую строку
    glPixelStorei( GL_UNPACK_SWAP_BYTES,false );    // Step through the string,
    glPixelStorei( GL_UNPACK_LSB_FIRST,false );    //  drawing each character.
@@ -102,7 +105,7 @@ void _OutBitText( const char *str, byte *bit, Real &X,Real &Y,Real bX )
    glPixelStorei( GL_UNPACK_ALIGNMENT,  1 );      // point back to the start of
    while( *s )                                    // the line and down one line
    { s=UtOEM( b,s,u ); c=b;
-     if( c==255 )               // в OEM здесь чисто, в DispCCCP ≡ пробел '‥'
+     if( c==255 )                 // в OEM здесь чисто, в DispCCCP ≡ пробел '‥'
      { if( u==1025 )c=256; else if( u==1105 )c=257; else  // 'Ё'+'ё'
        if( u==171 )c=258; else if( u==187 )c=259;         // '«'+'»' - continue
      }
@@ -123,7 +126,7 @@ void Place::String( const char *T )
     Design.Write( (char*)T,chX,chY,X,L.Thin );
   } else                                    //! три варианта растра DOS-866-ОЕМ
   { RasterSector Sv( pX,pY,Width,Height );  //    раньше был ещё и Windows-1251
-    if( bX>=0 )X=bX; else { X=-bX-AlfaRect( T ).cx; }
+    if( bX>=0 )X=bX; else X=-bX-AlfaRect( T ).cx;
     glRasterPos2i( chX,chY-L.Th );
     _OutBitText( T,L.Bit,chX,chY,X );
 } }
@@ -144,9 +147,10 @@ void Place::String( const char *T, Real x,Real y )
 //
 void Place::String( Course Dir, const Real *P, const char* T )
 { LFont; TextContext St; SIZE sz;
- Real dx,dy; char *str=(char*)T;
+ Real dx,dy; char *str=(char*)T; GLboolean vPos;
 //if( L.Bit )str=UtOEM( T );                 // выбор DOS-866 строчки в буфер
   glRasterPos3d( P[0],P[1],P[2] );           // плоская надпись со смещением
+  glGetBooleanv( GL_CURRENT_RASTER_POSITION_VALID,&vPos ); if( !vPos )return;
   sz=AlfaRect( T );      dx=-sz.cx/2;        // разбор типа записи внутри...
   if( Dir&_East  )dx= 4; dy=-sz.cy/6;        // сдвиги и переносы строк
   if( Dir&_West  )dx=-sz.cx - 4;             // здесь отключены
@@ -154,12 +158,10 @@ void Place::String( Course Dir, const Real *P, const char* T )
   if( Dir&_South )dy=-sz.cy + 3;
   if( L.Bit )
   { glBitmap( 0,0,0,0,dx,dy,NULL ); _OutBitText( str,L.Bit,dx,dy,1 ); } else
-  { static int P[4]={ 0,0,0,0 };              // для выборки новой позиции chX
+  { static int P[4]={ 0,0,0,0 };             // для выборки новой позиции chX
     Real Scale=(Real)(L.Th)/Design.H;
-    glGetIntegerv( GL_CURRENT_RASTER_POSITION,P );     //dy-=Design.H;
-                     P[0]+=dx*Scale; P[1]+=(dy-Design.B)*Scale;
-//  RasterSector Sv( pX,pY,Width,Height,Scale );
-//  RasterSector Sv( P[0],P[1],P[0]+1,P[1]+1,Real( Th )/Design.H );
+    glGetIntegerv( GL_CURRENT_RASTER_POSITION,P );
+                   P[0]+=dx*Scale; P[1]+=(dy-Design.B)*Scale;
     RasterSector Sv( P[0],P[1],P[0]+Width,P[1]+Height,Scale );
     Design.Write( str,dx=0,dy=0,1,L.Thin );
 } }
@@ -176,11 +178,12 @@ Place& Place::Text( Course Dir, const Real *P, const char* fmt, ... )
 Place& Place::Text( Course Dir,_Real X,_Real Y,_Real Z, const char* fmt, ... )
      { Arg( Dir,(const Real[]){X,Y,Z},s )Str }
 
-/*  == не п(р)о(д)ходит
+/*  == не п(р)о(д)ходит ~~ оттенение букв утолщением с обратным цветом
     Real _x=X,_y=Y;
     for( int xr=1; xr>=0; xr--  )
     {  if( xr>0 )glEnable( GL_COLOR_LOGIC_OP ),glLogicOp( GL_XOR );
        else     glDisable( GL_COLOR_LOGIC_OP ),glLogicOp( GL_COPY );
        char *S=(char*)Str; X=_x; Y=_y; glLineWidth( Thin + xr*10 ); ... glFlush();
     }
+if( glGetError()==GL_INVALID_VALUE )return;
 */

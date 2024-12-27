@@ -305,14 +305,13 @@ Real Field::Value( Vector A )
 //! дополнение морских координат уровнем поверхности воды
 //
 #if 1
-Vector Field::Locas( Vector P ){ P.z = Value( P ); return *(Vector*)(&P); }
+Vector Field::Locas( Vector P ){ P.z = Value( P ); return P; }
 #else
 Vector Field::Locas( Vector P )
-{ Vector &W=*(Vector*)(&P); W.z=0;
-  W.z = Wind.Wave( Tlaps*3600,W ).z
-     + Swell.Wave( Tlaps*3600,W ).z   // координаты хранятся в исходном массиве
-     + Surge.Wave( Tlaps*3600,W ).z;
-  return W;                           //
+{ P.z=0;
+  P.z = Wind.Wave( Tlaps*3600,P ).z
+     + Swell.Wave( Tlaps*3600,P ).z   // координаты хранятся в исходном массиве
+     + Surge.Wave( Tlaps*3600,P ).z; return P;
 }
 #endif
 //
@@ -353,14 +352,14 @@ int Waves::Slick( _Vector A, _Vector B, _Vector N )
   Real Rx=Mx/2+A.X/Ds,Ry=My/2+A.Y/Ds;           //    и отражающей способности
    x=minmax( 0,(int)floor( Rx ),Mx );           // поиск индексов ближней точки
    y=minmax( 0,(int)floor( Ry ),My );           // внутри оконтуривающей ячейки
-   APoint( w=*((Vector*)(&A)),y,x,H,My,My );
+   APoint( w=A,y,x,H,My,My );
 
    Rx=Mx/2+B.X/Ds,Ry=My/2+B.Y/Ds;
    dx=minmax( 0,(int)floor( Rx ),Mx );          // поиск индексов ближней точки
    dy=minmax( 0,(int)floor( Ry ),My );          // внутри оконтуривающей ячейки
-   APoint( w=*((Vector*)(&B)),dy,dx,H,My,My );
-                                            // AVid( w=*((Vector*)(&A)),y,x );
-                                           // AVid( w=*((Vector*)(&B)),dy,dx );
+   APoint( w=B,dy,dx,H,My,My );
+                                            // AVid( w=A,y,x );
+                                            // AVid( w=B,dy,dx );
    ly=( dy-=y )<0 ? -1:1;
    lx=( dx-=x )<0 ? -1:1;
    if( dx*lx>dy*ly )for( k=0; k<dx*lx; k++ )Square( V,N,y+(lx*k*dy)/dx,x+lx*k );

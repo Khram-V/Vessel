@@ -150,7 +150,7 @@ Window::Window( const char *_title, int x,int y, int w,int h )
 //ScreenWidth( GetSystemMetrics( SM_CXSCREEN ) ),
 //ScreenHeight( GetSystemMetrics( SM_CYSCREEN ) ),
   WindowX( CW_USEDEFAULT ),WindowY( CW_USEDEFAULT ),
-  isTimer( 0 ),isMouse( false ), mSec( 0 ),idEvent( 0x12 ),
+  isTimer( 0 ),isMouse( false ),mSec( 0 ),idEvent( 0x12 ),
   KeyPos( 0 ),KeyPas( 0 ),onKey( false ),extKey( NULL ),extTime( NULL )
 { ATOM atom;
   WNDCLASSW wc;
@@ -284,7 +284,8 @@ static fixed WinAsyncKeyStates( fixed code=0 )          // простой опр
   if( GetAsyncKeyState( VK_RMENU    ) )code|=R_ALT; return code;
 }
 #define lKey 0x3F               // маска(длина) клавиатурного буфера=64 символа
-void Window::PutChar( fixed Key )     // занесение одного символа и его кода
+
+void Window::PutChar( fixed Key )        // занесение одного символа и его кода
 { KeyBuffer[++KeyPas&=lKey].Key=Key;          // в кольцевой буфер для символов
   KeyBuffer[KeyPas].Code=WinAsyncKeyStates();  // и клавиш управляющих аккордов
   if( KeyPas==KeyPos ){ MessageBeep(MB_OK); ++KeyPos&=lKey; }  // сброс-перебор
@@ -300,17 +301,14 @@ bool Window::KeyBoard( fixed key )// виртуальная процедура �
               return extKey( key ); // true - символ принят, false - к возврату
   } return false; //!KeyPas!=KeyPos; либо все недочитанные символы сбрасываются
 }
-//#define retkey return wctob( KeyBuffer[KeyPos].Key );
-//#define retkey { fixed r=KeyBuffer[KeyPos].Key; return r<128?r:wctob( r ); }
-//
 //!  Обращение к клавиатуре через активное и контекстно настроенное окно Window
 //                  ! осторожно, здесь предполагается отсутствие вызовов OpenGL
-fixed Window::WaitKey()    // стандартный цикл ожидания нового символа в Windows
-{ onKey=true;  while( KeyPos==KeyPas )                   // || isTimer>0 )
-                    { if( !WinRequest() )WaitMessage();  // ожидание символа כל
-                      if( !Site )return onKey=false; }   //  в том же окне
-  onKey=false; return KeyBuffer[ ++KeyPos&=lKey ].Key;   //   wctob( key )=>
-}                                                        //    Uni16=>Win1251
+fixed Window::WaitKey()   // стандартный цикл ожидания нового символа в Windows
+{ onKey=true; while( KeyPos==KeyPas )                    // || isTimer>0 )
+  { if( !WinRequest( hWnd ) )WaitMessage();              // ожидание символа כל
+    if( !Site )return onKey=false;                       //   в том же окне:
+  } onKey=false; return KeyBuffer[ ++KeyPos&=lKey ].Key; //   wctob( key )=>
+}                                                        //   Uni16=>Win1251
 fixed Window::GetKey()         // запрос появления нового символа на клавиатуре
    { if( KeyPas==KeyPos )return 0; return KeyBuffer[ ++KeyPos&=lKey ].Key; }
 #undef lKey
@@ -390,17 +388,20 @@ bool Window::Timer()// контроль транзакций, вызов про�
 //
 static bool (*extFree)()=NULL;      // процедура главного вычислительного цикла
 static DWORD mWait=0,mWork=0;       // время задержки и циклов по исполнению
-static UINT_PTR tId=16;             // идентификатор нового прерывания
+static UINT_PTR tId=11;             // базовый идентификатор общего прерывания
 
 static void CALLBACK TimerProc( HWND hWind,UINT uMsg,UINT_PTR timerId,DWORD St)
-{ if( hWind )
+{ if( hWind )                                 // при достижении очереди таймера
   { Window *Win=Find( hWind );                // исполнение в контекстной среде
-    if( Win )
-    { if( !Win->mSec )Win->isTimer=0; else
+    if( Win )if( timerId==Win->idEvent )
+    { if( !Win->mSec )Win->isTimer=0; else    // при завершении всех транзакций
       if( !Win->isTimer )  // настройка OpenGL контекстным эпилогом перерисовки
-      { glContext S( Win ); bool St; Win->isTimer++; St=Win->Timer(); // запрос
-                                     Win->isTimer--;
-        if( St )Win->Save().Refresh(); WinExecute( Win->hWnd );
+      { glContext S( Win ); Win->isTimer++;
+//      ::KillTimer( hWind,timerId );
+        if( Win->Timer() )Win->Save().Refresh();           // запрос транзакции
+//      ::SetTimer( hWind,timerId,Win->mSec,TimerProc );   // ...заведомо старт
+        WinExecute();                                      // и для верности...
+        Win->isTimer--;
     } } return;                      // фиксируется фоновая подложка всего окна
   }
   if( tId!=timerId )return;              // всякие Sleep и т.п. пусть идут мимо
@@ -418,13 +419,14 @@ static void CALLBACK TimerProc( HWND hWind,UINT uMsg,UINT_PTR timerId,DWORD St)
   } else mWait=0;
 }
 Window& Window::SetTimer( DWORD mS,bool(*inTm)() )    // время+адрес исполнения
-{ if( !mS )KillTimer(); else                          //  включается таймер №12
+{ WinExecute();                                       // исполнение проходящего
+  if( !mS )KillTimer(); else                          // включается таймер №12+
   { ::SetTimer( hWnd,idEvent,mSec=mS,TimerProc ); extTime=inTm; // выбор адреса
   } return *this;
 }
 Window& Window::KillTimer()
-{ if( mSec )                             // приостановка с ожиданием завершения
-  { mSec=0; while( isTimer>0 )if( !WinRequest() )WaitMessage();
+{ if( mSec )                    // полная остановка без ожидания ранее начатого
+  { mSec=0; WinExecute(); //while( isTimer>0 )if( !WinRequest() )WaitMessage();
     extTime=NULL; ::KillTimer( hWnd,idEvent );        // теряется внешняя связь
   } return *this;
 }
@@ -434,7 +436,7 @@ DWORD WaitTime( DWORD Wait,        // активная задержка для �
 { extFree=inStay,mWork=Work,mWait=Wait;               // инициализация таймеров
   if( Wait )tId=::SetTimer( 0,0,Wait,TimerProc );     // כל = (со всеми окнами)
   while( mWait )if( !WinRequest() )WaitMessage();     // ожидание чистки mWait
-  return RealTime;                      // выход в особом случае
+  return RealTime;                                    // выход в особом случае
 }
 //  ...  все согласованные процедуры объединяются в единый модуль интерактивной
 //  графической среды Window::Place в/исключая независимые операции с Юлианским
@@ -466,6 +468,10 @@ void Break( const char Msg[],... )    // Случай аварийного за�
 #if 0
 Window& Above(){ SetForegroundWindow( hWnd ); SetFocus( hWnd );
   SetActiveWindow( hWnd ); ShowWindow( hWnd,SW_SHOWNA ); return Refresh(); }
-//while( isTimer>0 )if( !WinRequest() )WaitMessage(); glFinish(); WinExecute();
-//while( isTimer>0 )if( !WinRequest( hWnd ) )WaitMessage();
+  while( isTimer>0 )if( !WinRequest() )WaitMessage(); glFinish(); WinExecute();
+  while( isTimer )if( !WinRequest() )WaitMessage(); // до перезапуска таймера
+static void CALLBACK TimerProc( HWND hWind,UINT uMsg,UINT_PTR timerId,DWORD St);
+if( mSec )::SetTimer( hWnd,idEvent,mSec,TimerProc ); // ...заведомо старт
+#define retkey return wctob( KeyBuffer[KeyPos].Key );
+#define retkey { fixed r=KeyBuffer[KeyPos].Key; return r<128?r:wctob( r ); }
 #endif
