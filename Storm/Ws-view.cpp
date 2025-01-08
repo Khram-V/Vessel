@@ -138,17 +138,20 @@ bool Field::Draw()
             C =   ColorSelect( C,Swell.Color( Swell.Amd( W ).z ) );
         Clr[y][x]=ColorSelect( C,Surge.Color( Surge.Amd( W ).z ) )+black+1;
       }
+//#define R ((x&1)^(y&1)?0:0.1*( 0.5-Real( rand() )/RAND_MAX ))
+//#define R 0.1*( 0.5-Real( rand() )/RAND_MAX )
      bool f2=Exp.view&2 && !Exp.draw;          // Тёмная вода на четыре уровня
       while( true )
       { for( int y=0; y<mY-k; y+=k )           // тёмная вода в световых оттенках
         { glBegin( GL_QUAD_STRIP );            // раскраска общего волнового поля
           for( int x=0; x<mX; x+=k )           // в оттенках сине-зеленого цветов
           { Vector &p=Ws[y][x],&q=Ws[y+k][x];
+            Real R=0.1*( 0.4-Real( rand()  )/RAND_MAX );
             if( x<mX-k )glNormal3dv( (q-p)*(Ws[y][x+k]-p) );
             if( Exp.view&2 )color( colors(Clr[y+k][x]),0.1,1 ),dot( q ),
                             color( colors(Clr[y][x]),  0.1,1 ),dot( p );
-                      else  color( colors(Clr[y+k][x]),0,0.9 ),dot( q ),
-                            color( colors(Clr[y][x]),  0,0.9 ),dot( p );
+                      else  color( colors(Clr[y+k][x]),R,.82 ),dot( q ), // (Vector){ q.x,q.y,q.z+R } ),
+                            color( colors(Clr[y][x]),  R,.82 ),dot( p ); // (Vector){ p.x,p.y,p.z+R } );
           } glEnd();
         }
         if( f2 ){ glPolygonMode( GL_FRONT,GL_LINE ); f2=0; continue; } else break;

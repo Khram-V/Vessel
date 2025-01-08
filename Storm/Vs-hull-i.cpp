@@ -140,8 +140,8 @@ static bool Span( int l, int r )
 #if 1
 { //return fabs( dir(R[r+1]-R[r])%dir(R[r+1]-L[l]) )
   //     < fabs( dir(L[l+1]-L[l])%dir(L[l+1]-R[r]) );
-  //return dir( R[r+1]-L[l] ).x > dir( R[r]-L[l+1] ).x; // горизонтальная линия
-    return norm( R[r+1]-L[l] ) < norm( R[r]-L[l+1] );  // кратчайшее обновление
+  //return dir( R[r+1]-L[l] ).x > dir( R[r]-L[l+1] ).x;
+    return norm( R[r+1]-L[l] ) < norm( R[r]-L[l+1] );
 #else
 { static Vector blr={0,0,-1};
  Vector Base =R[r]-L[l], Right=dir( Base*(R[r+1]-R[r]) ),
@@ -347,8 +347,8 @@ Ok:
       //!            перестройка и оптимизация последовательности треугольников
       //                                     по всему покрытию бортовой обшивки
       //
-     int signLb=0,signRb=0,            // +1 надводный борт; -1 смоченная часть
-         wl=0,wr=0,zl,zr,              // индексы поиска по контурам шпангоутов
+     bool signBoard=false;             // +1 надводный борт; -1 смоченная часть
+     int wl=0,wr=0,zl,zr,              // индексы поиска по контурам шпангоутов
          sl=0,sr=0;                    // ... от третьих точек
       Ins( n )=lf[0],Ins( n )=rf[0];   // левая точка впереди - это существенно
 #if 0
@@ -375,43 +375,43 @@ Ok:
       for( wr=R.len-1; wr>sr; wr-- )if( R[wr].z<=0.0 )break;
 #endif
       // Две начальные точки уже в рабочем списке, ищем фрагмент одного знака
-//   int zl=sl,zr=sr;                // опорные точки s# уже занесены в обшивку
-//    wl=L.len;                      // контрольные z# только ожидают обработки
-//    wr=R.len;                      // ограничивающие w# к ватерлинии и палубе
       //
-Sign_Fragment: signLb=signRb=0;
-      //
-      /// разделение полос подводной обшивки и надводного борта с надстройками
-      //
-      if((zl=wl)<L.len ){ if(L[wl].z<0)signLb=-1; else if(L[wl].z>0)signLb=1; }
-      if((zr=wr)<R.len ){ if(R[wr].z<0)signRb=-1; else if(R[wr].z>0)signRb=1; }
+Sign_Fragment: signBoard=false;
 
-      if( zl<L.len )while( ++zl<L.len )
-        { if( !(L[zl].z) )break; else       // здесь, видимо, нужна новая точка
-          if( L[zl-1].z*L[zl].z<0 ){ break; } else // ??? смена знака !!!
-          { if( !signLb && L[zl].z ){ signLb=L[zl].z<0?-1:1;
-              if( signLb*signRb<0 ){ --zl; signLb=0; break; }
-        } } }
-      if( signLb*signRb<0 ){ zr=wr; signRb=0; } else
-      if( zr<R.len )while( ++zr<R.len )
-        { if( !(R[zr].z) )break; else
-          if( R[zr-1].z*R[zr].z<0 ){ break; } else // ??? смена знака !!!
-          { if( !signRb && R[zr].z ){ signRb=R[zr].z<0?-1:1;
-              if( signLb*signRb<0 ){ --zr; signRb=0; break; }
-        } } }
-//if( signLb*signRb<0 )
-//Break( "~ <%d:%d> n=%d[%dx%d], L=%d->%d, R=%d->%d",signLb,signRb,n,L.len,R.len,sl,wl,sr,wr );
+      while( sl<L.len-1 )if( !L[sl+1].z )sl++; else break;  // сброс нулевых
+      while( sr<R.len-1 )if( !R[sr+1].z )sr++; else break;
+//      if( sl<L.len-1 )signBoard=L[sl+1].z>0; else
+//      if( sr<R.len-1 )signBoard=R[sr+1].z>0; // else wl=L.len,wr=R.len;
 
-//    if( zl==L.len )zr=R.len;
-//    if( zr==R.len )zl=L.len;
-      if( zl==L.len ){ if( L[zl-1].z*R[R.len-1].z>=0 )zr=R.len; } //else zr=min( wr+1,R.len ); }
-      if( zr==R.len ){ if( R[zr-1].z*L[L.len-1].z>=0 )zl=L.len; } //else zl=min( wl+1,L.len ); }
-      wl=zl; zl=sl;
-      wr=zr; zr=sr;
-      ///
-      //
+      while( wl<L.len || wr<R.len )
+      {
+#if 0
+        if( wl<L.len-1 )++wl; else { wl=L.len; wr=R.len; break; }
+        if( wr<R.len-1 )++wr; else { wr=R.len; wl=L.len; break; }
+#else
+        if( ++wl>=L.len ){ wl=L.len;
+          while( wr<R.len )if( L[sl].z>0 ){ if( R[wr].z>0 )++wr; else break; }
+                                    else { if( R[wr].z<=0 )++wr; else break; } break; }
+        if( ++wr>=R.len ){ wr=R.len;
+          while( wl<L.len )if( R[sr].z>0 ){ if( L[wl].z>0 )++wl; else break; }
+                                    else { if( L[wl].z<=0 )++wl; else break; } break; }
+#endif
+        if( !L[wl].z && !R[wr].z )break; else
+        if( !L[wl].z )--wl; else
+        if( !R[wr].z )--wr;
+//      if( fabs( L[wl].z )<eps && fabs( R[wr].z )<eps )break;
+//      if( fabs( L[wl].z )<eps )--wl;
+//      if( fabs( R[wr].z )<eps )--wr;
+      }
+      zl=sl;
+      zr=sr;
+//      if( wl==L.len )wr=R.len;
+//      if( wr==R.len )wl=L.len;
+
+//Break( "~%s: n=%d[%dx%d], L=%d->%d, R=%d->%d",signBoard?"Up":"Down",n,L.len,R.len,sl,wl,sr,wr );
+
 //    if( L[sl].z<0 || R[sr].z<0 )
-      if( signLb<=0 && signRb<=0 )
+      if( !signBoard )
       { //
         //! простое последовательное построения сначала подводных обводов
         //          и затем надводного борта с множеством сломов на надстройках
@@ -428,31 +428,38 @@ Sign_Fragment: signLb=signRb=0;
         if( r<=sr )Ins( n,s-- )=lf[l--]; else   // четырехугольника, по возможности
         if( !Span( l-1,r-1 ) )Ins( n,s-- )=rf[r--];
                         else  Ins( n,s-- )=lf[l--];
-      } else     // .перенастройка и продолжение оптимизации по бортовым сломам
+      } else
+      //
+      ///          !.перенастройка и продолжение оптимизации по бортовым сломам
+//     int zl=sl,zr=sr;                // опорные точки s# уже занесены в обшивку
+//      wl=L.len;                      // контрольные z# только ожидают обработки
+//      wr=R.len;                      // ограничивающие w# к ватерлинии и палубе
       do
       { //       предварительный просмотр поверхности с поиском бортовых сломов
         // выбирается углы хорд относительно обоих локалей шпангоутных контуров
         //
        const Real C24=0.8;                    //.9135454576;
         if( sl==zl && sr==zr )                // обход начальных предустановок
-        { int l=wl-zl,r=wr-zr;            // поиске всего от киля до палубы
+        { int l=wl-zl,r=wr-zr;                // поиске всего от киля до палубы
           while( l>0 || r>0 )                 //    по индексам бортовых сломов
           { if( zl>=wl-2 || zr>=wr-2 )        // палуба перекрывается без каких
               { zl=wl; zr=wr; break; }        //  - либо дополнительных условий
             lfr=Span( zl,zr );
-            if( lfr )goto Rst;                //...подтягивается к правой точке
-        Lst:if( l>0 )
+            if( lfr )goto Rst;                // ..подтягивается к правой точке
+       Lst: if( l>0 )
             { if( ++zl>=wl-1 )zl=wl,l=0; else
               if( L[zl-1]==L[zl] || dir(L[zl+1]-L[zl])%dir(L[zl]-L[zl-1])<C24 )
                 { l=0; if( r>0 )r=2; }
-              else if( l>=0 )--l; continue;
+              else if( l>=0 )--l;
+              continue;
             }
             if( lfr )continue;
-        Rst:if( r>0 )
+       Rst: if( r>0 )
             { if( ++zr>=wr-1 )zr=wr,r=0; else // на точку ниже последнего слома
               if( R[zr-1]==R[zr] || dir(R[zr+1]-R[zr])%dir(R[zr]-R[zr-1])<C24 )
                 { r=0; if( l>0 )l=2; }
-              else if( r>=0 )--r; continue;
+              else if( r>=0 )--r;
+              continue;
             }   // точка слома, три попытки слева, левый отстаёт ниже горизонта
             if( lfr )goto Lst;
           }
@@ -492,8 +499,8 @@ Sign_Fragment: signLb=signRb=0;
         while( sr<wr-1 )if( R[sr]==R[sr+1] )zr=++sr; else break;
       } while( zl<wl || zr<wr );
       sl=wl; sr=wr;
-//      if( wl<L.len )++wl;
-//      if( wr<R.len )++wr;
+//    if( wl<L.len )++wl;
+//    if( wr<R.len )++wr;
       if( wl<L.len || wr<R.len )goto Sign_Fragment;           // к новой шпации
     }
     //     небольшая перенастройка визуализации сцены с кораблем

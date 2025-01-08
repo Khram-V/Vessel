@@ -375,9 +375,6 @@ Ok:
       for( wr=R.len-1; wr>sr; wr-- )if( R[wr].z<=0.0 )break;
 #endif
       // Две начальные точки уже в рабочем списке, ищем фрагмент одного знака
-//   int zl=sl,zr=sr;                // опорные точки s# уже занесены в обшивку
-//    wl=L.len;                      // контрольные z# только ожидают обработки
-//    wr=R.len;                      // ограничивающие w# к ватерлинии и палубе
       //
 Sign_Fragment: signLb=signRb=0;
       //
@@ -385,18 +382,18 @@ Sign_Fragment: signLb=signRb=0;
       //
       if((zl=wl)<L.len ){ if(L[wl].z<0)signLb=-1; else if(L[wl].z>0)signLb=1; }
       if((zr=wr)<R.len ){ if(R[wr].z<0)signRb=-1; else if(R[wr].z>0)signRb=1; }
-
+C:\Users\Khram\Vasily\Khram\WSpace\Fortran origin sources.cbp
       if( zl<L.len )while( ++zl<L.len )
         { if( !(L[zl].z) )break; else       // здесь, видимо, нужна новая точка
-          if( L[zl-1].z*L[zl].z<0 ){ break; } else // ??? смена знака !!!
-          { if( !signLb && L[zl].z ){ signLb=L[zl].z<0?-1:1;
-              if( signLb*signRb<0 ){ --zl; signLb=0; break; }
+          { if( !signLb ){ signLb=L[zl].z<=0?-1:1;
+              if( L[zl-1].z*L[zl].z<0 || signLb*signRb<0 ){ --zl; signLb=0; break; }
+  //          if( signLb*signRb<0 ){ --zl; signLb=0; break; }
         } } }
       if( signLb*signRb<0 ){ zr=wr; signRb=0; } else
       if( zr<R.len )while( ++zr<R.len )
         { if( !(R[zr].z) )break; else
-          if( R[zr-1].z*R[zr].z<0 ){ break; } else // ??? смена знака !!!
-          { if( !signRb && R[zr].z ){ signRb=R[zr].z<0?-1:1;
+          { if( !signRb ){ signRb=R[zr].z<=0?-1:1;
+//            if( R[zr-1].z*R[zr].z<0 || signLb*signRb<0 ){ signRb=0; break; }
               if( signLb*signRb<0 ){ --zr; signRb=0; break; }
         } } }
 //if( signLb*signRb<0 )
@@ -404,8 +401,8 @@ Sign_Fragment: signLb=signRb=0;
 
 //    if( zl==L.len )zr=R.len;
 //    if( zr==R.len )zl=L.len;
-      if( zl==L.len ){ if( L[zl-1].z*R[R.len-1].z>=0 )zr=R.len; } //else zr=min( wr+1,R.len ); }
-      if( zr==R.len ){ if( R[zr-1].z*L[L.len-1].z>=0 )zl=L.len; } //else zl=min( wl+1,L.len ); }
+      if( zl==L.len ){ if( L[zl-1].z*R[R.len-1].z>0 )zr=R.len; } //else zr=min( wr+1,R.len ); }
+      if( zr==R.len ){ if( R[zr-1].z*L[L.len-1].z>0 )zl=L.len; } //else zl=min( wl+1,L.len ); }
       wl=zl; zl=sl;
       wr=zr; zr=sr;
       ///
@@ -428,7 +425,12 @@ Sign_Fragment: signLb=signRb=0;
         if( r<=sr )Ins( n,s-- )=lf[l--]; else   // четырехугольника, по возможности
         if( !Span( l-1,r-1 ) )Ins( n,s-- )=rf[r--];
                         else  Ins( n,s-- )=lf[l--];
-      } else     // .перенастройка и продолжение оптимизации по бортовым сломам
+      } else
+      //
+      ///          !.перенастройка и продолжение оптимизации по бортовым сломам
+//     int zl=sl,zr=sr;                // опорные точки s# уже занесены в обшивку
+//      wl=L.len;                      // контрольные z# только ожидают обработки
+//      wr=R.len;                      // ограничивающие w# к ватерлинии и палубе
       do
       { //       предварительный просмотр поверхности с поиском бортовых сломов
         // выбирается углы хорд относительно обоих локалей шпангоутных контуров
