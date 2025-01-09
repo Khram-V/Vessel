@@ -128,30 +128,34 @@ bool Field::Draw()
         color( p.z>0?Surf:Subw,-0.1,Exp.view&2?1:0.75 ),dot( p );
       } glEnd();
     } else
-    { static int nx=0,ny=0,**Clr=NULL;       //  сборная цветовая матрица
+    { static int nx=0,ny=0,r=1,**Clr=NULL; //r=-r;   //  сборная цветовая матрица
       if( mY>ny || mX>nx )Clr=(int**)Allocate( ny=mY,(nx=mX)*sizeof(int),Clr );
+      if( !(Kt%3) )r=-r;
 #pragma omp parallel for
       for(int y=0;y<mY;y++) // выборка расцветки волновых склонов выполняется с
       for(int x=0;x<mX;x++) //  раздельным использованием исходных пакетов волн
       { Vector &W=Ws[y][x];
-        int C =   ColorSelect( C=0,Wind.Color( Wind.Amd( W ).z ) );
-            C =   ColorSelect( C,Swell.Color( Swell.Amd( W ).z ) );
-        Clr[y][x]=ColorSelect( C,Surge.Color( Surge.Amd( W ).z ) )+black+1;
+        int C=ColorSelect( C=0,Wind.Color( Wind.Amd( W ).z ) );
+            C=ColorSelect( C,Swell.Color( Swell.Amd( W ).z ) );
+            C=ColorSelect( C,Surge.Color( Surge.Amd( W ).z ) );
+        if( !(Exp.view&2) )C=minmax( 0,C+(r*( x&2^y&2?12:-12 )*rand())/RAND_MAX,255 ); //*(x&1?-1:1)*(y&1?-1:1)),255);
+//          C=minmax(0,int(C*(1.0+0.12*(0.5-Real(rand())/RAND_MAX))),255);
+            Clr[y][x]=C+black+1;
       }
-//#define R ((x&1)^(y&1)?0:0.1*( 0.5-Real( rand() )/RAND_MAX ))
-//#define R 0.1*( 0.5-Real( rand() )/RAND_MAX )
-     bool f2=Exp.view&2 && !Exp.draw;          // Тёмная вода на четыре уровня
+     bool f2=Exp.view&2 && !Exp.draw;   // Тёмная вода на четыре уровня
+      glNormal3i( 0,0,-1 ); //static int r=0; r^=1;
       while( true )
-      { for( int y=0; y<mY-k; y+=k )           // тёмная вода в световых оттенках
-        { glBegin( GL_QUAD_STRIP );            // раскраска общего волнового поля
-          for( int x=0; x<mX; x+=k )           // в оттенках сине-зеленого цветов
-          { Vector &p=Ws[y][x],&q=Ws[y+k][x];
-            Real R=0.1*( 0.4-Real( rand()  )/RAND_MAX );
-            if( x<mX-k )glNormal3dv( (q-p)*(Ws[y][x+k]-p) );
+      { for( int y=0; y<mY-k; y+=k )         // тёмная вода в световых оттенках
+//      { glBegin( GL_QUAD_STRIP );          // раскраска общего волнового поля
+        { glBegin( GL_TRIANGLE_STRIP );     // раскраска общего волнового поля
+          for( int x=0; x<mX; x+=k )         // в оттенках сине-зеленого цветов
+          { Vector &p=Ws[y][x],&q=Ws[y+k][x]; //Real R;
+//          if( x<mX-k )glNormal3dv( (q-p)*(Ws[y][x+k]-p) );
             if( Exp.view&2 )color( colors(Clr[y+k][x]),0.1,1 ),dot( q ),
                             color( colors(Clr[y][x]),  0.1,1 ),dot( p );
-                      else  color( colors(Clr[y+k][x]),R,.82 ),dot( q ), // (Vector){ q.x,q.y,q.z+R } ),
-                            color( colors(Clr[y][x]),  R,.82 ),dot( p ); // (Vector){ p.x,p.y,p.z+R } );
+                      else  //R=(r&1^x&1^y&1?-.075:.075)*Real(rand())/RAND_MAX,
+                            color( colors(Clr[y+k][x]),0,.82 ),dot( q ),
+                            color( colors(Clr[y][x]),0,.82 ),dot( p );
           } glEnd();
         }
         if( f2 ){ glPolygonMode( GL_FRONT,GL_LINE ); f2=0; continue; } else break;

@@ -93,12 +93,12 @@ bool View::KeyBoard( fixed key )   // к спуску из внешних вир
 //+glEnable   ( GL_CULL_FACE );        // включение режима отбора треугольников   glHint     ( GL_POINT_SMOOTH_HINT,GL_NICEST );   glEnable   ( GL_POINT_SMOOTH );   glPointSize( 1.0 );   glHint     ( GL_LINE_SMOOTH_HINT,GL_NICEST );   glEnable   ( GL_LINE_SMOOTH );     // сглаживание линий   glLineWidth( 1.0 );
    glPolygonMode( GL_FRONT,GL_FILL );
    glPolygonMode( GL_BACK,GL_LINE ); //POINT );
-   glShadeModel( GL_SMOOTH );       // FLAT закраска с использованием полутонов
    glHint     ( GL_POLYGON_SMOOTH_HINT,GL_NICEST );   glEnable   ( GL_POLYGON_SMOOTH); // Really Nice Perspective Calculations   glHint     ( GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST );   glBlendFunc( GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA );
+   glShadeModel( GL_SMOOTH );       // FLAT закраска с использованием полутонов
    glAlphaFunc( GL_ALWAYS,0 );
+   glEnable( GL_BLEND );
    glEnable( GL_DITHER );               // Предопределение графической среды
    glEnable( GL_ALPHA_TEST );
-   glEnable( GL_BLEND );
    glFogi( GL_FOG_MODE,GL_EXP2 );       //   GL_EXP2
    glFogf( GL_FOG_DENSITY,1.0/D );      //    0.0016
    glFogf( GL_FOG_START,-D );           // -Distance

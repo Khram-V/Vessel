@@ -92,7 +92,7 @@ void e6( Vector &W )        // округление записи для точн
 Real& angle( Real &A ){ return A=remainder( A,_Pd  ); }           // -180°÷180°
 //{ if( A>=0 )A=fmod( A,_Pd ); else A=_Pd-fmod(-A,_Pd ); return A; } // 0°÷360°
 Real angle( _Real A,_Real B ){ return remainder( A-B,_Pd ); }     // A-B: -п÷п
-Vector& angle( Vector &A){ angle( A.x ),angle( A.y ),angle( A.z ); return A; }
+Vector angle( Vector A){ angle( A.x ),angle( A.y ),angle( A.z ); return A; }
 Vector operator ~(_Vector v){ return (Vector){v.x,-v.y,v.z}; } // другого борта
 //
 //    ... из точки (a) в точку (b) с объемной стрелкой в долях её длины

@@ -312,7 +312,7 @@ void e6( Vector &W );         // округление записи для точ
 void e6( Real &R );
 Real& angle( Real &A );                  // -180°÷180°
 Real  angle( _Real A,_Real B );          // { A-B: -п÷п }
-Vector& angle( Vector &A );
+Vector angle( Vector A );
 Vector operator ~( _Vector );            // для другого борта
 bool intor( _Real F,_Real S,_Real G );   // с включением базовой точки G
 bool intoi( _Real F,_Real S,_Real G );   // захват

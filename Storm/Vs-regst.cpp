@@ -24,7 +24,7 @@ void logHydro(){ if( VIL ){ const byte St=Vessel->Statum;
      fprintf(VIL,"\n  ⇒ Гидромеханика[%d]: %s"+logTime(),St,Model[St]); } }
 void logStock()
 { Hull &H=*Vessel; textcolor( LIGHTBLUE );
-  print(59,24,"%s, и/сток: Kv=%g",H.lFlow?"В потоке волн":"Над гребнями",H.Kv);
+  print(59,25,"%s, и/сток: Kv=%g",H.lFlow?"В потоке волн":"Над гребнями",H.Kv);
   if( VIL )
   fprintf( VIL,"\n  ⇒ %s\n  ⇒ фактор исток/сток в условиях непротекания: kV=%g ",
     H.lFlow?"Увлечение корпуса кинематикой скоростей волновых потоков"
@@ -32,8 +32,8 @@ void logStock()
 }
 void logDamp()
 { Hull &H=*Vessel; H.DampInit(); textcolor( BROWN );
-  print(56,22,"μ√:│ ξ%.1f∫%.2f η%.1f∫%.2f ζ%.1f∫%.2f │ ",H.muF.x,H.nF.x,H.muF.y,H.nF.y,H.muF.z,H.nF.z );
-  print(57,23, "ω:│ ϑ%.1f∫%.2f ψ%.1f∫%.2f χ%.1f∫%.2f │ ",H.muM.x,H.nM.x,H.muM.y,H.nM.y,H.muM.z,H.nM.z );
+  print(56,23,"μ√:│ ξ%.1f∫%.2f η%.1f∫%.2f ζ%.1f∫%.2f │ ",H.muF.x,H.nF.x,H.muF.y,H.nF.y,H.muF.z,H.nF.z );
+  print(57,24, "ω:│ ϑ%.1f∫%.2f ψ%.1f∫%.2f χ%.1f∫%.2f │ ",H.muM.x,H.nM.x,H.muM.y,H.nM.y,H.muM.z,H.nM.z );
   if( VIL )
   { fprintf( VIL,"\n  ⇒ Демпфирование: μV{ ξ=%4.2lf, η=%4.2lf, ζ=%4.2lf };"
     " μω{ θ=%4.2lf, ψ=%4.2lf, χ=%4.2lf }, Kv=%0.2lg"+logTime(),
