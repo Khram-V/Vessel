@@ -114,7 +114,7 @@ bool View::KeyBoard( fixed key )   // к спуску из внешних вир
    glLightModeli( GL_LIGHT_MODEL_TWO_SIDE,true );
    glMaterialfv( GL_FRONT_AND_BACK,GL_AMBIENT, (const float[]){.2,.2,.2,1} ); //{1,1,1,0} );
    glMaterialfv( GL_FRONT_AND_BACK,GL_DIFFUSE, (const float[]){.8,.8,.8,1} ); //{1,1,1,0} );
-   glMaterialfv( GL_FRONT_AND_BACK,GL_SPECULAR,(const float[]){.5,.5,.5,.5}); //{1,1,1,0} );
+//   glMaterialfv( GL_FRONT_AND_BACK,GL_SPECULAR,(const float[]){.5,.5,.5,.5}); //{1,1,1,0} );
    glMaterialfv( GL_FRONT_AND_BACK,GL_EMISSION,(const float[]){.1,.1,.1,.1}); //{0,0,0,1} ); ;
    glMateriali ( GL_FRONT_AND_BACK,GL_SHININESS,255 );      // степень отсветки
    glLightfv( GL_LIGHT0,GL_AMBIENT, (const float[]){.1,.3,.2,.8}); // окружение

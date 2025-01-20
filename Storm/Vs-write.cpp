@@ -7,18 +7,20 @@
 static int fColor=-1;
 static FILE *F=NULL;
 static Real T=0.0,St=0.0;    // действующее смещение для приведения к оригиналу
+static void e5R( Real &R ){ R-=remainder( R,1e-5L ); }
+static void e5V( Vector &V ){ e5R( V.x ); e5R( V.y ); e5R( V.z ); }
 static void printF( Vector V )
-{ e6( V ); if( V.y<0 )V.y=0; fprintf( F,"v %lg %lg %lg\n",V.x,V.z,V.y );
-                             fprintf( F,"v %lg %lg %lg\n",V.x,V.z,-V.y );
+{ e5V( V ); if( V.y<0 )V.y=0; fprintf( F,"v %lg %lg %lg\n",V.x,V.z,V.y );
+                              fprintf( F,"v %lg %lg %lg\n",V.x,V.z,-V.y );
 }
-static void crossPoint( _Vector A,_Vector B,_Vector C, int a,int b,int c )
+static void crossPoint( _Vector A, _Vector B, _Vector C, int a, int b, int c )
 { if( fabs( A.y )<eps && fabs( B.y )<eps && fabs( C.y )<eps )return;
   int l=A.z<=0 && B.z<=0 && C.z<=0; // A.Z+B.Z+C.Z<=0.0;
   if( fColor!=l )fprintf( F,"usemtl %s\n",(fColor=l)?"green":"gray" );
                  fprintf( F,"f %d %d %d\n",a,b,c );
 }
-static void crossDC( Vector A,Vector B,Vector C )
-{ e6( A ); e6( B ); e6( C );
+static void crossDC( Vector A, Vector B, Vector C )
+{ e5V( A ); e5V( B ); e5V( C );
   if( fabs( A.y )<eps && fabs( B.y )<eps && fabs( C.y )<eps )return;
   fprintf(F,"31 4 1 0 0 %d\n%lg %lg %lg\n%lg %lg %lg\n%lg %lg %lg\n%lg %lg %lg\n",
   A.z<=0&&B.z<=0&&C.z<=0?3:9,

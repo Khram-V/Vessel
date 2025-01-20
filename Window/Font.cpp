@@ -4,7 +4,7 @@
 #include "Window.h"                // аппаратное окружение и стандартная среда
                                    // программирования MinGW_Microsoft-Windows
 #define _Design_len 9633           // допустимое количество букв в _Design_font
-#define LFont Font &L=Ft?*Ft:*(Site->Ft)
+#define LFont Font &L=Ft?*Ft:*(Site->Ft) // выбор активной или оконной площадки
 #include "Sym_Design.c"            //  Borland.chr + DesignCAD.vct Complex font
 
 static struct Design_Letters
@@ -109,10 +109,10 @@ void _OutBitText( const char *str, byte *bit, Real &X,Real &Y,Real bX )
      { if( u==1025 )c=256; else if( u==1105 )c=257; else  // 'Ё'+'ё'
        if( u==171 )c=258; else if( u==187 )c=259;         // '«'+'»' - continue
      }
-     if( c=='\n' ){ glBitmap( 0,0,0,0,-X+bX,-h,NULL ); X=bX; Y-=h; } else
+     if( c=='\n' ){ glBitmap( 0,0,0,0,bX-X,-h,NULL ); X=bX; Y-=h; } else
                   { glBitmap( w-1,h-2,        // Bitmap's width and height
                               -1,1,           // The origin in the font glyph
-                              w,0,            //      смещение до новой позиции
+                              w,0,            //     смещение до новой позиции
                               bit+2+c*(h-2)   //  + 2 байта и номер Х на высоту
                            ); X+=w; }         // сдвиг позиции и растра символа
    } glPopClientAttrib();                     // подготовка к следующей строчке

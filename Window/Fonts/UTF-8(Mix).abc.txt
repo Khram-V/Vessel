@@ -1,4 +1,39 @@
 ﻿
+Hex	Char	Dec	Description
+0000  ˉ NUL	0	null character
+0001  ☺ SOH	1	start of header
+0002  ☻ STX	2	start of text
+0003  ♥ ETX	3	end of text
+0004  ♦ EOT	4	end of transmission
+0005  ♣ ENQ	5	enquiry
+0006  ♠ ACK	6	acknowledge
+0007  ● BEL	7	bell (ring)
+0008  ◘ BS	8	backspace
+0009  ○ HT	9	horizontal tab
+000A  ◙ LF	10	line feed
+000B  ♂ VT	11	vertical tab
+000C  ♀ FF	12	form feed
+000D  ♪ CR	13	carriage return
+000E  ♫ SO	14	shift out
+000F  ☼ SI	15	shift in
+0010  ► DLE	16	data link escape
+0011  ◄ DC1	17	device control 1
+0012  ↕ DC2	18	device control 2
+0013  ‼ DC3	19	device control 3
+0014  ¶ DC4	20	device control 4
+0015  § NAK	21	negative acknowledge
+0016  ▄ SYN	22	synchronize
+0017  ↨ ETB	23	end transmission block
+0018  ↑ CAN	24	cancel
+0019  ↓ EM	25	end of medium
+001A  → SUB	26	substitute
+001B  ← ESC	27	escape
+001C  ∟ FS	28	file separator
+001D  ↔ GS	29	group separator
+001E  ▲ RS	30	record separator
+001F  ▼ US	31	unit separator
+007F  ⌂ DEL	127	delete (rubout)
+
       '' 128-159
 xC2A0 ' ' → 160  ←    49824
       '¡'   161
@@ -62,7 +97,7 @@ xC3B7 '÷' → 247  ← ÷  50103 = \ 246
       'Ā'   256      'ā'   257
       'Ă'   258      'ă'   259
       'Ą'   260      'ą'   261
-
+/// Греческий
 xCE84 '΄' → 900  ← ΄  52868
 xCE85 '΅' → 901  ← ΅  52869
 xCE86 'Ά' → 902  ← Ά  52870
@@ -192,7 +227,7 @@ xD087 'Ї' → 1031 ← Ї 53383
       'Ѝ'   1037
 xD08E 'Ў' → 1038 ← Ў 53390
       'Џ'   1039
-
+/// Русский
 xD090 'А' → 1040 ← А 53392
 xD091 'Б' → 1041 ← Б 53393
 xD092 'В' → 1042 ← В 53394
@@ -498,5 +533,5 @@ const short Win1251[64]={
 
 Ђ 1026  Ѓ 1027  ‚ 8218  ѓ 1107  „ 8222  … 8230  † 8224  ‡ 8225  € 8364  ‰ 8240  Љ 1033  ‹ 8249  Њ 1034  Ќ 1036  Ћ 1035  Џ 1039
 ђ 1106  ‘ 8216  ’ 8217  “ 8220  ” 8221  • 8226  – 8211  — 8212   152   ™ 8482  љ 1113  › 8250  њ 1114  ќ 1116  ћ 1115  џ 1119
-  160   Ў 1038  ў 1118  Ј 1032  ¤ 164   Ґ 1168  ¦ 166   § 167   Ё 1025  © 169   Є 1028  « 171   ¬ 172   ­ 173   ® 174   Ї 1031  
+  160   Ў 1038  ў 1118  Ј 1032  ¤ 164   Ґ 1168  ¦ 166   § 167   Ё 1025  © 169   Є 1028  « 171   ¬ 172   ­ 173   ® 174   Ї 1031
 ° 176   ± 177   І 1030  і 1110  ґ 1169  µ 181   ¶ 182   · 183   ё 1105  № 8470  є 1108  » 187   ј 1112  Ѕ 1029  ѕ 1109  ї 1111

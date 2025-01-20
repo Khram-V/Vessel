@@ -82,13 +82,16 @@ Matrix Steiner( _Matrix M,_Vector C,_Vector R )  // Сначала к базис
 Real  abs(_Vector a ){ return sqrt( norm( a ) ); }
 Real norm(_Vector a ){ return a.x*a.x+a.y*a.y+a.z*a.z;}
 Vector dir( _Vector a ){ Real n=norm(a); if(n>0)return a/sqrt(n); return Zero; }
-
-void e6( Real &R ){ R = round( R*1e5 )/1e5; }
-void e6( Vector &W )        // округление записи для точных сравнений 0.01 мм
+/*
+Real e8( _Real R ){ return  R-remainder( R,1.0e-10L ); }   // R = round( R*1e8L )/1e8L; }
+Vector e8( _Vector W ){ return (Vector){ e8( W.x ),e8( W.y ),e8( W.z ) }; }  // округление записи для точных сравнений 0.01 мм
+void e6( Real &A ){ A-=remainder( A,eps ); }
+void e6( Vector &W )
    { e6( W.x );
      e6( W.y ); // W.y<=eps?0.0:e5( W.y );
      e6( W.z );
    }
+*/
 Real& angle( Real &A ){ return A=remainder( A,_Pd  ); }           // -180°÷180°
 //{ if( A>=0 )A=fmod( A,_Pd ); else A=_Pd-fmod(-A,_Pd ); return A; } // 0°÷360°
 Real angle( _Real A,_Real B ){ return remainder( A-B,_Pd ); }     // A-B: -п÷п

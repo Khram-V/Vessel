@@ -102,36 +102,38 @@ bool Pro::KeyBoard( fixed key )
     case _F1: Help( Name,Cmds,Plus,-1,2 );       break;
     case _F2: while( TextMenu( Mlist( Menu_a ),this ).Answer()!=_Esc ); break;
     case _F3: // GetKey(); -- в прерывания символ из буфера не выбира(ется)лись
-    { Place R( this,PlaceAbove ); glClearColor( 1,1,0.8,1 ),glColor3f( 0,0,1 );
+    { Place R( this,PlaceAbove ); glClearColor( 1,1,0.8,1 ),glColor3f( 0,0,.75 );
       const char
-      *s="│≡Первая строчка ˉ○◙♪"
+      *s="│ ≡ образец _Design_font[343] для 9633 символьных кода\n"
+         "│ ˉ○◙♪"
          "  \n"
          "│ !\"#$%&'()*+,-./0123456789:;<=≠>?©… \n"
          "│ @ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_ \n"
          "│ `abcdefghijklmnopqrstuvwxyz{|}~ \n"
-         "│ ¡£¦§«±²°·Øøæ»¼½÷ƒ∝∞∩≡≥≤⌠⌡∂∑∫∮†‡≈∙∇√ⁿ■↑→←↓ \n"
+         "│ ¡£¦§«±²°·Øøæ»¼½÷ƒ∝∞∩≡≥≤⌠⌡∂∑∫∮†‡≈∙∇√ⁿ■↑→←↓¬⌐│─║═  \n"
          "│ ЄАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ \n"
          "│ абвгдеёжзийклмнопрстуфхцчшщъыьэюя \n"
-         "│ ΎΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ \n"
-         "│ ίαβγδεζηκλμνξοπρστυφχψωϑϕ₧ \n"
-         "│ ⌐│─┤╡╢╖╕╣║╗╝╜╛┐└┴┬├┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀░▒▓¬ \n"
-         "│ µ¿ÄÅÆÇÉÑÖÜßàáâäåçèéêëìíîïñòóôöùúûüÿ🌀   окончание W"
-/*       "│ !\"#$%%&'()*+,-./ 0123456789:;<=>? │.\n"
-         "│ @ABCDEFGHIJKLMNO PQRSTUVWXYZ[\\]^_ │.\n"
-         "│ `abcdefghijklmno pqrstuvwxyz{|}~  │.\n"
-         "│ АБВГДЕЁЖЗИЙКЛМНОП РСТУФХЦЧШЩЪЫЬЭЮЯ │.\n"
-         "│ абвгдеёжзийклмноп ░▒▓│┤╡╢╖╕╣║╗╝╜╛┐ │.\n"
-         "│ └┴┬├─┼╞╟╚╔╩╦╠═╬╧ ╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀ │.\n"
-         "│ рстуфхцчшщъыьэюя ≡±≥≤⌠⌡÷≈°∙·√ⁿ²■ │.\n"
-         "│ ΐΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩΪΫάέήίΰ │.\n"
-         "│ αβγδεζηκλμνξοπρςστυφχψωϊϋόύώ θι  │.\n"
-         "│ ©…∞ₒₐₓₑₔ‘’„“”«»‹›•∙×±≥≤÷≈≡≠∂δ∆∇∧∀∨⇒⇔↦←↑→↓↔↕↨∏∑∩∫ƒєæΘ │ окончание блока W"
-*/        ;
-//          R.AlfaBit( _8x16 )
-            R.AlfaVector( 0 )
-             .Area( 3,2,71,12 ).Clear().Print( 1,1,s ).Show();
-             glClearColor( 0.9,1,0.95,1 );     // восстановление фонового цвета
-            WaitKey();
+         "│ ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ \n"
+         "│ ίαβγδεζηκλμνξοπρστυφχψωϑϕ \n"
+         "│ ₧┤╡╢╖╕╣╗╝╜╛┐└┴┬├┼╞╟╚╔╩╦╠╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀░▒▓ \n"
+         "│ ΄΅ΎΏΐµ¿ÄÅÆÇÉÑÖÜßàáâäåçèéêëìíîïñòóôöùúûüÿ🌀  \n"
+         "│ ________________________________________________";
+      R.AlfaVector( 0 ).Area( 3,2,71,15 ).Clear().Print( 1,1,s ).Show();
+      glClearColor( 0.9,1,0.95,1 );            // восстановление фонового цвета
+      WaitKey();
+    } break;
+    case _F4:
+    { Place R( this,PlaceAbove ); glClearColor( 1,1,0.8,1 ),glColor3f( 0,0,0 );
+      R.AlfaBit( _8x16 ).Area( 3,2,37,11 ).Clear();
+      char s[256],*S=s;
+      for( int i,k=0; k<=7; k++ )
+      { S=s;
+        for( i=0; i<32; i++ )*S++ = k*32+i; s[32]=0;
+        if( !k )s[0]=s[10]='.'; S=OEMtU( s );
+        R.Print( 2,k+2,"│ %s ",S );
+      } R.Print( "\n│ « ёЁ » " ).Show();
+      glClearColor( 0.9,1,0.95,1 );     // восстановление фонового цвета
+      WaitKey();
     } break;
     default:
     { switch( key )
@@ -157,10 +159,10 @@ static void display( Place &Tv )
       color( white ),rectangle( (Point){-1,-1,-1},(Point){1,-0.6,-1} );
       for( int i=0; i<256; i++ )
       { color( (colors)(i+black+1) ); rectangle( (Point){-1+2.0*i/256.0,-0.95 },
-                                        (Point){ -1+2.0*(i+1)/256.0,-0.8} ); }
+                                                 (Point){-1+2.0*(i+1)/256.0,-0.8} ); }
       for( int i=0; i<=black; i++ )
-      { color( (colors)i ); rectangle( (Point){ -1+2*i/Real(black+1),-0.8 },
-                               (Point){ -1+2*(i+1)/Real(black+1),-0.7} ); }
+      { color( (colors)i ); rectangle( (Point){ -1+1.9*i/Real(black+1),-0.8 },
+                               (Point){ -1+1.9*(i+1)/Real(black+1),-0.7} ); }
     }
     //Tvm.WaitKey(); Tvm.Show(); return;
     Tv.Activate( false );
@@ -296,12 +298,12 @@ int main( int argc,char *argv[] )
              "█ - третья строка ЩЩ");
     glColor3f(1,1,0); Tvm.Print("ЩЩ,\n запятая и продолжение\n с новой записи ЩЩ");
     glColor3f(0,1,1); Tvm.Print("ЩЩ, \n запятая, и снова продолжение");
-    glColor3f(1,1,0); Tvm.Print(-6,7,"Строки справа-налево\nс общим отступом = -6");
+    glColor3f(1,1,0); Tvm.Print(-6,8,"Строки справа-налево\nс общим отступом = -6");
     glColor3f(1,1,1); Tvm.Print
 //       ( -12,-8,"Это -3 строки снизу и справа\n"
 //                "с отличным отступом = -12 и\n"
 //                "!важно! построчно сверху-вниз\n = ++ " );
-       ( -12,-8,"Это -3 строки в отсчётах снизу и справа-налево\n"
+       ( -12,-5,"Это -3 строки в отсчётах снизу и справа-налево\n"
                 "с отличным отступом справа = -12 и\n"
                 "!важно! печать восстановлена построчно сверху-вниз\n = ++ " );
     glColor3f(1,0,0); Tvm.Print( "...и продолжение после перевода строки " );
@@ -309,8 +311,8 @@ int main( int argc,char *argv[] )
     for( int i=0; i<=black; i++ )
     { color( (colors)i );
       if( !i )rectangle( (Point){-1,-1},(Point){1,-0.7} );
-      rectangle( (Point){ -1+2.0*i/Real(black+1),-0.9 },
-                 (Point){ -1+2.0*(i+1)/Real(black+1),-0.8 } );
+      rectangle( (Point){ -1+1.9*i/Real(black+1),-0.9 },
+                 (Point){ -1+1.9*(i+1)/Real(black+1),-0.8 } );
     }
     Tvm.Save();   //Refresh(); //Show();
     Tvm.Above();
@@ -323,7 +325,7 @@ int main( int argc,char *argv[] )
     Tvm.WaitKey();      //! простая приостановка обязательно должна срабатывать
     { Place Zero( &Tvm,PlaceAbove ); glClearColor( 1,1,1,0.5 );
       glColor3f(0,0,1);
-      Zero.AlfaVector( 18 ).Area(12,-14,40,1).Clear().Print(1,1,"Строчка в окошке");
+      Zero.AlfaVector( 18 ).Area(12,-20,40,1).Clear().Print(1,1,"Строчка в окошке");
       glColor3f(0,.5,0); Zero.AlfaVector( 12 ).Print( " со сменой шрифта" );
       Zero.Show(); Tvm.WaitKey();
     }
