@@ -351,38 +351,58 @@ Sign_Fragment: signLb=signRb=0; zl=wl; zr=wr;   /// v0+((x-x0)/(x1-x0))*(v1-v0)
       if( zl<L.len ){ if(L[zl].z<0)signLb=-1; else if(L[zl].z>0)signLb=1; }
       if( zr<R.len ){ if(R[zr].z<0)signRb=-1; else if(R[zr].z>0)signRb=1; }
       //
+      //  пропуск надводных точек весте с подводными всяко здесь нежелателен
+      //
+     bool signDiff=signLb*signRb<0;
+      if( signDiff )
+      { if( zr>0 )                             // справа было какое-то движение
+        { if( R[zr].z-R[zr-1].z>0.0 ){ if( signRb<0 )signRb=0; }
+                                  else if( signRb>0 )signRb=0; }
+        if( signRb && zl>0 )                // если справа нет - проверка слева
+        { if( L[zl].z-L[zl-1].z>0.0 ){ if( signLb<0 )signLb=0; }
+                                  else if( signLb>0 )signLb=0; }
+        if( signLb*signRb<0 )           // возможно то было две начальные точки
+        { if( signLb>0 )signLb=0;       // в предположении движения снизу вверх
+                   else signRb=0; }     //   -- либо надо еще: xl<X.len-1
+//      if( !signLb )++zr; else ++zl; goto Rem;
+      }
       //  контроль значимых начальных точек в диаметральной плоскости и по килю
       //                          ... значимо для обычного однокорпусного судна
-      if( signLb*signRb<0 )
+/*    if( signDiff )
       { if( signLb && fabs( L[zl].z )>fabs( L[zl+1].z ) )    // сближение слева
         { while( ++zl<L.len )if( !L[zl].z )break; signRb=0; goto Rem; }
         if( signRb && fabs( R[zr].z )>fabs( R[zr+1].z ) )       // иначе справа
         { while( ++zr<R.len )if( !R[zr].z )break; signLb=0; goto Rem; }
       }
-      //     поиск нулевой аппликаты по ходу вперёд без прогноза стороны шпации
+*/    //     поиск нулевой аппликаты по ходу вперёд без прогноза стороны шпации
       //
-      if( zl<L.len )while( ++zl<L.len )
-      { if( !L[zl].z && signLb )break; else // здесь, видимо, нужна новая точка
-        if( !signLb )
-        { if( L[zl].z<0 )signLb=-1; else if( L[zl].z>0 )signLb=1; } //else break; }
+      if( !signDiff || signLb )              // нет пересечения или новый поиск
+      if( zl<L.len )while( ++zl<L.len )     // возможно здесь нужна новая точка
+      { Real &LZ=L[zl].z;
+        if( !LZ && signLb )break; else
+        if( !signLb ){ if( LZ<0 )signLb=-1; else if( LZ>0 )signLb=1; } else
+        if( LZ>0 && signLb<0 || LZ<0 && signLb>0 ){ signLb=0; break; }
       }
+      if( !signDiff || signRb )
       if( zr<R.len )while( ++zr<R.len )
-      { if( !R[zr].z && signRb )break; else
-        if( !signRb )
-        { if( R[zr].z<0 )signRb=-1; else if( R[zr].z>0 )signRb=1; } //else break; }
+      { Real &RZ=R[zr].z;
+        if( !RZ && signRb )break; else
+        if( !signRb ){ if( RZ<0 )signRb=-1; else if( RZ>0 )signRb=1; } else
+        if( RZ>0 && signRb<0 || RZ<0 && signRb>0 ){ signRb=0; break; }
       }
-      //   есть ли односторонний разрыв шпангоутных контуров по сторонам шпации
+      //   в случае первых от киля точек на шпангоутах
+      //   есть односторонний разрыв контуров по сторонам шпации
       //
-      if( !(wl+wr) && zl==L.len ){ if( zr<R.len )signRb=0,zr=R.len; else signRb=signLb; } else
-      if( !(wr+wl) && zr==R.len ){ if( zl<L.len )signLb=0,zl=L.len; else signLb=signRb; } else
+      if( wl+wr==0 && zl==L.len ){ if( zr<R.len )signRb=0,zr=R.len; else signRb=signLb; } else
+      if( wl+wr==0 && zr==R.len ){ if( zl<L.len )signLb=0,zl=L.len; else signLb=signRb; } else
       //
       //  разнобой оставляет наибольшее смещение от исходной точки на шпангоуте
       //
       if( signLb*signRb<0 )
-      { if( zl-wl<zr-wr ){ signRb=0; zr=wr; }
+      { if( zl-wl>zr-wr ){ signRb=0; zr=wr; }
                     else { signLb=0; zl=wl; }
       } else
-//    if( signLb*signRb>0 ) //&& (zl<L.len || zr<R.len) )
+      if( signLb*signRb>0 ) //&& (zl<L.len || zr<R.len) )
       { if( zl==L.len )
         { if( zr<R.len )while( ++zr<R.len ){ if( R[zr-1].z*R[zr].z<0 )break; }
         } else
@@ -390,8 +410,7 @@ Sign_Fragment: signLb=signRb=0; zl=wl; zr=wr;   /// v0+((x-x0)/(x1-x0))*(v1-v0)
         { if( zl<L.len )while( ++zl<L.len ){ if( L[zl-1].z*L[zl].z<0 )break; }
         }
       }
-Rem:
-      wl=zl; zl=sl;
+Rem:  wl=zl; zl=sl;
       wr=zr; zr=sr;
       //
       // собственно построение оболочки обводов корпуса и надводной архитектуры

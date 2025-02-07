@@ -28,7 +28,7 @@ static void crossDC( Vector A, Vector B, Vector C )
 }
 Hull& Hull::Write( int format ) // Wavefront Technologies 4 Advanced Visualizer
 { int i,j,k,n; T=Ofs.z; St=Ofs.x;
-  if( format==1 )        // здесь тексты сохраняются в рабочем формате UTF-8
+  if( format==1 )      // здесь тексты .obj сохраняются в рабочем формате UTF-8
   { if( !(F=_wfopen( U2W( fext( FileName,"obj" ) ),L"wb" )) )return *this;
    Vector P,Q,q; int L[Nframes+2];
     memset( L,0,sizeof(int)*(Nframes+2) ); fColor=-1;
@@ -52,10 +52,10 @@ Hull& Hull::Write( int format ) // Wavefront Technologies 4 Advanced Visualizer
     for( k=-1; k<2; k+=2 )
     { bool b=k<0; Flex &S=b?Stern:Stem; n=b?0:L[Nframes+2];
       fprintf( F,b?"# Stern\n":"# Stem\n" );
-      for( i=0; i<S.len; i++ ){ Q=S[i];                    //if( !b )Q.Y=-Q.Y;
-        if( i>0 )
-        { if( P.z )crossPoint( P,P,Q, n+(i+1)*2 -!b, n+(i+1)*2 + b, b+n+i*2 );
-          if( Q.z )crossPoint( Q,P,Q, n+i*2     -!b, n+(i+1)*2 -!b, b+n+i*2 );
+      for( i=0; i<S.len; i++ ){ Q=S[i];                    // if( !b )Q.y=-Q.y;
+        if( i>0 )                                          // P.z|Q.z != 0 ???
+        { crossPoint( P,P,Q,n+(i+1)*2 -!b, n+(i+1)*2 + b, b+n+i*2 );  // P.z
+          crossPoint( Q,P,Q,n+i*2     -!b, n+(i+1)*2 -!b, b+n+i*2 );  // Q.z
         } P=Q;
     } }
     for( k=0; k<=Nframes; k++ )                         // Nframes+1 шпангоутов
