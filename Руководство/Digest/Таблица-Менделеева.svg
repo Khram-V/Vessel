@@ -1,0 +1,1055 @@
+<svg lang="ru-RU"
+xmlns="http://www.w3.org/2000/svg"
+xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 160 4950 3000">
+<title>Таблица Менделеева</title>
+<desc>таблица-Менделеева</desc>
+<style>
+.Source { font-size: 24px; fill: #666; }
+.Boxes rect,
+.Categories rect { outline-offset: -6px; outline: 6px solid rgba(0, 0, 0, 0.12); }
+.Categories path { stroke-width: 6px; fill: none; stroke: black; }
+.Boxes .Unclassified rect { outline-offset: -2px; outline-width: 2px; }
+.StateLegend rect { stroke: #000; stroke-width: 5px; fill: none; }
+.Alkali rect { fill: hsl(48deg, 77%, 64%); }
+.Alkaline rect { fill: hsl(60deg, 83%, 67%); }
+.Lanthanoid rect { fill: hsl(42deg, 62%, 76%); }
+.Actinoid rect { fill: hsl(340deg, 67%, 88%); }
+.Transition rect { fill: hsl(12deg, 87%, 85%); }
+.PostTransition rect{ fill: hsl(192deg, 62%, 80%); }
+.Metalloid rect { fill: hsl(165deg, 58%, 76%); }
+.Nonmetal rect { fill: hsl(120deg, 73%, 74%); }
+.Noble rect { fill: hsl(300deg, 44%, 82%); }
+.Unclassified rect { fill: #eee; }
+.VerticalInner rect { fill: #cef; stroke: #aaf; }
+
+.Gas { fill: #900; }
+.Liquid { fill: #00d; }
+.Unknown { fill: #676; }
+.GroupPeriod, .GroupText, .VerticalInner { fill: #003660; }
+
+.Title { font-size: 120px; }
+.StateLegend, .Symbol { font-size: 86px; }
+.GroupPeriod { font-size: 64px; }
+.Series, .SeriesHeader, .VerticalInner, .Atomic { font-size: 68px; }
+.Name, .Weight, .Parentheses { font-size: 56px; }
+.Weight { letter-spacing: 0.05em; }
+.GroupText { font-size: 45px; }
+.Trademark { font-size: 34px; }
+.Levels { font-size: 24px; }
+
+.Symbol { font-family: Arial-BoldMT, Arial, Helvetica, sans-serif; font-weight: 600; }
+.Name, .VerticalInner, .Weight, .Atomic, .Levels { font-family: ArialMT, Arial, Helvetica, sans-serif; }
+.Trademark, .Source { font-family: ProximaNova-Regular, Proxima Nova, Helvetica, sans-serif; }
+.Series, .LegendText, .GroupPeriod, .Title, .Parentheses { font-family: ProximaNova-Medium, Proxima Nova, Helvetica, sans-serif; font-weight: 500; }
+.SeriesHeader, .GroupText { font-family: ProximaNova-Semibold, Proxima Nova, Helvetica, sans-serif; font-weight: 600; }
+</style>
+<g class="Title"><text x="50" y="330" lengthAdjust="spacingAndGlyphs" text-anchor="left">Периодическая система элементов Дмитрия Ивановича Менделеева</text></g>
+<g class="VerticalInner" dominant-baseline="middle" text-anchor="middle">
+<rect x="655.5" y="1843" width="252" height="1308" rx="5" stroke-width="10" />
+<text x="781.5" y="1969">57–71</text>
+<text x="781.5" y="2233">89–103</text>
+</g>
+<g class="GroupPeriod" dominant-baseline="hanging" text-anchor="middle">
+<text x="253.5" y="405.5">1</text>
+<rect x="379" y="405.5" height="70" width="4"/>
+<text x="517.5" y="405.5">2</text>
+<rect x="643" y="405.5" height="70" width="4"/>
+<text x="781.5" y="405.5">3</text>
+<rect x="907" y="405.5" height="70" width="4"/>
+<text x="1045.5" y="405.5">4</text>
+<rect x="1171" y="405.5" height="70" width="4"/>
+<text x="1309.5" y="405.5">5</text>
+<rect x="1435" y="405.5" height="70" width="4"/>
+<text x="1573.5" y="405.5">6</text>
+<rect x="1699" y="405.5" height="70" width="4"/>
+<text x="1837.5" y="405.5">7</text>
+<rect x="1963" y="405.5" height="70" width="4"/>
+<text x="2101.5" y="405.5">8</text>
+<rect x="2227" y="405.5" height="70" width="4"/>
+<text x="2365.5" y="405.5">9</text>
+<rect x="2491" y="405.5" height="70" width="4"/>
+<text x="2629.5" y="405.5">10</text>
+<rect x="2755" y="405.5" height="70" width="4"/>
+<text x="2893.5" y="405.5">11</text>
+<rect x="3019" y="405.5" height="70" width="4"/>
+<text x="3157.5" y="405.5">12</text>
+<rect x="3283" y="405.5" height="70" width="4"/>
+<text x="3421.5" y="405.5">13</text>
+<rect x="3547" y="405.5" height="70" width="4"/>
+<text x="3685.5" y="405.5">14</text>
+<rect x="3811" y="405.5" height="70" width="4"/>
+<text x="3949.5" y="405.5">15</text>
+<text class="GroupText" x="3949.5" y="730">Подгруппа азота</text>
+<rect x="4075" y="405.5" height="70" width="4"/>
+<text x="4213.5" y="405.5">16</text>
+<text class="GroupText" x="4213.5" y="730">Халькогены</text>
+<rect x="4339" y="405.5" height="70" width="4"/>
+<text x="4477.5" y="405.5">17</text>
+<text class="GroupText" x="4477.5" y="730">Галогены</text>
+<rect x="4603" y="405.5" height="70" width="4"/>
+<text x="4741.5" y="405.5">18</text>
+</g>
+<g class="GroupPeriod" dominant-baseline="middle" text-anchor="end">
+<text x="92" y="649">1</text>
+<text x="92" y="913">2</text>
+<text x="92" y="1177">3</text>
+<text x="92" y="1441">4</text>
+<text x="92" y="1708">5</text>
+<text x="92" y="1972">6</text>
+<text x="92" y="2236">7</text>
+<text x="884" y="2771">6</text>
+<text x="884" y="3035">7</text>
+</g>
+<g class="Boxes">
+<g class="Alkali">
+<rect id="E3" x="127" y="786.5" height="253" width="253"/>
+<rect id="E11" x="127" y="1050.5" height="253" width="253"/>
+<rect id="E19" x="127" y="1314.5" height="253" width="253"/>
+<rect id="E37" x="127" y="1578.5" height="253" width="253"/>
+<rect id="E55" x="127" y="1842.5" height="253" width="253"/>
+<rect id="E87" x="127" y="2106.5" height="253" width="253"/>
+</g>
+<g class="Alkaline">
+<rect id="E4" x="391" y="786.5" height="253" width="253"/>
+<rect id="E12" x="391" y="1050.5" height="253" width="253"/>
+<rect id="E20" x="391" y="1314.5" height="253" width="253"/>
+<rect id="E38" x="391" y="1578.5" height="253" width="253"/>
+<rect id="E56" x="391" y="1842.5" height="253" width="253"/>
+<rect id="E88" x="391" y="2106.5" height="253" width="253"/>
+</g>
+<g class="Lanthanoid">
+<rect id="E57" x="919" y="2634.5" height="253" width="253"/>
+<rect id="E58" x="1183" y="2634.5" height="253" width="253"/>
+<rect id="E59" x="1447" y="2634.5" height="253" width="253"/>
+<rect id="E60" x="1711" y="2634.5" height="253" width="253"/>
+<rect id="E61" x="1975" y="2634.5" height="253" width="253"/>
+<rect id="E62" x="2239" y="2634.5" height="253" width="253"/>
+<rect id="E63" x="2503" y="2634.5" height="253" width="253"/>
+<rect id="E64" x="2767" y="2634.5" height="253" width="253"/>
+<rect id="E65" x="3031" y="2634.5" height="253" width="253"/>
+<rect id="E66" x="3295" y="2634.5" height="253" width="253"/>
+<rect id="E67" x="3559" y="2634.5" height="253" width="253"/>
+<rect id="E68" x="3823" y="2634.5" height="253" width="253"/>
+<rect id="E69" x="4087" y="2634.5" height="253" width="253"/>
+<rect id="E70" x="4351" y="2634.5" height="253" width="253"/>
+<rect id="E71" x="4615" y="2634.5" height="253" width="253"/>
+</g>
+<g class="Actinoid">
+<rect id="E89" x="919" y="2898.5" height="253" width="253"/>
+<rect id="E90" x="1183" y="2898.5" height="253" width="253"/>
+<rect id="E91" x="1447" y="2898.5" height="253" width="253"/>
+<rect id="E92" x="1711" y="2898.5" height="253" width="253"/>
+<rect id="E93" x="1975" y="2898.5" height="253" width="253"/>
+<rect id="E94" x="2239" y="2898.5" height="253" width="253"/>
+<rect id="E95" x="2503" y="2898.5" height="253" width="253"/>
+<rect id="E96" x="2767" y="2898.5" height="253" width="253"/>
+<rect id="E97" x="3031" y="2898.5" height="253" width="253"/>
+<rect id="E98" x="3295" y="2898.5" height="253" width="253"/>
+<rect id="E99" x="3559" y="2898.5" height="253" width="253"/>
+<rect id="E100" x="3823" y="2898.5" height="253" width="253"/>
+<rect id="E101" x="4087" y="2898.5" height="253" width="253"/>
+<rect id="E102" x="4351" y="2898.5" height="253" width="253"/>
+<rect id="E103" x="4615" y="2898.5" height="253" width="253"/>
+</g>
+<g class="Transition">
+<rect id="E21" x="655" y="1314.5" height="253" width="253"/>
+<rect id="E22" x="919" y="1314.5" height="253" width="253"/>
+<rect id="E23" x="1183" y="1314.5" height="253" width="253"/>
+<rect id="E24" x="1447" y="1314.5" height="253" width="253"/>
+<rect id="E25" x="1711" y="1314.5" height="253" width="253"/>
+<rect id="E26" x="1975" y="1314.5" height="253" width="253"/>
+<rect id="E27" x="2239" y="1314.5" height="253" width="253"/>
+<rect id="E28" x="2503" y="1314.5" height="253" width="253"/>
+<rect id="E29" x="2767" y="1314.5" height="253" width="253"/>
+<rect id="E30" x="3031" y="1314.5" height="253" width="253"/>
+<rect id="E39" x="655" y="1578.5" height="253" width="253"/>
+<rect id="E40" x="919" y="1578.5" height="253" width="253"/>
+<rect id="E41" x="1183" y="1578.5" height="253" width="253"/>
+<rect id="E42" x="1447" y="1578.5" height="253" width="253"/>
+<rect id="E43" x="1711" y="1578.5" height="253" width="253"/>
+<rect id="E44" x="1975" y="1578.5" height="253" width="253"/>
+<rect id="E45" x="2239" y="1578.5" height="253" width="253"/>
+<rect id="E46" x="2503" y="1578.5" height="253" width="253"/>
+<rect id="E47" x="2767" y="1578.5" height="253" width="253"/>
+<rect id="E48" x="3031" y="1578.5" height="253" width="253"/>
+<rect id="E72" x="919" y="1842.5" height="253" width="253"/>
+<rect id="E73" x="1183" y="1842.5" height="253" width="253"/>
+<rect id="E74" x="1447" y="1842.5" height="253" width="253"/>
+<rect id="E75" x="1711" y="1842.5" height="253" width="253"/>
+<rect id="E76" x="1975" y="1842.5" height="253" width="253"/>
+<rect id="E77" x="2239" y="1842.5" height="253" width="253"/>
+<rect id="E78" x="2503" y="1842.5" height="253" width="253"/>
+<rect id="E79" x="2767" y="1842.5" height="253" width="253"/>
+<rect id="E80" x="3031" y="1842.5" height="253" width="253"/>
+<rect id="E104" x="919" y="2106.5" height="253" width="253"/>
+<rect id="E105" x="1183" y="2106.5" height="253" width="253"/>
+<rect id="E106" x="1447" y="2106.5" height="253" width="253"/>
+<rect id="E107" x="1711" y="2106.5" height="253" width="253"/>
+<rect id="E108" x="1975" y="2106.5" height="253" width="253"/>
+</g>
+<g class="PostTransition">
+<rect id="E13" x="3295" y="1050.5" height="253" width="253"/>
+<rect id="E31" x="3295" y="1314.5" height="253" width="253"/>
+<rect id="E49" x="3295" y="1578.5" height="253" width="253"/>
+<rect id="E50" x="3559" y="1578.5" height="253" width="253"/>
+<rect id="E81" x="3295" y="1842.5" height="253" width="253"/>
+<rect id="E82" x="3559" y="1842.5" height="253" width="253"/>
+<rect id="E83" x="3823" y="1842.5" height="253" width="253"/>
+<rect id="E84" x="4087" y="1842.5" height="253" width="253"/>
+</g>
+<g class="Metalloid">
+<rect id="E5" x="3295" y="786.5" height="253" width="253"/>
+<rect id="E14" x="3559" y="1050.5" height="253" width="253"/>
+<rect id="E32" x="3559" y="1314.5" height="253" width="253"/>
+<rect id="E33" x="3823" y="1314.5" height="253" width="253"/>
+<rect id="E51" x="3823" y="1578.5" height="253" width="253"/>
+<rect id="E52" x="4087" y="1578.5" height="253" width="253"/>
+<rect id="E85" x="4351" y="1842.5" height="253" width="253"/>
+</g>
+<g class="Nonmetal">
+<rect id="E1" x="127" y="522.5" height="253" width="253"/>
+<rect id="E6" x="3559" y="786.5" height="253" width="253"/>
+<rect id="E7" x="3823" y="786.5" height="253" width="253"/>
+<rect id="E8" x="4087" y="786.5" height="253" width="253"/>
+<rect id="E9" x="4351" y="786.5" height="253" width="253"/>
+<rect id="E15" x="3823" y="1050.5" height="253" width="253"/>
+<rect id="E16" x="4087" y="1050.5" height="253" width="253"/>
+<rect id="E17" x="4351" y="1050.5" height="253" width="253"/>
+<rect id="E34" x="4087" y="1314.5" height="253" width="253"/>
+<rect id="E35" x="4351" y="1314.5" height="253" width="253"/>
+<rect id="E53" x="4351" y="1578.5" height="253" width="253"/>
+</g>
+<g class="Noble">
+<rect id="E2" x="4615" y="522.5" height="253" width="253"/>
+<rect id="E10" x="4615" y="786.5" height="253" width="253"/>
+<rect id="E18" x="4615" y="1050.5" height="253" width="253"/>
+<rect id="E36" x="4615" y="1314.5" height="253" width="253"/>
+<rect id="E54" x="4615" y="1578.5" height="253" width="253"/>
+<rect id="E86" x="4615" y="1842.5" height="253" width="253"/>
+</g>
+<g class="Unclassified">
+<rect id="E109" x="2239" y="2106.5" height="253" width="253"/>
+<rect id="E110" x="2503" y="2106.5" height="253" width="253"/>
+<rect id="E111" x="2767" y="2106.5" height="253" width="253"/>
+<rect id="E112" x="3031" y="2106.5" height="253" width="253"/>
+<rect id="E113" x="3295" y="2106.5" height="253" width="253"/>
+<rect id="E114" x="3559" y="2106.5" height="253" width="253"/>
+<rect id="E115" x="3823" y="2106.5" height="253" width="253"/>
+<rect id="E116" x="4087" y="2106.5" height="253" width="253"/>
+<rect id="E117" x="4351" y="2106.5" height="253" width="253"/>
+<rect id="E118" x="4615" y="2106.5" height="253" width="253"/>
+</g>
+</g>
+<g class="StateLegend">
+<g>
+<rect x="770.5" y="594" width="132" height="132"/>
+<text class="Symbol" x="805.45" y="690.78">C</text>
+<text class="LegendText" x="924.05" y="688.64">Твердое тело</text>
+</g>
+<g class="Liquid">
+<rect x="770.5" y="748" width="132" height="132"/>
+<text class="Symbol" x="779.18" y="844.78">Hg</text>
+<text class="LegendText" x="923.42" y="842.64">Жидкость</text>
+</g>
+<g class="Gas">
+<rect x="770.5" y="902" width="132" height="132"/>
+<text class="Symbol" x="805.45" y="998.78">H</text>
+<text class="LegendText" x="924.01" y="996.64">Газ</text>
+</g>
+<g class="Unknown">
+<rect x="770.5" y="1056" width="132" height="132"/>
+<text class="Symbol" x="790.3" y="1152.78">Rf</text>
+<text class="LegendText" x="923.7" y="1150.64">Неизвестный</text>
+</g>
+</g>
+<g class="Categories">
+<path d="M 2599,706.5
+v -115
+h -1192
+a 45 45 1 0 0 -45 45
+v 70"/>
+<g class="Alkali"><rect x="1359" y="720.5" width="187" height="473"/></g>
+<g class="Alkaline"><rect x="1557" y="720.5" width="187" height="473"/></g>
+<g class="Lanthanoid"><rect x="1755" y="720.5" width="451" height="231"/></g>
+<g class="Actinoid"><rect x="1755" y="962.5" width="451" height="231"/></g>
+<g class="Transition"><rect x="2217" y="720.5" width="187" height="473"/></g>
+<g class="PostTransition"><rect x="2415" y="720.5" width="187" height="473"/></g>
+<g class="Metalloid"><rect x="2613" y="588.5" width="165" height="605"/></g>
+<path d="M 2792,706.5
+v -115
+h 334
+a 45 45 0 0 1 45 45
+v 70"/>
+<g class="Nonmetal"><rect x="2789" y="720.5" width="187" height="473"/></g>
+<g class="Noble"><rect x="2987" y="720.5" width="187" height="473"/></g>
+</g>
+<g>
+<text class="SeriesHeader" x="1873.94" y="676">Металлы</text>
+<text class="Series" x="741" y="-1480.14" transform="rotate(90)">
+<tspan>Щелочные металлы</tspan>
+<tspan x="741" dy="81.6"></tspan>
+</text>
+<text class="Series" x="741" y="-1678.14" transform="rotate(90)">
+<tspan>Щёлочноземельные металлы</tspan>
+<tspan x="741" dy="81.6"></tspan>
+</text>
+<text class="Series" x="1775.5" y="786.36">
+<tspan>Лантаноиды</tspan>
+<tspan x="1775.5" dy="81.6"></tspan>
+</text>
+<text class="Series" x="1775.5" y="1028.36">
+<tspan>Актиноиды</tspan>
+<tspan x="1775.5" dy="81.6"></tspan>
+</text>
+<text class="Series" x="741" y="-2338.14" transform="rotate(90)">
+<tspan>Переходные металлы</tspan>
+<tspan x="741" dy="81.6"></tspan>
+</text>
+<text class="Series" x="741" y="-2536.14" transform="rotate(90)">
+<tspan>Постпереходные металлы</tspan>
+<tspan x="741" dy="81.6"></tspan>
+</text>
+<text class="SeriesHeader" x="609" y="-2709.48" transform="rotate(90)">Полуметаллы </text>
+<text class="SeriesHeader" x="2810.93" y="676">Неметаллы</text>
+<text class="Series" x="741" y="-2910.14" transform="rotate(90)">
+<tspan>Неметаллы</tspan>
+<tspan x="741" dy="81.6"></tspan>
+</text>
+<text class="Series" x="741" y="-3108.14" transform="rotate(90)">
+<tspan>Благородные газы</tspan>
+<tspan x="741" dy="81.6"></tspan>
+</text>
+</g>
+<g class="Atomic">
+<text x="402.69" y="587.12">Atomic</text>
+<text x="135.51" y="587.12">1</text>
+<text x="4627.5" y="587.12">2</text>
+<text x="139.5" y="851.12">3</text>
+<text x="402.75" y="851.12">4</text>
+<text x="3306.53" y="851.12">5</text>
+<text x="3570.37" y="851.12">6</text>
+<text x="3832.37" y="851.12">7</text>
+<text x="4098.49" y="851.12">8</text>
+<text x="4362.53" y="851.12">9</text>
+<text x="4623.95" y="851.12">10</text>
+<text x="136.42" y="1115.12">11</text>
+<text x="400.07" y="1115.12">12</text>
+<text x="3304.08" y="1115.12">13</text>
+<text x="3568.04" y="1115.12">14</text>
+<text x="3832.03" y="1115.12">15</text>
+<text x="4095.94" y="1115.12">16</text>
+<text x="4360.18" y="1115.12">17</text>
+<text x="4623.99" y="1115.12">18</text>
+<text x="135.99" y="1379.12">19</text>
+<text x="403.5" y="1379.12">20</text>
+<text x="667.5" y="1379.12">21</text>
+<text x="931.5" y="1379.12">22</text>
+<text x="1195.5" y="1379.12">23</text>
+<text x="1459.5" y="1379.12">24</text>
+<text x="1723.5" y="1379.12">25</text>
+<text x="1987.5" y="1379.12">26</text>
+<text x="2251.5" y="1379.12">27</text>
+<text x="2515.5" y="1379.12">28</text>
+<text x="2779.5" y="1379.12">29</text>
+<text x="3043.5" y="1379.12">30</text>
+<text x="3307.5" y="1379.12">31</text>
+<text x="3571.5" y="1379.12">32</text>
+<text x="3835.5" y="1379.12">33</text>
+<text x="4099.5" y="1379.12">34</text>
+<text x="4363.5" y="1379.12">35</text>
+<text x="4627.5" y="1379.12">36</text>
+<text x="139.5" y="1643.12">37</text>
+<text x="403.5" y="1643.12">38</text>
+<text x="667.5" y="1643.12">39</text>
+<text x="930.77" y="1643.12">40</text>
+<text x="1194.89" y="1643.12">41</text>
+<text x="1458.82" y="1643.12">42</text>
+<text x="1722.77" y="1643.12">43</text>
+<text x="1986.75" y="1643.12">44</text>
+<text x="2250.77" y="1643.12">45</text>
+<text x="2514.77" y="1643.12">46</text>
+<text x="2778.85" y="1643.12">47</text>
+<text x="3042.77" y="1643.12">48</text>
+<text x="3306.78" y="1643.12">49</text>
+<text x="3570.55" y="1643.12">50</text>
+<text x="3834.7" y="1643.12">51</text>
+<text x="4098.59" y="1643.12">52</text>
+<text x="4362.55" y="1643.12">53</text>
+<text x="4626.52" y="1643.12">54</text>
+<text x="138.55" y="1907.12">55</text>
+<text x="402.55" y="1907.12">56</text>
+<text x="930.59" y="2699.12">57</text>
+<text x="1194.55" y="2699.12">58</text>
+<text x="1458.57" y="2699.12">59</text>
+<text x="1722.39" y="2699.12">60</text>
+<text x="1986.49" y="2699.12">61</text>
+<text x="2250.43" y="2699.12">62</text>
+<text x="2514.41" y="2699.12">63</text>
+<text x="2778.37" y="2699.12">64</text>
+<text x="3042.41" y="2699.12">65</text>
+<text x="3306.38" y="2699.12">66</text>
+<text x="3570.45" y="2699.12">67</text>
+<text x="3834.39" y="2699.12">68</text>
+<text x="4098.4" y="2699.12">69</text>
+<text x="4360.63" y="2699.12">70</text>
+<text x="4624.86" y="2699.12">71</text>
+<text x="928.57" y="1907.12">72</text>
+<text x="1192.58" y="1907.12">73</text>
+<text x="1456.98" y="1907.12">74</text>
+<text x="1720.67" y="1907.12">75</text>
+<text x="1984.64" y="1907.12">76</text>
+<text x="2248.48" y="1907.12">77</text>
+<text x="2512.61" y="1907.12">78</text>
+<text x="2776.58" y="1907.12">79</text>
+<text x="3042.51" y="1907.12">80</text>
+<text x="3306.61" y="1907.12">81</text>
+<text x="3570.54" y="1907.12">82</text>
+<text x="3834.52" y="1907.12">83</text>
+<text x="4098.49" y="1907.12">84</text>
+<text x="4362.52" y="1907.12">85</text>
+<text x="4626.5" y="1907.12">86</text>
+<text x="138.57" y="2171.12">87</text>
+<text x="402.51" y="2171.12">88</text>
+<text x="930.52" y="2963.12">89</text>
+<text x="1194.53" y="2963.12">90</text>
+<text x="1458.62" y="2963.12">91</text>
+<text x="1722.57" y="2963.12">92</text>
+<text x="1986.57" y="2963.12">93</text>
+<text x="2250.53" y="2963.12">94</text>
+<text x="2514.55" y="2963.12">95</text>
+<text x="2778.53" y="2963.12">96</text>
+<text x="3042.61" y="2963.12">97</text>
+<text x="3306.54" y="2963.12">98</text>
+<text x="3570.54" y="2963.12">99</text>
+<text x="3831.95" y="2963.12">100</text>
+<text x="4095.95" y="2963.12">101</text>
+<text x="4359.95" y="2963.12">102</text>
+<text x="4623.95" y="2963.12">103</text>
+<text x="927.95" y="2171.12">104</text>
+<text x="1191.95" y="2171.12">105</text>
+<text x="1455.95" y="2171.12">106</text>
+<text x="1719.95" y="2171.12">107</text>
+<text x="1983.95" y="2171.12">108</text>
+<text x="2247.95" y="2171.12">109</text>
+<text x="2512.42" y="2171.12">110</text>
+<text x="2776.42" y="2171.12">111</text>
+<text x="3040.42" y="2171.12">112</text>
+<text x="3304.42" y="2171.12">113</text>
+<text x="3568.42" y="2171.12">114</text>
+<text x="3832.42" y="2171.12">115</text>
+<text x="4096.42" y="2171.12">116</text>
+<text x="4360.42" y="2171.12">117</text>
+<text x="4624.42" y="2171.12">118</text>
+</g>
+<g class="Symbol">
+<text style="font-weight: normal; letter-spacing: -0.04em;" x="402.96" y="659.8">Знаки</text>
+<text class="Gas" x="137.81" y="659.78">H</text>
+<text class="Gas" x="4625.84" y="659.78">He</text>
+
+<text x="138.29" y="923.78">Li</text>
+<text x="401.85" y="923.78">Be</text>
+<text x="3305.81" y="923.78">B</text>
+<text x="3571.05" y="923.78">C</text>
+<text class="Gas" x="3833.87" y="923.78">N</text>
+<text class="Gas" x="4098.74" y="923.78">O</text>
+<text class="Gas" x="4362.07" y="923.78">F</text>
+<text class="Gas" x="4625.9" y="923.78">Ne</text>
+
+<text x="137.91" y="1187.78">Na</text>
+<text x="401.37" y="1187.78">Mg</text>
+<text x="3306.25" y="1187.78">Al</text>
+<text x="3570.47" y="1187.78">Si</text>
+<text x="3833.88" y="1187.78">P</text>
+<text x="4098.44" y="1187.78">S</text>
+<text class="Gas" x="4363.07" y="1187.78">Cl</text>
+<text class="Gas" x="4626.25" y="1187.78">Ar</text>
+
+<text x="137.88" y="1451.78">K</text>
+<text x="403.06" y="1451.78">Ca</text>
+<text x="666.47" y="1451.78">Sc</text>
+<text x="928.03" y="1451.78">Ti</text>
+<text x="1195.5" y="1451.78">V</text>
+<text x="1459.07" y="1451.78">Cr</text>
+<text x="1721.38" y="1451.78">Mn</text>
+<text x="1986.17" y="1451.78">Fe</text>
+<text x="2251.06" y="1451.78">Co</text>
+<text x="2513.93" y="1451.78">Ni</text>
+<text x="2779.07" y="1451.78">Cu</text>
+<text x="3043.09" y="1451.78">Zn</text>
+<text x="3307.02" y="1451.78">Ga</text>
+<text x="3571.02" y="1451.78">Ge</text>
+<text x="3834.25" y="1451.78">As</text>
+<text x="4098.46" y="1451.78">Se</text>
+<text class="Liquid" x="4361.86" y="1451.78">Br</text>
+<text class="Gas" x="4625.9" y="1451.78">Kr</text>
+
+<text x="137.84" y="1715.78">Rb</text>
+<text x="402.47" y="1715.78">Sr</text>
+<text x="667.5" y="1715.78">Y</text>
+<text x="931.09" y="1715.78">Zr</text>
+<text x="1193.92" y="1715.78">Nb</text>
+<text x="1457.38" y="1715.78">Mo</text>
+<text x="1720.54" y="1715.78">Tc</text>
+<text x="1985.89" y="1715.78">Ru</text>
+<text x="2249.85" y="1715.78">Rh</text>
+<text x="2513.98" y="1715.78">Pd</text>
+<text x="2778.28" y="1715.78">Ag</text>
+<text x="3043.06" y="1715.78">Cd</text>
+<text x="3306.52" y="1715.78">In</text>
+<text x="3570.47" y="1715.78">Sn</text>
+<text x="3834.47" y="1715.78">Sb</text>
+<text x="4096.5" y="1715.78">Te</text>
+<text x="4362.47" y="1715.78">I</text>
+<text class="Gas" x="4626.4" y="1715.78">Xe</text>
+
+<text x="139.06" y="1979.78">Cs</text>
+<text x="401.86" y="1979.78">Ba</text>
+<text x="930.25" y="2771.78">La</text>
+<text x="1195.06" y="2771.78">Ce</text>
+<text x="1457.96" y="2771.78">Pr</text>
+<text x="1721.91" y="2771.78">Nd</text>
+<text x="1985.96" y="2771.78">Pm</text>
+<text x="2250.47" y="2771.78">Sm</text>
+<text x="2513.95" y="2771.78">Eu</text>
+<text x="2779.02" y="2771.78">Gd</text>
+<text x="3040.01" y="2771.78">Tb</text>
+<text x="3305.78" y="2771.78">Dy</text>
+<text x="3569.85" y="2771.78">Ho</text>
+<text x="3833.93" y="2771.78">Er</text>
+<text x="4096.48" y="2771.78">Tm</text>
+<text x="4359.38" y="2771.78">Yb</text>
+<text x="4626.29" y="2771.78">Lu</text>
+<text x="929.84" y="1979.78">Hf</text>
+<text x="1192.52" y="1979.78">Ta</text>
+<text x="1459.5" y="1979.78">W</text>
+<text x="1721.88" y="1979.78">Re</text>
+<text x="1986.75" y="1979.78">Os</text>
+<text x="2250.51" y="1979.78">Ir</text>
+<text x="2513.9" y="1979.78">Pt</text>
+<text x="2778.29" y="1979.78">Au</text>
+<text class="Liquid" x="3041.85" y="1979.78">Hg</text>
+<text x="3304.03" y="1979.78">Tl</text>
+<text x="3569.97" y="1979.78">Pb</text>
+<text x="3833.86" y="1979.78">Bi</text>
+<text x="4097.99" y="1979.78">Po</text>
+<text x="4362.28" y="1979.78">At</text>
+<text class="Gas" x="4625.85" y="1979.78">Rn</text>
+
+<text x="138.21" y="2243.78">Fr</text>
+<text x="401.87" y="2243.78">Ra</text>
+<text x="930.28" y="3035.78">Ac</text>
+<text x="1192.03" y="3035.78">Th</text>
+<text x="1457.96" y="3035.78">Pa</text>
+<text x="1722.39" y="3035.78">U</text>
+<text x="1985.92" y="3035.78">Np</text>
+<text x="2249.97" y="3035.78">Pu</text>
+<text x="2514.24" y="3035.78">Am</text>
+<text x="2779.06" y="3035.78">Cm</text>
+<text x="3041.86" y="3035.78">Bk</text>
+<text x="3307.05" y="3035.78">Cf</text>
+<text x="3569.92" y="3035.78">Es</text>
+<text x="3834.2" y="3035.78">Fm</text>
+<text x="4097.37" y="3035.78">Md</text>
+<text x="4361.92" y="3035.78">No</text>
+<text x="4626.28" y="3035.78">Lr</text>
+<text class="Unknown" x="929.85" y="2243.78">Rf</text>
+<text class="Unknown" x="1193.78" y="2243.78">Db</text>
+<text class="Unknown" x="1458.47" y="2243.78">Sg</text>
+<text class="Unknown" x="1721.86" y="2243.78">Bh</text>
+<text class="Unknown" x="1985.85" y="2243.78">Hs</text>
+<text class="Unknown" x="2249.36" y="2243.78">Mt</text>
+<text class="Unknown" x="2513.79" y="2243.78">Ds</text>
+<text class="Unknown" x="2777.89" y="2243.78">Rg</text>
+<text class="Unknown" x="3043.07" y="2243.78">Cn</text>
+<text class="Unknown" x="3305.92" y="2243.78">Nh</text>
+<text class="Unknown" x="3570.16" y="2243.78">Fl</text>
+<text class="Unknown" x="3833.37" y="2243.78">Mc</text>
+<text class="Unknown" x="4098.39" y="2243.78">Lv</text>
+<text class="Unknown" x="4360.48" y="2243.78">Ts</text>
+<text class="Unknown" x="4626.76" y="2243.78">Og</text>
+</g>
+<g class="Name">
+<text x="402.56" y="710">Имя</text>
+<text x="138.75" y="710">Водород</text>
+<text x="4626.71" y="710">Гелий</text>
+
+<text x="138.7" y="974">Литий</text>
+<text x="402.52" y="974">Бериллий</text>
+<text x="3306.52" y="974">Бор</text>
+<text x="3571.29" y="974">Углерод</text>
+<text x="3834.56" y="974">Азот</text>
+<text x="4099.24" y="974">Кислород</text>
+<text x="4362.92" y="974">Фтор</text>
+<text x="4626.55" y="974">Неон</text>
+
+<text x="139.13" y="1238">Натрий</text>
+<text x="402.53" y="1238">Магний</text>
+<text x="3306.89" y="1238">Алюминий</text>
+<text x="3571.13" y="1238">Кремний</text>
+<text x="3834.86" y="1238">Фосфор</text>
+<text x="4099.13" y="1238">Сера</text>
+<text x="4363.3" y="1238">Хлор</text>
+<text x="4626.82" y="1238">Аргон</text>
+
+<text x="138.77" y="1502">Калий</text>
+<text x="403.3" y="1502">Кальций</text>
+<text x="667.15" y="1502">Скандий</text>
+<text x="927.81" y="1502">Титан</text>
+<text x="1194.32" y="1502">Ванадий</text>
+<text x="1459.32" y="1502">Хром</text>
+<text x="1722.55" y="1502">Марганец</text>
+<text x="1987.26" y="1502">Железо</text>
+<text x="2251.29" y="1502">Кобальт</text>
+<text x="2514.56" y="1502">Никель</text>
+<text x="2779.29" y="1502">Медь</text>
+<text x="3041.73" y="1502">Цинк</text>
+<text x="3307.5" y="1502">Галлий</text>
+<text x="3571.5" y="1502">Германий</text>
+<text x="3834.82" y="1502">Мышьяк</text>
+<text x="4099.13" y="1502">Селен</text>
+<text x="4362.52" y="1502">Бром</text>
+<text x="4626.51" y="1502">Криптон</text>
+
+<text x="138.65" y="1766">Рубидий</text>
+<text x="403.14" y="1766">Стронций</text>
+<text x="664.34" y="1766">Иттрий</text>
+<text x="929.8" y="1766">Цирконий</text>
+<text x="1194.56" y="1766">Ниобий</text>
+<text x="1458.64" y="1766">Молибден</text>
+<text x="1720.94" y="1766">Технеций</text>
+<text x="1986.76" y="1766">Рутений</text>
+<text x="2250.63" y="1766">Родий</text>
+<text x="2514.71" y="1766">Палладий</text>
+<text x="2779.13" y="1766">Серебро</text>
+<text x="3043.3" y="1766">Кадмий</text>
+<text x="3307.26" y="1766">Индий</text>
+<text x="3567.81" y="1766">Олово</text>
+<text x="3834.82" y="1766">Сурьма</text>
+<text x="4096.41" y="1766">Теллур</text>
+<text x="4363.25" y="1766">Иод</text>
+<text x="4626.19" y="1766">Ксенон</text>
+
+<text x="139.3" y="2030">Цезий</text>
+<text x="402.53" y="2030">Барий</text>
+<text x="930.82" y="2822">Лантан</text>
+<text x="1195.29" y="2822">Церий</text>
+<text x="1458.99" y="2822">Празеодим</text>
+<text x="1722.76" y="2822">Неодим</text>
+<text x="1986.87" y="2822">Прометий</text>
+<text x="2251.16" y="2822">Самарий</text>
+<text x="2514.77" y="2822">Европий</text>
+<text x="2779.5" y="2822">Гадолиний</text>
+<text x="3040.41" y="2822">Тербий</text>
+<text x="3306.78" y="2822">Диспрозий</text>
+<text x="3570.71" y="2822">Гольмий</text>
+<text x="3834.76" y="2822">Эрбий</text>
+<text x="4095.81" y="2822">Тулий</text>
+<text x="4360.37" y="2822">Иттербий</text>
+<text x="4626.71" y="2822">Лютеций</text>
+<text x="930.71" y="2030">Гафний</text>
+<text x="1192.41" y="2030">Тантал</text>
+<text x="1456.4" y="2030">Вольфрам</text>
+<text x="1722.63" y="2030">Рений</text>
+<text x="1987.24" y="2030">Осмий</text>
+<text x="2251.26" y="2030">Иридий</text>
+<text x="2514.68" y="2030">Платина</text>
+<text x="2779.5" y="2030">Золото</text>
+<text x="3042.31" y="2030">Ртуть</text>
+<text x="3303.81" y="2030">Таллий</text>
+<text x="3570.71" y="2030">Свинец</text>
+<text x="3834.52" y="2030">Висмут</text>
+<text x="4098.69" y="2030">Полоний</text>
+<text x="4362.83" y="2030">Астат</text>
+<text x="4626.64" y="2030">Радон</text>
+
+<text x="138.95" y="2294">Франций</text>
+<text x="402.64" y="2294">Радий</text>
+<text x="930.84" y="3086">Актиний</text>
+<text x="1191.81" y="3086">Торий</text>
+<text x="1458.88" y="3086">Протактиний</text>
+<text x="1723.08" y="3086">Уран</text>
+<text x="1986.67" y="3086">Нептуний</text>
+<text x="2250.72" y="3086">Плутоний</text>
+<text x="2514.9" y="3086">Америций</text>
+<text x="2779.3" y="3086">Кюрий</text>
+<text x="3042.57" y="3086">Берклий</text>
+<text x="3307.33" y="3086">Калифорний</text>
+<text x="3570.89" y="3086">Эйнштейний</text>
+<text x="3834.93" y="3086">Фермий</text>
+<text x="4098.66" y="3086">Менделевий</text>
+<text x="4362.56" y="3086">Нобелий</text>
+<text x="4626.86" y="3086">Лоуренсий</text>
+<text x="930.95" y="2294">Резерфордий</text>
+<text x="1194.6" y="2294">Дубний</text>
+<text x="1459.21" y="2294">Сиборгий</text>
+<text x="1722.52" y="2294">Борий</text>
+<text x="1986.71" y="2294">Хассий</text>
+<text x="2250.5" y="2294">Мейтнерий</text>
+<text x="2514.89" y="2294">Дармштадтий</text>
+<text x="2778.9" y="2294">Рентгений</text>
+<text x="3043.35" y="2294">Коперниций</text>
+<text x="3306.56" y="2294">Нихоний</text>
+<text x="3570.94" y="2294">Флеровий</text>
+<text x="3834.52" y="2294">Московий</text>
+<text x="4098.89" y="2294">Ливерморий</text>
+<text x="4360.92" y="2294">Теннессин</text>
+<text x="4627.28" y="2294">Оганесон</text>
+</g>
+<g class="Weight">
+<text x="403.2" y="761">Weight</text>
+<text x="136.44" y="761">1,008</text>
+<text x="4626.88" y="761">4,0026</text>
+
+<text x="138.55" y="1025">6,94</text>
+<text x="402.7" y="1025">9,0122</text>
+<text x="3304.34" y="1025">10,81</text>
+<text x="3568.44" y="1025">12,011</text>
+<text x="3832.41" y="1025">14,007</text>
+<text x="4096.4" y="1025">15,999</text>
+<text x="4360.38" y="1025">18,998</text>
+<text x="4627.5" y="1025">20,180</text>
+
+<text x="139.5" y="1289">22,990</text>
+<text x="403.5" y="1289">24,305</text>
+<text x="3307.5" y="1289">26,982</text>
+<text x="3571.5" y="1289">28,085</text>
+<text x="3835.5" y="1289">30,974</text>
+<text x="4099.5" y="1289">32,06</text>
+<text x="4363.5" y="1289">35,45</text>
+<text x="4627.5" y="1289">39,948</text>
+
+<text x="139.5" y="1553">39,098</text>
+<text x="402.86" y="1553">40,078</text>
+<text x="666.84" y="1553">44,956</text>
+<text x="930.92" y="1553">47,867</text>
+<text x="1194.67" y="1553">50,942</text>
+<text x="1458.78" y="1553">51,996</text>
+<text x="1722.64" y="1553">54,938</text>
+<text x="1986.67" y="1553">55,845</text>
+<text x="2250.66" y="1553">58,933</text>
+<text x="2514.66" y="1553">58,693</text>
+<text x="2778.54" y="1553">63,546</text>
+<text x="3042.54" y="1553">65,38</text>
+<text x="3306.53" y="1553">69,723</text>
+<text x="3568.91" y="1553">72,630</text>
+<text x="3833.23" y="1553">74,922</text>
+<text x="4096.94" y="1553">78,971</text>
+<text x="4360.91" y="1553">79,904</text>
+<text x="4626.63" y="1553">83,798</text>
+
+<text x="138.64" y="1817">85,468</text>
+<text x="402.68" y="1817">87,62</text>
+<text x="666.63" y="1817">88,906</text>
+<text x="930.72" y="1817">91,224</text>
+<text x="1194.68" y="1817">92,906</text>
+<text x="1458.66" y="1817">95,95</text>
+<text x="1723.39" y="1817">(98)</text>
+<text x="1984.34" y="1817">101,07</text>
+<text x="2248.34" y="1817">102,91</text>
+<text x="2512.34" y="1817">106,42</text>
+<text x="2776.34" y="1817">107,87</text>
+<text x="3040.71" y="1817">112,41</text>
+<text x="3304.71" y="1817">114,82</text>
+<text x="3568.71" y="1817">118,71</text>
+<text x="3832.43" y="1817">121,76</text>
+<text x="4096.44" y="1817">127,60</text>
+<text x="4360.44" y="1817">126,90</text>
+<text x="4624.44" y="1817">131,29</text>
+<text x="136.44" y="2081">132,91</text>
+<text x="400.44" y="2081">137,33</text>
+<text x="928.44" y="2873">138,91</text>
+<text x="1192.42" y="2873">140,12</text>
+<text x="1456.42" y="2873">140,91</text>
+<text x="1720.42" y="2873">144,24</text>
+<text x="1987.4" y="2873">(145)</text>
+<text x="2248.4" y="2873">150,36</text>
+<text x="2512.4" y="2873">151,96</text>
+<text x="2776.4" y="2873">157,25</text>
+<text x="3040.4" y="2873">158,93</text>
+<text x="3304.34" y="2873">162,50</text>
+<text x="3568.34" y="2873">164,93</text>
+<text x="3832.34" y="2873">167,26</text>
+<text x="4096.34" y="2873">168,93</text>
+<text x="4360.52" y="2873">173,05</text>
+<text x="4624.52" y="2873">174,97</text>
+<text x="928.52" y="2081">178,49</text>
+<text x="1192.38" y="2081">180,95</text>
+<text x="1456.38" y="2081">183,84</text>
+<text x="1720.38" y="2081">186,21</text>
+<text x="1984.37" y="2081">190,23</text>
+<text x="2248.37" y="2081">192,22</text>
+<text x="2512.37" y="2081">195,08</text>
+<text x="2776.37" y="2081">196,97</text>
+<text x="3043.5" y="2081">200,59</text>
+<text x="3307.5" y="2081">204,38</text>
+<text x="3571.5" y="2081">207,2</text>
+<text x="3835.5" y="2081">208,98</text>
+<text x="4099.39" y="2081">(209)</text>
+<text x="4363.39" y="2081">(210)</text>
+<text x="4627.39" y="2081">(222)</text>
+
+<text x="139.39" y="2345">(223)</text>
+<text x="403.39" y="2345">(226)</text>
+<text x="931.39" y="3137">(227)</text>
+<text x="1195.5" y="3137">232,04</text>
+<text x="1459.5" y="3137">231,04</text>
+<text x="1723.5" y="3137">238,03</text>
+<text x="1987.39" y="3137">(237)</text>
+<text x="2251.39" y="3137">(244)</text>
+<text x="2515.39" y="3137">(243)</text>
+<text x="2779.39" y="3137">(247)</text>
+<text x="3043.39" y="3137">(247)</text>
+<text x="3307.39" y="3137">(251)</text>
+<text x="3571.39" y="3137">(252)</text>
+<text x="3835.39" y="3137">(257)</text>
+<text x="4099.39" y="3137">(258)</text>
+<text x="4363.39" y="3137">(259)</text>
+<text x="4627.39" y="3137">(266)</text>
+<text x="931.39" y="2345">(267)</text>
+<text x="1195.39" y="2345">(268)</text>
+<text x="1459.39" y="2345">(269)</text>
+<text x="1723.39" y="2345">(270)</text>
+<text x="1987.39" y="2345">(277)</text>
+<text x="2251.39" y="2345">(278)</text>
+<text x="2515.39" y="2345">(281)</text>
+<text x="2779.39" y="2345">(282)</text>
+<text x="3043.39" y="2345">(285)</text>
+<text x="3307.39" y="2345">(286)</text>
+<text x="3571.39" y="2345">(289)</text>
+<text x="3835.39" y="2345">(290)</text>
+<text x="4099.39" y="2345">(293)</text>
+<text x="4363.39" y="2345">(294)</text>
+<text x="4627.39" y="2345">(294)</text>
+</g>
+
+<g class="Levels" text-anchor="end">
+<g text-anchor="start">
+<text transform="translate(4880 530)"><tspan x="0" dy="20">K</tspan></text>
+<text transform="translate(4880 794)"><tspan x="0" dy="20">K</tspan><tspan x="0" dy="20">L</tspan></text>
+<text transform="translate(4880 1058)"><tspan x="0" dy="20">K</tspan><tspan x="0" dy="20">L</tspan><tspan x="0" dy="20">M</tspan></text>
+<text transform="translate(4880 1322)"><tspan x="0" dy="20">K</tspan><tspan x="0" dy="20">L</tspan><tspan x="0" dy="20">M</tspan><tspan x="0" dy="20">N</tspan></text>
+<text transform="translate(4880 1586)"><tspan x="0" dy="20">K</tspan><tspan x="0" dy="20">L</tspan><tspan x="0" dy="20">M</tspan><tspan x="0" dy="20">N</tspan><tspan x="0" dy="20">O</tspan></text>
+<text transform="translate(4880 1850)"><tspan x="0" dy="20">K</tspan><tspan x="0" dy="20">L</tspan><tspan x="0" dy="20">M</tspan><tspan x="0" dy="20">N</tspan><tspan x="0" dy="20">O</tspan><tspan x="0" dy="20">P</tspan></text>
+<text transform="translate(4880 2114)"><tspan x="0" dy="20">K</tspan><tspan x="0" dy="20">L</tspan><tspan x="0" dy="20">M</tspan><tspan x="0" dy="20">N</tspan><tspan x="0" dy="20">O</tspan><tspan x="0" dy="20">P</tspan><tspan x="0" dy="20">Q</tspan></text>
+<text transform="translate(4880 2642)"><tspan x="0" dy="20">K</tspan><tspan x="0" dy="20">L</tspan><tspan x="0" dy="20">M</tspan><tspan x="0" dy="20">N</tspan><tspan x="0" dy="20">O</tspan><tspan x="0" dy="20">P</tspan></text>
+<text transform="translate(4880 2906)"><tspan x="0" dy="20">K</tspan><tspan x="0" dy="20">L</tspan><tspan x="0" dy="20">M</tspan><tspan x="0" dy="20">N</tspan><tspan x="0" dy="20">O</tspan><tspan x="0" dy="20">P</tspan><tspan x="0" dy="20">Q</tspan></text>
+</g>
+
+<text transform="translate(367.5 530)"><tspan x="0" dy="20">1</tspan></text>
+<text transform="translate(4855.5 530)"><tspan x="0" dy="20">2</tspan></text>
+
+<text transform="translate(367.5 794)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">1</tspan></text>
+<text transform="translate(631.5 794)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(3535.5 794)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">3</tspan></text>
+<text transform="translate(3799.5 794)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">4</tspan></text>
+<text transform="translate(4063.5 794)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">5</tspan></text>
+<text transform="translate(4327.5 794)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">6</tspan></text>
+<text transform="translate(4591.5 794)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">7</tspan></text>
+<text transform="translate(4855.5 794)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan></text>
+
+<text transform="translate(367.5 1058)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">1</tspan></text>
+<text transform="translate(631.5 1058)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(3535.5 1058)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">3</tspan></text>
+<text transform="translate(3799.5 1058)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">4</tspan></text>
+<text transform="translate(4063.5 1058)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">5</tspan></text>
+<text transform="translate(4327.5 1058)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">6</tspan></text>
+<text transform="translate(4591.5 1058)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">7</tspan></text>
+<text transform="translate(4855.5 1058)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">8</tspan></text>
+
+<text transform="translate(367.5 1322)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">1</tspan></text>
+<text transform="translate(631.5 1322)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(895.5 1322)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">9</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(1159.5 1322)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">10</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(1423.5 1322)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">11</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(1687.5 1322)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">13</tspan><tspan x="0" dy="20">1</tspan></text>
+<text transform="translate(1951.5 1322)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">13</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(2215.5 1322)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">14</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(2479.5 1322)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">15</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(2743.5 1322)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">16</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(3007.5 1322)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">1</tspan></text>
+<text transform="translate(3271.5 1322)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(3535.5 1322)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">3</tspan></text>
+<text transform="translate(3799.5 1322)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">4</tspan></text>
+<text transform="translate(4063.5 1322)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">5</tspan></text>
+<text transform="translate(4327.5 1322)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">6</tspan></text>
+<text transform="translate(4591.5 1322)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">7</tspan></text>
+<text transform="translate(4855.5 1322)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">8</tspan></text>
+
+<text transform="translate(367.5 1586)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">1</tspan></text>
+<text transform="translate(631.5 1586)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(895.5 1586)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">9</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(1159.5 1586)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">10</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(1423.5 1586)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">12</tspan><tspan x="0" dy="20">1</tspan></text>
+<text transform="translate(1687.5 1586)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">13</tspan><tspan x="0" dy="20">1</tspan></text>
+<text transform="translate(1951.5 1586)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">13</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(2215.5 1586)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">15</tspan><tspan x="0" dy="20">1</tspan></text>
+<text transform="translate(2479.5 1586)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">16</tspan><tspan x="0" dy="20">1</tspan></text>
+<text transform="translate(2743.5 1586)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">18</tspan></text>
+<text transform="translate(3007.5 1586)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">1</tspan></text>
+<text transform="translate(3271.5 1586)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(3535.5 1586)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">3</tspan></text>
+<text transform="translate(3799.5 1586)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">4</tspan></text>
+<text transform="translate(4063.5 1586)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">5</tspan></text>
+<text transform="translate(4327.5 1586)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">6</tspan></text>
+<text transform="translate(4591.5 1586)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">7</tspan></text>
+<text transform="translate(4855.5 1586)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">8</tspan></text>
+
+<text transform="translate(367.5 1850)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">1</tspan></text>
+<text transform="translate(631.5 1850)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(1159.5 2642)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">9</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(1423.5 2642)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">19</tspan><tspan x="0" dy="20">9</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(1687.5 2642)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">21</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(1951.5 2642)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">22</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(2215.5 2642)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">23</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(2479.5 2642)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">24</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(2743.5 2642)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">25</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(3007.5 2642)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">25</tspan><tspan x="0" dy="20">9</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(3271.5 2642)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">27</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(3535.5 2642)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">28</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(3799.5 2642)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">29</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(4063.5 2642)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">30</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(4327.5 2642)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">31</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(4591.5 2642)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(4855.5 2642)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">9</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(1159.5 1850)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">10</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(1423.5 1850)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">11</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(1687.5 1850)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">12</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(1951.5 1850)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">13</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(2215.5 1850)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">14</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(2479.5 1850)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">15</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(2743.5 1850)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">17</tspan><tspan x="0" dy="20">1</tspan></text>
+<text transform="translate(3007.5 1850)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">1</tspan></text>
+<text transform="translate(3271.5 1850)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(3535.5 1850)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">3</tspan></text>
+<text transform="translate(3799.5 1850)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">4</tspan></text>
+<text transform="translate(4063.5 1850)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">5</tspan></text>
+<text transform="translate(4327.5 1850)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">6</tspan></text>
+<text transform="translate(4591.5 1850)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">7</tspan></text>
+<text transform="translate(4855.5 1850)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">8</tspan></text>
+
+<text transform="translate(367.5 2114)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">1</tspan></text>
+<text transform="translate(631.5 2114)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(1159.5 2906)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">9</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(1423.5 2906)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">10</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(1687.5 2906)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">20</tspan><tspan x="0" dy="20">9</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(1951.5 2906)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">21</tspan><tspan x="0" dy="20">9</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(2215.5 2906)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">22</tspan><tspan x="0" dy="20">9</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(2479.5 2906)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">24</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(2743.5 2906)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">25</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(3007.5 2906)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">25</tspan><tspan x="0" dy="20">9</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(3271.5 2906)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">27</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(3535.5 2906)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">28</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(3799.5 2906)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">29</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(4063.5 2906)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">30</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(4327.5 2906)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">31</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(4591.5 2906)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(4855.5 2906)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">3</tspan></text>
+<text transform="translate(1159.5 2114)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">10</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(1423.5 2114)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">11</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(1687.5 2114)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">12</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(1951.5 2114)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">13</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(2215.5 2114)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">14</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(2479.5 2114)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">15</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(2743.5 2114)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">17</tspan><tspan x="0" dy="20">1</tspan></text>
+<text transform="translate(3007.5 2114)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">17</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(3271.5 2114)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">2</tspan></text>
+<text transform="translate(3535.5 2114)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">3</tspan></text>
+<text transform="translate(3799.5 2114)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">4</tspan></text>
+<text transform="translate(4063.5 2114)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">5</tspan></text>
+<text transform="translate(4327.5 2114)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">6</tspan></text>
+<text transform="translate(4591.5 2114)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">7</tspan></text>
+<text transform="translate(4855.5 2114)"><tspan x="0" dy="20">2</tspan><tspan x="0" dy="20">8</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">32</tspan><tspan x="0" dy="20">18</tspan><tspan x="0" dy="20">8</tspan></text>
+</g>
+
+<text class="Parentheses" x="1011.5" y="2521.31">Для элементов, не имеющих стабильных изотопов, в скобках указывается масса изотопа с наибольшим периодом полураспада.</text>
+<a href="https://ptable.com/?lang=ru">
+<svg x="128" y="2935" width="460" height="216.25" viewBox="0 0 280 121.1">
+<defs>
+<style>
+.Square { fill: url(#lgrad); }
+.Pt { fill: white; paint-order: stroke; stroke: rgb(255, 255, 255, 0.4); stroke-width: 6; }
+.able { fill: #003660; paint-order: stroke; stroke: white; stroke-width: 6; /*vector-effect: non-scaling-stroke;*/ }
+</style>
+<linearGradient id="lgrad" y2="100%">
+<stop offset="0" stop-color="rgb(45,190,252)" />
+<stop offset="1" stop-color="rgb(2,118,253)" />
+</linearGradient>
+</defs>
+<rect class="Square" width="121.1" height="121.1"/>
+<g class="Pt">
+<path d="M25,93.38V27.71H46.3q12.09,0,15.77,1a17.2,17.2,0,0,1,9.45,6.43q3.81,4.95,3.81,12.79a21.29,21.29,0,0,1-2.2,10.16,18,18,0,0,1-5.57,6.48,19.26,19.26,0,0,1-6.88,3.11,75.46,75.46,0,0,1-13.75.94H38.28V93.38ZM38.28,38.82V57.46h7.26c5.22,0,8.72-.35,10.48-1a8.69,8.69,0,0,0,4.14-3.23,8.8,8.8,0,0,0,1.5-5.1,8.52,8.52,0,0,0-2.1-5.92,9.18,9.18,0,0,0-5.33-2.91,63.38,63.38,0,0,0-9.54-.45Z"/>
+<path d="M104.27,45.81v10h-8.6V75a48.82,48.82,0,0,0,.24,6.78A2.75,2.75,0,0,0,97,83.39a3.58,3.58,0,0,0,2.13.63,16.14,16.14,0,0,0,5.06-1.21l1.08,9.77a25.11,25.11,0,0,1-10,1.88,15.76,15.76,0,0,1-6.13-1.14,9,9,0,0,1-4-3,11.73,11.73,0,0,1-1.77-4.91,61,61,0,0,1-.4-8.87V55.84H77.26v-10H83V36.36L95.67,29v16.8Z"/>
+</g>
+<g class="able">
+<path d="M123,60.32,111.6,58.26q1.92-6.88,6.63-10.21t14-3.31q8.43,0,12.55,2a12.58,12.58,0,0,1,5.8,5.06q1.68,3.08,1.68,11.27l-.14,14.69A51.23,51.23,0,0,0,152.7,87,27,27,0,0,0,155,93.38H142.51c-.33-.83-.73-2.07-1.21-3.71-.21-.75-.36-1.24-.45-1.48a22.58,22.58,0,0,1-6.9,4.7,19.68,19.68,0,0,1-7.84,1.57c-4.9,0-8.75-1.33-11.58-4a13.26,13.26,0,0,1-4.23-10.08,13.49,13.49,0,0,1,1.93-7.19,12.61,12.61,0,0,1,5.39-4.84,43,43,0,0,1,10-2.93q8.82-1.65,12.22-3.09V61.09c0-2.42-.59-4.15-1.79-5.18s-3.45-1.54-6.76-1.54a9,9,0,0,0-5.24,1.32A9.15,9.15,0,0,0,123,60.32Zm16.84,10.22a78.71,78.71,0,0,1-7.66,1.92q-5.23,1.13-6.85,2.2a5.24,5.24,0,0,0-2.46,4.43,6.13,6.13,0,0,0,2,4.57,6.85,6.85,0,0,0,5,1.93,10.93,10.93,0,0,0,6.49-2.24,7.91,7.91,0,0,0,3-4.17,24.76,24.76,0,0,0,.49-6.13Z"/>
+<path d="M160.43,93.38V27.71H173V51.37q5.82-6.63,13.79-6.63A18.52,18.52,0,0,1,201.19,51q5.7,6.3,5.69,18.07,0,12.2-5.8,18.77A18.11,18.11,0,0,1,187,94.46a17.44,17.44,0,0,1-8-2,19.31,19.31,0,0,1-6.83-6v7Zm12.5-24.81q0,7.38,2.33,10.93,3.27,5,8.69,5a8.9,8.9,0,0,0,7.1-3.56Q194,77.4,194,69.73q0-8.15-3-11.76a9.35,9.35,0,0,0-7.57-3.6,9.49,9.49,0,0,0-7.52,3.51Q172.93,61.4,172.93,68.57Z"/>
+<path d="M213.34,93.38V27.71h12.58V93.38Z"/>
+<path d="M262.7,78.24l12.55,2.11a20.58,20.58,0,0,1-7.64,10.5q-5.22,3.62-13.06,3.61-12.41,0-18.37-8.11-4.69-6.5-4.7-16.39,0-11.83,6.18-18.53a20.37,20.37,0,0,1,15.64-6.69q10.6,0,16.75,7t5.87,21.48H244.38q.13,5.59,3.05,8.71a9.54,9.54,0,0,0,7.25,3.11,7.75,7.75,0,0,0,5-1.61A10,10,0,0,0,262.7,78.24Zm.72-12.72q-.14-5.46-2.82-8.31a8.64,8.64,0,0,0-6.54-2.84,8.74,8.74,0,0,0-6.81,3q-2.69,3-2.64,8.15Z"/>
+</g>
+</svg>
+</a>
+
+<script><![CDATA[
+function fix_width(node, width) {
+node.setAttribute("lengthAdjust", "spacingAndGlyphs");
+node.setAttribute("textLength", width);
+}
+
+function split_on_middle_space(text) {
+const middle = Math.round(text.length / 2);
+const first_tospace = text.lastIndexOf(" ", middle);
+const last_tospace = text.indexOf(" ", middle);
+
+let split_at;
+if (!text.includes(" "))
+split_at = text.length;
+else if (Math.abs(first_tospace - middle) < Math.abs(last_tospace - middle))
+split_at = first_tospace;
+else
+split_at = last_tospace;
+
+return [text.substr(0, split_at), text.substring(split_at)];
+}
+
+const TITLE_WIDTH = 4750;
+const title = document.querySelector(".Title > text");
+if (title.getComputedTextLength() > TITLE_WIDTH)
+fix_width(title, TITLE_WIDTH);
+
+const PAREN_WIDTH = 3750;
+const paren = document.querySelector(".Parentheses");
+if (paren.getComputedTextLength() > PAREN_WIDTH)
+fix_width(paren, PAREN_WIDTH);
+
+const NONMETAL_WIDTH = 346 - 12;
+const nonmetals = document.querySelector(".SeriesHeader + .SeriesHeader");
+if (nonmetals.getComputedTextLength() > NONMETAL_WIDTH)
+fix_width(nonmetals, NONMETAL_WIDTH);
+
+const BOX_WIDTH = 247 - 12;
+const names = document.querySelectorAll(".Name > text, .GroupText, .VerticalInner > text");
+const long_names = [...names].filter(name => name.getComputedTextLength() > BOX_WIDTH);
+long_names.forEach(name => fix_width(name, BOX_WIDTH));
+
+const STATE_WIDTH = 360 - 12;
+const states = document.querySelectorAll(".LegendText");
+const long_states = [...states].filter(name => name.getComputedTextLength() > STATE_WIDTH);
+long_states.forEach(name => fix_width(name, STATE_WIDTH));
+
+const SERIES_HEIGHT = 448 - 12;
+const series = document.querySelectorAll(".Series");
+const long_series = [...series].filter(name => name.getComputedTextLength() > SERIES_HEIGHT);
+long_series.forEach(name => {
+const tspans = name.querySelectorAll("tspan");
+const parts = split_on_middle_space(tspans[0].textContent);
+
+tspans[0].textContent = parts[0];
+tspans[1].textContent = parts[1];
+
+if (tspans[0].getComputedTextLength() > SERIES_HEIGHT)
+fix_width(tspans[0], SERIES_HEIGHT);
+if (tspans[1].getComputedTextLength() > SERIES_HEIGHT)
+fix_width(tspans[1], SERIES_HEIGHT);
+});
+]]></script>
+</svg>

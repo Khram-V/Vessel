@@ -13,14 +13,14 @@ static bool isBin=false;       // признак двоичной или тек�
 static FILE *F=NULL;           // локальный файл открывается временно
 static string Str;             // рабочая строчка изначально имеет 2К
 
-static bool OpenFile( char *FileName )// открытие файла цифровой модели корпуса
+static bool OpenFile(WCHAR *FileName) // открытие файла цифровой модели корпуса
 { char FTyp[14];
-  F=fopen( FileName,"rb" ); fread( FTyp,1,13,F );
+  F=_wfopen( FileName,L"rb" ); fread( FTyp,1,13,F );
   if( !strncmp( Future,FTyp,9 ) )
-  { fclose( F ); F=fopen( FileName,"rt" ); fgets( FTyp,13,F ); return false; }
-  else if( ((int*)FTyp)[0]==9 && !strncmp( Future,FTyp+4,9 ) )return true;
-  fclose( F ); F=NULL;
-  return false;
+  { fclose( F ); F=_wfopen( FileName,L"rt" ); fgets( FTyp,13,F ); return false; }
+  else
+  if( ((int*)FTyp)[0]==9 && !strncmp( Future,FTyp+4,9 ) )return true;
+  fclose( F ); F=NULL; return false;
 }
 static FileVersion getVersion()
 { if( isBin )return FileVersion( fgetc( F ) ); else
@@ -38,16 +38,16 @@ static Real getFloat()
 { if( isBin ){ float R; fread( &R,1,4,F ); return R; }
                  else return atof( getString( F ) );
 }
-static Point getPoint()
-{ Point P;
+static Vector getPoint()
+{ Vector P;
   if( isBin ){ P.x=getFloat(); P.y=getFloat(); P.z=getFloat(); }
-  else sscanf( getString( F ),"%g%g%g",&P.x,&P.y,&P.z );
+  else sscanf( getString( F ),"%lg%lg%lg",&P.x,&P.y,&P.z );
  return P;
 }
 static Plane getPlane()
 { Plane P;
   if( isBin )P.a=getFloat(),P.b=getFloat(),P.c=getFloat(),P.d=getFloat();
-  else sscanf( getString( F ),"%g%g%g%g",&P.a,&P.b,&P.c,&P.d );
+  else sscanf( getString( F ),"%lg%lg%lg%lg",&P.a,&P.b,&P.c,&P.d );
  return P;
 }
 static void readText( char **src )
@@ -58,7 +58,6 @@ static void readText( char **src )
     *src=strdup( WintU( Str ) );
   }
 }
-
 struct Image
 { int W,H,Size;;
   int Read();
@@ -91,48 +90,51 @@ int Image::Read()
   if( isBin )fseek( F,Size,SEEK_CUR ); else getString( F ); print( " Pic[%d·%d]=%d байт\n",W,H,Size );
   return Size;
 }
-
-bool Ship::ReadFile( char* FileName )
-{ if( !strcut( FileName ) )return false;
-  isBin=OpenFile( FileName );
-  if( !F )return false;                      print( "Открыт %s файл: %s \n",isBin?"двоичный":"текстовый",FileName );
-   FV=(FileVersion)getVersion();             print( "Версия = %d = '%s'\n",FV,sVer[FV] );
-   PT=(PrecisionType)getInt();               print( "Точность = %d\n",PT );
+//   Основная процедура считывания цифрового проекта корабля
+//
+bool Ship::LoadProject( WCHAR* FileName )
+{ isBin=OpenFile( FileName );
+   if( !F )return Ready=false;
+   print("Открыт %s файл: %s\n",
+    isBin?"двоичный":"текстовый",W2U( FileName ) ); textcolor( LIGHTBLUE );
+   FV=(FileVersion)getVersion(); print( "Версия = %d = '%s'\n",FV,sVer[FV] );
+   PT=(PrecisionType)getInt();   print( "Точность = %s[%d]\n",
+             ( (const char*[]){ "Low","Medium","High","VeryHigh" } )[PT],PT );
    //
    //   Сначала параметры визуализации
    //
-   Show.ModelView=(BoardView)getInt();       print( "< Visibility >:\n1^2 борта = %d\n",Show.ModelView );
-   Show.ControlNet=getByte();                print( "ControlNet = %d\n",Show.ControlNet );
-   Show.InteriorEdges=getByte();             print( "InteriorEdges = %d\n",Show.InteriorEdges );
-   Show.Stations=getByte();                  print( "Stations = %d\n",Show.Stations );
-   Show.Buttocks=getByte();                  print( "Buttocks = %d\n",Show.Buttocks );
-   Show.Waterlines=getByte();                print( "Waterlines = %d\n",Show.Waterlines );
-   Show.Normals=getByte();                   print( "Normals = %d\n",Show.Normals );
-   Show.Grid=getByte();                      print( "Grid = %d\n",Show.Grid );
-   Show.Diagonals=getByte();                 print( "Diagonals = %d\n",Show.Diagonals );
-   Show.Markers=getByte();                   print( "Markers = %d\n",Show.Markers );
-   Show.Curvature=getByte();                 print( "Curvature = %d\n",Show.Curvature );
-   Show.CurvatureScale=getFloat();           print( "CurvatureScale = %g\n",Show.CurvatureScale );
+   Shw.ModelView=(BoardView)getInt();       textcolor( LIGHTGRAY ),print( "< Visibility >:\n1^2 борта = %d\n",Shw.ModelView );
+   Shw.ControlNet=getByte();                print( "ControlNet = %d\n",Shw.ControlNet );
+   Shw.InteriorEdges=getByte();             print( "InteriorEdges = %d\n",Shw.InteriorEdges );
+   Shw.Stations=getByte();                  print( "Stations = %d\n",Shw.Stations );
+   Shw.Buttocks=getByte();                  print( "Buttocks = %d\n",Shw.Buttocks );
+   Shw.Waterlines=getByte();                print( "Waterlines = %d\n",Shw.Waterlines );
+   Shw.Normals=getByte();                   print( "Normals = %d\n",Shw.Normals );
+   Shw.Grid=getByte();                      print( "Grid = %d\n",Shw.Grid );
+   Shw.Diagonals=getByte();                 print( "Diagonals = %d\n",Shw.Diagonals );
+   Shw.Markers=getByte();                   print( "Markers = %d\n",Shw.Markers );
+   Shw.Curvature=getByte();                 print( "Curvature = %d\n",Shw.Curvature );
+   Shw.CurvatureScale=getFloat();           print( "CurvatureScale = %g\n",Shw.CurvatureScale );
    if( FV>=fv195 )
-   { Show.ControlCurves=getByte();           print( "195+ ControlCurves = %d\n",Show.ControlCurves );
+   { Shw.ControlCurves=getByte();           print( "195+ ControlCurves = %d\n",Shw.ControlCurves );
      if( FV>=fv210 )
-     { Show.CursorIncrement=getFloat();      print( "210+ CursorIncrement = %g\n",Show.CursorIncrement );
-       if( fabs( Show.CursorIncrement )<1e-7 )Show.CursorIncrement=0.1; //+++
+     { Shw.CursorIncrement=getFloat();      print( "210+ CursorIncrement = %g\n",Shw.CursorIncrement );
+       if( fabs( Shw.CursorIncrement )<1e-7 )Shw.CursorIncrement=0.1; //+++
        if( FV>=fv220 )
-       { Show.HydrostaticData=getByte();     print( "220+ HydrostaticData = %d\n",Show.HydrostaticData );
-         Show.HydrostDisplacement=getByte();   print( "220+ HydrostDisplacement = %d\n",Show.HydrostDisplacement );
-         Show.HydrostLateralArea=getByte();      print( "220+ HydrostLateralArea = %d\n",Show.HydrostLateralArea );
-         Show.HydrostSectionalAreas=getByte();    print( "220+ HydrostSectionalAreas = %d\n",Show.HydrostSectionalAreas );
-         Show.HydrostMetacentricHeight=getByte(); print( "220+ HydrostMetacentricHeight = %d\n",Show.HydrostMetacentricHeight );
-         Show.HydrostLCF=getByte();               print( "220+ HydrostLCF = %d\n",Show.HydrostLCF );
-         if( FV>=fv250 )Show.Flowlines=getByte(), print( "250+ Flowlines = %d\n",Show.Flowlines );
+       { Shw.HydrostaticData=getByte();     print( "220+ HydrostaticData = %d\n",Shw.HydrostaticData );
+         Shw.HydrostDisplacement=getByte();   print( "220+ HydrostDisplacement = %d\n",Shw.HydrostDisplacement );
+         Shw.HydrostLateralArea=getByte();      print( "220+ HydrostLateralArea = %d\n",Shw.HydrostLateralArea );
+         Shw.HydrostSectionalAreas=getByte();    print( "220+ HydrostSectionalAreas = %d\n",Shw.HydrostSectionalAreas );
+         Shw.HydrostMetacentricHeight=getByte(); print( "220+ HydrostMetacentricHeight = %d\n",Shw.HydrostMetacentricHeight );
+         Shw.HydrostLCF=getByte();               print( "220+ HydrostLCF = %d\n",Shw.HydrostLCF );
+         if( FV>=fv250 )Shw.lFlowline=getByte(), print( "250+ logFlowlines = %d\n",Shw.lFlowline );
        } //=220
      }   //=210
    }     //=195
    //
    //  Затем описание характеристик и размерений корпуса с авторскими ссылками
    //
-   readText( &Set.Name );                         print( "< Project >\nName=%s\n",Set.Name );
+   readText( &Set.Name );      textcolor( WHITE ),print( "< Project >\nName=%s\n",Set.Name );
    readText( &Set.Designer );                     print( "Name=%s\n",Set.Designer );
    Set.Length=getFloat();                         print( "Length=%g\n",Set.Length );
    Set.Beam=getFloat();                           print( "Beam=%g\n",Set.Beam );
@@ -167,7 +169,7 @@ bool Ship::ReadFile( char* FileName )
          Set.Trim=getFloat();                     print( "250+ Trim=%g\n",Set.Trim );
 
          Set.NoDisplacements=getInt();            print( "250+ NoDisplacements=%d\n",Set.NoDisplacements );
-         Set.Displacements=(Real*)Allocate( Set.NoDisplacements*sizeof(Real),Set.Displacements );
+         Set.Displacements=(Real*)Allocate( Set.NoDisplacements*sizeof(Real) );
          for( int i=0; i<Set.NoDisplacements; i++ )Set.Displacements[i]=getFloat();
 
          Set.MinimumDisplacement=getFloat();      print( "250+ MinimumDisplacement=%g\n",Set.MinimumDisplacement );
@@ -176,11 +178,11 @@ bool Ship::ReadFile( char* FileName )
          Set.UseDisplIncrements=getByte();        print( "250+ UseDisplIncrements=%d\n",Set.UseDisplIncrements );
 
          Set.NoAngles=getInt();                   print( "250+ NoAngles=%d\n",Set.Angles );
-         Set.Angles=(Real*)Allocate( Set.NoAngles*sizeof(Real),Set.Angles );
+         Set.Angles=(Real*)Allocate( Set.NoAngles*sizeof(Real) );
          for( int i=0; i<Set.NoAngles; i++ )Set.Angles[i]=getFloat();
 
          Set.NoTrims=getInt();                    print( "250+ NoTrims=%d\n",Set.Trims );
-         Set.Trims=(Real*)Allocate( Set.NoTrims*sizeof(Real),Set.Trims );
+         Set.Trims=(Real*)Allocate( Set.NoTrims*sizeof(Real) );
          for( int i=0; i<Set.NoTrims; i++ )Set.Trims[i]=getFloat();
 
          Set.FreeTrim=getByte();                  print( "250+ FreeTrim=%d\n",Set.FreeTrim );
@@ -204,12 +206,12 @@ bool Ship::ReadFile( char* FileName )
    N=getInt();                                  print( "< Surface.LaeyrData >\nNoLaeyrs = %d -> %d\n",Shl.NoLayers,N );
    if( Shl.NoLayers>0 )memset( Shl.L,0,Shl.NoLayers*sizeof( Surface::Laeyrs ) );
    Shl.NoLayers=N;
-   Shl.L=(Surface::Laeyrs*)Allocate( N*sizeof(Surface::Laeyrs),Shl.L );
-// Shl.L=(Surface::Laeyrs*)Allocate( N*sizeof(*Shl.L),Shl.L );
+   Shl.L=(Surface::Laeyrs*)Allocate( N*sizeof(Surface::Laeyrs) );
+// Shl.L=(Surface::Laeyrs*)Allocate( N*sizeof(*Shl.L) );
    if( N )
    { for( I=0; I<N; I++ )
      { /* Layer=AddNewLayer(); */               print( "AddNewLaeyr[%d]: ",I );
-       readText( &(Shl.L[I].Description) );     print( "'%s'",Shl.L[I].Description );
+       readText( &(Shl.L[I].Description) );     print( "'%-24s'",Shl.L[I].Description );
        Shl.L[I].ID=getInt();                    print( " ID=%d,",Shl.L[I].ID );
        Shl.L[I].Color=getInt();                 print( "%X",Shl.L[I].Color );
        Shl.L[I].Visible=getByte();              print("{%d,",Shl.L[I].Visible );
@@ -238,29 +240,28 @@ bool Ship::ReadFile( char* FileName )
    Shl.NoCoPoint=N;
    Shl.P=(Surface::CoPoint*)Allocate( N*sizeof( Surface::CoPoint ) );
    for( I=0; I<N; I++ )
-   { Point( Shl.P[I] )=getPoint();
+   { Shl.P[I].V=getPoint();
      Shl.P[I].T = (VertexType)getInt();
      Shl.P[I].Selected=getByte();
      if( FV>=fv198 )Shl.P[I].Locked=getByte();
-   }                                             if( --I>=0 )print( " = 0 ... [%d]={%g,%g,%g}",I,Shl.P[I].x,Shl.P[I].y,Shl.P[I].z ); print( "\n" );
+   }                                             if( --I>=0 )print( " = 0 ... [%d]={%g,%g,%g}",I,Shl.P[I].V.x,Shl.P[I].V.y,Shl.P[I].V.z ); print( "\n" );
    N=getInt();                                   print( "< ControlEdges > %d",N );
    if( Shl.NoEdges>0 )memset( Shl.G,0,Shl.NoEdges*sizeof( Surface::Edges ) );
    Shl.NoEdges=N;
    Shl.G=(Surface::Edges*)Allocate( N*sizeof( Surface::Edges ) );
    for( I=0; I<N; I++ )
    { K=getInt(); if( K==-1 )K=0; Shl.G[I].StartIndex=K;
-//                               Shl.G[I].StartPoint=Shl.P[K];
+                                 Shl.G[I].StartPoint=Shl.P[K].V;
      K=getInt(); if( K==-1 )K=0; Shl.G[I].EndIndex=K;
-//                               Shl.G[I].EndPoint=Shl.P[K];
+                                 Shl.G[I].EndPoint=Shl.P[K].V;
      Shl.G[I].Crease = getByte();
      Shl.G[I].Selected = getByte();
-   }                         if( --I>=0 )print( " = 0 ... [%d]={%d + %d}",I,Shl.G[I].StartIndex,Shl.G[I].EndIndex ); print( "\n" );
-
+   }                                                       if( --I>=0 )print( " = 0 ... [%d]={%d + %d}",I,Shl.G[I].StartIndex,Shl.G[I].EndIndex ); print( "\n" );
    if( FV>=fv195 )
    { N=getInt();                                           print( "195+ < ControlCurves > %d",N );
      if( Shl.NoCurves>0 )memset( Shl.G,0,Shl.NoCurves*sizeof( Surface::Curves ) );
      Shl.NoCurves=N;
-     Shl.C=(Surface::Curves*)Allocate( N*sizeof( Surface::Curves ),Shl.C );
+     Shl.C=(Surface::Curves*)Allocate( N*sizeof( Surface::Curves ) );
      for( I=0; I<N; I++ )
      { K=getInt();
        Shl.C[I].Capacity=K;
@@ -270,9 +271,9 @@ bool Ship::ReadFile( char* FileName )
      }                                                     print( "\n" );
    }
    N=getInt();                                             print( "< ControlFaces > %d\n",N );
-   if( Shl.NoFaces>0 )memset( Shl.G,0,Shl.NoFaces*sizeof( Surface::Faces ) );
+   if( Shl.NoFaces>0 )memset( Shl.F,0,Shl.NoFaces*sizeof( Surface::Faces ) );
    Shl.NoFaces=N;
-   Shl.F=(Surface::Faces*)Allocate( N*sizeof( Surface::Faces ),Shl.G );
+   Shl.F=(Surface::Faces*)Allocate( N*sizeof( Surface::Faces ) );
    for( I=0; I<N; I++ )
    { K=getInt();
      Shl.F[I].Capacity=K;
@@ -281,8 +282,7 @@ bool Ship::ReadFile( char* FileName )
      Shl.F[I].LayerIndex=getInt();
      Shl.F[I].Selected=getByte();
    }
-
-   NoStations=getInt();         print( "< Stations > = %d frames\n",NoStations );
+   NoStations=getInt();                                    print( "< Stations > = %d frames\n",NoStations );
    Stations=(InterSection*)Allocate( NoStations*sizeof( InterSection ) );
    for( I=0; I<NoStations; I++ )Stations[I].Read();
 
@@ -315,46 +315,54 @@ bool Ship::ReadFile( char* FileName )
          }
        }
        if( FV>=fv210 )
-       { for( I=0; I<17; I++ )getFloat(); getByte(),getByte();  if( isBin )fseek( F,2,SEEK_CUR );      /// выравнивание до 4 байт
-                                                                print( "210+ DelftSeriesResistanceData = 17x4+2x1(+2) = %d\n",17*4+2+2 );
-         for( I=0; I<9; I++ )getFloat(); getByte();             if( isBin )fseek( F,3,SEEK_CUR );
-                                                                print( "210+ KAPERResistanceData = 9x4+1(+3) = %d\n",9*4+1+3 );
+       { for( I=0; I<17; I++ )getFloat(); getByte(),getByte();  /// выравнивание до 4 байт
+          if( isBin )fseek( F,2,SEEK_CUR );                     print( "210+ DelftSeriesResistanceData = 17x4+2x1(+2) = %d\n",17*4+2+2 );
+         for( I=0; I<9; I++ )getFloat(); getByte();
+          if( isBin )fseek( F,3,SEEK_CUR );                     print( "210+ KAPERResistanceData = 9x4+1(+3) = %d\n",9*4+1+3 );
          if( FV>=fv250 )
          { BackImage *Pic;
            N=getInt();                                          print( "250+ BackGroundImages = %d\n",N );
            if( N>0 )
            { Pic = (BackImage*)Allocate( N*sizeof( BackImage ) );
-             for( I=0; I<N; I++ ){                              print( "250+ Фон №_%d ",I );
-               Pic[I].Read();
-             }
+             for( I=0; I<N; I++ )Pic[I].Read();                 print( "250+ Фон №_%d ",I );
            }
            N=getInt();                                          print( "250+ Flow Lines = %d\n",N );
-
+           if( N>0 )
+           { NoFlowLines=N;
+             FlowLines=(Flex*)Allocate( N*sizeof( Flex ) );
+             for( I=0; I<NoFlowLines; I++ )
+             { getFloat(), // FProjectionPoint.X
+               getFloat(); // FProjectionPoint.Y
+               getInt(); // fvBodyplan,fvProfile,fvPlan,fvPerspective: ViewType
+               getByte(),getByte(); // FBuild,AddSorted
+               N=getInt();
+               for( K=0; K<N; K++ ){ FlowLines[I]+=getPoint(); getByte(); }
+             }
+           }
          } // =250
        }   // =210
      }     // =191
    }       // =180
-   return false;
+   return Ready=true;
 }
-
 void InterSection::Read()
 { int K,N;
   IT=(IntersectionType)getInt();                                       // print( "\n IT=%d",K );
   if( FV>=fv191 )ShowCurvature=getByte();
             else ShowCurvature=false;                                  // print( " ShowCurvature=%d",St[I].ShowCurvature );
-  Plane(*this)=getPlane();
+  Pl=getPlane();
   Build=getByte();
   NoItems=N=getInt();
   T=(Items*)Allocate( N*sizeof(Items) );                               // textcolor( YELLOW );print( "\n a=%g,b=%g,c=%g,d=%g,Build=%d,N=%d",St[I].a,St[I].b,St[I].c,St[I].d,St[I].Build,N );
   for( int n=0; n<N; n++ )
   { T[n].NoSplines=K=getInt();
-    T[n].S=(InterSection::Items::Spline*)Allocate( K*sizeof(InterSection::Items::Spline) );   // print( "\nN=%d, K=%d  ",N,K  ); getch();
+    T[n].S=(InterSection::Items::Spline*)Allocate( K*sizeof(InterSection::Items::Spline) ); // print( "\nN=%d, K=%d  ",N,K  ); getch();
     for( int k=0; k<K; k++ )
-    { Point &P=T[n].S[k].P;
+    { Vector &P=T[n].S[k].P;
       if( FV >=fv160 )
-      { if( IT==fiStation ){ P.x=-d; P.y=getFloat(); P.z=getFloat(); } else
-        if( IT==fiButtock ){ P.x=getFloat(); P.y=-d; P.z=getFloat(); } else
-        if( IT==fiWaterline){P.x=getFloat(); P.y=getFloat(); P.z=-d; }
+      { if( IT==fiStation ){ P.x=-Pl.d; P.y=getFloat(); P.z=getFloat(); } else
+        if( IT==fiButtock ){ P.x=getFloat(); P.y=-Pl.d; P.z=getFloat(); } else
+        if( IT==fiWaterline){P.x=getFloat(); P.y=getFloat(); P.z=-Pl.d; }
         else P = getPoint();
       } else P = getPoint();
       T[n].S[k].Knuckle=getByte();

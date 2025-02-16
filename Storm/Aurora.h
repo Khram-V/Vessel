@@ -312,13 +312,4 @@ void logStop();   // завершение протокола
 //void e6( Real &R );
 //Real e8( _Real ); void e6( Real& );        // округление записи для точных сравнений 0.01 мм
 //Vector e8( _Vector ); void e6( Vector& );
-Real& angle( Real &A );                  // -180°÷180°
-Real  angle( _Real A,_Real B );          // { A-B: -п÷п }
-Vector angle( Vector A );
-Vector operator ~( _Vector );            // для другого борта
-bool intor( _Real F,_Real S,_Real G );   // с включением базовой точки G
-bool intoi( _Real F,_Real S,_Real G );   // захват
-bool intox( _Real F,_Real S,_Real G );   // и без
-Real Inter( _Real x,_Real x0,_Real x1,_Real y0,_Real y1 ); // любое направление
-Vector Inter( _Real x, _Real x0,_Real x1, _Vector v0,_Vector v1 );
 #endif

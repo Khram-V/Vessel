@@ -4,7 +4,7 @@
 //              общества судостроителей имени Алексея Николаевича Крылова
 //      Подборка базовый геометрических объектов и операций        ‏יְרוּשָׁלַיִם
 //
-#include "Aurora.h"
+#include "..\Window\View.h"
 
 struct Vector; typedef const Vector& _Vector; // свободный разностный вектор
 struct Matrix; typedef const Matrix& _Matrix; // чистая матрица для тензора
@@ -87,3 +87,13 @@ const Vector Zero={ 0,0,0 },Zenit={ 0,0,1 };
 inline const Real sqr( _Real a ){ return a*a; }
 Real abs( _Vector a ),norm( _Vector a );
 Vector dir( _Vector a );
+Real& angle( Real &A );                  // -180°÷180°
+Real  angle( _Real A,_Real B );          // { A-B: -п÷п }
+Vector angle( Vector A );
+Vector operator ~( _Vector );            // для другого борта
+bool intor( _Real F,_Real S,_Real G );   // с включением базовой точки G
+bool intoi( _Real F,_Real S,_Real G );   // захват
+bool intox( _Real F,_Real S,_Real G );   // и без
+Real Inter( _Real x,_Real x0,_Real x1,_Real y0,_Real y1 ); // любое направление
+Vector Inter( _Real x, _Real x0,_Real x1, _Vector v0,_Vector v1 );
+

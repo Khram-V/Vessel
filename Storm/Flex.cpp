@@ -5,7 +5,7 @@
 //         k>=0 є { 0÷len-1 } — положительные индексы с прямым отсчётом P[k]
 //         k<0  є { len+k÷0 } — отрицательные ≡ обратный отсчёт  P[len-k]
 //
-#include "Aurora.h"
+#include "Flex.h"
 
 Vector operator * (_Vector a,_Vector b ){ return (Vector){ a.y*b.z-a.z*b.y,
                                                            a.z*b.x-a.x*b.z,
@@ -13,7 +13,6 @@ Vector operator * (_Vector a,_Vector b ){ return (Vector){ a.y*b.z-a.z*b.y,
 Real operator %( _Vector a,_Vector b ){ return a.x*b.x+a.y*b.y+a.z*b.z; }
 bool operator==( _Vector a,_Vector b ){ return a.x==b.x&&a.y==b.y&&a.z==b.z; }
 bool operator!=( _Vector a,_Vector b ){ return a.x!=b.x||a.y!=b.y||a.z!=b.z; }
-
 
 Vector operator - ( Vector a ){ a.x=-a.x; a.y=-a.y; a.z=-a.z; return a; }
 Vector operator * ( _Real w,Vector c ){ c.x*=w; c.y*=w; c.z*=w; return c; }

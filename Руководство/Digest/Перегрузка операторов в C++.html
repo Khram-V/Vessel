@@ -1,0 +1,236 @@
+<html lang="ru"><head><title>Перегрузка операторов в C++</title>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+<style>
+.{display:block;overflow-x:auto;padding:.5em;color:#383a42;background:#f0fafa;font-size:110%}
+.comment{color:#50a157;font-style:italic}
+.keyword{color:navy;font-weight:bold}
+.class .title{color:brown}
+.number{color:#986801}
+.title{color:#4078f2}</style>
+<link rel="icon" href="cpp.ico" type="ico">
+</head>
+<body>
+<p>&nbsp;</p>
+<h2>Явные вызовы деструктора</h2>
+<p>Редко возникает необходимость в явном вызове деструктора. Однако может быть полезно выполнить удаление объектов, размещенных по абсолютным адресам. Эти объекты обычно выделяются с помощью определяемого&nbsp;<strong style="box-sizing: inherit; outline-color: inherit; font-weight: 600;"><code style="box-sizing: inherit; outline-color: inherit; font-family: SFMono-Regular, Consolas, &quot;Liberation Mono&quot;, Menlo, Courier, monospace; font-size: 13.6px; direction: ltr; background-color: var(--theme-inline-code); overflow-wrap: break-word; border-radius: 3px; padding: 0.1em 0.2em;">new</code></strong>&nbsp;пользователем оператора, который принимает аргумент размещения. Оператор&nbsp;<strong style="box-sizing: inherit; outline-color: inherit; font-weight: 600;"><code style="box-sizing: inherit; outline-color: inherit; font-family: SFMono-Regular, Consolas, &quot;Liberation Mono&quot;, Menlo, Courier, monospace; font-size: 13.6px; direction: ltr; background-color: var(--theme-inline-code); overflow-wrap: break-word; border-radius: 3px; padding: 0.1em 0.2em;">delete</code></strong>&nbsp;не может освободить эту память, так как он не выделяется из свободного хранилища (дополнительные сведения см.&nbsp;<a data-linktype="relative-path" style="box-sizing: inherit; outline-color: inherit; color: var(--theme-hyperlink); background-color: rgba(0, 0, 0, 0); cursor: pointer; overflow-wrap: break-word; text-decoration: none; outline-style: initial; outline-width: 0px;" href="https://docs.microsoft.com/ru-ru/cpp/cpp/new-and-delete-operators?view=msvc-170">в разделе &quot;Новые и удаленные операторы</a>&quot;). Вызов деструктора, однако, может выполнить соответствующую очистку. Для явного вызова деструктора для объекта (<code style="box-sizing: inherit; outline-color: inherit; font-family: SFMono-Regular, Consolas, &quot;Liberation Mono&quot;, Menlo, Courier, monospace; font-size: 13.6px; direction: ltr; background-color: var(--theme-inline-code); overflow-wrap: break-word; border-radius: 3px; padding: 0.1em 0.2em;">s</code>) класса&nbsp;<code style="box-sizing: inherit; outline-color: inherit; font-family: SFMono-Regular, Consolas, &quot;Liberation Mono&quot;, Menlo, Courier, monospace; font-size: 13.6px; direction: ltr; background-color: var(--theme-inline-code); overflow-wrap: break-word; border-radius: 3px; padding: 0.1em 0.2em;">String</code>&nbsp;воспользуйтесь одним из следующих операторов.</p>
+C++
+<pre>
+  s.String::~String();    // non-virtual call
+  ps->String::~String();  // non-virtual call
+
+  s.~String();       // Virtual call
+  ps->~String();     // Virtual call
+</pre>
+<p>Нотация для явных вызовов деструкторов, показанная в предыдущем примере, может использоваться независимо от того, определяет ли тип деструктор. Это позволяет выполнять такие явные вызовы, не зная, определен ли деструктор для типа. Явный вызов деструктора, если ни один из них не определен, не имеет никакого эффекта.</p>
+<pre>
+  s.String::~String();   // non-virtual call
+  ps->String::~String(); // non-virtual call
+
+  s.~String();   // Virtual call
+  ps->~String(); // Virtual call
+</pre>
+<h2>Перегрузка операторов в C++</h2>
+— перегрузка операторов, это всего лишь более удобный способ вызова функций, поэтому не стоит увлекаться перегрузкой операторов. Использовать её следует только тогда, когда это упростит написание кода. Но, не настолько, чтобы это затрудняло чтение. Ведь, как известно, код читается намного чаще, чем пишется. И не забывайте, что вам никогда не дадут перегрузить операторы в тандеме со встроенными типами, возможность перегрузки есть только для пользовательских типов/классов.<a name="habracut"></a><h3>Синтаксис перегрузки</h3>
+Синтаксис перегрузки операторов очень похож на определение функции с именем operator@, где @ — это идентификатор оператора (например +, -, &lt;&lt;, &gt;&gt;). Рассмотрим простейший пример:
+<pre><code class="cpp"><span class="class"><span class="keyword">class</span> <span class="title">Integer</span>
+{</span>
+<span class="keyword">private</span>:
+<span class="keyword">    int</span> value;
+<span class="keyword">public</span>:
+    Integer(<span class="keyword">int</span> i): value(i)
+    {}
+<span class="keyword">const</span> Integer <span class="keyword">operator</span>+(<span class="keyword">const</span> Integer&amp; rv) <span class="keyword">const</span> {
+<span class="keyword">      return</span> (value + rv.value);
+    }
+};</code></pre>
+В данном случае, оператор оформлен как член класса, аргумент определяет значение, находящееся в правой части оператора. Вообще, существует два основных способа перегрузки операторов: глобальные функции, <a href="http://en.wikipedia.org/wiki/Friend_function">дружественные</a> для класса, или подставляемые функции самого класса. Какой способ, для какого оператора лучше, рассмотрим в конце топика.<br>
+<br>
+В большинстве случаев, операторы (кроме условных) возвращают объект, или ссылку на тип, к которому относятся его аргументы (если типы разные, то вы сами решаете как интерпретировать результат вычисления оператора).<h3>Перегрузка унарных операторов</h3>
+Рассмотрим примеры перегрузки унарных операторов для определенного выше класса Integer. Заодно определим их в виде дружественных функций и рассмотрим операторы декремента и инкремента:<pre><code class="cpp"><span class="class"><span class="keyword">class</span> <span class="title">Integer</span>
+{</span>
+<span class="keyword">private</span>:
+<span class="keyword">int</span> value;
+<span class="keyword">public</span>:
+    Integer(<span class="keyword">int</span> i): value(i)
+    {}
+
+<span class="comment">//унарный +</span>
+<span class="keyword">friend</span> <span class="keyword">const</span> Integer&amp; <span class="keyword">operator</span>+(<span class="keyword">const</span> Integer&amp; i);
+
+<span class="comment">//унарный -</span>
+<span class="keyword">friend</span> <span class="keyword">const</span> Integer <span class="keyword">operator</span>-(<span class="keyword">const</span> Integer&amp; i);
+
+<span class="comment">//префиксный инкремент</span>
+<span class="keyword">friend</span> <span class="keyword">const</span> Integer&amp; <span class="keyword">operator</span>++(Integer&amp; i);
+
+<span class="comment">//постфиксный инкремент</span>
+<span class="keyword">friend</span> <span class="keyword">const</span> Integer <span class="keyword">operator</span>++(Integer&amp; i, <span class="keyword">int</span>);
+
+<span class="comment">//префиксный декремент</span>
+<span class="keyword">friend</span> <span class="keyword">const</span> Integer&amp; <span class="keyword">operator</span>--(Integer&amp; i);
+
+<span class="comment">//постфиксный декремент</span>
+<span class="keyword">friend</span> <span class="keyword">const</span> Integer <span class="keyword">operator</span>--(Integer&amp; i, <span class="keyword">int</span>);
+};
+
+<span class="comment">//унарный плюс ничего не делает.</span>
+<span class="keyword">const</span> Integer&amp; <span class="keyword">operator</span>+(<span class="keyword">const</span> Integer&amp; i) {
+<span class="keyword">	return</span> i.value;
+}
+
+<span class="keyword">const</span> Integer <span class="keyword">operator</span>-(<span class="keyword">const</span> Integer&amp; i) {
+<span class="keyword">	return</span> Integer(-i.value);
+}
+
+<span class="comment">//префиксная версия возвращает значение после инкремента</span>
+<span class="keyword">const</span> Integer&amp; <span class="keyword">operator</span>++(Integer&amp; i) {
+	    i.value++;
+<span class="keyword">	return</span> i;
+}
+
+<span class="comment">//постфиксная версия возвращает значение до инкремента</span>
+<span class="keyword">const</span> Integer <span class="keyword">operator</span>++(Integer&amp; i, <span class="keyword">int</span>) {
+<span class="function">	Integer <span class="title">oldValue</span><span class="params">(i.value)</span></span>;
+	    i.value++;
+<span class="keyword">	return</span> oldValue;
+}
+
+<span class="comment">//префиксная версия возвращает значение после декремента</span>
+<span class="keyword">const</span> Integer&amp; <span class="keyword">operator</span>--(Integer&amp; i) {
+    i.value--;
+<span class="keyword">    return</span> i;
+}
+
+<span class="comment">//постфиксная версия возвращает значение до декремента</span>
+<span class="keyword">const</span> Integer <span class="keyword">operator</span>--(Integer&amp; i, <span class="keyword">int</span>) {
+<span class="function">Integer <span class="title">oldValue</span><span class="params">(i.value)</span></span>;
+    i.value--;
+<span class="keyword">    return</span> oldValue;
+}</code></pre>
+Теперь вы знаете, как компилятор различает префиксные и постфиксные версии декремента и инкремента. В случае, когда он видит выражение ++i, то вызывается функция operator++(a). Если же он видит i++, то вызывается operator++(a, int). То есть вызывается перегруженная функция operator++, и именно для этого используется фиктивный параметр int в постфиксной версии.<h3>Бинарные операторы</h3>
+Рассмотрим синтаксис перегрузки бинарных операторов. Перегрузим один оператор, который возвращает l-значение, один условный оператор и один оператор, создающий новое значение (определим их глобально):<pre><code class="cpp"><span class="class"><span class="keyword">class</span> <span class="title">Integer</span>
+{</span>
+<span class="keyword">private</span>:
+<span class="keyword">int</span> value;
+<span class="keyword">public</span>:
+    Integer(<span class="keyword">int</span> i): value(i)
+    {}
+<span class="keyword">friend</span> <span class="keyword">const</span> Integer <span class="keyword">operator</span>+(<span class="keyword">const</span> Integer&amp; left, <span class="keyword">const</span> Integer&amp; right);
+
+<span class="keyword">friend</span> Integer&amp; <span class="keyword">operator</span>+=(Integer&amp; left, <span class="keyword">const</span> Integer&amp; right);
+
+<span class="keyword">friend</span> <span class="keyword">bool</span> <span class="keyword">operator</span>==(<span class="keyword">const</span> Integer&amp; left, <span class="keyword">const</span> Integer&amp; right);
+};
+
+<span class="keyword">const</span> Integer <span class="keyword">operator</span>+(<span class="keyword">const</span> Integer&amp; left, <span class="keyword">const</span> Integer&amp; right) {
+<span class="keyword">	return</span> Integer(left.value + right.value);
+}
+
+Integer&amp; <span class="keyword">operator</span>+=(Integer&amp; left, <span class="keyword">const</span> Integer&amp; right) {
+    left.value += right.value;
+<span class="keyword">	return</span> left;
+}
+
+<span class="keyword">bool</span> <span class="keyword">operator</span>==(<span class="keyword">const</span> Integer&amp; left, <span class="keyword">const</span> Integer&amp; right) {
+<span class="keyword">	return</span> left.value == right.value;
+}</code></pre>
+Во всех этих примерах операторы перегружаются для одного типа, однако, это необязательно. Можно, к примеру, перегрузить сложение нашего типа Integer и определенного по его подобию Float.<h3>Аргументы и возвращаемые значения</h3>
+Как можно было заметить, в примерах используются различные способы передачи аргументов в функции и возвращения значений операторов.<ul>
+<li>Если аргумент не изменяется оператором, в случае, например унарного плюса, его нужно передавать как ссылку на константу. Вообще, это справедливо для почти всех арифметических операторов (сложение, вычитание, умножение...)</li>
+<li>Тип возвращаемого значения зависит от сути оператора. Если оператор должен возвращать новое значение, то необходимо создавать новый объект (как в случае бинарного плюса). Если вы хотите запретить изменение объекта как l-value, то нужно возвращать его константным.</li>
+<li>Для операторов присваивания необходимо возвращать ссылку на измененный элемент. Также, если вы хотите использовать оператор присваивания в конструкциях вида (x=y).f(), где функция f() вызывается для для переменной x, после присваивания ей y, то не возвращайте ссылку на константу, возвращайте просто ссылку.</li>
+<li>Логические операторы должны возвращать в худшем случае int, а в лучшем bool.</li>
+</ul>
+<h3>Оптимизация возвращаемого значения</h3>
+При создании новых объектов и возвращении их из функции следует использовать запись как для вышеописанного примера оператора бинарного плюса.<pre><code class="cpp"><span class="keyword">return</span> Integer(left.value + right.value);</code></pre>
+Честно говоря, не знаю, какая ситуация актуальна для C++11, все рассуждения далее справедливы для C++98.<br>
+На первый взгляд, это похоже на синтаксис создания временного объекта, то есть как будто бы нет разницы между кодом выше и этим:<pre><code class="cpp"><span class="function">Integer <span class="title">temp</span><span class="params">(left.value + right.value)</span></span>;
+<span class="keyword">	return</span> temp;</code></pre>
+Но на самом деле, в этом случае произойдет вызов конструктора в первой строке, далее вызов конструктора копирования, который скопирует объект, а далее, при раскрутке стека вызовется деструктор. При использовании первой записи компилятор изначально создаёт объект в памяти, в которую нужно его скопировать, таким образом экономится вызов конструктора копирования и деструктора.<h3>Особые операторы</h3>
+В C++ есть операторы, обладающие специфическим синтаксисом и способом перегрузки. Например оператор индексирования []. Он всегда определяется как член класса и, так как подразумевается поведение индексируемого объекта как массива, то ему следует возвращать ссылку.<h4>Оператор запятая</h4>
+В число «особых» операторов входит также оператор запятая. Он вызывается для объектов, рядом с которыми поставлена запятая (но он не вызывается в списках аргументов функций). Придумать осмысленный пример использования этого оператора не так-то просто. Хабраюзер <a href="https://habrahabr.ru/users/axispod/" class="user_link">AxisPod</a> в комментариях к предыдущей статье о перегрузке <a href="http://habrahabr.ru/blogs/cpp/123417/#comment_4053406">рассказал об одном</a>.<h4>Оператор разыменования указателя</h4>
+Перегрузка этих операторов может быть оправдана для классов умных указателей. Этот оператор обязательно определяется как функция класса, причём на него накладываются некоторые ограничения: он должен возвращать либо объект (или ссылку), либо указатель, позволяющий обратиться к объекту.<h4>Оператор присваивания</h4>
+Оператор присваивания обязательно определяется в виде функции класса, потому что он неразрывно связан с объектом, находящимся слева от &quot;=&quot;. Определение оператора присваивания в глобальном виде сделало бы возможным переопределение стандартного поведения оператора &quot;=&quot;. Пример:<pre><code class="cpp"><span class="class"><span class="keyword">class</span> <span class="title">Integer</span>
+{</span>
+<span class="keyword">private</span>:
+<span class="keyword">    int</span> value;
+<span class="keyword">public</span>:
+    Integer(<span class="keyword">int</span> i): value(i) {}
+
+    Integer&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> Integer&amp; right) {
+<span class="comment">    //проверка на самоприсваивание</span>
+<span class="keyword">    if</span> (<span class="keyword">this</span> == &amp;right) { <span class="keyword">return</span> *<span class="keyword">this</span>; }
+        value = right.value;
+<span class="keyword">    return</span> *<span class="keyword">this</span>;
+    }
+};</code></pre>
+<pre>Как можно заметить, в начале функции производится проверка на самоприсваивание. Вообще, в данном случае самоприсваивание безвредно, но ситуация не всегда такая простая. Например, если объект большой, можно потратить много времени на ненужное копирование, или при работе с указателями.</pre>
+<h4>Неперегружаемые операторы</h4>
+Некоторые операторы в C++ не перегружаются в принципе. По всей видимости, это сделано из соображений безопасности.<ul>
+<li>Оператор выбора члена класса &quot;.&quot;.</li>
+<li>Оператор разыменования указателя на член класса &quot;.*&quot;</li>
+<li>В С++ отсутствует оператор возведения в степень (как в Fortran) &quot;**&quot;.</li>
+<li>Запрещено определять свои операторы (возможны проблемы с определением приоритетов).</li>
+<li>Нельзя изменять приоритеты операторов</li>
+</ul>
+<h3>Рекомендации к форме определения операторов</h3>
+Как мы уже выяснили, существует два способа операторов — в виде функции класса и в виде дружественной глобальной функции.<br>
+Роб Мюррей, в своей книге C++ Strategies and Tactics определил следующие рекомендации по выбору формы оператора:<table align="center">
+<tr>
+<td><b>Оператор</b></td>
+<td><b>Рекомендуемая форма</b></td>
+</tr>
+<tr>
+<td>Все унарные операторы</td>
+<td>Член класса</td>
+</tr>
+<tr>
+<td>= () [] -&gt; -&gt;*</td>
+<td>Обязательно член класса</td>
+</tr>
+<tr>
+<td>+= -= /= *= ^= &amp;= |= %= &gt;&gt;= &lt;&lt;=</td>
+<td>Член класса</td>
+</tr>
+<tr>
+<td>Остальные бинарные операторы</td>
+<td>Не член класса</td>
+</tr>
+</table>
+Почему так? Во-первых, на некоторые операторы изначально наложено ограничение. Вообще, если семантически нет разницы как определять оператор, то лучше его оформить в виде функции класса, чтобы подчеркнуть связь, плюс помимо этого функция будет подставляемой (inline). К тому же, иногда может возникнуть потребность в том, чтобы представить левосторонний операнд объектом другого класса. Наверное, самый яркий пример — переопределение &lt;&lt; и &gt;&gt; для потоков ввода/вывода.<p><u><span lang="en-us">+++ </span>Пример из MSDN</u>:</p>
+<pre><code><span class="keyword">class</span> <span class="title">Int</span>
+{
+<span class="keyword">public</span>:
+    Int &amp;<span class="keyword">operator</span>++( <span class="keyword">int</span> n );
+<span class="keyword">private</span>:
+<span class="keyword">    int</span> _i;
+};
+Int&amp; Int::<span class="keyword">operator</span>++( <span class="keyword">int</span> n )
+{   <span class="keyword">if</span>( n != <span class="number">0</span> )_i+=n;</code><code> <span class="comment">// Handle case where an argument is passed.</span>
+<span class="keyword">          else </span> _i++;  <span class="comment">// Handle case where no argument is passed.</span>
+<span class="keyword">    return</span> *<span class="keyword">this</span>;
+}
+<span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span>
+</span>{ Int i;
+   i.<span class="keyword">operator</span>++( <span class="number">25</span> ); <span class="comment">// Increment by 25.</span>
+}</code></pre>
+<pre><u><code><span>+++ </span></code>операторы преобразования типов</u>:</pre>
+<pre><code><span class="class"><span class="keyword">class</span> <span class="title">A</span>
+{</span>
+    <span class="keyword">int</span> x;
+
+<span class="keyword">public</span>:
+    A(<span class="keyword">int</span> _x): x(_x) {}
+
+    <span class="function"><span class="keyword">operator</span> <span class="title">int</span><span class="params">()</span> <span class="keyword">const</span> </span>{
+        <span class="keyword">return</span> x;
+    }
+};
+
+<span class="function"><span class="keyword">void</span> <span class="title">foo</span><span class="params">()</span> </span>{
+    A a;
+    <span class="keyword">int</span> b;
+    b = a;
+}</code></pre>
+</body>
+</html>

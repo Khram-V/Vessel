@@ -38,8 +38,11 @@
 				<Option object_output="Dev/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters='&quot;Fregate type 23-11.fbm&quot;' />
+				<Option parameters='&quot;Fregate type 23-11.ftm&quot;' />
 				<Option projectLinkerOptionsRelation="2" />
+				<Linker>
+					<Add library="glu32" />
+				</Linker>
 			</Target>
 		</Build>
 		<Compiler>
@@ -112,6 +115,12 @@
 		<Unit filename="../Ship/Ship_IO.cpp">
 			<Option target="Ship" />
 		</Unit>
+		<Unit filename="../Storm/Flex.cpp">
+			<Option target="Ship" />
+		</Unit>
+		<Unit filename="../Storm/Flex.h">
+			<Option target="Ship" />
+		</Unit>
 		<Unit filename="../Tools/Allocate.cpp" />
 		<Unit filename="../Tools/FileOpen.cpp" />
 		<Unit filename="../Tools/Ship.Rc">
@@ -128,6 +137,12 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../Window/UniCode.cpp" />
+		<Unit filename="../Window/View.cpp">
+			<Option target="Ship" />
+		</Unit>
+		<Unit filename="../Window/View.h">
+			<Option target="Ship" />
+		</Unit>
 		<Unit filename="../Window/Window-Free.cpp">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
