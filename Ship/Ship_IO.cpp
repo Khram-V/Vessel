@@ -136,14 +136,15 @@ bool Ship::LoadProject( WCHAR* FileName )
    //
    readText( &Set.Name );      textcolor( WHITE ),print( "< Project >\nName=%s\n",Set.Name );
    readText( &Set.Designer );                     print( "Name=%s\n",Set.Designer );
-   Set.Length=getFloat();                         print( "Length=%g\n",Set.Length );
-   Set.Beam=getFloat();                           print( "Beam=%g\n",Set.Beam );
-   Set.Draft=getFloat();                          print( "Draft=%g\n",Set.Draft );
+       Length=getFloat();                         print( "Length=%g\n",Length );
+       Beam=getFloat();                           print( "Beam=%g\n",Beam );
+       Draft=getFloat();                          print( "Draft=%g\n",Draft );
    Set.MainparticularsHasBeenset=getByte();       print( "MainparticularsHasBeenset=%d\n",Set.MainparticularsHasBeenset );
    Set.WaterDensity=getFloat();                   print( "WaterDensity=%g\n",Set.WaterDensity );
    Set.AppendageCoefficient=getFloat();           print( "AppendageCoefficient=%g\n",Set.AppendageCoefficient );
    Set.ShadeUnderwaterShip=getByte();             print( "ShadeUnderwaterShip=%d\n",Set.ShadeUnderwaterShip );
-   Set.UnderWaterColor=getInt();                  print( "UnderWaterColor=%08X\n",Set.UnderWaterColor );
+       UnderWaterColor.C=getInt();                print( "UnderWaterColor=%08X\n",UnderWaterColor );
+       UnderWaterColorAlpha=255-UnderWaterColor.c[3];
    Set.Units=(UnitType)getInt();                  print( "Units = %d\n",Set.Units );
    Set.UseDefaultSplitSectionLocation=getByte();  print( "UseDefaultSplitSectionLocation=%d\n",Set.UseDefaultSplitSectionLocation );
    Set.SplitSectionLocation=getFloat();           print( "SplitSectionLocation=%g\n",Set.SplitSectionLocation );
@@ -195,111 +196,35 @@ bool Ship::LoadProject( WCHAR* FileName )
          }   //=317
        }     //=250
      }      /* =230 */                            textcolor( LIGHTGRAY );
-     Set.UnderWaterColorAlpha =  0xFF; //Hull<FREE!ship>.UnderWaterColorAlpha;
-     if( FV>=fv500 )Set.UnderWaterColorAlpha=getInt(),print( "500+ UnderWaterColorAlpha=%d\n",Set.UnderWaterColorAlpha );
+     UnderWaterColorAlpha =  0xFF; //Hull<FREE!ship>.UnderWaterColorAlpha;
+     if( FV>=fv500 )UnderWaterColorAlpha=getInt(),print( "500+ UnderWaterColorAlpha=%d\n",UnderWaterColorAlpha );
    }      ///* =210
    //
-   //   чтение собственно секций всех сплайновых геометрических поверхностей
+   //  чтение основных данным по обводам корабля - форме корпусной обшивки
+   //
+   Shl.Read();
+   //
+   //
    //
   int I,K,N;
-   Shl.isLoad=true;                             // First load layerdata
-   N=getInt();                                  print( "< Surface.LaeyrData >\nNoLaeyrs = %d -> %d\n",Shl.NoLayers,N );
-   if( Shl.NoLayers>0 )memset( Shl.L,0,Shl.NoLayers*sizeof( Surface::Laeyrs ) );
-   Shl.NoLayers=N;
-   Shl.L=(Surface::Laeyrs*)Allocate( N*sizeof(Surface::Laeyrs) );
-// Shl.L=(Surface::Laeyrs*)Allocate( N*sizeof(*Shl.L) );
-   if( N )
-   { for( I=0; I<N; I++ )
-     { /* Layer=AddNewLayer(); */               print( "AddNewLaeyr[%d]: ",I );
-       readText( &(Shl.L[I].Description) );     print( "'%-24s'",Shl.L[I].Description );
-       Shl.L[I].ID=getInt();                    print( " ID=%d,",Shl.L[I].ID );
-       Shl.L[I].Color=getInt();                 print( "%X",Shl.L[I].Color );
-       Shl.L[I].Visible=getByte();              print("{%d,",Shl.L[I].Visible );
-       Shl.L[I].Symmetric=getByte();            print("%d,",Shl.L[I].Symmetric );
-       Shl.L[I].Developable=getByte();          print("%d,",Shl.L[I].Developable );
-       if( FV>=fv180 )
-       { Shl.L[I].UseforIntersection=getByte(); textcolor( LIGHTCYAN ),print("%d,",Shl.L[I].UseforIntersection );
-         Shl.L[I].UswinHydrostatic=getByte();   print("%d}",Shl.L[I].UswinHydrostatic );
-         if( FV>=fv191 )
-         { Shl.L[I].MaterialDensity=getFloat(); textcolor( LIGHTGREEN ),print(" MD=%g",Shl.L[I].MaterialDensity );
-           Shl.L[I].Thickness=getFloat();       print(" Tn=%g",Shl.L[I].Thickness );
-           if( FV>=fv201 )
-           { Shl.L[I].ShoeinLineSpan=getByte(); textcolor( LIGHTRED ),print(" Shoe=%d",Shl.L[I].ShoeinLineSpan );
-             if( FV>=fv261 )
-               Shl.L[I].AlphaBlend=getInt();    textcolor( YELLOW ),print(" Alfa=%d",Shl.L[I].AlphaBlend );
-           } //=201
-         }   //=191
-       }     /*=180 */                          textcolor( LIGHTGRAY ),print( "\n" );
-     }       // for
-   }
-   N=getInt();                                  print( "index of active layer = %d\n",N );
-   Shl.ActiveLayer=Shl.L[N];
-
-   N=getInt();                                  print( "< ControlPoints > %d",N );
-   if( Shl.NoCoPoint>0 )memset( Shl.P,0,Shl.NoCoPoint*sizeof( Surface::CoPoint ) );
-   Shl.NoCoPoint=N;
-   Shl.P=(Surface::CoPoint*)Allocate( N*sizeof( Surface::CoPoint ) );
-   for( I=0; I<N; I++ )
-   { Shl.P[I].V=getPoint();
-     Shl.P[I].T = (VertexType)getInt();
-     Shl.P[I].Selected=getByte();
-     if( FV>=fv198 )Shl.P[I].Locked=getByte();
-   }                                             if( --I>=0 )print( " = 0 ... [%d]={%g,%g,%g}",I,Shl.P[I].V.x,Shl.P[I].V.y,Shl.P[I].V.z ); print( "\n" );
-   N=getInt();                                   print( "< ControlEdges > %d",N );
-   if( Shl.NoEdges>0 )memset( Shl.G,0,Shl.NoEdges*sizeof( Surface::Edges ) );
-   Shl.NoEdges=N;
-   Shl.G=(Surface::Edges*)Allocate( N*sizeof( Surface::Edges ) );
-   for( I=0; I<N; I++ )
-   { K=getInt(); if( K==-1 )K=0; Shl.G[I].StartIndex=K;
-                                 Shl.G[I].StartPoint=Shl.P[K].V;
-     K=getInt(); if( K==-1 )K=0; Shl.G[I].EndIndex=K;
-                                 Shl.G[I].EndPoint=Shl.P[K].V;
-     Shl.G[I].Crease = getByte();
-     Shl.G[I].Selected = getByte();
-   }                                                       if( --I>=0 )print( " = 0 ... [%d]={%d + %d}",I,Shl.G[I].StartIndex,Shl.G[I].EndIndex ); print( "\n" );
-   if( FV>=fv195 )
-   { N=getInt();                                           print( "195+ < ControlCurves > %d",N );
-     if( Shl.NoCurves>0 )memset( Shl.G,0,Shl.NoCurves*sizeof( Surface::Curves ) );
-     Shl.NoCurves=N;
-     Shl.C=(Surface::Curves*)Allocate( N*sizeof( Surface::Curves ) );
-     for( I=0; I<N; I++ )
-     { K=getInt();
-       Shl.C[I].Capacity=K;
-       Shl.C[I].P=(int*)Allocate( K*sizeof(int) );
-       for( int j=0; j<K; j++ )Shl.C[I].P[j]=getInt();
-       Shl.C[I].Selected=getByte();                        print( ", K=%d[%d]",K,Shl.C[I].Selected );
-     }                                                     print( "\n" );
-   }
-   N=getInt();                                             print( "< ControlFaces > %d\n",N );
-   if( Shl.NoFaces>0 )memset( Shl.F,0,Shl.NoFaces*sizeof( Surface::Faces ) );
-   Shl.NoFaces=N;
-   Shl.F=(Surface::Faces*)Allocate( N*sizeof( Surface::Faces ) );
-   for( I=0; I<N; I++ )
-   { K=getInt();
-     Shl.F[I].Capacity=K;
-     Shl.F[I].P=(int*)Allocate( K*sizeof(int) );       /// <++ Control Points
-     for( int j=0; j<K; j++ ){ int m=getInt(); if( m==-1 )m=0; Shl.F[I].P[j]=m; }
-     Shl.F[I].LayerIndex=getInt();
-     Shl.F[I].Selected=getByte();
-   }
-   NoStations=getInt();                                    print( "< Stations > = %d frames\n",NoStations );
+   NoStations=getInt();                                                         print( "< Stations > = %d frames\n",NoStations );
    Stations=(InterSection*)Allocate( NoStations*sizeof( InterSection ) );
    for( I=0; I<NoStations; I++ )Stations[I].Read();
 
-   NoButtocks=getInt();         print( "< Buttocks > = %d curves\n",NoButtocks );
+   NoButtocks=getInt();                                                         print( "< Buttocks > = %d curves\n",NoButtocks );
    Buttocks=(InterSection*)Allocate( NoButtocks*sizeof( InterSection ) );
    for( I=0; I<NoButtocks; I++ )Buttocks[I].Read();
 
-   NoWaterlines=getInt();       print( "< Waterlines > = %d lines\n",NoWaterlines );
+   NoWaterlines=getInt();                                                       print( "< Waterlines > = %d lines\n",NoWaterlines );
    Waterlines=(InterSection*)Allocate( NoWaterlines*sizeof( InterSection ) );
    for( I=0; I<NoWaterlines; I++ )Waterlines[I].Read();
 
    if( FV>=fv180 )
-   { NoDiagonals=getInt();      print( "180+ < Diagonals > = %d fishes\n",NoDiagonals );
+   { NoDiagonals=getInt();                                                      print( "180+ < Diagonals > = %d fishes\n",NoDiagonals );
      Diagonals=(InterSection*)Allocate( NoDiagonals*sizeof( InterSection ) );
      for( I=0; I<NoDiagonals; I++ )Diagonals[I].Read();
 
-     if( FV>=fv191 )            print( "191+ < Markers > = %d \n",NoMarkers );
+     if( FV>=fv191 )                                                            print( "191+ < Markers > = %d \n",NoMarkers );
      { NoMarkers=getInt();
        Marks=(Marker*)Allocate( NoMarkers*sizeof(Marker) );
        for( I=0; I<NoMarkers; I++ )
@@ -333,7 +258,7 @@ bool Ship::LoadProject( WCHAR* FileName )
              for( I=0; I<NoFlowLines; I++ )
              { getFloat(), // FProjectionPoint.X
                getFloat(); // FProjectionPoint.Y
-               getInt(); // fvBodyplan,fvProfile,fvPlan,fvPerspective: ViewType
+               getInt();   // fvBodyplan,fvProfile,fvPlan,fvPerspective: ViewType
                getByte(),getByte(); // FBuild,AddSorted
                N=getInt();
                for( K=0; K<N; K++ ){ FlowLines[I]+=getPoint(); getByte(); }
@@ -345,6 +270,96 @@ bool Ship::LoadProject( WCHAR* FileName )
    }       // =180
    return Ready=true;
 }
+//
+//   чтение собственно секций всех сплайновых геометрических поверхностей
+//
+void Surface::Read()
+{ int I,K,N;
+   isLoad=true;                             // First load layerdata
+   N=getInt();                                  print( "< Surface.LaeyrData >\nNoLaeyrs = %d -> %d\n",NoLayers,N );
+   if( NoLayers>0 )memset( L,0,NoLayers*sizeof( Surface::Laeyrs ) );
+   NoLayers=N;
+   L=(Surface::Laeyrs*)Allocate( N*sizeof( Surface::Laeyrs ) );
+// L=(Surface::Laeyrs*)Allocate( N*sizeof(*L) );
+   if( N )
+   { for( I=0; I<N; I++ )
+     { /* Layer=AddNewLayer(); */           print( "AddNewLaeyr[%d]: ",I );
+       readText( &(L[I].Description) );     print( "'%-24s'",L[I].Description );
+       L[I].ID=getInt();                    print( " ID=%d,",L[I].ID );
+       L[I].Color=getInt();                 print( "%X",L[I].Color );
+       L[I].Visible=getByte();              print("{%d,",L[I].Visible );
+       L[I].Symmetric=getByte();            print("%d,",L[I].Symmetric );
+       L[I].Developable=getByte();          print("%d,",L[I].Developable );
+       if( FV>=fv180 )
+       { L[I].UseforIntersection=getByte(); textcolor( LIGHTCYAN ),print("%d,",L[I].UseforIntersection );
+         L[I].UswinHydrostatic=getByte();   print("%d}",L[I].UswinHydrostatic );
+         if( FV>=fv191 )
+         { L[I].MaterialDensity=getFloat(); textcolor( LIGHTGREEN ),print(" MD=%g",L[I].MaterialDensity );
+           L[I].Thickness=getFloat();       print(" Tn=%g",L[I].Thickness );
+           if( FV>=fv201 )
+           { L[I].ShoeinLineSpan=getByte(); textcolor( LIGHTRED ),print(" Shoe=%d",L[I].ShoeinLineSpan );
+             if( FV>=fv261 )
+               L[I].AlphaBlend=getInt();    textcolor( YELLOW ),print(" Alfa=%d",L[I].AlphaBlend );
+           } //=201
+         }   //=191
+       }     /*=180 */                          textcolor( LIGHTGRAY ),print( "\n" );
+     }       // for
+   }
+   N=getInt();                                  print( "index of active layer = %d\n",N );
+   ActiveLayer=L[N];
+
+   N=getInt();                                  print( "< ControlPoints > %d",N );
+   if( NoCoPoint>0 )memset( P,0,NoCoPoint*sizeof( Surface::CoPoint ) );
+   NoCoPoint=N;
+   P=(Surface::CoPoint*)Allocate( N*sizeof( Surface::CoPoint ) );
+   for( I=0; I<N; I++ )
+   { P[I].V=getPoint();
+     P[I].T = (VertexType)getInt();
+     P[I].Selected=getByte();
+     if( FV>=fv198 )P[I].Locked=getByte();
+   }                                             if( --I>=0 )print( " = 0 ... [%d]={%g,%g,%g}",I,P[I].V.x,P[I].V.y,P[I].V.z ); print( "\n" );
+   N=getInt();                                   print( "< ControlEdges > %d",N );
+   if( NoEdges>0 )memset( G,0,NoEdges*sizeof( Surface::Edges ) );
+   NoEdges=N;
+   G=(Surface::Edges*)Allocate( N*sizeof( Surface::Edges ) );
+   for( I=0; I<N; I++ )
+   { K=getInt(); if( K==-1 )K=0; G[I].StartIndex=K;
+                                 G[I].StartPoint=P[K].V;
+     K=getInt(); if( K==-1 )K=0; G[I].EndIndex=K;
+                                 G[I].EndPoint=P[K].V;
+     G[I].Crease = getByte();
+     G[I].Selected = getByte();
+   }                                                       if( --I>=0 )print( " = 0 ... [%d]={%d + %d}",I,G[I].StartIndex,G[I].EndIndex ); print( "\n" );
+   if( FV>=fv195 )
+   { N=getInt();                                           print( "195+ < ControlCurves > %d",N );
+     if( NoCurves>0 )memset( G,0,NoCurves*sizeof( Surface::Curves ) );
+     NoCurves=N;
+     C=(Surface::Curves*)Allocate( N*sizeof( Surface::Curves ) );
+     for( I=0; I<N; I++ )
+     { K=getInt();
+       C[I].Capacity=K;
+       C[I].P=(int*)Allocate( K*sizeof(int) );
+       for( int j=0; j<K; j++ )C[I].P[j]=getInt();
+       C[I].Selected=getByte();                        print( ", K=%d[%d]",K,C[I].Selected );
+     }                                                     print( "\n" );
+   }
+   N=getInt();                                             print( "< ControlFaces > %d\n",N );
+   if( NoFaces>0 )memset( F,0,NoFaces*sizeof( Surface::Faces ) );
+   NoFaces=N;
+   F=(Surface::Faces*)Allocate( N*sizeof( Surface::Faces ) );
+   for( I=0; I<N; I++ )
+   { K=getInt();
+     F[I].Capacity=K;
+     F[I].P=(int*)Allocate( K*sizeof(int) );       /// <++ Control Points
+     for( int j=0; j<K; j++ ){ int m=getInt(); if( m==-1 )m=0; F[I].P[j]=m; }
+     F[I].LayerIndex=getInt();
+     F[I].Selected=getByte();
+   }
+   Extents();  // расчёт - переопределение графических экстремумов
+}
+//
+//   Выборка контуров теоретического чертежа со сплайновыми параметрами
+//
 void InterSection::Read()
 { int K,N;
   IT=(IntersectionType)getInt();                                       // print( "\n IT=%d",K );

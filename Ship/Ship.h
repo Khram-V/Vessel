@@ -20,6 +20,13 @@ typedef enum { fiFree,fiStation,fiButtock,fiWaterline,fiDiagonal } IntersectionT
 struct Plane { Real a,b,c,d; }; // Description of 3D plane: a*x+b*y+c*z-d=0.0;
 union Color{ unsigned int C; byte c[4]; };
 
+extern Vector Min,Max;         // Экстремумы исходного графического изображения
+extern byte  UnderWaterColorAlpha;
+extern Color UnderWaterColor;
+extern Real  Beam,             // ширина
+             Draft,            // осадка
+             Length;           // длина
+
 struct Project
 {                               // четыре строки описание корабля
 char *Name,                     // название проекта
@@ -34,11 +41,7 @@ bool MainparticularsHasBeenset, // Flag to check if the main particulars have be
                           // Невозможно автоматическое перемещение модели по оси Z
      EnableBonjeanSAC;    // Unable calculation and save in file Bonjean scale and SAC
                           // Невозможно рассчитать и сохранить в файле шкалу Бонжана и SAC
-Real AppendageCoefficient, // коэффициент остаточного сопротивления: волн и пр.
-     Beam,                 // ширина
-     Draft,                // осадка
-     Length;               // длина
-byte UnderWaterColorAlpha;
+Real AppendageCoefficient; // коэффициент остаточного сопротивления: волн и пр.
 Real WaterDensity,         // плотность воды
 //   WaterTemper,          // и температура
      SplitSectionLocation; // положение мидельшпангоута
@@ -48,10 +51,9 @@ bool UseDefaultSplitSectionLocation; // If set to true, the midship/mainframe lo
      // то используется значение в FProjectMainframeLocation.
 bool ShadeUnderwaterShip,
      SavePreview;
-unsigned int  UnderWaterColor;
 UnitType      Units;
 PrecisionType Precision;
-bool          SimplifyIntersections;
+bool SimplifyIntersections;
 
 HydrostaticCoefficient
      HydrostaticCoefficients;      // General hydrostatics calculation settings
@@ -97,9 +99,9 @@ bool Normals,       // Show normals of selected surface patches
 Real CurvatureScale, // Scalefactor used to increase or decrease the size of the curvature plot
      CursorIncrement;
 };
-struct Surface
-{ bool isLoad;
-  int  NoLayers,NoCoPoint,NoEdges,NoCurves,NoFaces;
+class Surface
+{ bool isLoad;              //-- признак успешной загрузки
+  int  NoLayers,NoCoPoint,NoEdges,NoCurves,NoFaces; // размеры кривых  массивов
   struct Laeyrs
   { char *Description;
     int ID;
@@ -133,8 +135,11 @@ struct Surface
     int LayerIndex;
     bool Selected;
   } *F;
-//Surface(){ memset( this,0,sizeof( Surface ) ); }
-  void Drawing( BoardView=mvPort,_Real Draught=0.0 );
+  void Extents();           // экстремумы по расчетным площадкам
+public:
+  Surface(){ memset( this,0,sizeof( Surface ) ); }
+  void Read();
+  void Drawing( BoardView=mvPort );
 };
 
 struct InterSection //: Plane
@@ -144,7 +149,7 @@ struct InterSection //: Plane
   Plane Pl;
   struct Items
    { int NoSplines; struct Spline{ Vector P; bool Knuckle; } *S; } *T;
-//InterSection(){ memset( this,0,sizeof( InterSection ) ); }
+  InterSection(){ memset( this,0,sizeof( InterSection ) ); }
   void Read();
   void Drawing( BoardView=mvPort );
 };

@@ -1,26 +1,16 @@
 
 #include "Ship.h"
 //
-//   прорисовка исходных многоугольников
+//    общие данные как бы в стиле fortran-common блоков
 //
-void Surface::Drawing( BoardView Sides, _Real Draught )
-{ static Flex V; Vector W; int I,K,N; Color C; glLineWidth( 1 );
-  for( N=0; N<NoFaces; N++ )   // синхронная по бортам прорисовка треугольников
-  if( (K=F[N].Capacity)>2 )
-  { V.len=0; C.C=L[F[N].LayerIndex].Color;
-    for( I=0; I<K; I++)V+=P[F[N].P[I]].V; // C.c[3]=V[0].z>=Draught?0xFF:0x7F; glColor4ubv(C.c);
-    glNormal3dv( W=(V[2]-V[0])*(V[1]-V[0]) ); glBegin( GL_POLYGON );
-    for( I=0; I<K; I++ )
-      { C.c[3]=V[I].z>Draught?0xFF:0xBF; glColor4ubv( C.c ); dot( V[I] ); }
-    glEnd();
-    if( Sides==mvBoth )
-    { glNormal3dv(~W ); glBegin( GL_POLYGON );
-      for( I=K-1; I>=0; I-- )
-      { C.c[3]=V[I].z>Draught?0xFF:0xBF; glColor4ubv( C.c ); dot(~V[I] ); }
-      glEnd();
-  } } glLineWidth( .2 );
-}
-//    подготовленные в предыдущем расчёте теоретические контуры
+Vector Min={0.0},Max={0.0};    // Экстремумы исходного графического изображения
+byte  UnderWaterColorAlpha=0xFF;             // для алгоритмов
+Color UnderWaterColor={ 0xFFFFFF };         //   с точным положением ватерлинии
+Real  Beam=1.0,               // ширина
+      Draft=1.0,              // осадка
+      Length=1.0;             // длина
+//
+//   подготовленные в предыдущем расчёте теоретические контуры
 //
 void InterSection::Drawing( BoardView Sides )                  // mvPort,mvBoth
 { if( Sides==mvBoth )
@@ -40,10 +30,11 @@ void InterSection::Drawing( BoardView Sides )                  // mvPort,mvBoth
 bool FreeShip::Draw()               // виртуальная процедура с настройкой сцены
 { BoardView &B=Shw.ModelView;
   View::Draw();
-  glTranslated( -Set.SplitSectionLocation,0,0 ); // Set.Length/-2
-  Clear(); color( lightcyan );                              glLineWidth( .2 );
-  axis(*this,Set.Length,Set.Beam,Set.Draft*2,"x","y","z" ); glLineWidth( .5 );
-  Shl.Drawing( B,Set.Draft );
+  glTranslated( (Max.x+Min.x)/-1.75,0,             // -Set.SplitSectionLocation
+                (Max.z+Min.z)/-2 );                // Set.Length/-2
+  Clear(); color( lightcyan );                  glLineWidth( .2 );
+  axis(*this,Length,Beam,Draft*2,"x","y","z" ); glLineWidth( .5 );
+  Shl.Drawing( B );
   color( lightblue );  for( int k=0; k<NoStations; k++ )Stations[k].Drawing( B );
   color( green ); for( int k=0; k<NoWaterlines; k++ )Waterlines[k].Drawing( B );
   color( cyan );  for( int k=0; k<NoButtocks; k++ )Buttocks[k].Drawing( B );
@@ -72,7 +63,10 @@ FreeShip::FreeShip():Ship(),View("Free!ship in C++ ",-12,12,640,480) //Matrix()
   Locate( Xpm( 4 ),Ypm( 4 ),min( 1280,Xpm( 64 ) ),
                             min( 1024,Ypm( 72 ) ) );
   glCullFace( GL_FRONT_AND_BACK );                    // какие отбираются грани
-  Distance=-2*( Set.Length+Set.Beam+Set.Draft );
+  Distance=-1.75*( Max.x+Max.y-Min.x-Min.y + Width*(Max.z-Min.z)*0.9/Height );
+
+//  Distance=-2*abs( Max-Min ); //  ( Set.Length+Set.Beam+Set.Draft );
+//  if( Max.z-Min.z>Max.x-Min.x )Distance*=(Max.z-Min.z)*1280/(Max.x-Min.x)/1024; //:-)
   eyeX=135;  // lookX=-60;
   glDisable( GL_FOG );
   glDisable( GL_LIGHT1 );
