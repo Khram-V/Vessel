@@ -11,10 +11,11 @@ static void e5R( Real &R ){ R-=remainder( R,1e-5L ); }
 static void e5V( Vector &V ){ e5R( V.x ); e5R( V.y ); e5R( V.z ); }
 static void printF( Vector V )
 { e5V( V ); if( V.y<0 )V.y=0; fprintf( F,"v %lg %lg %lg\n",V.x,V.z,V.y );
-                              fprintf( F,"v %lg %lg %lg\n",V.x,V.z,-V.y );
+                              fprintf( F,"v %lg %lg %lg\n",V.x,V.z,!V.y?0:-V.y );
 }
 static void crossPoint( _Vector A, _Vector B, _Vector C, int a, int b, int c )
 { if( fabs( A.y )<eps && fabs( B.y )<eps && fabs( C.y )<eps )return;
+  if( A.z*B.z<0 || B.z*C.z<0 || C.z*A.z<0 )return;
   int l=A.z<=0 && B.z<=0 && C.z<=0; // A.Z+B.Z+C.Z<=0.0;
   if( fColor!=l )fprintf( F,"usemtl %s\n",(fColor=l)?"green":"gray" );
                  fprintf( F,"f %d %d %d\n",a,b,c );
@@ -26,12 +27,15 @@ static void crossDC( Vector A, Vector B, Vector C )
   A.z<=0&&B.z<=0&&C.z<=0?3:9,
          A.x+St,A.z+T,A.y,B.x+St,B.z+T,B.y,C.x+St,C.z+T,C.y,A.x+St,A.z+T,A.y );
 }
-Hull& Hull::Write( int format ) // Wavefront Technologies 4 Advanced Visualizer
+//!      Wavefront Technologies 4 Advanced Visualizer
+//
+Hull& Hull::Write( int format )
 { int i,j,k,n; T=Ofs.z; St=Ofs.x;
   if( format==1 )      // здесь тексты .obj сохраняются в рабочем формате UTF-8
   { if( !(F=_wfopen( U2W( fext( FileName,"obj" ) ),L"wb" )) )return *this;
-   Vector P,Q,q; int L[Nframes+2];
-    memset( L,0,sizeof(int)*(Nframes+2) ); fColor=-1;
+   Vector P,Q,q; int L[Nframes+3];
+    memset( L,0,sizeof(int)*(Nframes+3) );
+    fColor=-1;
     //
     //     последовательная запись всего массива опорных точек в текстовый файл
     //
@@ -39,23 +43,25 @@ Hull& Hull::Write( int format ) // Wavefront Technologies 4 Advanced Visualizer
                       ShipName,n=Stern.len );                   // заголовок
     for( i=0; i<n; i++ )printF( Stern[i] ); L[0]=n*2;           // ахтерштевень
     for( k=0; k<=Nframes+1; k++ )                               // и следом все
-    { if( k )L[k]=L[k-1]+n*2;                                   // шпангоуты
-      fprintf( F,"# Sp%d[%d]=%d\n",k,n=Frame[k].len,L[k] );
+    { fprintf( F,"# Sp%d[%d]=%d\n",k,n=Frame[k].len,L[k] );     // шпангоуты
       for( i=0; i<n; i++ )printF( Frame[k][i] );
-    } L[k]=L[k-1]+n*2;
+      L[k+1]=L[k]+n*2;
+    }
     fprintf( F,"# Stem[%d]=%d \n",n=Stem.len,L[k] );
     for( i=0; i<n; i++ )printF( Stem[i] );
     fprintf( F,"# ShipHull[%d]\n#~~~~~~~~~~\n",L[k]+n*2 );
     //
     //    формирование индексов треугольников с единым правилом обхода площадок
     //
-    for( k=-1; k<2; k+=2 )
-    { bool b=k<0; Flex &S=b?Stern:Stem; n=b?0:L[Nframes+2];
-      fprintf( F,b?"# Stern\n":"# Stem\n" );
+    for( k=0; k<2; k++ )
+    { Flex &S=k?Stem:Stern; n=(k?L[Nframes+2]:0)-1;        // -1 для учёта i<0
+      fprintf( F,k?"# Stem\n":"# Stern\n" );
       for( i=0; i<S.len; i++ ){ Q=S[i];                    // if( !b )Q.y=-Q.y;
         if( i>0 )                                          // P.z|Q.z != 0 ???
-        { crossPoint( P,P,Q,n+(i+1)*2 -!b, n+(i+1)*2 + b, b+n+i*2 );  // P.z
-          crossPoint( Q,P,Q,n+i*2     -!b, n+(i+1)*2 -!b, b+n+i*2 );  // Q.z
+        { crossPoint( P,P,Q,n+i*2+k, n+i*2+1-k, n+i*2+3 );  // P.z
+          crossPoint( P,Q,Q,n+i*2, n+i*2+3-k, n+i*2+2+k );  // Q.z
+//        { crossPoint( P,P,Q,n+i*2+1-k, n+i*2+k, n+i*2+3 );  // P.z
+//          crossPoint( Q,P,Q,n+i*2, n+i*2+2+k, n+i*2+3-k );  // Q.z
         } P=Q;
     } }
     for( k=0; k<=Nframes; k++ )                         // Nframes+1 шпангоутов
@@ -73,11 +79,10 @@ Hull& Hull::Write( int format ) // Wavefront Technologies 4 Advanced Visualizer
                               else nq=nP,iq=iP,Q=P;          // перпендикуляром
     } } }
   }
+  //!    теперь запись в формате DС2, по варианту изготовления новых чертежей
+  //
   else if( format==2 )
-  { //
-    //!    теперь запись в формате DС2, по варианту изготовления новых чертежей
-    //
-    if( !(F=_wfopen( U2W( fext( FileName,"dc2" ) ),L"wb" )) )return *this;
+  { if( !(F=_wfopen( U2W( fext( FileName,"dc2" ) ),L"wb" )) )return *this;
     //
     //  во первой строке письма общие размерения графического изображения
     //

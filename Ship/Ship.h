@@ -162,9 +162,9 @@ struct Marker
 
 struct Ship                       // Сборка корпуса в целом
 { PrecisionType PT;               // Precision of the ship-model
-  Visibility   Shw;               // Show настройка графической визуализации
+  Visibility   Visio;             // Show настройка графической визуализации
   Project      Set;               // характеристики и размерности корабля
-  Surface      Shl;               // Shell оболочка поверхности обшивки корпуса
+  Surface      Shell;             // Shell оболочка поверхности обшивки корпуса
 
   int NoStations,NoButtocks,NoWaterlines,NoDiagonals,NoMarkers,NoFlowLines;
   InterSection *Stations,         // LoadStation

@@ -28,13 +28,13 @@ void InterSection::Drawing( BoardView Sides )                  // mvPort,mvBoth
 //   Главная виртуальна процедура изображения всего корабля/проекта
 //
 bool FreeShip::Draw()               // виртуальная процедура с настройкой сцены
-{ BoardView &B=Shw.ModelView;
+{ BoardView &B=Visio.ModelView;
   View::Draw();
   glTranslated( (Max.x+Min.x)/-1.75,0,             // -Set.SplitSectionLocation
                 (Max.z+Min.z)/-2 );                // Set.Length/-2
   Clear(); color( lightcyan );                  glLineWidth( .2 );
   axis(*this,Length,Beam,Draft*2,"x","y","z" ); glLineWidth( .5 );
-  Shl.Drawing( B );
+  Shell.Drawing( B );
   color( lightblue );  for( int k=0; k<NoStations; k++ )Stations[k].Drawing( B );
   color( green ); for( int k=0; k<NoWaterlines; k++ )Waterlines[k].Drawing( B );
   color( cyan );  for( int k=0; k<NoButtocks; k++ )Buttocks[k].Drawing( B );
@@ -81,7 +81,7 @@ FreeShip::FreeShip():Ship(),View("Free!ship in C++ ",-12,12,640,480) //Matrix()
 //   Интерактивная настройка/управление графическим отображением проекта
 //
 bool FreeShip::KeyBoard( fixed Keyb )
-{ BoardView &B=Shw.ModelView;
+{ BoardView &B=Visio.ModelView;
   if( Keyb==' ' ){ if( B==mvPort )B=mvBoth; else B=mvPort; return Draw(); }
   else return View::KeyBoard( Keyb );
 }

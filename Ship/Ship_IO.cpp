@@ -103,31 +103,31 @@ bool Ship::LoadProject( WCHAR* FileName )
    //
    //   Сначала параметры визуализации
    //
-   Shw.ModelView=(BoardView)getInt();       textcolor( LIGHTGRAY ),print( "< Visibility >:\n1^2 борта = %d\n",Shw.ModelView );
-   Shw.ControlNet=getByte();                print( "ControlNet = %d\n",Shw.ControlNet );
-   Shw.InteriorEdges=getByte();             print( "InteriorEdges = %d\n",Shw.InteriorEdges );
-   Shw.Stations=getByte();                  print( "Stations = %d\n",Shw.Stations );
-   Shw.Buttocks=getByte();                  print( "Buttocks = %d\n",Shw.Buttocks );
-   Shw.Waterlines=getByte();                print( "Waterlines = %d\n",Shw.Waterlines );
-   Shw.Normals=getByte();                   print( "Normals = %d\n",Shw.Normals );
-   Shw.Grid=getByte();                      print( "Grid = %d\n",Shw.Grid );
-   Shw.Diagonals=getByte();                 print( "Diagonals = %d\n",Shw.Diagonals );
-   Shw.Markers=getByte();                   print( "Markers = %d\n",Shw.Markers );
-   Shw.Curvature=getByte();                 print( "Curvature = %d\n",Shw.Curvature );
-   Shw.CurvatureScale=getFloat();           print( "CurvatureScale = %g\n",Shw.CurvatureScale );
+   Visio.ModelView=(BoardView)getInt();       textcolor( LIGHTGRAY ),print( "< Visibility >:\n1^2 борта = %d\n",Visio.ModelView );
+   Visio.ControlNet=getByte();                print( "ControlNet = %d\n",Visio.ControlNet );
+   Visio.InteriorEdges=getByte();             print( "InteriorEdges = %d\n",Visio.InteriorEdges );
+   Visio.Stations=getByte();                  print( "Stations = %d\n",Visio.Stations );
+   Visio.Buttocks=getByte();                  print( "Buttocks = %d\n",Visio.Buttocks );
+   Visio.Waterlines=getByte();                print( "Waterlines = %d\n",Visio.Waterlines );
+   Visio.Normals=getByte();                   print( "Normals = %d\n",Visio.Normals );
+   Visio.Grid=getByte();                      print( "Grid = %d\n",Visio.Grid );
+   Visio.Diagonals=getByte();                 print( "Diagonals = %d\n",Visio.Diagonals );
+   Visio.Markers=getByte();                   print( "Markers = %d\n",Visio.Markers );
+   Visio.Curvature=getByte();                 print( "Curvature = %d\n",Visio.Curvature );
+   Visio.CurvatureScale=getFloat();           print( "CurvatureScale = %g\n",Visio.CurvatureScale );
    if( FV>=fv195 )
-   { Shw.ControlCurves=getByte();           print( "195+ ControlCurves = %d\n",Shw.ControlCurves );
+   { Visio.ControlCurves=getByte();           print( "195+ ControlCurves = %d\n",Visio.ControlCurves );
      if( FV>=fv210 )
-     { Shw.CursorIncrement=getFloat();      print( "210+ CursorIncrement = %g\n",Shw.CursorIncrement );
-       if( fabs( Shw.CursorIncrement )<1e-7 )Shw.CursorIncrement=0.1; //+++
+     { Visio.CursorIncrement=getFloat();      print( "210+ CursorIncrement = %g\n",Visio.CursorIncrement );
+       if( fabs( Visio.CursorIncrement )<1e-7 )Visio.CursorIncrement=0.1; //+++
        if( FV>=fv220 )
-       { Shw.HydrostaticData=getByte();     print( "220+ HydrostaticData = %d\n",Shw.HydrostaticData );
-         Shw.HydrostDisplacement=getByte();   print( "220+ HydrostDisplacement = %d\n",Shw.HydrostDisplacement );
-         Shw.HydrostLateralArea=getByte();      print( "220+ HydrostLateralArea = %d\n",Shw.HydrostLateralArea );
-         Shw.HydrostSectionalAreas=getByte();    print( "220+ HydrostSectionalAreas = %d\n",Shw.HydrostSectionalAreas );
-         Shw.HydrostMetacentricHeight=getByte(); print( "220+ HydrostMetacentricHeight = %d\n",Shw.HydrostMetacentricHeight );
-         Shw.HydrostLCF=getByte();               print( "220+ HydrostLCF = %d\n",Shw.HydrostLCF );
-         if( FV>=fv250 )Shw.lFlowline=getByte(), print( "250+ logFlowlines = %d\n",Shw.lFlowline );
+       { Visio.HydrostaticData=getByte();     print( "220+ HydrostaticData = %d\n",Visio.HydrostaticData );
+         Visio.HydrostDisplacement=getByte();   print( "220+ HydrostDisplacement = %d\n",Visio.HydrostDisplacement );
+         Visio.HydrostLateralArea=getByte();      print( "220+ HydrostLateralArea = %d\n",Visio.HydrostLateralArea );
+         Visio.HydrostSectionalAreas=getByte();    print( "220+ HydrostSectionalAreas = %d\n",Visio.HydrostSectionalAreas );
+         Visio.HydrostMetacentricHeight=getByte(); print( "220+ HydrostMetacentricHeight = %d\n",Visio.HydrostMetacentricHeight );
+         Visio.HydrostLCF=getByte();               print( "220+ HydrostLCF = %d\n",Visio.HydrostLCF );
+         if( FV>=fv250 )Visio.lFlowline=getByte(), print( "250+ logFlowlines = %d\n",Visio.lFlowline );
        } //=220
      }   //=210
    }     //=195
@@ -202,7 +202,7 @@ bool Ship::LoadProject( WCHAR* FileName )
    //
    //  чтение основных данным по обводам корабля - форме корпусной обшивки
    //
-   Shl.Read();
+   Shell.Read();
    //
    //
    //
@@ -274,19 +274,19 @@ bool Ship::LoadProject( WCHAR* FileName )
 //   чтение собственно секций всех сплайновых геометрических поверхностей
 //
 void Surface::Read()
-{ int I,K,N;
-   isLoad=true;                             // First load layerdata
-   N=getInt();                                  print( "< Surface.LaeyrData >\nNoLaeyrs = %d -> %d\n",NoLayers,N );
+{ int I,K,N,EdErr;
+   isLoad=true; textbackground( BLUE );                // First load layerdata
+   N=getInt();                                         print( "< Surface.LaeyrData >\nNoLaeyrs = %d -> %d\n",NoLayers,N );
    if( NoLayers>0 )memset( L,0,NoLayers*sizeof( Surface::Laeyrs ) );
    NoLayers=N;
    L=(Surface::Laeyrs*)Allocate( N*sizeof( Surface::Laeyrs ) );
 // L=(Surface::Laeyrs*)Allocate( N*sizeof(*L) );
    if( N )
    { for( I=0; I<N; I++ )
-     { /* Layer=AddNewLayer(); */           print( "AddNewLaeyr[%d]: ",I );
-       readText( &(L[I].Description) );     print( "'%-24s'",L[I].Description );
-       L[I].ID=getInt();                    print( " ID=%d,",L[I].ID );
-       L[I].Color=getInt();                 print( "%X",L[I].Color );
+     { /* Layer=AddNewLayer(); */           print( "AddNewLaeyr[%02d]: ",I );
+       readText( &(L[I].Description) );  // print( "'%-24s'",L[I].Description );
+       L[I].ID=getInt();                    print( " ID=%02d ",L[I].ID );
+       L[I].Color=getInt();                 print( "%8X",L[I].Color );
        L[I].Visible=getByte();              print("{%d,",L[I].Visible );
        L[I].Symmetric=getByte();            print("%d,",L[I].Symmetric );
        L[I].Developable=getByte();          print("%d,",L[I].Developable );
@@ -295,17 +295,17 @@ void Surface::Read()
          L[I].UswinHydrostatic=getByte();   print("%d}",L[I].UswinHydrostatic );
          if( FV>=fv191 )
          { L[I].MaterialDensity=getFloat(); textcolor( LIGHTGREEN ),print(" MD=%g",L[I].MaterialDensity );
-           L[I].Thickness=getFloat();       print(" Tn=%g",L[I].Thickness );
+           L[I].Thickness=getFloat();       print(" Tn=%-3g",L[I].Thickness );
            if( FV>=fv201 )
            { L[I].ShoeinLineSpan=getByte(); textcolor( LIGHTRED ),print(" Shoe=%d",L[I].ShoeinLineSpan );
              if( FV>=fv261 )
-               L[I].AlphaBlend=getInt();    textcolor( YELLOW ),print(" Alfa=%d",L[I].AlphaBlend );
+               L[I].AlphaBlend=getInt();    textcolor( YELLOW ),print(" Alfa=%d ",L[I].AlphaBlend );
            } //=201
          }   //=191
-       }     /*=180 */                          textcolor( LIGHTGRAY ),print( "\n" );
+       }     /*=180 */                   textcolor( LIGHTGRAY ),print("'%-24s'\n",L[I].Description );
      }       // for
    }
-   N=getInt();                                  print( "index of active layer = %d\n",N );
+   N=getInt();                              print( "index of active layer = %d\n",N );
    ActiveLayer=L[N];
 
    N=getInt();                                  print( "< ControlPoints > %d",N );
@@ -317,44 +317,48 @@ void Surface::Read()
      P[I].T = (VertexType)getInt();
      P[I].Selected=getByte();
      if( FV>=fv198 )P[I].Locked=getByte();
-   }                                             if( --I>=0 )print( " = 0 ... [%d]={%g,%g,%g}",I,P[I].V.x,P[I].V.y,P[I].V.z ); print( "\n" );
-   N=getInt();                                   print( "< ControlEdges > %d",N );
-   if( NoEdges>0 )memset( G,0,NoEdges*sizeof( Surface::Edges ) );
-   NoEdges=N;
+   }                                                                      if( N>0 )print( " = {%g,%g,%g}`0`",P[0].V.x,P[0].V.y,P[0].V.z ); print( "\n" );
+   N=getInt();                                                            print( "< ControlEdges > %d",N );
+   NoEdges=N; EdErr=0;
    G=(Surface::Edges*)Allocate( N*sizeof( Surface::Edges ) );
+   if( NoEdges>0 )memset( G,0,NoEdges*sizeof( Surface::Edges ) );
    for( I=0; I<N; I++ )
-   { K=getInt(); if( K==-1 )K=0; G[I].StartIndex=K;
+   { K=getInt(); if( K==-1 )K=0; G[I].StartIndex=K;       if( K>=NoCoPoint )EdErr++;
                                  G[I].StartPoint=P[K].V;
      K=getInt(); if( K==-1 )K=0; G[I].EndIndex=K;
-                                 G[I].EndPoint=P[K].V;
+                                 G[I].EndPoint=P[K].V;    if( K>=NoCoPoint )EdErr++;
      G[I].Crease = getByte();
      G[I].Selected = getByte();
-   }                                                       if( --I>=0 )print( " = 0 ... [%d]={%d + %d}",I,G[I].StartIndex,G[I].EndIndex ); print( "\n" );
+   }                                                                      if( N>0 )print( " = {н:%d+к:%d}`0` E(%d)",G[0].StartIndex,G[0].EndIndex,EdErr ); print( "\n" );
    if( FV>=fv195 )
-   { N=getInt();                                           print( "195+ < ControlCurves > %d",N );
+   { N=getInt();                                                          print( "195+ < ControlCurves > %d",N );
      if( NoCurves>0 )memset( G,0,NoCurves*sizeof( Surface::Curves ) );
-     NoCurves=N;
+     NoCurves=N; EdErr=0;
      C=(Surface::Curves*)Allocate( N*sizeof( Surface::Curves ) );
      for( I=0; I<N; I++ )
      { K=getInt();
        C[I].Capacity=K;
        C[I].P=(int*)Allocate( K*sizeof(int) );
-       for( int j=0; j<K; j++ )C[I].P[j]=getInt();
-       C[I].Selected=getByte();                        print( ", K=%d[%d]",K,C[I].Selected );
-     }                                                     print( "\n" );
+       for( int j=0; j<K; j++ )if( (C[I].P[j]=getInt())>=NoCoPoint )EdErr++;
+       C[I].Selected=getByte();                                           print( ", K=%d[%d]",K,C[I].Selected );
+     }                                                                    print( " E(%d)\n",EdErr );
    }
-   N=getInt();                                             print( "< ControlFaces > %d\n",N );
+   N=getInt();                                                            print( "< ControlFaces >\n" );
    if( NoFaces>0 )memset( F,0,NoFaces*sizeof( Surface::Faces ) );
-   NoFaces=N;
+   NoFaces=N; EdErr=0;                                                    print( "NoFaces=%d - количество площадок обшивки  ",NoFaces );
    F=(Surface::Faces*)Allocate( N*sizeof( Surface::Faces ) );
    for( I=0; I<N; I++ )
    { K=getInt();
      F[I].Capacity=K;
-     F[I].P=(int*)Allocate( K*sizeof(int) );       /// <++ Control Points
-     for( int j=0; j<K; j++ ){ int m=getInt(); if( m==-1 )m=0; F[I].P[j]=m; }
+     F[I].P=(int*)Allocate( K*sizeof(int) );             /// <++ Control Points
+     for( int j=0; j<K; j++ ){ int m=getInt();
+                               if( m>=NoCoPoint || m<0 )EdErr++;
+                               if( m==-1 )m=0; F[I].P[j]=m;
+                             }
      F[I].LayerIndex=getInt();
      F[I].Selected=getByte();
-   }
+   }                                                                      print( " # E(%d) \n",EdErr );
+                                                                          textbackground( BLACK );
    Extents();  // расчёт - переопределение графических экстремумов
 }
 //
