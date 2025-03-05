@@ -135,20 +135,20 @@ class Surface
     int LayerIndex;
     bool Selected;
   } *F;
-  void Extents();           // экстремумы по расчетным площадкам
+  void Extents();             // экстремумы по расчетным площадкам
 public:
   Surface(){ memset( this,0,sizeof( Surface ) ); }
   void Read();
   void Drawing( BoardView=mvPort );
 };
+struct Spline{ Vector P; bool Knuckle; };
+struct Items{ int NoSplines; Spline *S; };
 
 struct InterSection //: Plane
 { IntersectionType IT;
   bool ShowCurvature,Build;
-  int  NoItems;
   Plane Pl;
-  struct Items
-   { int NoSplines; struct Spline{ Vector P; bool Knuckle; } *S; } *T;
+  int NoItems; Items *T;
   InterSection(){ memset( this,0,sizeof( InterSection ) ); }
   void Read();
   void Drawing( BoardView=mvPort );
@@ -156,8 +156,7 @@ struct InterSection //: Plane
 struct Marker
 { bool Visible,Selected,ShowCurvature;
   Real CurvatureScale;
-  int NoSplines;
-  struct Spline{ Vector P; bool Knuckle; } *S;
+  int NoSplines; Spline *S;
 };
 
 struct Ship                       // Сборка корпуса в целом

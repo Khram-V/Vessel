@@ -4,11 +4,11 @@
 //    общие данные как бы в стиле fortran-common блоков
 //
 Vector Min={0.0},Max={0.0};    // Экстремумы исходного графического изображения
-byte  UnderWaterColorAlpha=0xFF;             // для алгоритмов
+byte  UnderWaterColorAlpha=0xFF;            // для алгоритмов
 Color UnderWaterColor={ 0xFFFFFF };         //   с точным положением ватерлинии
-Real  Beam=1.0,               // ширина
-      Draft=1.0,              // осадка
-      Length=1.0;             // длина
+ Real Beam=1.0,                             // ширина
+      Draft=1.0,                            // осадка
+      Length=1.0;                           //  длина
 //
 //   подготовленные в предыдущем расчёте теоретические контуры
 //
@@ -30,10 +30,10 @@ void InterSection::Drawing( BoardView Sides )                  // mvPort,mvBoth
 bool FreeShip::Draw()               // виртуальная процедура с настройкой сцены
 { BoardView &B=Visio.ModelView;
   View::Draw();
-  glTranslated( (Max.x+Min.x)/-1.75,0,             // -Set.SplitSectionLocation
-                (Max.z+Min.z)/-2 );                // Set.Length/-2
-  Clear(); color( lightcyan );                  glLineWidth( .2 );
-  axis(*this,Length,Beam,Draft*2,"x","y","z" ); glLineWidth( .5 );
+  glTranslated( (Max.x+Min.x)/-1.75,0,      // -Set.SplitSectionLocation
+                (Max.z+Min.z)/-2 );         // Set.Length/-2
+  Clear(); color( lightcyan );                 glLineWidth( .2 );
+  axis(*this,Length,Beam,Draft*2,"x","y","z"); glLineWidth( .5 );
   Shell.Drawing( B );
   color( lightblue );  for( int k=0; k<NoStations; k++ )Stations[k].Drawing( B );
   color( green ); for( int k=0; k<NoWaterlines; k++ )Waterlines[k].Drawing( B );
@@ -49,7 +49,7 @@ bool FreeShip::Draw()               // виртуальная процедура
 }
 Ship::Ship()   //! конструктор с расчисткой и считыванием новой числовой модели
 { memset( this,0,sizeof( Ship ) );
-  textcolor( LIGHTCYAN ); print( "Free!Ship [*.fbm,*.ftm]\n" );
+  textcolor( LIGHTCYAN );                 print( "Free!Ship [*.fbm,*.ftm]\n" );
   textcolor( LIGHTRED );
   int argc; WCHAR **argv=CommandLineToArgvW( GetCommandLineW(),&argc );
   if( argc>1 )
@@ -64,9 +64,8 @@ FreeShip::FreeShip():Ship(),View("Free!ship in C++ ",-12,12,640,480) //Matrix()
                             min( 1024,Ypm( 72 ) ) );
   glCullFace( GL_FRONT_AND_BACK );                    // какие отбираются грани
   Distance=-1.75*( Max.x+Max.y-Min.x-Min.y + Width*(Max.z-Min.z)*0.9/Height );
-
 //  Distance=-2*abs( Max-Min ); //  ( Set.Length+Set.Beam+Set.Draft );
-//  if( Max.z-Min.z>Max.x-Min.x )Distance*=(Max.z-Min.z)*1280/(Max.x-Min.x)/1024; //:-)
+//  if(Max.z-Min.z>Max.x-Min.x)Distance*=(Max.z-Min.z)*1280/(Max.x-Min.x)/1024;
   eyeX=135;  // lookX=-60;
   glDisable( GL_FOG );
   glDisable( GL_LIGHT1 );
@@ -75,7 +74,7 @@ FreeShip::FreeShip():Ship(),View("Free!ship in C++ ",-12,12,640,480) //Matrix()
   glLightfv( GL_LIGHT0,GL_POSITION,(const float[]){0,.1*Distance,-Distance,.5});
   glLightfv( GL_LIGHT0,GL_SPOT_DIRECTION,(const float[]){0,0,-1,0 });
 //glLightModelfv( GL_LIGHT_MODEL_AMBIENT,(const float[]){ .1,.1,.1,0 } ); //!??
-  glMateriali ( GL_FRONT_AND_BACK,GL_SHININESS,255 );      // степень отсветки
+  glMateriali( GL_FRONT_AND_BACK,GL_SHININESS,255 );    // степень отсветки
   Draw();                                               // начальная прорисовка
 }
 //   Интерактивная настройка/управление графическим отображением проекта
@@ -86,9 +85,7 @@ bool FreeShip::KeyBoard( fixed Keyb )
   else return View::KeyBoard( Keyb );
 }
 int main() // int argc, char **argv )
-{ texttitle( "FREE!Ship view in C++ " );
-  FreeShip Hull;
-  do{ Hull.Title( DtoA( Real(ElapsedTime())/3600000.0,-3 ) ); // заголовок
-      WaitTime( 500 );
+{ texttitle( "FREE!Ship view in C++ " ); FreeShip Hull;            // заголовок
+  do{ Hull.Title( DtoA( Real(ElapsedTime())/3600000.0,-3 ) ); WaitTime( 500 );
     } while( WinReady() && Hull.GetKey()!=_Esc ); return 0;
 }

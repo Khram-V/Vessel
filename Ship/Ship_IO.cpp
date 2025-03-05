@@ -9,17 +9,16 @@ const char *sVer[]={
  "3.02+","3.03+","3.08+","3.09+","3.12+","3.13+","3.16+","3.27+","3.3+","3.34+",
  "3.4",  "4.2",  "4.3",  "4.6.2","5.0" };
 static FileVersion FV=fv261;
-static bool isBin=false;       // признак двоичной или текстовой записи корпуса
-static FILE *F=NULL;           // локальный файл открывается временно
-static string Str;             // рабочая строчка изначально имеет 2К
+static bool isBin=false;    // признак двоичной или текстовой записи корпуса
+static FILE *F=NULL;        // локальный файл открывается временно
+static string Str;          // рабочая строчка изначально имеет 2К
 
 static bool OpenFile(WCHAR *FileName) // открытие файла цифровой модели корпуса
 { char FTyp[14];
   F=_wfopen( FileName,L"rb" ); fread( FTyp,1,13,F );
   if( !strncmp( Future,FTyp,9 ) )
-  { fclose( F ); F=_wfopen( FileName,L"rt" ); fgets( FTyp,13,F ); return false; }
-  else
-  if( ((int*)FTyp)[0]==9 && !strncmp( Future,FTyp+4,9 ) )return true;
+    { fclose(F); F=_wfopen(FileName,L"rt"); fgets(FTyp,13,F); return false; }
+  else if( ((int*)FTyp)[0]==9 && !strncmp( Future,FTyp+4,9 ) )return true;
   fclose( F ); F=NULL; return false;
 }
 static FileVersion getVersion()
@@ -31,12 +30,10 @@ static byte getByte()
 { if( isBin )return fgetc( F ); else return atoi( getString( F ) );
 }
 static int getInt()
-{ if( isBin ){ int I; fread( &I,1,4,F ); return I; }
-                 else return atoi( getString( F ) );
+{ if( isBin ){ int I; fread( &I,1,4,F ); return I; } else return atoi( getString( F ) );
 }
 static Real getFloat()
-{ if( isBin ){ float R; fread( &R,1,4,F ); return R; }
-                 else return atof( getString( F ) );
+{ if( isBin ){ float R; fread( &R,1,4,F ); return R; } else return atof( getString( F ) );
 }
 static Vector getPoint()
 { Vector P;
@@ -53,84 +50,73 @@ static Plane getPlane()
 static void readText( char **src )
 { if( *src )free( *src ); // на входе-выходе просто адрес = строчка - недотрога
   if( !isBin )*src=strdup( getString( F ) ); else
-  { int l=0; fread( &l,1,4,F );                Str[0]=0; //print(" l=%d ",l);
+  { int l=0; fread( &l,1,4,F );                Str[0]=0;                //print(" l=%d ",l);
     for( int i=0; i<l; i++ )Str[i]=fgetc( F ); Str[l]=0;
     *src=strdup( WintU( Str ) );
   }
 }
-struct Image
-{ int W,H,Size;;
-  int Read();
-};
-struct BackImage
-{ ViewType VT;
-  bool Visible;
-  int  Quality, OrgX,OrgY;
-  Real Scale;
-  int  Blend;
-  bool Transparent;
-  int  TransColor;
-  int  Tolerance;
-  Image Pic;
-  void Read();
-};
-
-void BackImage::Read()
-{ VT     =(ViewType)getInt();                    print( " Type=%d",VT );
-  Visible=getByte();                             print( " V=%d",Visible );
-  Quality=getInt(),OrgX=getInt(),OrgY=getInt();  print( " Q:%d,<%d,%d>",Quality,OrgX,OrgY );
-  Scale  =getFloat();                            print( " S:%g",Scale );
-  Blend  =getInt();                              print( " B:%d",Blend );
-  Transparent=getByte(); TransColor=getInt();    print( " T=%X:%X",Transparent,TransColor );
-  Tolerance=getInt();                            print( " Tol:%d",Tolerance );
-  Pic.Read();
-}
+struct Image{ int W,H,Size;; int Read(); };
 int Image::Read()
 { W=getInt(); H=getInt(); Size=getInt();
-  if( isBin )fseek( F,Size,SEEK_CUR ); else getString( F ); print( " Pic[%d·%d]=%d байт\n",W,H,Size );
+  if( isBin )fseek( F,Size,SEEK_CUR ); else getString( F );               print( " Pic[%d·%d]=%d байт\n",W,H,Size );
   return Size;
+}
+struct BackImage
+{ ViewType VT;
+  bool Visible,Transparent;
+  int Quality, OrgX,OrgY, Blend, TransColor,Tolerance; Real Scale; Image Pic;
+  void Read();
+};
+void BackImage::Read()
+{ VT     =(ViewType)getInt();                                             print( " Type=%d",VT );
+  Visible=getByte();                                                      print( " V=%d",Visible );
+  Quality=getInt(),OrgX=getInt(),OrgY=getInt();                           print( " Q:%d,<%d,%d>",Quality,OrgX,OrgY );
+  Scale  =getFloat();                                                     print( " S:%g",Scale );
+  Blend  =getInt();                                                       print( " B:%d",Blend );
+  Transparent=getByte(); TransColor=getInt();                             print( " T=%X:%X",Transparent,TransColor );
+  Tolerance=getInt();                                                     print( " Tol:%d",Tolerance );
+  Pic.Read();
 }
 //   Основная процедура считывания цифрового проекта корабля
 //
 bool Ship::LoadProject( WCHAR* FileName )
 { isBin=OpenFile( FileName );
-   if( !F )return Ready=false;
-   print("Открыт %s файл: %s\n",
-    isBin?"двоичный":"текстовый",W2U( FileName ) ); textcolor( LIGHTBLUE );
-   FV=(FileVersion)getVersion(); print( "Версия = %d = '%s'\n",FV,sVer[FV] );
-   PT=(PrecisionType)getInt();   print( "Точность = %s[%d]\n",
-             ( (const char*[]){ "Low","Medium","High","VeryHigh" } )[PT],PT );
+   if( !F )return Ready=false;                                            print( "Открыт %s файл: %s\n",isBin?"двоичный":"текстовый",W2U(FileName)); textcolor(LIGHTBLUE);
+   FV=(FileVersion)getVersion();                                          print( "Версия = %d = '%s'\n",FV,sVer[FV]);
+   PT=(PrecisionType)getInt();                                            print( "Точность = %s[%d]\n",((const char*[]){"Low","Medium","High","VeryHigh"})[PT],PT);
    //
    //   Сначала параметры визуализации
    //
-   Visio.ModelView=(BoardView)getInt();       textcolor( LIGHTGRAY ),print( "< Visibility >:\n1^2 борта = %d\n",Visio.ModelView );
-   Visio.ControlNet=getByte();                print( "ControlNet = %d\n",Visio.ControlNet );
-   Visio.InteriorEdges=getByte();             print( "InteriorEdges = %d\n",Visio.InteriorEdges );
-   Visio.Stations=getByte();                  print( "Stations = %d\n",Visio.Stations );
-   Visio.Buttocks=getByte();                  print( "Buttocks = %d\n",Visio.Buttocks );
-   Visio.Waterlines=getByte();                print( "Waterlines = %d\n",Visio.Waterlines );
-   Visio.Normals=getByte();                   print( "Normals = %d\n",Visio.Normals );
-   Visio.Grid=getByte();                      print( "Grid = %d\n",Visio.Grid );
-   Visio.Diagonals=getByte();                 print( "Diagonals = %d\n",Visio.Diagonals );
-   Visio.Markers=getByte();                   print( "Markers = %d\n",Visio.Markers );
-   Visio.Curvature=getByte();                 print( "Curvature = %d\n",Visio.Curvature );
-   Visio.CurvatureScale=getFloat();           print( "CurvatureScale = %g\n",Visio.CurvatureScale );
+   Visio.ModelView=(BoardView)getInt();                                   textcolor( LIGHTGRAY ),print( "< Visibility >:\n1^2 борта = %d\n",Visio.ModelView );
+   Visio.ControlNet=getByte();                                            print( "ControlNet = %d\n",Visio.ControlNet );
+   Visio.InteriorEdges=getByte();                                         print( "InteriorEdges = %d\n",Visio.InteriorEdges );
+   Visio.Stations=getByte();                                              print( "Stations = %d\n",Visio.Stations );
+   Visio.Buttocks=getByte();                                              print( "Buttocks = %d\n",Visio.Buttocks );
+   Visio.Waterlines=getByte();                                            print( "Waterlines = %d\n",Visio.Waterlines );
+   Visio.Normals=getByte();                                               print( "Normals = %d\n",Visio.Normals );
+   Visio.Grid=getByte();                                                  print( "Grid = %d\n",Visio.Grid );
+   Visio.Diagonals=getByte();                                             print( "Diagonals = %d\n",Visio.Diagonals );
+   Visio.Markers=getByte();                                               print( "Markers = %d\n",Visio.Markers );
+   Visio.Curvature=getByte();                                             print( "Curvature = %d\n",Visio.Curvature );
+   Visio.CurvatureScale=getFloat();                                       print( "CurvatureScale = %g\n",Visio.CurvatureScale );
    if( FV>=fv195 )
-   { Visio.ControlCurves=getByte();           print( "195+ ControlCurves = %d\n",Visio.ControlCurves );
+   { Visio.ControlCurves=getByte();                                       print( "195+ ControlCurves = %d\n",Visio.ControlCurves );
      if( FV>=fv210 )
-     { Visio.CursorIncrement=getFloat();      print( "210+ CursorIncrement = %g\n",Visio.CursorIncrement );
+     { Visio.CursorIncrement=getFloat();                                  print( "210+ CursorIncrement = %g\n",Visio.CursorIncrement );
        if( fabs( Visio.CursorIncrement )<1e-7 )Visio.CursorIncrement=0.1; //+++
        if( FV>=fv220 )
-       { Visio.HydrostaticData=getByte();     print( "220+ HydrostaticData = %d\n",Visio.HydrostaticData );
-         Visio.HydrostDisplacement=getByte();   print( "220+ HydrostDisplacement = %d\n",Visio.HydrostDisplacement );
-         Visio.HydrostLateralArea=getByte();      print( "220+ HydrostLateralArea = %d\n",Visio.HydrostLateralArea );
-         Visio.HydrostSectionalAreas=getByte();    print( "220+ HydrostSectionalAreas = %d\n",Visio.HydrostSectionalAreas );
-         Visio.HydrostMetacentricHeight=getByte(); print( "220+ HydrostMetacentricHeight = %d\n",Visio.HydrostMetacentricHeight );
-         Visio.HydrostLCF=getByte();               print( "220+ HydrostLCF = %d\n",Visio.HydrostLCF );
-         if( FV>=fv250 )Visio.lFlowline=getByte(), print( "250+ logFlowlines = %d\n",Visio.lFlowline );
-       } //=220
-     }   //=210
-   }     //=195
+       { Visio.HydrostaticData=getByte();                                 print( "220+ HydrostaticData = %d\n",Visio.HydrostaticData );
+         Visio.HydrostDisplacement=getByte();                             print( "220+ HydrostDisplacement = %d\n",Visio.HydrostDisplacement );
+         Visio.HydrostLateralArea=getByte();                              print( "220+ HydrostLateralArea = %d\n",Visio.HydrostLateralArea );
+         Visio.HydrostSectionalAreas=getByte();                           print( "220+ HydrostSectionalAreas = %d\n",Visio.HydrostSectionalAreas );
+         Visio.HydrostMetacentricHeight=getByte();                        print( "220+ HydrostMetacentricHeight = %d\n",Visio.HydrostMetacentricHeight );
+         Visio.HydrostLCF=getByte();                                      print( "220+ HydrostLCF = %d\n",Visio.HydrostLCF );
+         if( FV>=fv250 )
+         { Visio.lFlowline=getByte();                                     print( "250+ logFlowlines = %d\n",Visio.lFlowline );
+         } //=250
+       }   //=220
+     }     //=210
+   }       //=195
    //
    //  Затем описание характеристик и размерений корпуса с авторскими ссылками
    //
@@ -196,7 +182,7 @@ bool Ship::LoadProject( WCHAR* FileName )
          }   //=317
        }     //=250
      }      /* =230 */                            textcolor( LIGHTGRAY );
-     UnderWaterColorAlpha =  0xFF; //Hull<FREE!ship>.UnderWaterColorAlpha;
+     // UnderWaterColorAlpha = 0xFF; // Hull<FREE!ship>.UnderWaterColorAlpha;
      if( FV>=fv500 )UnderWaterColorAlpha=getInt(),print( "500+ UnderWaterColorAlpha=%d\n",UnderWaterColorAlpha );
    }      ///* =210
    //
@@ -233,7 +219,8 @@ bool Ship::LoadProject( WCHAR* FileName )
          Marks[I].ShowCurvature=getByte();
          Marks[I].CurvatureScale=getFloat();
          Marks[I].NoSplines=getInt();
-         Marks[I].S=(Marker::Spline*)Allocate( Marks[I].NoSplines*sizeof( Marker::Spline ) );
+         Marks[I].S=(Spline*)Allocate( Marks[I].NoSplines*sizeof( Spline ) );
+//       Marks[I].S=(Marker::Spline*)Allocate( Marks[I].NoSplines*sizeof( Marker::Spline ) );
          for( K=0; K<Marks[I].NoSplines; K++ )
          { Marks[I].S[K].P=getPoint();
            Marks[I].S[K].Knuckle=getByte();
@@ -245,8 +232,7 @@ bool Ship::LoadProject( WCHAR* FileName )
          for( I=0; I<9; I++ )getFloat(); getByte();
           if( isBin )fseek( F,3,SEEK_CUR );                     print( "210+ KAPERResistanceData = 9x4+1(+3) = %d\n",9*4+1+3 );
          if( FV>=fv250 )
-         { BackImage *Pic;
-           N=getInt();                                          print( "250+ BackGroundImages = %d\n",N );
+         { BackImage *Pic; N=getInt();                          print( "250+ BackGroundImages = %d\n",N );
            if( N>0 )
            { Pic = (BackImage*)Allocate( N*sizeof( BackImage ) );
              for( I=0; I<N; I++ )Pic[I].Read();                 print( "250+ Фон №_%d ",I );
@@ -275,40 +261,39 @@ bool Ship::LoadProject( WCHAR* FileName )
 //
 void Surface::Read()
 { int I,K,N,EdErr;
-   isLoad=true; textbackground( BLUE );                // First load layerdata
-   N=getInt();                                         print( "< Surface.LaeyrData >\nNoLaeyrs = %d -> %d\n",NoLayers,N );
+   isLoad=true; textbackground( BLUE ); // First load layerdata
+   N=getInt();                                                            print( "< Surface.LaeyrData >\nNoLaeyrs = %d -> %d\n",NoLayers,N );
    if( NoLayers>0 )memset( L,0,NoLayers*sizeof( Surface::Laeyrs ) );
    NoLayers=N;
    L=(Surface::Laeyrs*)Allocate( N*sizeof( Surface::Laeyrs ) );
 // L=(Surface::Laeyrs*)Allocate( N*sizeof(*L) );
    if( N )
    { for( I=0; I<N; I++ )
-     { /* Layer=AddNewLayer(); */           print( "AddNewLaeyr[%02d]: ",I );
-       readText( &(L[I].Description) );  // print( "'%-24s'",L[I].Description );
-       L[I].ID=getInt();                    print( " ID=%02d ",L[I].ID );
-       L[I].Color=getInt();                 print( "%8X",L[I].Color );
-       L[I].Visible=getByte();              print("{%d,",L[I].Visible );
-       L[I].Symmetric=getByte();            print("%d,",L[I].Symmetric );
-       L[I].Developable=getByte();          print("%d,",L[I].Developable );
+     { /* Layer=AddNewLayer(); */                                         print( "AddNewLaeyr[%02d]: ",I );
+       readText( &(L[I].Description) );                                // print( "'%-24s'",L[I].Description );
+       L[I].ID=getInt();                                                  print( " ID=%02d ",L[I].ID );
+       L[I].Color=getInt();                                               print( "%8X",L[I].Color );
+       L[I].Visible=getByte();                                            print( "{%d,",L[I].Visible );
+       L[I].Symmetric=getByte();                                          print( "%d,",L[I].Symmetric );
+       L[I].Developable=getByte();                                        print( "%d,",L[I].Developable );
        if( FV>=fv180 )
-       { L[I].UseforIntersection=getByte(); textcolor( LIGHTCYAN ),print("%d,",L[I].UseforIntersection );
-         L[I].UswinHydrostatic=getByte();   print("%d}",L[I].UswinHydrostatic );
+       { L[I].UseforIntersection=getByte();                               textcolor( LIGHTCYAN ),print("%d,",L[I].UseforIntersection );
+         L[I].UswinHydrostatic=getByte();                                 print( "%d}",L[I].UswinHydrostatic );
          if( FV>=fv191 )
-         { L[I].MaterialDensity=getFloat(); textcolor( LIGHTGREEN ),print(" MD=%g",L[I].MaterialDensity );
-           L[I].Thickness=getFloat();       print(" Tn=%-3g",L[I].Thickness );
+         { L[I].MaterialDensity=getFloat();                               textcolor( LIGHTGREEN ),print(" MD=%g",L[I].MaterialDensity );
+           L[I].Thickness=getFloat();                                     print( " Tn=%-3g",L[I].Thickness );
            if( FV>=fv201 )
-           { L[I].ShoeinLineSpan=getByte(); textcolor( LIGHTRED ),print(" Shoe=%d",L[I].ShoeinLineSpan );
+           { L[I].ShoeinLineSpan=getByte();                               textcolor( LIGHTRED ),print(" Shoe=%d",L[I].ShoeinLineSpan );
              if( FV>=fv261 )
-               L[I].AlphaBlend=getInt();    textcolor( YELLOW ),print(" Alfa=%d ",L[I].AlphaBlend );
-           } //=201
-         }   //=191
-       }     /*=180 */                   textcolor( LIGHTGRAY ),print("'%-24s'\n",L[I].Description );
+               L[I].AlphaBlend=getInt();                                  textcolor( YELLOW ),print(" Alfa=%d ",L[I].AlphaBlend );
+           } // =201
+         }   // =191
+       }     /* =180 */                                                   textcolor( LIGHTGRAY ),print("'%-24s'\n",L[I].Description );
      }       // for
    }
-   N=getInt();                              print( "index of active layer = %d\n",N );
+   N=getInt();                                                            print( "index of active layer = %d\n",N );
    ActiveLayer=L[N];
-
-   N=getInt();                                  print( "< ControlPoints > %d",N );
+   N=getInt();                                                            print( "< ControlPoints > %d",N );
    if( NoCoPoint>0 )memset( P,0,NoCoPoint*sizeof( Surface::CoPoint ) );
    NoCoPoint=N;
    P=(Surface::CoPoint*)Allocate( N*sizeof( Surface::CoPoint ) );
@@ -323,10 +308,10 @@ void Surface::Read()
    G=(Surface::Edges*)Allocate( N*sizeof( Surface::Edges ) );
    if( NoEdges>0 )memset( G,0,NoEdges*sizeof( Surface::Edges ) );
    for( I=0; I<N; I++ )
-   { K=getInt(); if( K==-1 )K=0; G[I].StartIndex=K;       if( K>=NoCoPoint )EdErr++;
+   { K=getInt(); if( K==-1 )K=0; G[I].StartIndex=K;    if( K>=NoCoPoint )EdErr++;
                                  G[I].StartPoint=P[K].V;
      K=getInt(); if( K==-1 )K=0; G[I].EndIndex=K;
-                                 G[I].EndPoint=P[K].V;    if( K>=NoCoPoint )EdErr++;
+                                 G[I].EndPoint=P[K].V; if( K>=NoCoPoint )EdErr++;
      G[I].Crease = getByte();
      G[I].Selected = getByte();
    }                                                                      if( N>0 )print( " = {н:%d+к:%d}`0` E(%d)",G[0].StartIndex,G[0].EndIndex,EdErr ); print( "\n" );
@@ -350,7 +335,7 @@ void Surface::Read()
    for( I=0; I<N; I++ )
    { K=getInt();
      F[I].Capacity=K;
-     F[I].P=(int*)Allocate( K*sizeof(int) );             /// <++ Control Points
+     F[I].P=(int*)Allocate( K*sizeof(int) );    /// <++ Control Points
      for( int j=0; j<K; j++ ){ int m=getInt();
                                if( m>=NoCoPoint || m<0 )EdErr++;
                                if( m==-1 )m=0; F[I].P[j]=m;
@@ -375,7 +360,8 @@ void InterSection::Read()
   T=(Items*)Allocate( N*sizeof(Items) );                               // textcolor( YELLOW );print( "\n a=%g,b=%g,c=%g,d=%g,Build=%d,N=%d",St[I].a,St[I].b,St[I].c,St[I].d,St[I].Build,N );
   for( int n=0; n<N; n++ )
   { T[n].NoSplines=K=getInt();
-    T[n].S=(InterSection::Items::Spline*)Allocate( K*sizeof(InterSection::Items::Spline) ); // print( "\nN=%d, K=%d  ",N,K  ); getch();
+    T[n].S=(Spline*)Allocate( K*sizeof( Spline ) );                    // print( "\nN=%d, K=%d  ",N,K ); getch();
+//  T[n].S=(InterSection::Items::Spline*)Allocate( K*sizeof(InterSection::Items::Spline) );
     for( int k=0; k<K; k++ )
     { Vector &P=T[n].S[k].P;
       if( FV >=fv160 )
@@ -388,5 +374,3 @@ void InterSection::Read()
     }
   }
 }
-
-

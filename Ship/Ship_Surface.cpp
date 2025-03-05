@@ -26,7 +26,7 @@ void Surface::Drawing( BoardView Sides )
 */      glColor4ubv( C.c ); dot( ~V[I] );
       }
       glEnd();
-  } } glLineWidth( .2 );
+  } } glLineWidth( 0.2 );
 }
 void Surface::Extents()
 { for( int i=0; i<NoCoPoint; i++ )
