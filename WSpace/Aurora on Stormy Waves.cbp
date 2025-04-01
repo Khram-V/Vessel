@@ -8,7 +8,7 @@
 		<Build>
 			<Target title="Aurora">
 				<Option platforms="Windows;" />
-				<Option output="../../Work/Aurora" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Aurora" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../Vessel" />
 				<Option object_output="Dev/Obj" />
 				<Option type="0" />
@@ -18,7 +18,7 @@
 				<Option projectLinkerOptionsRelation="2" />
 			</Target>
 			<Target title="Aurora-eq">
-				<Option output="../../Work/Aurora-eq" prefix_auto="1" extension_auto="1" />
+				<Option output="../../../Work/Aurora-eq" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../Vessel" />
 				<Option object_output="Dev/Obj" />
 				<Option type="0" />
@@ -36,7 +36,7 @@
 				</Linker>
 			</Target>
 			<Target title="Aurora-stable">
-				<Option output="../../Work/Aurora-stable" prefix_auto="1" extension_auto="1" />
+				<Option output="../../../Work/Aurora-stable" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../Vessel" />
 				<Option object_output="Dev/Obj" />
 				<Option type="0" />
@@ -52,7 +52,7 @@
 				</Linker>
 			</Target>
 			<Target title="Aurora-night">
-				<Option output="../../Work/Aurora-night" prefix_auto="1" extension_auto="1" />
+				<Option output="../../../Work/Aurora-night" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../Vessel" />
 				<Option object_output="Dev/Obj" />
 				<Option type="0" />
@@ -67,7 +67,7 @@
 				</Linker>
 			</Target>
 			<Target title="Waves Profile">
-				<Option output="../../Work/Wave" prefix_auto="1" extension_auto="1" />
+				<Option output="../../../Work/Wave" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Data" />
 				<Option object_output="Dev/Obj" />
 				<Option type="0" />

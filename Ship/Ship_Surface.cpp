@@ -8,7 +8,7 @@ void Surface::Drawing( BoardView Sides )
   for( N=0; N<NoFaces; N++ )   // синхронная по бортам прорисовка треугольников
   if( (K=F[N].Capacity)>2 )
   { V.len=0; C.C=L[F[N].LayerIndex].Color;
-    for( I=0; I<K; I++)V+=P[F[N].P[I]].V; // C.c[3]=V[0].z>=Draught?0xFF:0x7F; glColor4ubv(C.c);
+    for( I=0; I<K; I++)V+=P[F[N].P[I]].V;              // C.c[3]=V[0].z>=Draught?0xFF:0x7F; glColor4ubv(C.c);
     glNormal3dv( W=(V[2]-V[0])*(V[1]-V[0]) ); glBegin( GL_POLYGON );
     for( I=0; I<K; I++ )
       { C.c[3]=V[I].z>Draft+Min.z?0xFF:0xBF; glColor4ubv( C.c ); dot( V[I] ); }
@@ -24,9 +24,9 @@ void Surface::Drawing( BoardView Sides )
           C.c[2] = byte( C.c[2]*(1-a)+UnderWaterColor.c[2]*a )/2;
         } C.c[3]=UnderWaterColorAlpha;
 */      glColor4ubv( C.c ); dot( ~V[I] );
-      }
-      glEnd();
-  } } glLineWidth( 0.2 );
+      } glEnd();
+    }
+  } glLineWidth( 0.2 );
 }
 void Surface::Extents()
 { for( int i=0; i<NoCoPoint; i++ )

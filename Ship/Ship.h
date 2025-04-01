@@ -2,6 +2,7 @@
 #include <StdIO.h>
 #include "..\Window\ConIO.h"
 #include "..\Storm\Flex.h"
+//#include "..\Type.h"
 
 typedef enum { fv100,fv110,fv120,fv130,fv140, fv150,fv160,fv165,fv170,fv180,
                fv190,fv191,fv195,fv198,fv200, fv201,fv210,fv220,fv230,fv240,
@@ -139,6 +140,7 @@ class Surface
 public:
   Surface(){ memset( this,0,sizeof( Surface ) ); }
   void Read();
+  void ReadFEF();
   void Drawing( BoardView=mvPort );
 };
 struct Spline{ Vector P; bool Knuckle; };
@@ -176,6 +178,8 @@ struct Ship                       // Сборка корпуса в целом
   Ship();                           // очищающий конструктор
   bool LoadProject( WCHAR *FName ); // быстрая выборка всего комплекса данных
                                     // в общую структуры в оперативной памяти
+  bool LoadFEF( const WCHAR *FName ); // Ship.fef == File Exchange Format
+
 };
 struct FreeShip: Ship,View        //,Matrix
 { FreeShip();

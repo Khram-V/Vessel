@@ -120,68 +120,68 @@ bool Ship::LoadProject( WCHAR* FileName )
    //
    //  Затем описание характеристик и размерений корпуса с авторскими ссылками
    //
-   readText( &Set.Name );      textcolor( WHITE ),print( "< Project >\nName=%s\n",Set.Name );
-   readText( &Set.Designer );                     print( "Name=%s\n",Set.Designer );
-       Length=getFloat();                         print( "Length=%g\n",Length );
-       Beam=getFloat();                           print( "Beam=%g\n",Beam );
-       Draft=getFloat();                          print( "Draft=%g\n",Draft );
-   Set.MainparticularsHasBeenset=getByte();       print( "MainparticularsHasBeenset=%d\n",Set.MainparticularsHasBeenset );
-   Set.WaterDensity=getFloat();                   print( "WaterDensity=%g\n",Set.WaterDensity );
-   Set.AppendageCoefficient=getFloat();           print( "AppendageCoefficient=%g\n",Set.AppendageCoefficient );
-   Set.ShadeUnderwaterShip=getByte();             print( "ShadeUnderwaterShip=%d\n",Set.ShadeUnderwaterShip );
-       UnderWaterColor.C=getInt();                print( "UnderWaterColor=%08X\n",UnderWaterColor );
+   readText( &Set.Name );                    textcolor( WHITE ),print( "< Project >\nName=%s\n",Set.Name );
+   readText( &Set.Designer );                                   print( "Name=%s\n",Set.Designer );
+       Length=getFloat();                                       print( "Length=%g\n",Length );
+       Beam=getFloat();                                         print( "Beam=%g\n",Beam );
+       Draft=getFloat();                                        print( "Draft=%g\n",Draft );
+   Set.MainparticularsHasBeenset=getByte();                     print( "MainparticularsHasBeenset=%d\n",Set.MainparticularsHasBeenset );
+   Set.WaterDensity=getFloat();                                 print( "WaterDensity=%g\n",Set.WaterDensity );
+   Set.AppendageCoefficient=getFloat();                         print( "AppendageCoefficient=%g\n",Set.AppendageCoefficient );
+   Set.ShadeUnderwaterShip=getByte();                           print( "ShadeUnderwaterShip=%d\n",Set.ShadeUnderwaterShip );
+       UnderWaterColor.C=getInt();                              print( "UnderWaterColor=%08X\n",UnderWaterColor );
        UnderWaterColorAlpha=255-UnderWaterColor.c[3];
-   Set.Units=(UnitType)getInt();                  print( "Units = %d\n",Set.Units );
-   Set.UseDefaultSplitSectionLocation=getByte();  print( "UseDefaultSplitSectionLocation=%d\n",Set.UseDefaultSplitSectionLocation );
-   Set.SplitSectionLocation=getFloat();           print( "SplitSectionLocation=%g\n",Set.SplitSectionLocation );
-   Set.DisableModelCheck=getByte();               print( "DisableModelCheck=%d\n",Set.DisableModelCheck );
-   readText( &Set.Comment );                      print( "Comment=%s\n",Set.Comment );
-   readText( &Set.CreatedBy );                    print( "CreatedBy=%s\n",Set.CreatedBy );
+   Set.Units=(UnitType)getInt();                                print( "Units = %d\n",Set.Units );
+   Set.UseDefaultSplitSectionLocation=getByte();                print( "UseDefaultSplitSectionLocation=%d\n",Set.UseDefaultSplitSectionLocation );
+   Set.SplitSectionLocation=getFloat();                         print( "SplitSectionLocation=%g\n",Set.SplitSectionLocation );
+   Set.DisableModelCheck=getByte();                             print( "DisableModelCheck=%d\n",Set.DisableModelCheck );
+   readText( &Set.Comment );                                    print( "Comment=%s\n",Set.Comment );
+   readText( &Set.CreatedBy );                                  print( "CreatedBy=%s\n",Set.CreatedBy );
    Set.SavePreview=true;
    if( FV>=fv210 )
    { Set.HydrostaticCoefficients=(HydrostaticCoefficient)getInt(); print( "210+ HydrostaticCoefficients = %d\n",Set.HydrostaticCoefficients );
-     Set.SavePreview=getByte();                   textcolor( YELLOW ),print( "210+ SavePreview=%d\n",Set.SavePreview );
+     Set.SavePreview=getByte();                                 textcolor( YELLOW ),print( "210+ SavePreview=%d\n",Set.SavePreview );
      if( Set.SavePreview )
-     { Image Fon;                                 print( "210+ " );
+     { Image Fon;                                               print( "210+ " );
        Fon.Read();
 //       int W,H,Size; W=getInt(); H=getInt(); Size=getInt();
 //       if( isBin )fseek( F,Size,SEEK_CUR ); else getString( F ); print( "210+ Картинка[%d·%d]=%d байт\n",W,H,Size );
      }
      if( FV>=fv230 )
-     { Set.SimplifyIntersections=getByte();       textcolor( LIGHTCYAN ),print( "230+ SimplifyIntersections=%d\n",Set.SimplifyIntersections );
+     { Set.SimplifyIntersections=getByte();                     textcolor( LIGHTCYAN ),print( "230+ SimplifyIntersections=%d\n",Set.SimplifyIntersections );
        if( FV>=fv250 )
-       { Set.StartDraft=getFloat();               print( "250+ StartDraft=%g\n",Set.StartDraft );
-         Set.EndDraft=getFloat();                 print( "250+ EndDraft=%g\n",Set.EndDraft );
-         Set.DraftStep=getFloat();                print( "250+ DraftStep=%g\n",Set.DraftStep );
-         Set.Trim=getFloat();                     print( "250+ Trim=%g\n",Set.Trim );
+       { Set.StartDraft=getFloat();                             print( "250+ StartDraft=%g\n",Set.StartDraft );
+         Set.EndDraft=getFloat();                               print( "250+ EndDraft=%g\n",Set.EndDraft );
+         Set.DraftStep=getFloat();                              print( "250+ DraftStep=%g\n",Set.DraftStep );
+         Set.Trim=getFloat();                                   print( "250+ Trim=%g\n",Set.Trim );
 
-         Set.NoDisplacements=getInt();            print( "250+ NoDisplacements=%d\n",Set.NoDisplacements );
+         Set.NoDisplacements=getInt();                          print( "250+ NoDisplacements=%d\n",Set.NoDisplacements );
          Set.Displacements=(Real*)Allocate( Set.NoDisplacements*sizeof(Real) );
          for( int i=0; i<Set.NoDisplacements; i++ )Set.Displacements[i]=getFloat();
 
-         Set.MinimumDisplacement=getFloat();      print( "250+ MinimumDisplacement=%g\n",Set.MinimumDisplacement );
-         Set.MaximumDisplacement=getFloat();      print( "250+ MaximumDisplacement=%g\n",Set.MaximumDisplacement );
-         Set.DisplIncrement=getFloat();           print( "250+ DisplIncrement=%g\n",Set.DisplIncrement );
-         Set.UseDisplIncrements=getByte();        print( "250+ UseDisplIncrements=%d\n",Set.UseDisplIncrements );
+         Set.MinimumDisplacement=getFloat();                    print( "250+ MinimumDisplacement=%g\n",Set.MinimumDisplacement );
+         Set.MaximumDisplacement=getFloat();                    print( "250+ MaximumDisplacement=%g\n",Set.MaximumDisplacement );
+         Set.DisplIncrement=getFloat();                         print( "250+ DisplIncrement=%g\n",Set.DisplIncrement );
+         Set.UseDisplIncrements=getByte();                      print( "250+ UseDisplIncrements=%d\n",Set.UseDisplIncrements );
 
-         Set.NoAngles=getInt();                   print( "250+ NoAngles=%d\n",Set.Angles );
+         Set.NoAngles=getInt();                                 print( "250+ NoAngles=%d\n",Set.Angles );
          Set.Angles=(Real*)Allocate( Set.NoAngles*sizeof(Real) );
          for( int i=0; i<Set.NoAngles; i++ )Set.Angles[i]=getFloat();
 
-         Set.NoTrims=getInt();                    print( "250+ NoTrims=%d\n",Set.Trims );
+         Set.NoTrims=getInt();                                  print( "250+ NoTrims=%d\n",Set.Trims );
          Set.Trims=(Real*)Allocate( Set.NoTrims*sizeof(Real) );
          for( int i=0; i<Set.NoTrims; i++ )Set.Trims[i]=getFloat();
 
-         Set.FreeTrim=getByte();                  print( "250+ FreeTrim=%d\n",Set.FreeTrim );
-         Set.FVCG=getFloat();                     print( "250+ FVCG=%g\n",Set.FVCG );
+         Set.FreeTrim=getByte();                                print( "250+ FreeTrim=%d\n",Set.FreeTrim );
+         Set.FVCG=getFloat();                                   print( "250+ FVCG=%g\n",Set.FVCG );
          if( FV>=fv317 )
-         { Set.EnableModelAutoMove=getByte();     print( "317+ EnableModelAutoMove=%d\n",Set.EnableModelAutoMove );
+         { Set.EnableModelAutoMove=getByte();                   print( "317+ EnableModelAutoMove=%d\n",Set.EnableModelAutoMove );
            if( FV>=fv332 )
-           { Set.EnableBonjeanSAC=getByte();      print( "317+ EnableBonjeanSAC=%d\n",Set.EnableBonjeanSAC );
+           { Set.EnableBonjeanSAC=getByte();                    print( "317+ EnableBonjeanSAC=%d\n",Set.EnableBonjeanSAC );
            } //=332
          }   //=317
        }     //=250
-     }      /* =230 */                            textcolor( LIGHTGRAY );
+     }      /* =230 */                                          textcolor( LIGHTGRAY );
      // UnderWaterColorAlpha = 0xFF; // Hull<FREE!ship>.UnderWaterColorAlpha;
      if( FV>=fv500 )UnderWaterColorAlpha=getInt(),print( "500+ UnderWaterColorAlpha=%d\n",UnderWaterColorAlpha );
    }      ///* =210
@@ -254,6 +254,10 @@ bool Ship::LoadProject( WCHAR* FileName )
        }   // =210
      }     // =191
    }       // =180
+   textcolor( YELLOW );
+   print( "\n Длина : [ %6.2f - %-6.2f ] = %g ",Min.x,Max.x,Max.x-Min.x );
+   print( "\n Ширина: [ %6.2f - %-6.2f ] = %g ",Min.y,Max.y,(Max.y>-Min.y?Max.y:-Min.y)*2 );
+   print( "\n Высота: [ %6.2f - %-6.2f ] = %g ",Min.z,Max.z,Max.z-Min.z );
    return Ready=true;
 }
 //
@@ -374,3 +378,80 @@ void InterSection::Read()
     }
   }
 }
+//   Полноценный вариант в варианте с базовым форматом, без излишеств
+//
+bool Ship::LoadFEF( const WCHAR *FName )    // Ship.fef == File Exchange Format
+{ int I; //char *str;
+  if( !(F=_wfopen( FName,L"rb" ) ) )return false; textcolor( WHITE );
+  readText( &Set.Name );                                                  print( "< Project >\nName     =%s\n",Set.Name );
+  readText( &Set.Designer );                                              print(              "Designer =%s\n",Set.Designer );
+  readText( &Set.Comment );                                               print(              "Comment  =%s\n",Set.Comment );
+  readText( &Set.CreatedBy );                                             print(              "CreatedBy=%s\n",Set.CreatedBy );
+  sscanf( getString( F ),"%lg%lg%lg%lg%lg%d%d%d",
+   &Length,&Beam,&Draft,
+   &Set.WaterDensity,
+   &Set.AppendageCoefficient,
+   &Set.Units,&I,&PT );
+   Set.MainparticularsHasBeenset=I;                                       print( "L,B,T={ %g, %g, %g },\n\t WaterDensity=%g, A?C=%g, Units=%d, Been=%d, Точность=%d\n\n",Length,Beam,Draft,Set.WaterDensity,Set.AppendageCoefficient,Set.Units,Set.MainparticularsHasBeenset,PT );
+//
+// TFreeSubdivisionSurface.ImportFEFFile
+//
+   Shell.ReadFEF();
+   textcolor( YELLOW );
+   print( "\n Длина : [ %6.2f - %-6.2f ] = %g ",Min.x,Max.x,Max.x-Min.x );
+   print( "\n Ширина: [ %6.2f - %-6.2f ] = %g ",Min.y,Max.y,(Max.y>-Min.y?Max.y:-Min.y)*2 );
+   print( "\n Высота: [ %6.2f - %-6.2f ] = %g ",Min.z,Max.z,Max.z-Min.z );
+   return Ready=true;
+}
+//
+//   чтение собственно секций всех сплайновых геометрических поверхностей
+//
+void Surface::ReadFEF()
+{ int I,K;
+   isLoad=true; textbackground( BLUE ); // First load layerdata
+   K=getInt();                                                            print( "< Surface.LaeyrData >\nNoLaeyrs = %d -> %d\n",NoLayers,K );
+   if( !K )K=getInt();                                                    print( "NoLaeyrs(повтор) = %d\n",K );
+   NoLayers=K;
+   L=(Surface::Laeyrs*)Allocate( max(1,NoLayers)*sizeof( Surface::Laeyrs ) );
+   for( I=0; I<NoLayers; I++ )
+   { Laeyrs &T=L[I]; int v,s,d,u,w;
+     readText( &T.Description );                                          print( "[%d]'%-12s'",I,T.Description );
+     sscanf( getString( ::F ),"%d%u%i%i%i%i%i%lg%lg",&T.ID,
+             &T.Color,&v,&s,&d,&u,&w,
+             &T.MaterialDensity,
+             &T.Thickness ); v=T.Visible,
+                             s=T.Symmetric,
+                             d=T.Developable,
+                             u=T.UseforIntersection,
+                             w=T.UswinHydrostatic;                        print( ", ID=%d, Color=%X, Vis=%i, Symm=%i, ... Плотность=%g, Толщина=%g \n",T.ID,T.Color,T.Visible,T.Symmetric,T.MaterialDensity,T.Thickness );
+   }
+   if( NoCoPoint>0 )memset( P,0,NoCoPoint*sizeof( Surface::CoPoint ) );   print( "< ControlPoints > %d",NoCoPoint );
+   NoCoPoint=getInt();
+   P=(Surface::CoPoint*)Allocate( NoCoPoint*sizeof( Surface::CoPoint ) );
+   for( I=0; I<NoCoPoint; I++ )
+   { CoPoint &T=P[I];
+     sscanf( getString( ::F ),"%lg%lg%lg%i%i",&T.V.x,&T.V.y,&T.V.z,&T.T,&K );
+                          T.Selected=K;
+   }                                                                      if( NoCoPoint>0 )print( " = {%g,%g,%g}`0`",P[0].V.x,P[0].V.y,P[0].V.z ); print( "\n" );
+   NoEdges=getInt();                                                      print( "< ControlEdges > %d",NoEdges );
+   G=(Surface::Edges*)Allocate( NoEdges*sizeof( Surface::Edges ) );
+   if( NoEdges>0 )memset( G,0,NoEdges*sizeof( Surface::Edges ) );
+   for( I=0; I<NoEdges; I++ )
+   { int K1,K2;
+     sscanf( getString( ::F ),"%i%i%i%i",&K1,&K2,&G[I].Crease,&K );
+       G[I].StartPoint=P[G[I].StartIndex=K1].V;   G[I].Selected=K;
+         G[I].EndPoint=P[G[I].EndIndex=K2].V;
+   }                                                                      if( NoEdges>0 )print( " = {н:%d+к:%d}",G[0].StartIndex,G[0].EndIndex ); print( "\n" );
+   NoFaces=getInt();                                                      print( "< ControlFaces >\nNoFaces=%d - количество фрагментов обшивки\n",NoFaces );
+   F=(Surface::Faces*)Allocate( NoFaces*sizeof( Surface::Faces ) );
+   for( I=0; I<NoFaces; I++ ) // и здесь уж чтение напрямую из текстового файла
+   { fscanf( ::F,"%d",&K ); F[I].Capacity=K;
+     F[I].P=(int*)Allocate( K*sizeof(int) );             /// <++ Control Points
+     for( int j=0; j<K; j++ )fscanf( ::F,"%d",&F[I].P[j] );
+     sscanf( getString( ::F ),"%d%i",&F[I].LayerIndex,&K  );
+                                      F[I].Selected=K;
+   }                                                                      textbackground( BLACK );
+   Extents();  // расчёт - переопределение графических экстремумов
+}
+
+

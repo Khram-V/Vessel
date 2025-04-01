@@ -409,28 +409,24 @@ Sign_Fragment: signLb=signRb=0; zl=wl; zr=wr;   /// v0+((x-x0)/(x1-x0))*(v1-v0)
                     else { signLb=0; zl=wl; }
       } else
       if( signLb*signRb>0 ) //&& (zl<L.len || zr<R.len) )
-      { if( zl==L.len )
-        { if( zr<R.len )while( ++zr<R.len ){ if( R[zr-1].z*R[zr].z<0 )break; }
-        } else
-        if( zr==R.len )
-        { if( zl<L.len )while( ++zl<L.len ){ if( L[zl-1].z*L[zl].z<0 )break; }
-        }
-      }
-Rem:  wl=zl; zl=sl;
+      { if( zl==L.len ){ if( zr<R.len )while( ++zr<R.len ){ if( R[zr-1].z*R[zr].z<0 )break; } } else
+        if( zr==R.len ){ if( zl<L.len )while( ++zl<L.len ){ if( L[zl-1].z*L[zl].z<0 )break; }
+      } }
+//Rem:
+      wl=zl; zl=sl;
       wr=zr; zr=sr;
       //
       // собственно построение оболочки обводов корпуса и надводной архитектуры
       //
       if( signLb<=0 || signRb<=0 )
       { //
-        //! простое последовательное построения сначала подводных обводов
+        //!       простое последовательное построения сначала подводных обводов
         //          и затем надводного борта с множеством сломов на надстройках
-        //
-        while( sl<wl || sr<wr )               // завершающий веер треугольников
-        if( sl>=wl )Ins( n )=rf[++sr]; else   // установка обоих точек для нового
-        if( sr>=wr )Ins( n )=lf[++sl]; else   // четырехугольника, по возможности
-        { if( Span( sl,sr ) )Ins( n )=rf[++sr]; // на выходе строго sl==wl и sr==wr
-                     else    Ins( n )=lf[++sl]; //! смачиваемая поверхность корпуса
+        while( sl<wl || sr<wr )             // завершающий веер треугольников
+        if( sl>=wl )Ins( n )=rf[++sr]; else // установка обоих точек для нового
+        if( sr>=wr )Ins( n )=lf[++sl]; else // четырехугольника, по возможности
+        { if( Span(sl,sr) )Ins(n)=rf[++sr]; // на выходе строго sl==wl и sr==wr
+                   else    Ins(n)=lf[++sl]; //! смачиваемая поверхность корпуса
           if( sl-zl>0 && wl-sl>0 && (dir( L[sl]-L[sl-1] )%dir( L[sl+1]-L[sl] ))<=0 //>2 от киля
            || sr-zr>0 && wr-sr>0 && (dir( R[sr]-R[sr-1] )%dir( R[sr+1]-R[sr] ))<=0 )break;
         }

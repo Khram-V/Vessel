@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Hull">
-				<Option output="../../Work/Hull" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Hull" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../Vessel" />
 				<Option object_output="Dev/Obj/" />
 				<Option type="0" />
@@ -16,7 +16,7 @@
 				<Option projectLinkerOptionsRelation="2" />
 			</Target>
 			<Target title="Hull-64">
-				<Option output="../../Work/Hull-64" prefix_auto="1" extension_auto="1" />
+				<Option output="../../../Work/Hull-64" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../Vessel" />
 				<Option object_output="Dev/Obj/" />
 				<Option type="0" />
@@ -33,12 +33,12 @@
 				</Linker>
 			</Target>
 			<Target title="Ship">
-				<Option output="../../Work/Ship" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="../../Ship/Ships" />
+				<Option output="../../Ship" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../Ship" />
 				<Option object_output="Dev/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters='&quot;Fregate type 23-11.ftm&quot;' />
+				<Option parameters='&quot;Save\Import\Perle2(DS).fef&quot; &quot;Ships\Fregate type 23-11.fbm&quot; Save\~באסילי.ftm' />
 				<Option projectLinkerOptionsRelation="2" />
 				<Linker>
 					<Add library="glu32" />
@@ -115,6 +115,9 @@
 		<Unit filename="../Ship/Ship_IO.cpp">
 			<Option target="Ship" />
 		</Unit>
+		<Unit filename="../Ship/Ship_Surface.cpp">
+			<Option target="Ship" />
+		</Unit>
 		<Unit filename="../Storm/Flex.cpp">
 			<Option target="Ship" />
 		</Unit>
@@ -154,10 +157,7 @@
 			<Option target="Hull" />
 			<Option target="Hull-64" />
 		</Unit>
-		<Unit filename="../Window/Window_Help.cpp">
-			<Option target="Hull" />
-			<Option target="Hull-64" />
-		</Unit>
+		<Unit filename="../Window/Window_Help.cpp" />
 		<Unit filename="../Window/Window_Menu.cpp">
 			<Option target="Hull" />
 			<Option target="Hull-64" />

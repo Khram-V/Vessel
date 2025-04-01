@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="FText">
-				<Option output="../../Work/FText" prefix_auto="1" extension_auto="1" />
+				<Option output="../../../Work/FText" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Data" />
 				<Option object_output="Dev/Obj/" />
 				<Option type="1" />

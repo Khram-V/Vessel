@@ -31,7 +31,7 @@ void Window::Help
     for( c++,k=0; k<p; k+=2 )glColor3f( 0,.8,0 ),P.Print( 2,c++,Plus[k] ),
                              glColor3f( 0,.6,.6 ),P.Print( Plus[k+1] );
     P.AlfaVector( 7,0 );
-    glColor4f( 1,1,0,0.8 ); P.Print( -1,0,"©75÷24 В.Храмушин" );
+    glColor4f( 1,.9,.8,.5 ); P.Print( -1,0,"©75÷24 В.Храмушин" );
   } P.Show(); //Save().Refresh();            // среда восстанавливается, а
     WaitKey();                               // окно будет снято Р-деструктором
 }
