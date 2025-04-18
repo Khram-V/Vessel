@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Tv_Graphics Borland" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Option virtualFolders="Tv/" />
+		<Build>
+			<Target title="Tv-32">
+				<Option output="../../Tv" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../Work" />
+				<Option object_output="../../Work/Obj" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option parameters="Univer86.dc2" />
+				<Option projectLinkerOptionsRelation="2" />
+			</Target>
+			<Target title="Tv-64">
+				<Option output="../../../Work/Tv64" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../../Work" />
+				<Option object_output="../../Work/Obj" />
+				<Option type="0" />
+				<Option compiler="gcc-mingw64" />
+				<Option parameters="Univer86.dc2" />
+				<Compiler>
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-m64" />
+				</Compiler>
+				<Linker>
+					<Add option="-static-libgcc" />
+					<Add option="-static" />
+					<Add option="-m64" />
+				</Linker>
+			</Target>
+			<Target title="Flow">
+				<Option output="../../../Work/Flow" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../../Work" />
+				<Option object_output="../../Work/Obj" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+			</Target>
+			<Target title="Waves">
+				<Option output="../../../Work/Waves" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../../Work" />
+				<Option object_output="../../Work/Obj" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option projectLinkerOptionsRelation="2" />
+			</Target>
+			<Target title="Hull">
+				<Option output="../../../Work/Hull_K" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../Work" />
+				<Option object_output="../../Work/Obj" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option parameters="Корвет-2.vsl" />
+				<Option projectLinkerOptionsRelation="2" />
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Os" />
+			<Add option="-std=gnu++98" />
+			<Add option="-std=c90" />
+			<Add option="-funsigned-char" />
+			<Add option="-fopenmp" />
+			<Add option="-fno-exceptions" />
+			<Add option="-ffast-math" />
+			<Add option="-mthreads" />
+			<Add option="-Wunused" />
+		</Compiler>
+		<Linker>
+			<Add option="-s" />
+			<Add library="gdi32" />
+			<Add library="gomp" />
+		</Linker>
+		<Unit filename="../Tv/Flow.cpp">
+			<Option target="Flow" />
+		</Unit>
+		<Unit filename="../Tv/Flow_Fletcher.cpp">
+			<Option target="Flow" />
+		</Unit>
+		<Unit filename="../Tv/Flow_Mb.cpp">
+			<Option target="Flow" />
+		</Unit>
+		<Unit filename="../Tv/Hull.cpp">
+			<Option target="Hull" />
+		</Unit>
+		<Unit filename="../Tv/Hull.h">
+			<Option target="Hull" />
+		</Unit>
+		<Unit filename="../Tv/K_Frame.cpp">
+			<Option target="Hull" />
+		</Unit>
+		<Unit filename="../Tv/K_Hull.cpp">
+			<Option target="Hull" />
+		</Unit>
+		<Unit filename="../Tv/K_Math.cpp">
+			<Option target="Hull" />
+		</Unit>
+		<Unit filename="../Tv/K_Mich.cpp">
+			<Option target="Hull" />
+		</Unit>
+		<Unit filename="../Tv/K_Statics.cpp">
+			<Option target="Hull" />
+		</Unit>
+		<Unit filename="../Tv/K_Wave.cpp">
+			<Option target="Hull" />
+		</Unit>
+		<Unit filename="../Tv/K_WaveAta.cpp">
+			<Option target="Hull" />
+		</Unit>
+		<Unit filename="../Tv/OS/Allocate.cpp" />
+		<Unit filename="../Tv/OS/Basis.cpp" />
+		<Unit filename="../Tv/OS/Basis.h" />
+		<Unit filename="../Tv/OS/Curve.cpp">
+			<Option target="Tv-32" />
+			<Option target="Tv-64" />
+		</Unit>
+		<Unit filename="../Tv/OS/Curve.h">
+			<Option target="Tv-32" />
+			<Option target="Tv-64" />
+			<Option target="Flow" />
+		</Unit>
+		<Unit filename="../Tv/OS/Graphics.cpp" />
+		<Unit filename="../Tv/OS/Graphics.h" />
+		<Unit filename="../Tv/OS/Julian.cpp">
+			<Option target="Hull" />
+		</Unit>
+		<Unit filename="../Tv/OS/Rstring.cpp" />
+		<Unit filename="../Tv/OS/Ship.Rc">
+			<Option compilerVar="CPP" />
+		</Unit>
+		<Unit filename="../Tv/OS/Tf_Topo.cpp">
+			<Option target="Waves" />
+			<Option target="Hull" />
+		</Unit>
+		<Unit filename="../Tv/OS/Tv_File.cpp">
+			<Option target="Hull" />
+		</Unit>
+		<Unit filename="../Tv/OS/Tv_Graph.h" />
+		<Unit filename="../Tv/OS/Tv_Graphics.cpp" />
+		<Unit filename="../Tv/OS/Tv_Help.cpp">
+			<Option target="Hull" />
+		</Unit>
+		<Unit filename="../Tv/OS/Tv_Text.cpp" />
+		<Unit filename="../Tv/OS/Type.h" />
+		<Unit filename="../Tv/OS/Window.cpp">
+			<Option target="Tv-32" />
+			<Option target="Tv-64" />
+		</Unit>
+		<Unit filename="../Tv/OS/Window.h">
+			<Option target="Tv-32" />
+			<Option target="Tv-64" />
+		</Unit>
+		<Unit filename="../Tv/Tv.cpp">
+			<Option virtualFolder="Tv/" />
+			<Option target="Tv-32" />
+			<Option target="Tv-64" />
+		</Unit>
+		<Unit filename="../Tv/Tv.h">
+			<Option virtualFolder="Tv/" />
+			<Option target="Tv-32" />
+			<Option target="Tv-64" />
+		</Unit>
+		<Unit filename="../Tv/Tv_DCM.cpp">
+			<Option virtualFolder="Tv/" />
+			<Option target="Tv-32" />
+			<Option target="Tv-64" />
+		</Unit>
+		<Unit filename="../Tv/Tv_Fnt.cpp">
+			<Option virtualFolder="Tv/" />
+			<Option target="Tv-32" />
+			<Option target="Tv-64" />
+		</Unit>
+		<Unit filename="../Tv/Tv_Inf.cpp">
+			<Option virtualFolder="Tv/" />
+			<Option target="Tv-32" />
+			<Option target="Tv-64" />
+		</Unit>
+		<Unit filename="../Tv/Tv_NetCDF.cpp">
+			<Option virtualFolder="Tv/" />
+			<Option target="Tv-32" />
+			<Option target="Tv-64" />
+		</Unit>
+		<Unit filename="../Tv/Tv_Pcx.cpp">
+			<Option virtualFolder="Tv/" />
+			<Option target="Tv-32" />
+			<Option target="Tv-64" />
+		</Unit>
+		<Unit filename="../Tv/Waves.cpp">
+			<Option target="Waves" />
+		</Unit>
+		<Extensions />
+	</Project>
+</CodeBlocks_project_file>

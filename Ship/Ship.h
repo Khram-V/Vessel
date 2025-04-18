@@ -58,15 +58,13 @@ bool SimplifyIntersections;
 
 HydrostaticCoefficient
      HydrostaticCoefficients;      // General hydrostatics calculation settings
-Real StartDraft,                   // crosscurves settings
-     EndDraft,
-     DraftStep,
+Real StartDraft,EndDraft,DraftStep, // cross-curves settings
      Trim;
-Real* Displacements;
  int NoDisplacements;
 Real MinimumDisplacement,
      MaximumDisplacement,
      DisplIncrement;
+Real* Displacements;
 bool UseDisplIncrements;
  int NoAngles; Real* Angles;
  int NoTrims;  Real* Trims;
@@ -160,7 +158,6 @@ struct Marker
   Real CurvatureScale;
   int NoSplines; Spline *S;
 };
-
 struct Ship                       // Сборка корпуса в целом
 { PrecisionType PT;               // Precision of the ship-model
   Visibility   Visio;             // Show настройка графической визуализации
@@ -168,20 +165,20 @@ struct Ship                       // Сборка корпуса в целом
   Surface      Shell;             // Shell оболочка поверхности обшивки корпуса
 
   int NoStations,NoButtocks,NoWaterlines,NoDiagonals,NoMarkers,NoFlowLines;
-  InterSection *Stations,         // LoadStation
-               *Buttocks,         // LoadButtocks
-               *Waterlines,       // LoadWaterlines
-               *Diagonals;        // LoadDiagonals
+  InterSection *Stations,         // шпангоуты  LoadStation
+               *Buttocks,         // батоксы    LoadButtocks
+               *Waterlines,       // ватерлинии LoadWaterlines
+               *Diagonals;        // рыбины      LoadDiagonals
   Marker *Marks;
   Flex* FlowLines;
   bool Ready;
   Ship();                           // очищающий конструктор
   bool LoadProject( WCHAR *FName ); // быстрая выборка всего комплекса данных
-                                    // в общую структуры в оперативной памяти
-  bool LoadFEF( const WCHAR *FName ); // Ship.fef == File Exchange Format
-
+                                    // в общие структуры в оперативной памяти
+  bool LoadFEF( WCHAR *FName );     // здесь Ship.fef == File Exchange Format
+  bool LoadPart( WCHAR *FName );    // или просто фрагмент цифровой модели
 };
-struct FreeShip: Ship,View        //,Matrix
+struct FreeShip: Ship,View        // , Matrix
 { FreeShip();
   virtual bool Draw();            // виртуальная процедура с настройкой сцены
   virtual bool KeyBoard( fixed ); //

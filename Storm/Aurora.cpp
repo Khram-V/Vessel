@@ -342,11 +342,12 @@ static bool AllKeyb( fixed Keyb )
 static int Write_choice( Window* Win )
 { fixed ans=1;
   Mlist Menu[]={ { 1,0," Выходной формат модели корпуса корабля" },
-                 { 2,47,"Wavefront Technologies Advanced Visualizer .obj" },
+                 { 2,47,"Free!ship exchange format (треугольники)   .fef" },
+                 { 1,47,"Wavefront Technologies Advanced Visualizer .obj" },
                  { 1,47,"Шпангоуты и контуры диаметральной плоскости.dc2" },
                  { 1,47,"Контурная модель в трёхмерной проекции     .dc3" },
                  { 1,47,"Корабль с контурами и обшивкой корпуса     .dc3" } };
-  TextMenu T( Mlist( Menu ),Win,6,5 ); return ans=T.Answer( ans );
+  TextMenu T( Mlist( Menu ),Win,6,5 ); return ans=T.Answer( ans )-1;
 }
 //     ... и далее раздельно для каждого окна
 //

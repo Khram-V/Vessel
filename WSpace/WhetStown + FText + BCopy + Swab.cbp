@@ -9,7 +9,7 @@
 			<Target title="FText">
 				<Option output="../../../Work/FText" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Data" />
-				<Option object_output="Dev/Obj/" />
+				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option parameters="*.VSL /R /B+4" />
@@ -24,7 +24,7 @@
 			<Target title="SWAB">
 				<Option output="Dev/SWAB" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Data" />
-				<Option object_output="Dev/Obj/" />
+				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option parameters="0גכעגכע.vsl" />
@@ -39,7 +39,7 @@
 				<Option platforms="Windows;" />
 				<Option output="Dev/WhetStones(-c-)" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Data" />
-				<Option object_output="Dev/Obj/" />
+				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 			</Target>
@@ -47,7 +47,7 @@
 				<Option platforms="Windows;" />
 				<Option output="Dev/Complex" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Dev" />
-				<Option object_output="Dev/Obj/" />
+				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
 				<Option compiler="gnu_gcc_nightly" />
 				<Option parameters="UTF-8(866).txt" />
@@ -72,7 +72,7 @@
 				<Option platforms="Windows;" />
 				<Option output="Dev/DC3" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../Vessel/Digitize" />
-				<Option object_output="Dev/Obj/" />
+				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option parameters='&quot;ONR5613(vsl).dc3&quot; &quot;5415-hull.dc3&quot; &quot;JAPAN Bulk Carrier (vsl).dc3&quot;' />
@@ -84,7 +84,7 @@
 				<Option platforms="Windows;" />
 				<Option output="Dev/DesignFonts" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Data" />
-				<Option object_output="Dev/Obj/" />
+				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option parameters='&quot;~באסילי.vsl  что равно abrakadabra&quot;' />
@@ -100,7 +100,7 @@
 			<Target title="Hello">
 				<Option output="Dev/Hello" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Data" />
-				<Option object_output="Dev/Obj/" />
+				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option parameters="0גכעגכע.vsl" />

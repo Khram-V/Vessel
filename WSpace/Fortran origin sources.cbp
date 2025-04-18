@@ -10,7 +10,7 @@
 			<Target title="Hollandia">
 				<Option output="Dev/Hollandia" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../Ship" />
-				<Option object_output="Dev/Obj" />
+				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
 				<Option compiler="gfortran" />
 				<Compiler>
@@ -21,14 +21,14 @@
 			<Target title="WhetStone">
 				<Option output="Dev/WhetStone(fortran)" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Data" />
-				<Option object_output="Dev/Obj" />
+				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
 				<Option compiler="gfortran" />
 			</Target>
 			<Target title="Whet">
 				<Option output="Dev/WhetStone" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Data" />
-				<Option object_output="Dev/Obj" />
+				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
 				<Option compiler="gfortran" />
 			</Target>

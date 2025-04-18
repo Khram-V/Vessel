@@ -288,8 +288,7 @@ void Surface::Read()
            L[I].Thickness=getFloat();                                     print( " Tn=%-3g",L[I].Thickness );
            if( FV>=fv201 )
            { L[I].ShoeinLineSpan=getByte();                               textcolor( LIGHTRED ),print(" Shoe=%d",L[I].ShoeinLineSpan );
-             if( FV>=fv261 )
-               L[I].AlphaBlend=getInt();                                  textcolor( YELLOW ),print(" Alfa=%d ",L[I].AlphaBlend );
+             if( FV>=fv261 )L[I].AlphaBlend=getInt();                     textcolor( YELLOW ),print(" Alfa=%d ",L[I].AlphaBlend );
            } // =201
          }   // =191
        }     /* =180 */                                                   textcolor( LIGHTGRAY ),print("'%-24s'\n",L[I].Description );
@@ -339,7 +338,7 @@ void Surface::Read()
    for( I=0; I<N; I++ )
    { K=getInt();
      F[I].Capacity=K;
-     F[I].P=(int*)Allocate( K*sizeof(int) );    /// <++ Control Points
+     F[I].P=(int*)Allocate( K*sizeof(int) );    // <++ Control Points
      for( int j=0; j<K; j++ ){ int m=getInt();
                                if( m>=NoCoPoint || m<0 )EdErr++;
                                if( m==-1 )m=0; F[I].P[j]=m;
@@ -380,7 +379,7 @@ void InterSection::Read()
 }
 //   Полноценный вариант в варианте с базовым форматом, без излишеств
 //
-bool Ship::LoadFEF( const WCHAR *FName )    // Ship.fef == File Exchange Format
+bool Ship::LoadFEF( WCHAR *FName )      // Ship.fef == FreeShip Exchange Format
 { int I; //char *str;
   if( !(F=_wfopen( FName,L"rb" ) ) )return false; textcolor( WHITE );
   readText( &Set.Name );                                                  print( "< Project >\nName     =%s\n",Set.Name );

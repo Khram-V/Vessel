@@ -9,20 +9,27 @@
 			<Target title="Hull">
 				<Option output="../../Hull" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../Vessel" />
-				<Option object_output="Dev/Obj/" />
+				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option parameters='&quot;S60(d=0,69) Free!Ship&quot; &quot;Сторожевой корабль «Буревестник»-1135&quot; &quot;СРТМК «Василий Яковенко»-502ЭМ&quot; &quot;A-1206 Cruise-1&quot; &quot;Буксир «Арктикаборг»&quot; &quot;A-1206 Cruise-2&quot; Examples\Куб-5 Examples\Шар-5 Examples\Шлюпка Examples\Эллипс &quot;A-1201 Корвет-А&quot;' />
 				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-fopenmp" />
+				</Compiler>
+				<Linker>
+					<Add library="gomp" />
+				</Linker>
 			</Target>
 			<Target title="Hull-64">
 				<Option output="../../../Work/Hull-64" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../Vessel" />
-				<Option object_output="Dev/Obj/" />
+				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc-mingw64" />
 				<Compiler>
 					<Add option="-m64" />
+					<Add option="-fopenmp" />
 					<Add option="-Wno-narrowing" />
 				</Compiler>
 				<Linker>
@@ -30,12 +37,13 @@
 					<Add option="-static-libgcc" />
 					<Add option="-static" />
 					<Add option="-m64" />
+					<Add library="gomp" />
 				</Linker>
 			</Target>
 			<Target title="Ship">
 				<Option output="../../Ship" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../../Ship" />
-				<Option object_output="Dev/Obj" />
+				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option parameters='&quot;Save\Import\Perle2(DS).fef&quot; &quot;Ships\Fregate type 23-11.fbm&quot; Save\~באסילי.ftm' />
@@ -50,7 +58,6 @@
 			<Add option="-funsigned-char" />
 			<Add option="-fexec-charset=UTF-8" />
 			<Add option="-finput-charset=UTF-8" />
-			<Add option="-fopenmp" />
 			<Add option="-ffast-math" />
 			<Add option="-fno-exceptions" />
 			<Add option="-Wunused" />
@@ -60,7 +67,6 @@
 			<Add library="opengl32" />
 			<Add library="gdi32" />
 			<Add library="comdlg32" />
-			<Add library="gomp" />
 		</Linker>
 		<Unit filename="../Math/Complex.h">
 			<Option target="Hull" />

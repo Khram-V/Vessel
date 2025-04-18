@@ -10,7 +10,7 @@
 				<Option platforms="Windows;" />
 				<Option output="Dev/Dipole" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Dev/" />
-				<Option object_output="Dev/Obj/" />
+				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option use_console_runner="0" />
@@ -22,7 +22,7 @@
 				<Option platforms="Windows;" />
 				<Option output="Dev/Vector and Tensor" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Dev/" />
-				<Option object_output="Dev/Obj/" />
+				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option use_console_runner="0" />
@@ -32,7 +32,7 @@
 				<Option platforms="Windows;" />
 				<Option output="Dev/Tensor Base Space" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Dev/" />
-				<Option object_output="Dev/Obj/" />
+				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option use_console_runner="0" />
@@ -41,7 +41,7 @@
 				<Option platforms="Windows;" />
 				<Option output="Dev/Physical Simulation" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Dev/" />
-				<Option object_output="Dev/Obj/" />
+				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option use_console_runner="0" />
