@@ -484,7 +484,7 @@ int Display::Answer( int _K )
 { const int IO=81,            //  81-161 - строка обмена с терминалом
             BF=162;           // 162-242 - сохранение для регистрации изменений
  static int lf=0;             //       Начальная инициализация списка сообщений
- int  ls,Lx=0,Ly=1,bc,fc,c,k,kw=_K>=0 && _K<Nm;
+ int  ls,Lx=0,Ly=1,bc,fc,c,k,kw=_K>=0 && _K<Nm, Th=Tv.Th; Tv.Th=16;
  bool key=( M->X==0 );
   setC
   for( Ls=M,k=ls=0; k<Nm; Ls++,k++ )    //
@@ -532,18 +532,16 @@ int Display::Answer( int _K )
                 else     sscanf( St+IO,f,Ls->dat );
       } } Message();
     } else kw+=k;
-  } while( ans!=_Enter ); Active=TRUE; retC return kw;
+  } while( ans!=_Enter ); Active=TRUE; retC Tv.Th=Th; return kw;
 }
 void Display::Back(){ if( Active )Tback(); Active=false; }
 //
 //      Tmenu   - Автономная процедура диалога с терминалом  /90.10.03/
 //
 int Tmenu( Mlist *m, int n, int x, int y, int ans )
-{
-  Display T( m,n,x,y ); return T.Answer( ans );
-}
+  { Display T( m,n,x,y ); return T.Answer( ans );
+  }
 int Tmenu( void Hl(int), Mlist *m, int n, int x, int y, int ans )
-{
-  Display T( Hl,m,n,x,y ); return T.Answer( ans );
-}
+  { Display T( Hl,m,n,x,y ); return T.Answer( ans );
+  }
 Display::~Display(){ Back(); }

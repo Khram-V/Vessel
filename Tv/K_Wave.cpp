@@ -5,38 +5,38 @@
 //
 #include "Hull.h"
 #define  _fmt "L=%.3lg, B=%.3lg, S=%lg, V=%lg, d=%.3lg, R=%.3lg, C=%.3lg\n"
-                             //
+static
 Real WaveRes( Real **Hull,   // Корпус
               Real Froud,    // Число Фруда
               Real Length,   // Длина
               Real Depth,    // Осадка
               int Nx, int Nz // Индексы по длине и по осадке
-            );               //
-inline void line_x( int x1, int y1, int x2, int y2 )
+            );
+static void line_x( int x1, int y1, int x2, int y2 )
 { int c=color( LIGHTGRAY );
   setlinestyle( DOTTED_LINE,0,NORM_WIDTH );
   setwritemode( XOR_PUT );  line( x1,y1,x2,y2 );
   setwritemode( COPY_PUT );
   setlinestyle( SOLID_LINE,0,NORM_WIDTH );
   color( c );
-}                                //
-void Hull_Wave( const int Type ) //
-{                                //
- const int   Nr=50;              //
+}
+void Hull_Wave( const int Type )
+{
+ const int   Nr=50;
  const Real  mFn=1.0,            // Предельное число Фруда
              Ro=1.025,           // кг/дм.куб
               g=9.8106;          // м/сек.кв
- int   i,x,y,c=color( CYAN );    //
- Real  V,Rm=0,R[Nr],Fn,w=0,      //
-       W,Cm=0,C[Nr],   v=0;      //
+ int   i,x,y,c=color( CYAN );
+ Real  V,Rm=0,R[Nr],Fn,w=0,
+       W,Cm=0,C[Nr],   v=0;
  Window WR;                      // Окно корпуса
  Plaze  PL( 32,63 );             // Рабочий корпус для ускоренных расчетов
-        PL.build( Draught );     //
+        PL.build( Draught );
         V=PL.V/( Lwl*Draught*Bwl ); // Коэффициент общей полноты
-  Ghelp();              //
-  setactivepage( 1 );   // Работа с графическим изображением
-  setvisualpage( 1 );   // кривых элементов теоретического чертежа,
-  clear();              // статической остойчивости и масштабом Бонжана
+  Ghelp();
+  setactivepage( 1 ); // Работа с графическим изображением
+  setvisualpage( 1 ); // кривых элементов теоретического чертежа,
+  clear();            // статической остойчивости и масштабом Бонжана
 //
 //      Предварительная проработка изображения
 //
@@ -94,8 +94,7 @@ void Hull_Wave( const int Type ) //
   color( YELLOW );
   Tv.Text( South_East,mFn/36,Cm*0.96,Type?"WaveRes":"Michell" );
  Course Ans;
- int h=Tv.Th;
-       Tv.Th=10;
+ int h=Tv.Th; Tv.Th=12;
   for(;;)
   { Tv_GetCursor( x,y );
     if( WR.Is( x,y ) )
@@ -131,7 +130,6 @@ void Hull_Wave( const int Type ) //
   setactivepage( 0 );
   setvisualpage( 0 );
 }
-//
 //      Прорисовка профиля корабельной волны
 //
 void Plaze::DrawWaves( Real Fn )
@@ -189,3 +187,156 @@ void Plaze::drawlines()
        else lineto( i<Nx/2?Y[k][i]:-Y[k][i],Real( k ) );
   } color( c );
 }
+//                                                 /05.03/  85.04.02
+//  Расчет волнового сопротивления тонкого судна по формулам Мичелла
+//
+const double g=9.8106, // Ускорение свободного падения
+             ro=1.025; //  и плотность морской воды
+
+static int Nx,Nz;
+static double Tl,Fr, Hx, R; //Xl,Xu;
+
+static void AtaBee( double *_Y, double &Ac, double &As )
+{ double dX,X,Y;                                     //
+   Ac=As=0; dX=2.0/double( Nx-1 );                   // dX=(Ac+2)/(As+Nx);
+   for( int j=0; j<Nx; j++ )                         // J=NA+1 TO NS-1;
+   { X=R*(dX*(Nx-1-j)-1.0); Y=_Y[j]; Ac+=cos( X )*Y; // [ -1.0 -:- +1.0 ]
+                                     As+=sin( X )*Y; //
+   } X=(1.0-cos( R*dX ))/( R*R*dX )/(Nz-1); Ac*=X;   // = 2*FFF/Nx/2;
+                                            As*=X;   //
+}                                       //
+static double **Y;                      // Матрица ординат корпуса
+                                        //
+static double AtaBlue( const double &Al )
+{
+ double C1,C2,Fw,Sumci=0,W=0,A,
+        S1,S2,D2,Sumsi=0,P; Fw=Fr*Fr; R=Al/Fw/2; A=Al*Al; P=Tl*A/Fw/(Nz-1);
+  AtaBee( Y[Nz-1],C1,S1 );      //
+  for( int k=Nz-2; k>=0; k-- )  // I=KU+1 TO KD
+  { W+=P;                       //
+    if( W>64 )D2=0; else { D2=exp( -W ); AtaBee( Y[k],C2,S2 ); }
+    W=D2*C2; Sumci += C1+W; C1=W;
+    W=D2*S2; Sumsi += S1+W; S1=W;
+  }
+  Fw=Sumci*Sumci+Sumsi*Sumsi; return Hx<=0 ? Fw:A*Fw/sqrt( A-1 );
+}
+// Простое интегрирование аналитически определенной функции
+//
+static double QG4( const double &Xl, const double &Xu,
+                   double F( const double& ) )
+{ double A = 0.5*( Xu+Xl ),B=Xu-Xl,C,D;
+         C = .4305681557970263 * B;
+         D = .1739274225687269 * ( F( A+C )+F( A-C ) );
+         C = .1699905217924281 * B;
+  return B * (D+.3260725774312731 * ( F( A+C )+F( A-C )));
+}                               //
+static
+Real WaveRes( Real **_Hull,     // Корпус
+              Real Froud,       // Число Фруда
+              Real Length,      // Длина
+              Real Depth,       // Осадка
+               int _Nx,         // Индексы по длине
+               int _Nz )        //  и по осадке
+{ double Wres=0,W,Xl,Xu;        //
+   Tl=Depth/Length;
+   Y=_Hull;  Nx=_Nx;
+   Fr=Froud; Nz=_Nz;
+   Hx=-1;
+   Wres=AtaBlue( 1 )*0.0106 + AtaBlue( Xl=1.0001 )*0.00353;
+   Hx=3.33*Fr*Fr;
+   W=1.9-Fr*3;
+   W=W*W+3;
+   for( int i=0; i<3; i++,Hx*=3 )       // DO I=1,3;
+   for( Real j=1.0; j<=W; j++  )        // DO J=1 TO 3+(1.9-FROUD*3)**2;
+   {                 Xu=Xl+Hx;
+     Wres += QG4( Xl,Xu,AtaBlue );
+                  Xl=Xu;
+   } return 2*Wres*ro*g*pow( Depth/Froud/Froud/Froud,2 )/Length/M_PI;
+}
+#if 0
+    FROUD= V/SQRT(G*AL);                        TL=T/AL;
+    WRES = WAVERES((FI),(FROUD),(TL));
+    TL   = WRES*RO*G*T*T*B*B/FROUD**6/AL/PI/4;
+    WRES = WRES*T*T*B*B/FROUD**8/AL**2/OMEGA/PI/2;
+    PUT SKIP LIST('  FROUD='!!FROUD!!'  R/W='!!TL/DOUBLE!!
+                '  R/S='!!TL/OMEGA!!' *** TIME='!!TIME!!' *** '!!L);
+#endif
+                        //
+static double WL;       // Длина поперечной волны
+                        //
+double Plaze::Amplint( const double &La )
+{   int i,j;                  //
+ double X,Z,Wk=2.0*M_PI/La,   // Волновое число
+            Mw=sqrt( WL/La ); // Число Маха
+ Point A={ 0,0 },W;           // Интегральная амплитуда
+  for( i=Nx-1; i>=0; i--  )   //
+  { Z=0;
+    W=0;
+    X=Wk*dX*(Nx-1-i)/Mw;
+    for( j=Nz-1; j>=0; j-- )
+    { W += exp( (Point){ -Z,X } )*QV[j][i];
+      Z += Wk*dZ;
+    } A += W;
+     Wx[i]=norm( A )*Mw/sqrt( Mw*Mw-1 )/La/La;
+  } return norm( A )*Mw/sqrt( Mw*Mw-1 )/La/La;
+}
+double Plaze::QG4( const double &Xl, const double &Xu )
+{ double A = 0.5*( Xu+Xl ),B=Xu-Xl,C,D;
+         C = .4305681557970263 * B;
+         D = .1739274225687269 * ( Amplint( A+C )+Amplint( A-C ) );
+         C = .1699905217924281 * B;
+  return B * (D+.3260725774312731 * ( Amplint( A+C )+Amplint( A-C )));
+}
+Real Plaze::Michell( Real Fn )
+{   int i;      //
+ double Rw=0.0, // Искомое волновое сопротивление
+          Vo,   // Скорость в м/с
+           l;   // Аргумент интегрирования
+                //
+  Vo = Fn*sqrt( g*Lwl );                //
+  WL = 2.0*M_PI * Vo*Vo/g;              // Макс. длина волны
+#if 0                                   //
+  for( j=0; j<Nz;   j++ )
+  for( i=0; i<Nx-1; i++ )               //
+  { QV[j][i]=( Y[j][i+1]-Y[j][i] )*dZ;  // Распределеные источники
+//  QV[j][i] = dX*dZ*X; //*Wide;        // с коэффициентом наклона
+//  YY[j][i] =( Y[j][i]+Y[j][i+1] )/2.0;
+//  if( j>Nz ) //>0 )
+//  { Z = ( Y[j][i]-Y[j-1][i] )/Dz;
+//    QV[j][i] *= sqrt( 1+ X*X+ Z*Z );  //= sqrt( 1+ X*X );
+//  }
+  }
+#endif
+                                        //
+ const int la=24;                       // Количество дроблений по волнам
+ static                                 //
+ double La[la+1]={ 0.0 };               // Фазовая длина волны
+       l=double( 1.0 )/la;              //
+  for( i=1; i<=la; i++ )La[i]+=La[i-1]+sin( M_PI_2*l*i )*sqrt( 1.0-l*i );
+  for( i=1; i<=la; i++ )La[i]*=WL/La[la];
+  for( i=1; i<=la; i++ )if( La[i]>dX )
+                        Rw+=QG4( La[i-1],La[i] );
+ return 4*g*ro*Rw;
+}
+#if 0
+struct Michell{ Real Vo;        // Скорость в м/с
+                Real Vl;        // Водоизмещение
+                Real Sf;        // Смоченная поверхность
+                Real Rw;        // Сопротивление
+                Real Cw;        // Коэффициент сопротивления
+} Michell_Results={ 0,0,0,0 };  //
+  Michell_Results.Vo=Vo;        // Скорость в м/с
+  Michell_Results.Vl=Vl;        // Водоизмещение
+  Michell_Results.Sf=Sf;        // Смоченная поверхность
+  Michell_Results.Rw=Rw;        // Сопротивление
+  Michell_Results.Cw=Cw;        // Коэффициент сопротивления
+
+  for( j=0; j<Nz; j++ )                         //
+  { Z = Dz*Wk*j;        if( Z>69 )continue;     //
+    X = Dx/2;           // -0.5*Length;         // От носа к корме
+    for( i=0; i<Nx-1; i++)                      //
+    { A += QV[j][i] * exp( complex( -Z,Wk*X/Mw ) );
+      X += Dx;
+  } }
+
+#endif

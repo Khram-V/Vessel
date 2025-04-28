@@ -53,21 +53,19 @@ DrawPlane wH( "Корпус",    "Y","Z" ),   // Окно проекции корпус,
 static int Console();
 
 static void Init()
-{ int i,k;
-  color( LIGHTGRAY );
-  k=Tv.Th; Tv.Th=10; i=Tv.mY/20+3;
-  Tgo( 0,++i ); Tprintf( "L=%.3lg",Length );
+{ int k; color( LIGHTGRAY );
+  k=Tv.Th; Tv.Th=16; Tpoint.y=Tv.mY/2; Tpoint.x=1; // i=Tv.mY/32+3;
+  Tprintf( " L=%.3lg",Length );
   if( fabs( Length-Lwl )>Length/500 )
-                Tprintf(  "/%.3lg",Lwl );
-  Tgo( 0,++i ); Tprintf( "B=%.3lg",Breadth );
+  Tprintf(  "/%.3lg",Lwl );                        Tln();
+  Tprintf( " B=%.3lg",Breadth );
   if( fabs( Breadth-Bwl )>Breadth/500 )
-                Tprintf(  "/%.3lg",Bwl );
-  Tgo( 0,++i ); Tprintf( "T=%.3lg",Draught ); //Kh.Init();
-  Tgo( 0,++i ); Tprintf( "V=%.6lg",Volume  );
-  Tgo( 0,++i ); Tprintf( "S=%.5lg",Surface );
-  Tgo( 0,++i ); Tprintf( "\x7F=%.3lf",Volume/Bwl/Lwl/Draught );
-  Tgo( 0,++i ); Tprintf( "\x0F=%d",Kh.Ms );
-  Tv.Th=k;
+  Tprintf(  "/%.3lg",Bwl );                        Tln();
+  Tprintf( " T=%.3lg",Draught );                   Tln(); //Kh.Init();
+  Tprintf( " V=%.6lg",Volume  );                   Tln();
+  Tprintf( " S=%.5lg",Surface );                   Tln();
+  Tprintf( " \x7F=%.3lf",Volume/Bwl/Lwl/Draught ); Tln();
+  Tprintf( " \x0F=%d",Kh.Ms ); Tv.Th=k;
 }
 int main() // int ac, char** av )   // Предопределение графической среды
 {
@@ -77,7 +75,7 @@ int main() // int ac, char** av )   // Предопределение графической среды
   setwindowtitle( "Ship - computational fluid mechanics" );
   Tv_Start_Mouse();             // Запуск указателя "мышка"
   Tv_SetCursor( 0,0 );          // Приведение мышки к верхнему левому углу
-  Tv.Font( _Small_font,16 );    // Шрифт графический тонкий на 12 пикселей
+  Tv.Font( _Small_font,17 );    // Шрифт графический тонкий на 12 пикселей
   if( _ac_==1 )Kh.Read();       // При вызове без параметров -> Hull.vsl
       else Kh.Read( _av_[1] );  // Степановские, польские или новые корпуса
   Building();                   // Первая прорисовка на экране

@@ -281,9 +281,7 @@ void Building()               //       ___\¦ г--+-+--°°L¬\+/
   Draw_Hull();
 }
 //   г----------------------------------------------------------------¬
-//   ¦                                                                ¦
-//   ¦   Прорисовка проекции корпус (основного теоретического чертежа)¦
-//   ¦                                                                ¦
+//   ¦  Прорисовка проекции корпус (основного теоретического чертежа) ¦
 //   L================================================================-
 //
 void Draw_Hull( int id ) // Проекция корпус
@@ -326,47 +324,44 @@ void Draw_Hull( int id ) // Проекция корпус
   for( ; k>=0; k-- ){ lineto(~Kh.Sty[k]); if(!i)color(i=WHITE); }
 }
 //   г---------------------------------------------------------¬
-//   ¦                                                         ¦
 //   ¦ Подготовка упрощенного варианта теоретического корпуса  ¦
-//   ¦                                                         ¦
 //   L=========================================================-
 //
 void Plaze::allocate( int z, int x )
 {  Y=(Real**)Allocate( z,x*sizeof(Real),Y ); Nx=x; Nz=z;
-  QV=(Real**)Allocate( z,x*sizeof(Real),QV);// Источники со смещенными узлами
-  Xa=(Real*)Allocate( z*sizeof(Real),Xa );  // Абсциссы ахтерштевня
-  Xs=(Real*)Allocate( z*sizeof(Real),Xs );  //   и форштевня
-  Ya=(Real*)Allocate( z*sizeof(Real),Ya );  // Аппликаты на ахтерштевне
-  Ys=(Real*)Allocate( z*sizeof(Real),Ys );  //   и форштевне (транце)
-  Wx=(Real*)Allocate( x*sizeof(Real),Wx );  // Вектор волнообразования
-}                                           //
+  QV=(Real**)Allocate( z,x*sizeof(Real),QV); // Источники со смещенными узлами
+  Xa=(Real*)Allocate( z*sizeof(Real),Xa );   // Абсциссы ахтерштевня
+  Xs=(Real*)Allocate( z*sizeof(Real),Xs );   //        и форштевня
+  Ya=(Real*)Allocate( z*sizeof(Real),Ya );   // Аппликаты на форштевне
+  Ys=(Real*)Allocate( z*sizeof(Real),Ys );   //         и ахтерштевне (транце)
+  Wx=(Real*)Allocate( x*sizeof(Real),Wx );   // Вектор волнообразования
+}
 void Plaze::build( Real _z )
 { int  i,j;
-  Real x,y,z,sx,sz;                     //
-  if( Nx<3 || Nz<2 )allocate( 12,48 );  // если не выделена память
-  dX=Length/(Nx-1);                     //
-  dZ=(Depth=_z-Do)/(Nz-1);              //
+  Real x,y,z,sx,sz;
+  if( Nx<3 || Nz<2 )allocate( 12,48 ); // если не выделена память
+  dX=Length/(Nx-1);
+  dZ=(Depth=_z-Do)/(Nz-1);
   V=S=0.0;
   for(   z=Do,j=0; j<Nz; j++,z+=dZ )
   { for( x=Xo,i=0; i<Nx; i++,x+=dX )V+=Y[j][i]=Kh( x,z );
-    Xa[j]=m_Stern( z );                 // ахтерштевень
-    Xs[j]=m_Stem( z );                  // форштевень
-  }                                     //
-       V*=dX*dZ*2.0;                    // водоизмещение
-
+    Xa[j]=m_Stern( z );         // ахтерштевень
+    Xs[j]=m_Stem( z );          // форштевень
+  }
+  V*=dX*dZ*2.0;                 // водоизмещение
   for( i=1; i<Nx; i++ )
   for( j=0; j<Nz; j++ )
   { y=Y[j][i];
     if( y>0.0 )
-    { if( j<Nz-1 )              //
+    { if( j<Nz-1 )
       if( (sz=Y[j+1][i])>0.0 )  // Смоченная поверхность корпуса
-      { sx=( Y[j][i-1]-y )/dX;  //
+      { sx=( Y[j][i-1]-y )/dX;
         sz=( sz-y )/dZ;
         S+=sqrt( 1+sx*sx+sz*sz )*dX*dZ; goto Lx;
       } S+=y*dX;                             Lx:;
-  } }   S*=2.0;                 //
+  } }   S*=2.0;
   for( j=0; j<Nz; j++ )         // Распределенные источники
-  {                             //
+  {
     for( i=1; i<Nx-1; i++ )QV[j][i]=(Y[j][i+1]-Y[j][i-1] )*dZ/-2.0;
     QV[j][Nx-1]=QV[j][Nx-2]/2.0;
     QV[j][0]=QV[j][1]/2.0;

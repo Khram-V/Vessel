@@ -36,10 +36,11 @@ static const int
   border_top=GetSystemMetrics( SM_CYCAPTION )+GetSystemMetrics( SM_CYFIXEDFRAME ),
   border_height=border_top+GetSystemMetrics( SM_CYFIXEDFRAME ),
   screen_width=GetSystemMetrics( SM_CXSCREEN )-border_left*2,
-  screen_height=GetSystemMetrics( SM_CYFULLSCREEN ), //-border_height,
+  screen_height=GetSystemMetrics( SM_CYFULLSCREEN )-4,   //-border_height,
   line_style_cnv[]={ PS_SOLID,PS_DOT,PS_DASHDOT,PS_DASH,PS_DASHDOTDOT },
   write_mode_cnv[]={ R2_COPYPEN,R2_XORPEN,R2_MERGEPEN,R2_MASKPEN,R2_NOTCOPYPEN },
   bitblt_mode_cnv[]={ SRCCOPY,SRCINVERT,SRCPAINT,SRCAND,NOTSRCCOPY };
+
 static int
   aspect_ratio_x=10000, window_width=800,
   aspect_ratio_y=10000, window_height=600,
@@ -571,6 +572,7 @@ static void detect( int &mode, int &width,int &height ) // Режимы /bgi=:
     if( width>screen_width )width=screen_width;         // 7      - 1600 x 1200
     if( height>screen_height )height=screen_height;     // 8      - 1920 x 1440
     if( width==screen_width && height==screen_height )mode=VGAMAX;
+//  height=SystemParametersInfo( SPI_GETWORKAREA,?,?,? );
 }
 static void graphdefaults()                // с некоторым перебором определений
 {   setcolor  ( WHITE );                   // белые линии

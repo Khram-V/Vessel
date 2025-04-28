@@ -18,7 +18,7 @@
 			</Target>
 			<Target title="Tv-64">
 				<Option output="../../../Work/Tv64" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="../../../Work" />
+				<Option working_dir="../../Work" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc-mingw64" />
@@ -61,13 +61,9 @@
 		</Build>
 		<Compiler>
 			<Add option="-Os" />
-			<Add option="-std=gnu++98" />
-			<Add option="-std=c90" />
 			<Add option="-funsigned-char" />
-			<Add option="-fopenmp" />
-			<Add option="-fno-exceptions" />
 			<Add option="-ffast-math" />
-			<Add option="-mthreads" />
+			<Add option="-fno-exceptions" />
 			<Add option="-Wunused" />
 		</Compiler>
 		<Linker>
@@ -75,6 +71,9 @@
 			<Add library="gdi32" />
 			<Add library="gomp" />
 		</Linker>
+		<Unit filename="../Tools/Ship.Rc">
+			<Option compilerVar="CPP" />
+		</Unit>
 		<Unit filename="../Tv/Flow.cpp">
 			<Option target="Flow" />
 		</Unit>
@@ -99,16 +98,10 @@
 		<Unit filename="../Tv/K_Math.cpp">
 			<Option target="Hull" />
 		</Unit>
-		<Unit filename="../Tv/K_Mich.cpp">
-			<Option target="Hull" />
-		</Unit>
 		<Unit filename="../Tv/K_Statics.cpp">
 			<Option target="Hull" />
 		</Unit>
 		<Unit filename="../Tv/K_Wave.cpp">
-			<Option target="Hull" />
-		</Unit>
-		<Unit filename="../Tv/K_WaveAta.cpp">
 			<Option target="Hull" />
 		</Unit>
 		<Unit filename="../Tv/OS/Allocate.cpp" />
@@ -129,9 +122,6 @@
 			<Option target="Hull" />
 		</Unit>
 		<Unit filename="../Tv/OS/Rstring.cpp" />
-		<Unit filename="../Tv/OS/Ship.Rc">
-			<Option compilerVar="CPP" />
-		</Unit>
 		<Unit filename="../Tv/OS/Tf_Topo.cpp">
 			<Option target="Waves" />
 			<Option target="Hull" />
@@ -180,11 +170,6 @@
 			<Option target="Tv-64" />
 		</Unit>
 		<Unit filename="../Tv/Tv_NetCDF.cpp">
-			<Option virtualFolder="Tv/" />
-			<Option target="Tv-32" />
-			<Option target="Tv-64" />
-		</Unit>
-		<Unit filename="../Tv/Tv_Pcx.cpp">
 			<Option virtualFolder="Tv/" />
 			<Option target="Tv-32" />
 			<Option target="Tv-64" />

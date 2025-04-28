@@ -1,14 +1,14 @@
-///                                   +Var ++2.1.12  /90.12.18-11.05.15/
-///    Tv_GRAPHics.cpp
-///                                   -bgi = 0 -  ( Mode )   - VGAMAX
-#ifndef __Tv_Graph__                    //   1 -  320 x 240  - CGA
-#define __Tv_Graph__                    //   2 -  640 x 350  - EGA
-#include <StdIO.h>                      //   3 -  640 x 480  - VGA
-#include "Graphics.h"                   //   4 -  800 x 600  - SVGA
-#include "Basis.h"                      //   5 - 1024 x 768  - VESA
-                                        //   6 - 1280 x 1024
-typedef void *HIMG;                     //   7 - 1600 x 1200
-                                        //   8 - 1920 x 1440
+///                    +Var ++2.1.12  /90.12.18-11.05.15/
+///  Tv_GRAPHics.cpp
+///                    -bgi = 0 -  ( Mode )   - VGAMAX
+#ifndef __Tv_Graph__    //   1 -  320 x 240  - CGA
+#define __Tv_Graph__    //   2 -  640 x 350  - EGA
+#include <StdIO.h>      //   3 -  640 x 480  - VGA
+#include "Graphics.h"   //   4 -  800 x 600  - SVGA
+#include "Basis.h"      //   5 - 1024 x 768  - VESA
+                        //   6 - 1280 x 1024
+typedef void *HIMG;     //   7 - 1600 x 1200
+                        //   8 - 1920 x 1440
 int Tv_Graphics_Start( int Mode=-1,int Width=0,int Height=0 ); // Инициализация
 
 class Bfont:Basis_Area  //
@@ -233,23 +233,16 @@ long long Tfile( char* PathName, const char* Com );
 Course Tgetc( void );
 Course Tgets( char* S,int len,int pos=0 );
 Course Wgets( char* S,int len,int pos=0 ); // c перекодировкой
-//
-//       line : проведение линии
-//     moveto : прием текущей отсчётной точки
-//     lineto : соединение с текущей отсчётной точкой
-//     needle : изображение стрелочки
-//
-   void needle( int,int,int,int );
-   void needle( Real,Real,Real,Real );
-   void line  ( Real,Real,Real,Real );
-   void moveto( Real,Real );
-   void lineto( Real,Real );
-                            //
-   int  color  ( int );     // Установка только цвета
-   int  bkcolor( int );     // Установка цвета фона
-   void pattern( int,int ); // Установка типа и цвета раскраски
-   void pattern( int );     // Установка только цвета фона
-                            //
+  void needle( int,int,int,int );
+  void needle( Real,Real,Real,Real ); // изображение стрелочки
+  void line  ( Real,Real,Real,Real ); // проведение линии
+  void moveto( Real,Real );           // прием текущей отсчётной точки
+  void lineto( Real,Real );           // соединение с текущей отсчётной точкой
+  int  color  ( int );     // Установка только цвета
+  int  bkcolor( int );     // Установка цвета фона
+  void pattern( int,int ); // Установка типа и цвета раскраски
+  void pattern( int );     // Установка только цвета фона
+                           //
 inline void moveto( _point p ){ moveto( p.x,p.y ); }
 inline void lineto( _point q ){ lineto( q.x,q.y ); }
 inline void line  ( _point p,_point q ){ line  ( p.x,p.y,q.x,q.y ); }

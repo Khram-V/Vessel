@@ -44,9 +44,9 @@ Frame& Frame::SpLine()
   }
  Real *u,*v,*zi=z+1,
             *yi=y+1;
-     u=(Real*)Allocate( N*sizeof( Real )*2 ); v=u+N;
-   (_z=(Real*)Allocate( (N+1)*sizeof( Real ),_z ))[N]; *_z=0;
-   (_y=(Real*)Allocate( (N+1)*sizeof( Real ),_y ))[N]; *_y=0;
+    u=(Real*)Allocate( N*sizeof( Real )*2 ); v=u+N;
+  (_z=(Real*)Allocate( (N+1)*sizeof( Real ),_z ))[N]=0; *_z=0;
+  (_y=(Real*)Allocate( (N+1)*sizeof( Real ),_y ))[N]=0; *_y=0;
   for( int i=1; i<N; i++,zi++,yi++ )
   { _z[i]=-1.0/( _z[i-1]+4.0 );
     _y[i]=-1.0/( _y[i-1]+4.0 );

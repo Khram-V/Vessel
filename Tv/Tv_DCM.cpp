@@ -306,8 +306,8 @@ void Field_Window::Draw( Field& wF ) // Typ = 5,6 типа входного файла
       } Ghelp();    F.Lx-=F.Jx; Active=5; // 0x01 | 0x04
       rewind( DC ); F.Ly-=F.Jy;           //
   } }
-  if( !Active && DC )fclose( DC );
-  if( Active )
+
+  if( !Active ){ if( DC )fclose( DC ); Break( "? %s не открыт",Name ); } else
   { Real Ly,Lx,dF,dL;
     Ly=Tv_port.bottom-Tv_port.top;      // Выборка текущих размерностей
     Lx=Tv_port.right-Tv_port.left;      // и пересчет их в меркаторскую

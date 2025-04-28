@@ -12,7 +12,7 @@
 #if !defined( _Window_h_ )
 #define _Window_h_           // аппаратное окружение и стандартная среда
 #include <Windows.h>         // программирования MinGW_Microsoft-Windows
-#include "../Type.h"         // собственно настройка локальных иных операций
+#include "..\Type.h"         // собственно настройка локальных иных операций
 
 struct Window;               // производный класс постройки нового окна Windows
 enum Place_Signs{ PlaceOrtho=0x40,     // трёхмерное ортогональное пространство

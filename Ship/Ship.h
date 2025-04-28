@@ -98,10 +98,24 @@ bool Normals,       // Show normals of selected surface patches
 Real CurvatureScale, // Scalefactor used to increase or decrease the size of the curvature plot
      CursorIncrement;
 };
+//struct Layers
+//{ char *Description;
+//    int ID;
+//    unsigned int Color;
+//    bool Visible,
+//         Symmetric,
+//         Developable,
+//         UseforIntersection, // fc>=180
+//         UswinHydrostatic;
+//    Real MaterialDensity,    // fv>=191
+//         Thickness;
+//    bool ShoeinLineSpan;     // fv>=201
+//    byte AlphaBlend;         // fv>=261
+//};
 class Surface
 { bool isLoad;              //-- признак успешной загрузки
   int  NoLayers,NoCoPoint,NoEdges,NoCurves,NoFaces; // размеры кривых  массивов
-  struct Laeyrs
+  struct Layers
   { char *Description;
     int ID;
     unsigned int Color;
@@ -112,7 +126,7 @@ class Surface
          UswinHydrostatic;
     Real MaterialDensity,    // fv>=191
          Thickness;
-    bool ShoeinLineSpan;     // fv>=201
+    bool ShowInLineSpan;     // fv>=201
     byte AlphaBlend;         // fv>=261
   } *L, ActiveLayer;
   struct CoPoint             /// Control Point

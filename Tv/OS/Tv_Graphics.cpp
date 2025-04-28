@@ -43,7 +43,7 @@ int Tv_Graphics_Start( int Mode, int width, int height )
     initwindow( width,height,Mode );
     getviewsettings( &Tport );
 //  setviewport( Tport.left,Tport.top,Tport.right,Tport.bottom,Tport.clip=0 );
-    Tv.mY=getmaxy();
+    Tv.mY=getmaxy()-2;
     Tv.mX=getmaxx();
     Tv_place( &Ap );                    //
     Tv.Font( 0,0 );                     // Стандартный растровый шрифт
@@ -187,8 +187,7 @@ void TvClip()
 { field _ap={ 0,0,0,0,0 };
   setviewport( Tv_port.left,Tv_port.top,Tv_port.right,Tv_port.bottom,true );
   Tv_place( &_ap );
-  Tv_place( 0,&Fp );              // области внутри картинки
-           Ap=_ap;
+  Tv_place( 0,&Fp );  Ap=_ap;     // области внутри картинки
 }
 void TvUnClip()                   // Восстановление полноэкранного изображения
 { setviewport( 0,0,Tv.mX,Tv.mY,0 ); Tv_place( &Ap ); Tv_place( 0,&Fp );

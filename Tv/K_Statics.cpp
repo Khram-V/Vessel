@@ -1,7 +1,6 @@
-//   +------------------------------------------------------------+
-//   ¦ Программа расчета статической и динамической остойчивости, ¦
-//   ¦         ( масштаба Бонжана и непотопляемости )             ¦
-//   *============================================================*
+//    +----------------------------------------------------------------+
+//    ¦ Расчёт диаграмм Рида и кривых элементов теоретического чертежа ¦
+//    *================================================================*
 //                     1997, январь, В.Храмушин, Южно-Сахалинск
 //                     2001, август - Владивосток, октябрь - ГС-210
 //
@@ -10,25 +9,39 @@
 const int _nZ=36,_nX=72, // Количество точек на сплайновых кривых
           _nA=36;        // Количество углов накренения
 const Real mA=180;       // Максимальный угол накренения в градусах
+static Real mX=0;        // аппликата метацентра
+static Real Amin=-0.1,Amax=0.1;
 
 struct Hydrostatic:Plaze
-{ Real  Vol[_nZ],            // Грузовой размер
-        zCV[_nZ],            // Аппликата центра величины
-        Swl[_nZ],            // Площадь ватерлинии
-        Srf[_nZ],            // Смоченная поверхность корпуса
-        xCV[_nZ],            // Абсцисса центра величины
-        xCW[_nZ],            // Абсцисса центра площади ватерлинии
-        rfX[_nZ],            // Поперечный метацентрический радиус
-        Rfy[_nZ],            // Продольный метацентрический радиус
-        aV[_nA][_nZ];        // Массив накренютых водоизмещений
-  Point aC[_nA][_nZ];        // -- аппликат и ординат новых центров величины
-  Hydrostatic(): Plaze( _nZ,_nX ){}
- ~Hydrostatic(){}
+{ Real  *Vol, //[_nZ],      // Грузовой размер
+        *zCV, //[_nZ],      // Аппликата центра величины
+        *Swl, //[_nZ],      // Площадь ватерлинии
+        *Srf, //[_nZ],      // Смоченная поверхность корпуса
+        *xCV, //[_nZ],      // Абсцисса центра величины
+        *xCW, //[_nZ],      // Абсцисса центра площади ватерлинии
+        *rfX, //[_nZ],      // Поперечный метацентрический радиус
+        *Rfy, //[_nZ],      // Продольный метацентрический радиус
+        **aV; //[_nA][_nZ]; // Массив накренютых водоизмещений
+  Point **aC; //[_nA][_nZ]; // -- аппликат и ординат новых центров величины
+  Hydrostatic(): Plaze( _nZ,_nX )
+    { aV=(Real**)Allocate( _nA,_nZ*sizeof( Real ) );
+      aC=(Point**)Allocate( _nA,_nZ*sizeof( Point ) );
+      Vol=(Real*)calloc( _nZ,sizeof( Real ) );
+      zCV=(Real*)calloc( _nZ,sizeof( Real ) );
+      Swl=(Real*)calloc( _nZ,sizeof( Real ) );
+      Srf=(Real*)calloc( _nZ,sizeof( Real ) );
+      xCV=(Real*)calloc( _nZ,sizeof( Real ) );
+      xCW=(Real*)calloc( _nZ,sizeof( Real ) );
+      rfX=(Real*)calloc( _nZ,sizeof( Real ) );
+      Rfy=(Real*)calloc( _nZ,sizeof( Real ) );
+    }
+ ~Hydrostatic(){ Allocate( 0,0,aV ); Allocate( 0,0,aC );
+                 free( Vol ); free( zCV ); free( Swl ); free( Srf );
+                 free( xCV ); free( xCW ); free( rfX ); free( Rfy ); }
   void Initial();
   void Graphics();
   void Stability();
 };
-//
 //   г---------------------------------------------------------¬
 //   ¦                                                         ¦
 //   ¦  Основные кривые элементов теоретического чертежа       ¦
@@ -45,38 +58,39 @@ void Hydrostatic::Initial()
  double r,R,S,sX,v,
         x,y,z;
   build( Height);
-  for( k=0; k<_nZ; k++ )xCW[k]=Xm;
-  for( k=0; k<_nZ; k++ )        //
+//for( k=0; k<_nZ; k++ )xCW[k]=Xm;
+  for( k=0; k<_nZ; k++ )
   { R=r=sX=S=0.0;               // Первый прогон интегрирования
     x=dX/2;                     // для вычисления площадей, объемов,
-    z=dZ*( double( k )+0.5 );    // их моментов инерции
+    z=dZ*( double( k )+0.5 );   // их моментов инерции - посредине
     for( i=0; i<_nX; i++,x+=dX )// и метацентрических радиусов
-    { S+=( y=Y[k][i] );         //
+    { S+=( y=Y[k][i] );
       r+=y*y*y;                 // стр.61 у Владимира Вениаминовича С-Т-Ш
-      R+=y*x*x;                 //
+      R+=y*x*x;
       sX+=y*x;
-    }                           //
+    }
     Swl[k]=(S*=2*dX);           // Площадь ватерлинии
-            sX*=2*dX;           // Момент площади ватерлинии
-    if( k>0 )                   //
-    { v=dZ*(S+Swl[k-1])/2;      //
+           sX*=2*dX;            // Момент площади ватерлинии
+    if( k>0 )
+    { v=dZ*(S+Swl[k-1])/2;
       Vol[k]=Vol[k-1] + v;      // Водоизмещение
       zCV[k]=zCV[k-1] + v*z;    // Момент для аппликаты центра величины zC
       xCV[k]=xCV[k-1] + sX*dZ;  // Момент для абсциссы центра величины xC
-    }                           //
-    if( !S )xCW[k]=Xm,Rfy[k]=rfX[k]=0; else
+    }
+    if( S<=0 ) //|| k==0 )
+      xCW[k]=Xm,Rfy[k]=rfX[k]=0; else
     { xCW[k]=sX/S+Xo;           // Центр площади ватерлинии
-      Rfy[k]=(R*2*dX-sX*sX/S);   // /Vol[k]->Продольный метацентрический радиус
-      rfX[k]= r*2*dX/3;          // /Vol[k]->Поперечный --//--
-    }                           //
-//  if( !S )continue;           //
+      Rfy[k]=(R*2*dX-sX*sX/S);  // /Vol[k]->Продольный метацентрический радиус
+      rfX[k]= r*2*dX/3;         // /Vol[k]->Поперечный --//--
+    }
+//  if( !S )continue;
 //  xCW[k]=sX/S+Xo;             // Центр площади ватерлинии
 //  Rfy[k]=(R*2*dX-sX*sX/S);    // /Vol[k]->Продольный метацентрический радиус
 //  rfX[k]= r*2*dX/3;           // /Vol[k]->Поперечный --//--
-  }                             //
-  zCV[0]=xCW[0]; //Do;          //
+  }
+  zCV[0]=Do; //xCW[0];
   Srf[0]=S=Swl[0];              // Площадь смоченной поверхности
-  for( l=k=1; k<_nZ; k++ )      //
+  for( l=k=1; k<_nZ; k++ )
   { if( l<0 || Swl[k] )
     { for( i=1; i<_nX; i++ )
       { y=Y[k][i];
@@ -86,27 +100,26 @@ void Hydrostatic::Initial()
       xCV[k]=xCV[k]/Vol[k]+Xo;
       if( !Swl[k-1] && l>0 )
       for( l=k-1; l>=0; l-- )xCV[l]=xCV[k],xCW[l]=xCW[k],zCV[l]=Do; l=-1;
-      if( !Swl[k] )xCW[k]=xCW[k-1];
-  } }
+      if( !Swl[k] )xCW[k]=xCW[k-1];       ///???
+    }
+  }
 }
-static void MinMax( Real *F, int N, Real &Min, Real &Max, const int mx=0 )
+static void MinMax( const Real *F, int N, Real &Min, Real &Max, const int mx=0 )
 { int i; if( !mx )Min=Max=F[0];
   for( i=0; i<N; i++ )if( Min>F[i] )Min=F[i]; else
                       if( Max<F[i] )Max=F[i];
 }
 static void Graphic_for_Element
-( Real *C,            // собственно прорисовываемая кривая (NULL - если ее нет)
+( const Real *C,      // собственно прорисовываемая кривая (NULL - если ее нет)
    int y,             // смешение оси по вертикали
   Real I,             // начальный отсчет шкалы
   Real L,             // длина шкалы оси
   const int up,       // длина маркеров отметки шкалы (-вверх, +вниз, 0-нет)
   const int sp,       // местоположение метки
   const char Label[], // подпись на шкале и на графике
-  const int Scale=1    // признак перемасштабирования (округления) шкалы
-){                      //
- Field F; F.Jx=F.Jy=0.0;
- double x,dL;
- int i;
+  const int Scale=1   // признак перемасштабирования (округления) шкалы
+)
+{ Field F; Real x,dL; int i; F.Jx=F.Jy=0.0;
   if( Scale )
   { if( L==0.0 )MinMax( C,_nZ,I,L );
     dL=Tv_step( L-I );
@@ -135,7 +148,7 @@ static void Graphic_for_Element
 //
 void Hydrostatic::Graphics()
 { int i,k=_nZ/3;
-  Real mn,mx;
+  Real mn,mx,mz=Height-Do;
 
   color( YELLOW );
   Graphic_for_Element( Vol,Tv.mY/2+30,0,Vol[_nZ-1],-4,k++,"V" );
@@ -153,16 +166,18 @@ void Hydrostatic::Graphics()
   Graphic_for_Element( rfX,Tv.mY/2+90,0,0,-4,k++,"Jx" );   // Инерция
   Graphic_for_Element( Rfy,Tv.mY/2+90,0,0,+4,k++,"Jy" );   // ватерлинии
                                                            //
-  for( i=1; i<=_nZ; i++ )if( Vol[k] )rfX[i]/=Vol[i],
-                                     Rfy[i]/=Vol[i]; Rfy[0]=Rfy[1];
-  color( LIGHTRED );                                 rfX[0]=rfX[1];
+  for( i=1; i<_nZ; i++ )if( Vol[i] )rfX[i]/=Vol[i],
+                                    Rfy[i]/=Vol[i]; Rfy[0]=Rfy[1];
+  color( LIGHTRED );                                rfX[0]=rfX[1];
   MinMax( rfX,_nZ,mn,mx );
   Graphic_for_Element( rfX,Tv.mY/2+120,0,min(mx,Breadth ),-4,k++,"r" );
   MinMax( Rfy,_nZ,mn,mx );
   Graphic_for_Element( Rfy,Tv.mY/2+120,0,min(mx,Length*2),+4,k++,"R" );
-
+  mX=0;
   color( WHITE );
-  for( i=0; i<=_nZ; i++ )rfX[i]+=zCV[i];
+  for( i=0; i<_nZ; i++ )
+  { rfX[i]+=zCV[i]; if( fabs( i*dZ-Draught+Do )<mz ){ mX=rfX[i]; mz=fabs( i*dZ-Draught+Do ); };
+  }
   Graphic_for_Element(   0,Tv.mY/2,Do,Height,4,k++,"Z,zC,zM",0 );
   Graphic_for_Element( zCV,Tv.mY/2,Do,Height,0,k++,"zC"     ,0 );
   Graphic_for_Element( rfX,Tv.mY/2,Do,Height,0,k++,"zM"     ,0 );
@@ -171,20 +186,18 @@ void Hydrostatic::Graphics()
 //   Расчет плеч статической остойчивости формы
 //
 void Hydrostatic::Stability()
-{                       //
- int i,                 // Индекс номера шпангоута
-     j,                 // Индекс угла накренения
-     k,                 // Индекс контрольной осадки (*cos)
-     l,                 // Индекс номера точки на контуре шпангоута
-     m,                 // Признак обратного прохода по шпангоуту (+-1)
-     n,                 // Признак определения первой точки на шпангоуте
-     o;                 // Признак обратного входа в контур шпангоута
- double Z,A,dA,         // Ведущие аргументы
-        V,dV;           // Объемные сумматоры
- Point f0,f1,f2,a,b,c,  // Три путевые и три контрольные точки
-       M,dC;            // Сумматор моментов и центр элементарной площадки
-                        //
-  A=dA=M_PI*mA/( _nA*180.0 );   // Шаг по углу накренения
+{ int i,               // Индекс номера шпангоута
+      j,               // Индекс угла накренения
+      k,               // Индекс контрольной осадки (*cos)
+      l,               // Индекс номера точки на контуре шпангоута
+      m,               // Признак обратного прохода по шпангоуту (+-1)
+      n,               // Признак определения первой точки на шпангоуте
+      o;               // Признак обратного входа в контур шпангоута
+ Real Z,A,dA,          // Ведущие аргументы
+      V,dV;            // Объемные сумматоры
+ Point f0,f1,f2,a,b,c, // Три путевые и три контрольные точки
+       M,dC;           // Сумматор моментов и центр элементарной площадки
+  A=dA=M_PI*mA/( _nA*180.0 ); // Шаг по углу накренения
   TvClip();
   for( j=0; j<_nA; j++,A+=dA )
   for( k=0; k<_nZ; k++ )        //
@@ -235,16 +248,18 @@ void Hydrostatic::Stability()
       color( BLUE     ); line( A-dA,aC[j-1][k].y,A,aC[j][k].y );
   } } TvUnClip();
 //
-//      Процедура пересчета всех массивов к равнообъемным накренениям
+//      Процедура пересчета всех массивов к равнообъёмным накренениям
 //
-  Swl[0]=0;            A=dA;
+ Real H;
+  Swl[0]=0;            A=dA; Amin=-0.1; Amax=0.1; // 10 см
   for( j=0; j<_nA; j++,A+=dA )
   { for( k=1; k<_nZ; k++ )                      //
     { V=Vol[k];                                 // Поиск аргумента-осадки
       for( i=1; aV[j][i]<V && i<_nZ-1; )i++;    // по грузовому размеру
       Swl[k]=i-(aV[j][i]-V)/(aV[j][i]-aV[j][i-1]); // -индексная метка осадки
     }
-    for( k=1; k<_nZ; k++ )                      //
+    for( k=0; k<_nZ; k++ )                      //
+    if( k*dZ<Draught*0.25 || k*dZ>Height*0.875 )aV[j][k]=0; else
     { i=int( Swl[k] );
       if( i<0 )i=0; else
       if( i>=_nZ-1 )i=_nZ-2;
@@ -253,35 +268,42 @@ void Hydrostatic::Stability()
 
 //    dC.x=dV*aC[j][i+1].x+(1-dV)*aC[j][i].x;
 //    dC.y=dV*aC[j][i+1].y+(1-dV)*aC[j][i].y;
-                                                //
-//    aV[j][k]=dC.y-(rfX[k]-Do-0.5)*sin( A );   // От метацентра - полметра
-      aV[j][k]=dC.y-(zCV[k]-Do)*sin( A );       // От центра величины
-//    aV[j][k]=dC.y-k*dZ*sin( A );              // От ватерлинии
-    }                                           //
+
+      H=aV[j][k]=dC.y-(mX-Do-0.5)*sin( A );     // От центра тяжести - полметра
+//    H=aV[j][k]=dC.y-(rfX[k]-Do-0.5)*sin( A ); // От метацентра - полметра
+//    H=aV[j][k]=dC.y-(zCV[k]-Do)*sin( A );     // От центра величины
+//    H=aV[j][k]=dC.y-k*dZ*sin( A );            // От ватерлинии
+      if( Amin>H )Amin=H;
+      if( Amax<H )Amax=H;
+    }
   }
 }
 //
 //      Простая прорисовка осей для диаграммы Рида
 //
-static void Axis_Statics( Real A )
+static void Axis_Statics( _Real A, _Real Mn, _Real Mx, bool Vert=true )
 { int k;
- Real dA,z;
-  color( BLUE      ); line( Real( 1 ),Real( 0 ),Real( 1 ),Height-Draught/5 );
-  color( LIGHTGRAY ); line( Real( 0 ),Real( 0 ),A,Real( 0 ) );
-  dA=A/36;            line( Real( 0 ),Real( 0 ),Real( 0 ),Height-Draught/5 );
+ Real dA,z,dZ;
+  if( Mx-Mn<0.01 )return;                               // < 1.0 см
+  if( Vert )
+  { color( BLUE      ); line( Real( 1 ),Mn,Real( 1 ),Mx );
+    color( LIGHTGRAY ); line( Real( 0 ),Mn,Real( 0 ),Mx );
+  } color( LIGHTGRAY ); line( Real( 0 ),Real( 0 ),A,Real( 0 ) );
+  dZ=Tv_step( (Mx-Mn)/2 );
+  dA=A/36;
   for( k=0; k<=36; k++ )
-  { color( LIGHTGRAY );
-    line( Tv_x( k*dA ),Tv_y(0),Tv_x(k*dA),Tv_y(0)+(k&1?4:8) );
+  { color( LIGHTGRAY ); line( Tv_x( k*dA ),Tv_y(0),Tv_x(k*dA),Tv_y(0)+(k&1?4:8) );
     color( WHITE );
     if( !(k%6) )Tv.Text( South,Tv_x(k*dA),Tv_y(0)+8,_Fmt( "%i",k*5 ) );
   }
-  for( k=0,z=0.0; z<=Height-Draught/5; k++,z+=Draught/5 )
-  { color( LIGHTGRAY );
-    line( !(k%5)?3:6,Tv_y( z ),12,Tv_y( z ) );
+  if( !Vert )return;
+  for( k=Mn/dZ,z=k*dZ; z<=Mx && k<24; k++,z+=dZ )
+  { color( LIGHTGRAY ); line( !(k%5)?3:6,Tv_y( z ),12,Tv_y( z ) );
     color( WHITE );
     if( k && !(k&1) )Tv.Text( North_East,0,Tv_y(z),_Fmt( "%.3lg",z ) );
-  } Tv.Text( South_East,20,Tv.mY/2+12,W2D( "Остойчивость: Lф [м] " ) );
-    Tv.Text( South_East,32,Tv.mY/2+24,"Zg=Zc" );
+  }
+  Tv.Text( South_East,20,Tv.mY/2+12,W2D( "Остойчивость: Lф [м] " ) );
+  Tv.Text( South_East,32,Tv.mY/2+24,_Fmt("Zg = Zm(kwl)-0.5 = %4.2lf",mX-0.5)); //_Fmt( "Zg = Zc [i]   %lg < %lg ",Amin,Amax ) );
 }
 void Hull_Statics()
 { Ghelp();
@@ -313,24 +335,30 @@ void Hull_Statics()
 //      Прорисовка кривых элементов теоретического чертежа
 //
   LD.Graphics();
+  A=M_PI*mA/180.0;
+  _F.Jx=0.0;     _F.Lx=A;
+  _F.Jy=-Height; _F.Ly=Height*2; f.Jx=-12,f.Jy=-16; f.wb=0; // =-40
+                                 f.Lx=-Tv.mX/2-12;
+                                 f.Ly=-Tv.mY/2-20;  Tv_place( 0,&_F );
+                                                    Tv_place( &f );
+  Axis_Statics( A,-Height,Height*2,false );
 //
 //      Расчет плеч статической остойчивости формы
 //
-   A=M_PI*mA/180.0;
-  _F.Jx=0.0;     _F.Lx=A;
-  _F.Jy=-Height; _F.Ly=Height*2; f.Jx=-12,f.Jy=-40; f.wb=0;
-                                 f.Lx=-Tv.mX/2-12;
-                                 f.Ly=-Tv.mY/2;    Tv_place( 0,&_F );
-                                                   Tv_place( &f );
-  Axis_Statics( A );
-
   LD.Stability();
-
-   pattern( Tv.BkColor );
+  pattern( Tv.BkColor );
   _F.Jx=0.0; _F.Lx=M_PI*mA/180.0; bar( 0,Tv.mY/2+2,Tv.mX/2-2,Tv.mY );
-  _F.Jy=0.0; _F.Ly=Height;        Tv_place( 0,&_F );
-
-  Axis_Statics( A );
+#if 0
+  _F.Jy=Amin; _F.Ly=Amax-Amin; Tv_place( 0,&_F ); dA=A/_nA; color( WHITE );
+  for( k=1; k<_nZ; k++ )
+  { moveto( Real(0),Real(0) );
+    for( j=0,A=dA; j<_nA; j++,A+=dA )
+    { lineto( A,LD.aV[j][k] );
+    }
+  }
+#else
+  _F.Jy=Amin; _F.Ly=Amax-Amin; Tv_place( 0,&_F );
+  Axis_Statics( A,Amin,Amax );
   dA=A/_nA;
   dz=LD.dZ;
   z=Draught/5-Do;
@@ -345,9 +373,10 @@ void Hull_Statics()
     for( j=0; j<_nA; j++,A+=dA )lineto( A,LD.aV[j][k] );
     if( k*dz>=Height-Draught/5 )break;
   }
+#endif
   setlinestyle( SOLID_LINE,0,NORM_WIDTH );
 
-  Axis_Statics( M_PI*mA/180.0 );
+  Axis_Statics( M_PI*mA/180.0,Amin,Amax );
 
   Thelp( "%ld Мб ",coreleft()>>20 );
   while( Tv_getc()==_MouseMoved );
@@ -364,7 +393,6 @@ if( k==Nz/2 )
   color( j&1?LIGHTCYAN:YELLOW );
   line( (a+Do)*polar( M_PI_2 ),(b+Do)*polar( M_PI_2 ) ); //Tv_getc();
 }
-
 if( k==_nZ/2 )
 { Gheld( "Z[%i]=%lg, A[%i]=%lg, V=%lg, M={%lg,%lg}",k,Z,j,A,V*dX,aC[j][k].x,aC[j][k].y );
 //  Tv_getc();

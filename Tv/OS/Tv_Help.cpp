@@ -7,8 +7,8 @@
 //
 Course Help( const char *Name[], const char** Text, const char** Plus )
 {
- int i=strlen( Name[0] ),n=0,h=0,t=0,p=0,l=29,b=Tv.BkColor,c=Tv.Color,k;
- Course Ans;
+ int i=strlen( Name[0] ),n=0,h=0,t=0,p=0,l=29,b=Tv.BkColor,c=Tv.Color,k,f=Tv.Th;
+ Course Ans;                                                           Tv.Th=18;
   if( Name )for( ; Name[n] && Name[n][0]; n++ );
   if( Text )for( ; Text[t]; t++ ); if( t )h++;
   if( Plus )for( ; Plus[p]; p++ ); if( p )h++; h+=n+(p+1)/2+(t+1)/2+1; //2;
@@ -35,12 +35,13 @@ Course Help( const char *Name[], const char** Text, const char** Plus )
     }
     do{ Ans=Tv_getc(); } while ( Ans>=_MouseMoved && Ans<=_MouseReleased );
     Tback();
+
 //  if( !Name[n] )break;
     if( Ans==_Esc || Ans==_Enter )Ans=Center; else
     if( Ans<_Enter ){ if( Ans&North )--y; if( Ans&East  )x+=2;
                       if( Ans&South )++y; if( Ans&West  )x-=2;
                     }
-  } while( Ans && Ans<_Enter ); color( c ); bkcolor( b );
+  } while( Ans && Ans<_Enter ); color( c ); bkcolor( b ); Tv.Th=f;
     return Course( Ans );
 }
 #if 0

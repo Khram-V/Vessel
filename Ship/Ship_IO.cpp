@@ -267,9 +267,9 @@ void Surface::Read()
 { int I,K,N,EdErr;
    isLoad=true; textbackground( BLUE ); // First load layerdata
    N=getInt();                                                            print( "< Surface.LaeyrData >\nNoLaeyrs = %d -> %d\n",NoLayers,N );
-   if( NoLayers>0 )memset( L,0,NoLayers*sizeof( Surface::Laeyrs ) );
+   if( NoLayers>0 )memset( L,0,NoLayers*sizeof( Surface::Layers ) );
    NoLayers=N;
-   L=(Surface::Laeyrs*)Allocate( N*sizeof( Surface::Laeyrs ) );
+   L=(Surface::Layers*)Allocate( N*sizeof( Surface::Layers ) );
 // L=(Surface::Laeyrs*)Allocate( N*sizeof(*L) );
    if( N )
    { for( I=0; I<N; I++ )
@@ -287,7 +287,7 @@ void Surface::Read()
          { L[I].MaterialDensity=getFloat();                               textcolor( LIGHTGREEN ),print(" MD=%g",L[I].MaterialDensity );
            L[I].Thickness=getFloat();                                     print( " Tn=%-3g",L[I].Thickness );
            if( FV>=fv201 )
-           { L[I].ShoeinLineSpan=getByte();                               textcolor( LIGHTRED ),print(" Shoe=%d",L[I].ShoeinLineSpan );
+           { L[I].ShowInLineSpan=getByte();                               textcolor( LIGHTRED ),print(" Shoe=%d",L[I].ShowInLineSpan );
              if( FV>=fv261 )L[I].AlphaBlend=getInt();                     textcolor( YELLOW ),print(" Alfa=%d ",L[I].AlphaBlend );
            } // =201
          }   // =191
@@ -411,18 +411,19 @@ void Surface::ReadFEF()
    K=getInt();                                                            print( "< Surface.LaeyrData >\nNoLaeyrs = %d -> %d\n",NoLayers,K );
    if( !K )K=getInt();                                                    print( "NoLaeyrs(повтор) = %d\n",K );
    NoLayers=K;
-   L=(Surface::Laeyrs*)Allocate( max(1,NoLayers)*sizeof( Surface::Laeyrs ) );
+   L=(Surface::Layers*)Allocate( max(1,NoLayers)*sizeof( Surface::Layers ) );
    for( I=0; I<NoLayers; I++ )
-   { Laeyrs &T=L[I]; int v,s,d,u,w;
+   { Layers &T=L[I]; int v,d,s,u,w,p;
      readText( &T.Description );                                          print( "[%d]'%-12s'",I,T.Description );
-     sscanf( getString( ::F ),"%d%u%i%i%i%i%i%lg%lg",&T.ID,
-             &T.Color,&v,&s,&d,&u,&w,
+     sscanf( getString( ::F ),"%d%d%i%i%i%i%i%i%lg%lg",&T.ID,
+             &T.Color,&v,&d,&s,&u,&w,&p,
              &T.MaterialDensity,
-             &T.Thickness ); v=T.Visible,
-                             s=T.Symmetric,
-                             d=T.Developable,
-                             u=T.UseforIntersection,
-                             w=T.UswinHydrostatic;                        print( ", ID=%d, Color=%X, Vis=%i, Symm=%i, ... Плотность=%g, Толщина=%g \n",T.ID,T.Color,T.Visible,T.Symmetric,T.MaterialDensity,T.Thickness );
+             &T.Thickness ); T.Visible=v;
+                             T.Developable=d,
+                             T.Symmetric=s,
+                             T.UseforIntersection=u,
+                             T.UswinHydrostatic=w,
+                             T.ShowInLineSpan=p;                          print( ", ID=%d, Color=%X, Vis=%i, Symm=%i, ... Плотность=%g, Толщина=%g \n",T.ID,T.Color,T.Visible,T.Symmetric,T.MaterialDensity,T.Thickness );
    }
    if( NoCoPoint>0 )memset( P,0,NoCoPoint*sizeof( Surface::CoPoint ) );   print( "< ControlPoints > %d",NoCoPoint );
    NoCoPoint=getInt();
