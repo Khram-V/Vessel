@@ -202,10 +202,14 @@ Part_of_hull:    // разделение корпуса по уровням на
     //! собственно блок моделирования отражения потоков/волн от корпуса корабля
 /** else
     if( Storm->Exp.wave>1 )      // отражение локальных скоростей от ватерлинии
-    { for( i=0; i<wR.len-2; i+=2 )Storm->Slicks( out(wR[i]),out(wR[i+2]),x ); // dir( (wR[i+1]+wR[i+3])*0.5 ) );
-      for( i=0; i<wL.len-2; i+=2 )Storm->Slicks( out(wL[i]),out(wL[i+2]),x ); // dir( (wL[i+1]+wL[i+3])*0.5 ) );
+    { //for( i=0; i<wR.len-2; i+=2 )Storm->Slicks( out(wR[i]),out(wR[i+2]),x ); // dir( (wR[i+1]+wR[i+3])*0.5 ) );
+      //for( i=0; i<wL.len-2; i+=2 )Storm->Slicks( out(wL[i]),out(wL[i+2]),x ); // dir( (wL[i+1]+wL[i+3])*0.5 ) );
+      for( i=0; i<WaterLine.len; i+=3 )
+         Storm->Slicks( out(WaterLine[i+1]),out(WaterLine[i+2]),x );
+
     }
-*/  Part=true;                       // однократный возврат к перерисовке
+*/
+    Part=true;                       // однократный возврат к перерисовке
     if( onlyDraw )goto Part_of_hull; // только надводного борта, здесь Course=x
   }
   //

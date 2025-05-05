@@ -13,9 +13,9 @@ int main()
         Tw=1,Th=1,     // усреднённая ширина и базовая высота шрифта
         Tb=0;          // вертикальное смещение базовой линии
 
- const char InName[]="..\\..\\Window\\Fonts\\DesignCAD.alfa",
+ const char InName[]="DesignCAD.alfa",
 //         OutName[]="..\\..\\Window\\Fonts\\DesignCAD.characters";
-           OutName[]="..\\..\\Window\\Sym_Design.c";
+           OutName[]="Sym_Design.c++";
 
  FILE *F,*T;
  char *S;

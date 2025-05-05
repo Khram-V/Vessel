@@ -333,8 +333,8 @@ Real Waves::AmH( _Vector A )            // интерполяция на вол�
   return ( H[y][x].z*(1-Ry)+H[y+1][x].z*Ry )*(1.0-Rx)  // простые разности
        + ( H[y][x+1].z*(1-Ry)+H[y+1][x+1].z*Ry )*Rx;   // билинейных пересчётов
 }
-/*
-#if 1
+
+#if 0
 static void Square( Vector** V, Vector N, int y,int x )
 { N.z=0.0;
   // if( abs( N )<eps )N=1; N=1;
@@ -349,12 +349,12 @@ static void Square( Vector** V, Vector N, int y,int x )
 int Waves::Slick( _Vector A, _Vector B, _Vector N )
 { Vector w; //D=dir( B-A );
   int y,x,dy,dx,ly,lx,k;                        // выбор маски местоположения
-  Real Rx=Mx/2+A.X/Ds,Ry=My/2+A.Y/Ds;           //    и отражающей способности
+  Real Rx=Mx/2+A.x/Ds,Ry=My/2+A.y/Ds;           //    и отражающей способности
    x=minmax( 0,(int)floor( Rx ),Mx );           // поиск индексов ближней точки
    y=minmax( 0,(int)floor( Ry ),My );           // внутри оконтуривающей ячейки
    APoint( w=A,y,x,H,My,My );
 
-   Rx=Mx/2+B.X/Ds,Ry=My/2+B.Y/Ds;
+   Rx=Mx/2+B.x/Ds,Ry=My/2+B.x/Ds;
    dx=minmax( 0,(int)floor( Rx ),Mx );          // поиск индексов ближней точки
    dy=minmax( 0,(int)floor( Ry ),My );          // внутри оконтуривающей ячейки
    APoint( w=B,dy,dx,H,My,My );
@@ -366,7 +366,7 @@ int Waves::Slick( _Vector A, _Vector B, _Vector N )
               else  for( k=0; k<dy*ly; k++ )Square( V,N,y+ly*k,x+(ly*k*dx)/dy );
    return k;
 }
-#else
+//#else
 int Waves::Slick( _Vector D, int y,int x,int dy,int dx )
 { if( dy>y )++dy; if( y>dy )++y; int ly=( dy-=y )<0 ? -1:1;
   if( dx>x )++dx; if( x>dx )++x; int lx=( dx-=x )<0 ? -1:1,k; //D.z=0.0;
@@ -388,4 +388,4 @@ void Field::Slick( _Vector A, _Vector B, _Vector D )
       Surge.AVid( a=A,iy,ix ).AVid( b=B,jy,jx ),Surge.Slick( V,iy,ix,jy,jx );
 }
 #endif
-*/
+

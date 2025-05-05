@@ -47,7 +47,7 @@ struct Event                               //
 };
 typedef unsigned short fixed;
 typedef unsigned char  byte;
-typedef          char* string;
+//typedef        char* string;
 typedef struct{ int Jx,Jy,Lx,Ly,wb; } field;    typedef const field& _field;
 typedef struct{ Real Jx,Jy,Lx,Ly;   } Field;    typedef const Field& _Field;
 

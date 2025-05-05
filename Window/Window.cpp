@@ -152,7 +152,7 @@ Window::Window( const char *_title, int x,int y, int w,int h )
   WindowX( CW_USEDEFAULT ),WindowY( CW_USEDEFAULT ),
   isTimer( 0 ),isMouse( false ),mSec( 0 ),idEvent( 0x12 ),
   KeyPos( 0 ),KeyPas( 0 ),onKey( false ),extKey( NULL ),extTime( NULL )
-{ ATOM atom;
+{ //ATOM atom;
   WNDCLASSW wc;
   HINSTANCE hInstance=GetModuleHandle( NULL );
   PIXELFORMATDESCRIPTOR pfd; //={ sizeof(PIXELFORMATDESCRIPTOR) };
@@ -182,7 +182,7 @@ Window::Window( const char *_title, int x,int y, int w,int h )
 // wc.hbrBackground=NULL; // GetStockObject( BLACK_BRUSH ) цвет заполнения окна
 // wc.lpszMenuName =NULL;                   // имя главного меню
    wc.lpszClassName=ws;                     // имя класса окна
-   atom=RegisterClassW( &wc );              // ==0 => "\n!\7RegisterClass\n "
+ /*atom=*/ RegisterClassW( &wc );           // ==0 => "\n!\7RegisterClass\n "
    Locate( x,y,w,h );                       // -- без hWnd - только размерности
    hWnd = CreateWindowW                     // Create main window
    ( wc.lpszClassName,                      // имя класса окна

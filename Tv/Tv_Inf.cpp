@@ -743,7 +743,7 @@ static void Write()
   if( k==_Enter )
   { Point Bs,Es; Bs.x=jX;            Es.x=jX+lX;
                  Bs.y=jY; ItD( Bs ); Es.y=jY+lY; ItD( Es );
-       fext( Fname,ext=string(Tp<2?"grd":(Tp==2?"inf":"2Dp")) );
+       fext( Fname,ext=(char*)(Tp<2?"grd":(Tp==2?"inf":"2Dp")) );
     do
     { color( RED  ); Tgo( 1,0 ); Tprintf( "%-29s","Name:" );
       color( BLUE ); Tgo( 7,0 ); k=Wgets( Fname,-64 );

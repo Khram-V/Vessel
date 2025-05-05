@@ -33,7 +33,6 @@
 					<Add option="-Wno-narrowing" />
 				</Compiler>
 				<Linker>
-					<Add option="-static-libstdc++" />
 					<Add option="-static-libgcc" />
 					<Add option="-static" />
 					<Add option="-m64" />
@@ -54,6 +53,7 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-fexpensive-optimizations" />
 			<Add option="-Os" />
 			<Add option="-funsigned-char" />
 			<Add option="-fexec-charset=UTF-8" />

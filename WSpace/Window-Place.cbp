@@ -140,7 +140,6 @@
 			<Add option="-std=gnu++98" />
 			<Add option="-funsigned-char" />
 			<Add option="-finput-charset=utf-8" />
-			<Add option="-fopenmp" />
 			<Add option="-ffast-math" />
 			<Add option="-fno-exceptions" />
 			<Add option="-Wunused" />
@@ -324,6 +323,11 @@
 			<Option target="Window Trial" />
 			<Option target="GLFW Shapes" />
 			<Option target="GLFW Trial" />
+		</Unit>
+		<Unit filename="../Window/Sym_Design.c">
+			<Option compilerVar="CC" />
+			<Option link="0" />
+			<Option target="Window Shapes" />
 		</Unit>
 		<Unit filename="../Window/UniCode.cpp">
 			<Option target="A-lib32" />

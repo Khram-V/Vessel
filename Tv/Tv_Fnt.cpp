@@ -56,7 +56,7 @@ void DCFont::Read_VFN()
   fread( P,1,(unsigned)L,F );
   fclose( F );
 }                       //
-#define Lw 1024         // Максимальная длина обрабатываемой строки
+#define Lw 2048         // Максимальная длина обрабатываемой строки
                         //
 static int Stream( FILE *F, char* S, char* &s )
 { while( *s<=' ' )
@@ -72,15 +72,19 @@ void DCFont::Read_VCT()
  char S[Lw],*s;
  FILE *F;
   if( (F=fopen( FName,"rt" ))==0 )Break( Err2,FName );
-  for( L=0;;)
-  { fgets( S,Lw,F ); if( *S<=' ' )break; else i=*S;
+  for( L=0;; )
+  { fgets( S,Lw,F );
+    if( *S<' ' )break; else
+    if( *S>' ' )i=*S; else sscanf( S,"%d",&i );
     fgets( S,Lw,F ); sscanf( S,"%d%d",&k,&j ); WL[i]=j; L+=QL[i]=k; k*=2;
           *S=0; s=S;
-    while( k-->0 )Stream( F,S,s );
+    while( k-- > 0 )Stream( F,S,s );
   } rewind( F ); L*=4;
   for( i=0; i<256; i++ )AL[i+1]=AL[i]+QL[i];
   for( ;; )
-  { fgets( S,Lw,F ); if( *S<=' ' )break; else i=*S;
+  { fgets( S,Lw,F );
+    if( *S<' ' )break; else
+    if( *S>' ' )i=*S; else sscanf( S,"%d",&i );
     fgets( S,Lw,F ); k=QL[i]; p=P+AL[i]*2; *S=0; s=S;
     for( j=0; j<k; j++,p++ ){ p[0]=Stream( F,S,s );
                               p[k]=Stream( F,S,s ); }
@@ -133,23 +137,21 @@ void DCFont::Graphics_Drawing()
 //             };
   if( ( Tv_getk()&SHIFT )==0 )clear();
   color( DARKGRAY );
-//if( Msg[3][0]=='А' )
-//for( m=3; m<7; m++ )CharToOemBuff( Msg[m],Msg[m],strlen( Msg[m] ) );
   Yy=Height+24;
-  for( m=0; m<8 && Yy<Tv.mY-3; m++ )
-  { //str=string( m>0?W2D( Msg[m] ):Msg[0] );
-    if( !m )strcpy( str,Ident ); else
-    { for( i=0; i<32; i++ )str[i]=m*32+i; str[32]=0; }
-    Xx=6;
-    i=0;
-    while( (j=str[i++])!=0 && Xx<Tv.mX-6 )
-    { int Y,X,y=-1,x=-1; k=QL[j]; pX=P+AL[j]*2; pY=pX+k;
-      while( k-- > 0 )
+  for( m=-1; m<8 && Yy<Tv.mY-3; m++ )
+  { if( m<0 )strcpy( str,Ident ); else
+    { for( j=i=0; i<32; i++ ){ str[i]=m*32+i; j+=QL[str[i]]; }
+      if( !j )continue;        str[32]=0;            // с кодами меньше пробела
+    }
+    for( Xx=6,i=0; i<32; i++ )
+    { int Y,X,y=-1,x=-1; j=str[i]; if( m<0 && !j )break;
+      k=QL[j]; pX=P+AL[j]*2; pY=pX+k;
+      while( k-- > 0 )                             // прорисовка одной буквочки
       {  Y=*pY++;  X=*pX++;
          if( x<0  && x==y )moveto( Xx+X,Yy-Y ); else
          if( X>=0 || X!=Y )lineto( Xx+X,Yy-Y ); x=X; y=Y;
       } k=WL[j]; Xx+=k?k:Width;
-    }   Yy+=(Height*3)/2; if( !m ){ Yy+=Height/2; color( CYAN ); }
+    }   Yy+=Height*2; if( m<0 ){ Yy+=Height/2; color( CYAN ); }
   }
   Thelp( " Sign:%d, [%dx%d]:%ld %s(%d)  \"%s\"  %02X%02X",
        (int)Ver,Width,Height,L,Fill?"Filled ":"",Begin,Ident,
@@ -162,7 +164,7 @@ void DCFont::Graphics_Drawing()
               };
   color( CYAN ); i=0;
   do
-  { Menu[4].Msg=(string)(Fill?" Fill":" No Fill");
+  { Menu[4].Msg=Fill?" Fill":" No Fill";
     for( j=0; j<45; j++ )
     if( FName[j]<=' ' || FName[j]=='.' ){ FName[j]=0; break; }
     switch( i=Tmenu( Mlist( Menu ),1,-1,i ) )
@@ -186,19 +188,20 @@ void DCFont::Graphics_Drawing()
       } break;
       case 7:
       { FILE *F;
-       int i,j,k,l;
-       short *p;                             // Запись текстового
+       int i,j,k,l; short *p;                // Запись текстового
         strcat( FName,".vct" );              // шрифта Design-CAD v5.
-        if( (F=fopen( FName,"wt" ))!=0 )     // (в формате .VCT)
+        if( (F=fopen( FName,"wb" ))!=0 )     // (в формате .VCT)
         { for( i=0; i<256; i++ )
-          if( QL[i]>0 )
-          { fprintf( F,"%c\n%d %d\n",i,QL[i],WL[i] ); p=P+AL[i]*2; k=QL[i];
+          if( (k=QL[i])>0 )
+          { if( i<32 )fprintf( F," %d",i );
+                else  fprintf( F,"%c",i );
+            fprintf( F,"\n%d %d\n",QL[i],WL[i] ); p=P+AL[i]*2; k=QL[i];
             for( j=l=0; j<k; j++,p++ )
             { l+=fprintf( F," %d %d",p[0],p[k] );
               if( l>72 && j<k-1 ){ fprintf( F,"\n" ); l=0; }
             } fprintf( F,"\n" );
           }   fprintf( F,"\n%d %d %d %d\n%s\n",Width,Height,Width/5,Fill,Ident );
-               fclose( F );
+              fclose( F );
         } else Tv_bell();
       }
     }

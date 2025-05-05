@@ -67,7 +67,7 @@ static int Set_Stem()
   Ns=1/Ns; Tmenu( Mlist( Menu_a ),1,-1 );
   Ns=1/Ns;
   scpy( Kh.Name,
-   W2D( string(Hull_Type?"Синусно-степенной корпус":"Параболическая модель корпуса") ) );
+   W2D( Hull_Type?"Синусно-степенной корпус":"Параболическая модель корпуса") );
   if( Breadth<0.1 )Breadth=0.1;
   if( Draught>Breadth )Draught=Breadth;
   if( Lwl<Breadth*3 )Lwl=Breadth*3;

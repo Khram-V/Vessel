@@ -222,7 +222,8 @@ public: Waves( const char Name[] );  // конструктор с возможн
   Waves& View(_Real,int,bool); // изображение групповой структуры трохоидальных
   Waves& Ghost( _Real Tr );   // волн со сдвигом картинки вниз на величину ofsZ
   int Color( _Real mH );     // 256 белосиних оттенков по высоте волн Герстнера
-//int Slick( _Point A,_Point B,_Vector N );    // ячейка на воде вблизи корпуса
+//int Slick( _Vector A,_Vector B,_Vector N );  // ячейка на воде вблизи корпуса
+//int Slick( _Vector D, int y,int x,int dy,int dx );
   Vector Wave( _Real T,_Vector R );// время и местоположение частицы в трохоиде
   void Wave( _Real T, Vector &R, Vector &V );   // место и скорость на трохоиде
 //Vector dWave( int y,int x );  // вертикальная скорость частицы на поверхности
@@ -292,9 +293,10 @@ public:
  Vector WaveV( _Real T,_Vector R,Vector &V ); // точки + скорости
 
    bool TimeW(){ return Timer(); }
-
-//void Slicks( _Point A,_Point B,_Vector N ) // отражение нормальной компоненты
-//{ Wind.Slick( A,B,N ),Swell.Slick( A,B,N ),Surge.Slick( A,B,N ); }// скорости
+/*
+ void Slicks(_Vector A,_Vector B,_Vector N ) // отражение нормальной компоненты
+ { Wind.Slick( A,B,N ),Swell.Slick( A,B,N ),Surge.Slick( A,B,N ); } // скорости
+*/
 };
 void Model_Config( Window* Win );            // запрос по моделям гидромеханики
 void wavePrint();// активная информация по волновым полям для текстовой консоли

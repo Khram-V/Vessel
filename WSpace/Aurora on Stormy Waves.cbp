@@ -29,9 +29,7 @@
 					<Add option="-m64" />
 				</Compiler>
 				<Linker>
-					<Add option="-static-libstdc++" />
 					<Add option="-static-libgcc" />
-					<Add option="-static" />
 					<Add option="-m64" />
 				</Linker>
 			</Target>
@@ -40,11 +38,12 @@
 				<Option working_dir="../Vessel" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
-				<Option compiler="gnu_gcc_stable" />
+				<Option compiler="gnu_gcc_stable32" />
 				<Option parameters='&quot;БПК «Стерегущий»-61&quot;' />
 				<Option projectCompilerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-Wno-narrowing" />
+					<Add option="-Wno-literal-suffix" />
 				</Compiler>
 				<Linker>
 					<Add library="pthread" />
@@ -56,7 +55,7 @@
 				<Option working_dir="../Vessel" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
-				<Option compiler="gnu_gcc_nightly" />
+				<Option compiler="gnu_gcc_stable" />
 				<Option parameters='&quot;OSU Regional Class Research Vessel.vsl&quot;' />
 				<Option projectCompilerOptionsRelation="2" />
 				<Compiler>
@@ -64,6 +63,7 @@
 				</Compiler>
 				<Linker>
 					<Add library="pthread" />
+					<Add library="dl" />
 				</Linker>
 			</Target>
 			<Target title="Waves Profile">
