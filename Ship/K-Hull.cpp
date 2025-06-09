@@ -10,12 +10,12 @@
 //                  1997, январь, В.Храмушин, Южно-Сахалинск
 //                  2001, август - Владивосток, октябрь - ГС-210
 //                  2018, июль - Санкт-Петербург, ПМ-ПУ СПбГУ
-//                  2020 - ‏יְרוּשָׁלַיִם‏‎ .
+//                  2020÷25 - ‏יְרוּשָׁלַיִם‏‎ .
 #include <stdio.h>
 #include "Hull.h"
 
-static char *Str=(char*)"\0\n<<МИДВ-85>>\n©1975-2024, В.Храмушин,"
-                      " Сахалин - Санкт-Петербург  - ‏יְרוּשָׁלַיִם‏‎ - \n",
+static char *Str=(char*)"\0\n<<МИДВ-85>>\n©1975-2025, В.Храмушин,"
+                      " Сахалин - Петергоф - ‏יְרוּשָׁלַיִם‏‎ - \n",
             *FileName=0;
 static FILE *Fh=NULL;       // файл исходных данных по таблице плазовых ординат
 static void FGetS();        // чтение строки с переадресацией на внешнюю память
@@ -42,20 +42,27 @@ void Hull::Simple_Hull( int Nx, int Nz, int Nf )
   Stx.allocate( Nf ),Sty.allocate( Nf ),
   Asx.allocate( Nf ),Asy.allocate( Nf );
 }
-void Hull::Aphines( _Real cX,_Real cY,_Real cZ )
-{ Xo*=cX; Xm*=cX; Length*=cX;  Lwl*=cX; Lmx*=cY;
-                  Breadth*=cY; Bwl*=cY; Bmx*=cY;
-  Do*=cZ;         Draught*=cZ; Depth*=cZ;
-  Volume *= cX*cY*cZ;
-  Surface*= pow( cX*cY*cZ,2.0/3.0 ); // (cX*cX+cY*cY+cZ*cZ)/3.0;
-  for( int k=0; k<Ns; k++ )
-  { for( int i=0; i<=F[k].N; i++ )F[k].z[i]*=cZ,F[k].y[i]*=cY;
-    F[k].X*=cX; F[k].SpLine();
+void Hull::Aphines
+( _Real cX,_Real cY,_Real cZ, _Real dX,_Real dZ, Real Lc,Real Ac )
+{ if( Lc>eps ){ Lc/=1000.0; Ac=cos( Ac*_dR );
+    for( int i; i<Ns; i++ )F[i].Opt( Lc,Ac );          // сброс лишних узлов
+    Stx.Opt( Lc,Ac ); Asx.Opt( Lc,Ac );                // на отрезках меньше Lc
+    Sty.Opt( Lc,Ac ); Asy.Opt( Lc,Ac );                //          под углом Ac
   }
-  for( int i=0; i<=Stx.N; i++ )Stx[i]*=cX,Stx(i)*=cZ; //Stx.Easy();
-  for( int i=0; i<=Asx.N; i++ )Asx[i]*=cX,Asx(i)*=cZ; //Asx.Easy();
-  for( int i=0; i<=Sty.N; i++ )Sty[i]*=cY,Sty(i)*=cZ; //Sty.Easy();
-  for( int i=0; i<=Asy.N; i++ )Asy[i]*=cY,Asy(i)*=cZ; //Asy.Easy();
+  Length*=cX;  Lwl*=cX; Lmx*=cY;                       // масштабирование всех
+  Breadth*=cY; Bwl*=cY; Bmx*=cY;                       // главных размерений
+  Draught*=cZ; Depth*=cZ;
+  Volume *= cX*cY*cZ;
+  Surface*= pow( cX*cY*cZ,2.0/3.0 ); // и то не точно: (cX*cX+cY*cY+cZ*cZ)/3.0;
+  Xo=(Xo+dX)*cX; Xm=(Xm+dX)*cX; Do=(Do+dZ)*cZ;
+  for( int k=0; k<Ns; k++ )
+  { for( int i=0; i<=F[k].N; i++ )F[k].z[i]=(F[k].z[i]+dZ)*cZ,F[k].y[i]*=cY;
+    F[k].X=(F[k].X+dX)*cX; F[k].SpLine();
+  }
+  for( int i=0; i<=Stx.N; i++ )Stx[i]=(Stx[i]+dX)*cX,Stx(i)=(Stx(i)+dZ)*cZ; //Stx.Easy();
+  for( int i=0; i<=Asx.N; i++ )Asx[i]=(Asx[i]+dX)*cX,Asx(i)=(Asx(i)+dZ)*cZ; //Asx.Easy();
+  for( int i=0; i<=Sty.N; i++ )Sty[i]*=cY,Sty(i)=(Sty(i)+dZ)*cZ;            //Sty.Easy();
+  for( int i=0; i<=Asy.N; i++ )Asy[i]*=cY,Asy(i)=(Asy(i)+dZ)*cZ;            //Asy.Easy();
   MinMax();
   Init();
 }
@@ -86,15 +93,17 @@ void Hull::ModelEx( Real &cL, Real &cB, int cN, int cM )
     } strcpy( Name,"Кирпич - прямоугольный параллелепипед" );
   } else
   { for( i=0; i<cN; i++ )
-    { Real si=sin( i*da ),ci=cos( i*da ),R=Draught*si;
-      F[i].X=ci*Xo;
-      for( j=0; j<cN; j++ )Add( F[i],Draught-cos( j*da )*R,sin( j*da )*R,j );
+    { Real si=sin( i*da ),ci=cos( i*da ),R=Draught*si,r=R;
+      if( cM<3 )F[i].X=ci*Xo;
+        else r=(F[i].X=Xo+i*dx)/Xo,r=Draught*sqrt( 1-r*r );            //     Real ww=(Xo+i*dx)/Xo;
+      for( j=0; j<cN; j++ )
+        Add( F[i], Draught-cos( j*da )*r,                              //(cM<3?R:Draught*sqrt(1-ww*ww)),
+                           sin( j*da )*R, j );
       Add( Stx,Draught*( 1-ci ),-si*Xo,i); Add( Sty,Draught*( 1-ci ),0,i );
       Add( Asx,Draught*( 1-ci ),si*Xo,i ); Add( Asy,Draught*( 1-ci ),0,i );
       F[i].Easy();
     }
-    if( cM==1 )strcpy( Name,"Эллипс - удлинённый шарик" );
-    else
+    if( cM==1 )strcpy( Name,"Эллипс - удлинённый шарик" ); else
     { for( i=0; i<cN; i++ )
       { for( j=0; j<cN/2; j++ )F[i](j)=F[cN/2](j);
         if( i<cN/2 ){ Stx[i]=-Xo; Stx(i)=i*dz;
@@ -103,11 +112,15 @@ void Hull::ModelEx( Real &cL, Real &cB, int cN, int cM )
       if( cM==2 )
         strcpy( Name,"Шлюпка - эллипсоид с равноудалёнными ватерлиниями" );
       else
-      { strcpy( Name,"Корпус - эллипсоид с обводами кубической полноты" );
+      { strcpy( Name,"Корпус - синусоидальные обводы кубической полноты" );
         for( i=0; i<cN; i++ )
-        for( j=0; j<cN/2; j++ )
-          F[i][j]=F[i][cN/2]*( 1-pow( Real( cN/2-j )*2.0/cN,3 ) );
-  } } }
+        { for( j=0; j<cN/2; j++ )
+          { F[i][j]=F[i][cN/2]*( 1-pow( Real( cN/2-j )*2.0/cN,3 ) );
+          } //F[i].X=Xo+i*dx; //  *=cos( i*da );
+        }
+      }
+    }
+  }
   Free( F[0] );
   Free( F[cN-1] );
   Stx.Easy(); Sty.Easy(); Asx.Easy(); Asy.Easy(); MinMax(); Init(); //BilgeEx()
@@ -117,18 +130,18 @@ void Hull::ModelEx( Real &cL, Real &cB, int cN, int cM )
 static Real Bilge( _Real _x,_Real p=(5.0/3.0) )
 { return 0.5*( 1 + sin( ( pow( fabs( _x-0.5 )*2,p )/2+0.5 )*_Pd*1.5 ) );
 }
-void Hull::BilgeEx()
+void Hull::BilgeEx( _Real zMax, _Real Pw )
 { Real cz,cx=F[0].X,cl=F[Nstem].X-cx;  // разметка длины между перпендикулярами
   for( int i=0; i<Ns; i++ )
   { cz=Bilge( (F[i].X-cx)/cl );                           // аргумент от 0 до 1
-    for( int j=0; j<F[i].N && F[i](j)<Draught; j++ )
-      F[i][j] *= 1-cz*pow( ( Draught-F[i](j) )/Draught,3 ); }
+    for( int j=0; j<F[i].N && F[i](j)<zMax; j++ )
+      F[i][j] *= 1-cz*pow( ( zMax-F[i](j) )/zMax,Pw ); }
   for( int i=0; i<=Asy.N; i++ )               // As-ахтерштевень, St-форштевень
-   if( ( cz=Asy( i ) )<Draught )
-    Asy[i] *= 1-Bilge( (Asx(cz)-cx)/cl )*pow( (Draught-cz)/Draught,3 );
+   if( ( cz=Asy( i ) )<zMax )
+    Asy[i] *= 1-Bilge( (Asx(cz)-cx)/cl )*pow( (zMax-cz)/zMax,Pw );
   for( int i=0; i<=Sty.N; i++ )
-   if( ( cz=Sty( i ) )<Draught )
-    Sty[i] *= 1-Bilge( (Stx(cz)-cx)/cl )*pow((Draught-cz)/Draught,3);
+   if( ( cz=Sty( i ) )<zMax )
+    Sty[i] *= 1-Bilge( (Stx(cz)-cx)/cl )*pow((zMax-cz)/zMax,Pw );
   MinMax();
   Init();
 }

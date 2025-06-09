@@ -8,7 +8,6 @@
 //                      2001.11.02, В.Храмушин, НИС "П.Гордиенко",
 //                                              Татарский пролив
 #include "Hull.h"
-#define eps 1.0e-12
 
 Frame::Frame( int l )
      { Spl=false; y=z=_x=_y=0; N=0; X=min=max=0; if( l>0 )allocate( l ); }
@@ -38,6 +37,18 @@ void Hull::MinMax()
   Lwl=Stx.G( Draught,true )-Asx.G( Draught,true );       // длина по ватерлинии
   if( Ns<3 )Xm=( F[0].X+F[1].X )/2; else Xm=F[Ms].X;     // абсцисса для миделя
   Bwl=Y( Xm,Draught )*2.0;                       // ширина ватерлинии на миделе
+}
+void Frame::Opt( _Real Lc, _Real Ac )   // поиск со сбросом коротких рёбер < Lc
+{ if( N>=2 )                            // если косинус угла гладкости < La
+  { complex a,b; Real la,lb; int i,k;
+    for( i=k=1; i<N; i++ )
+    { a.x=z[k]-z[k-1],a.y=y[k]-y[k-1]; la=abs( a ); // вектор обновлённый
+      b.x=z[i+1]-z[k],b.y=y[i+1]-y[k]; lb=abs( b ); // и вектор удлинённый
+      if( la<eps || lb<eps                    // совпадающие точки пропускаются
+      || la+lb>Lc || (a%b)/la/lb<Ac )k++;     // длина и косинус гладкости узла
+      if( k<i+1 )z[k]=z[i+1],y[k]=y[i+1];
+    } N=k;                                    // N=N-1 - или в последний отсчёт
+  }
 }
 //!   Предварительный расчет для построения сплайн-функции
 //!   с аргументом-параметром по реальному расстоянию между точками

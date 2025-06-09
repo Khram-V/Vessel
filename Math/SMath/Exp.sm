@@ -1,0 +1,205 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?application progid="SMath Solver" version="1.3.0.9126"?>
+<worksheet xmlns="http://smath.info/schemas/worksheet/1.0">
+  <settings ppi="96">
+    <identity>
+      <id>d2a8cd7a-bb04-45f6-a148-2fb487549a0a</id>
+      <revision>6</revision>
+    </identity>
+    <metadata lang="rus">
+      <author>Василий Николаевич Храмушин</author>
+    </metadata>
+    <calculation>
+      <precision>4</precision>
+      <exponentialThreshold>5</exponentialThreshold>
+      <trailingZeros>false</trailingZeros>
+      <significantDigitsMode>false</significantDigitsMode>
+      <mixedNumbers>false</mixedNumbers>
+      <roundingMode>0</roundingMode>
+      <approximateEqualAccuracy>0</approximateEqualAccuracy>
+      <fractions>decimal</fractions>
+    </calculation>
+    <pageModel active="false" viewMode="2" printGrid="false" printAreas="true" simpleEqualsOnly="false" printBackgroundImages="true" hideElementsHighlightings="false">
+      <paper id="9" orientation="Portrait" width="827" height="1169" />
+      <margins left="39" right="39" top="49" bottom="49" />
+      <header alignment="Center" color="#a9a9a9">&amp;[DATE] &amp;[TIME] - &amp;[FILENAME]</header>
+      <footer alignment="Center" color="#a9a9a9">&amp;[PAGENUM] / &amp;[COUNT]</footer>
+      <backgrounds />
+    </pageModel>
+    <dependencies>
+      <assembly name="SMath Core" version="1.73.9126.0" guid="a37cba83-b69c-4c71-9992-55ff666763bd" />
+      <assembly name="MathRegion" version="1.73.9126.0" guid="02f1ab51-215b-466e-a74d-5d8b1cf85e8d" />
+      <assembly name="X-Y Plot Region (JXCharts)" version="0.3.9106.25707" guid="c12231ec-4873-43c1-a7d0-a167ebd17066" />
+    </dependencies>
+  </settings>
+  <regions type="content">
+    <region left="36" top="9" width="145" height="44" color="#0000ff" fontSize="10">
+      <math decimalPlaces="7" exponentialThreshold="7">
+        <input>
+          <e type="operand">x</e>
+          <e type="function" args="1">y</e>
+          <e type="operand">x</e>
+          <e type="operand">2</e>
+          <e type="operator" args="2">^</e>
+          <e type="function" args="1">exp</e>
+          <e type="operand">1</e>
+          <e type="operator" args="1">-</e>
+          <e type="operator" args="2">^</e>
+          <e type="operator" args="2">:</e>
+        </input>
+      </math>
+    </region>
+    <region left="243" top="36" width="125" height="52" color="#000000" fontSize="10">
+      <math decimalPlaces="7" exponentialThreshold="7">
+        <input>
+          <e type="operand">x</e>
+          <e type="function" args="1">y</e>
+        </input>
+        <result action="symbolic">
+          <e type="operand">1</e>
+          <e type="operand">x</e>
+          <e type="operand">2</e>
+          <e type="operator" args="2">^</e>
+          <e type="function" args="1">exp</e>
+          <e type="operator" args="2">/</e>
+        </result>
+      </math>
+    </region>
+    <region left="36" top="90" width="135" height="35" color="#ff0000" fontSize="10">
+      <math decimalPlaces="7" exponentialThreshold="7">
+        <input>
+          <e type="operand">x</e>
+          <e type="function" args="1">v</e>
+          <e type="operand">x</e>
+          <e type="function" args="1">exp</e>
+          <e type="operand">1</e>
+          <e type="operator" args="1">-</e>
+          <e type="operator" args="2">^</e>
+          <e type="operator" args="2">:</e>
+        </input>
+      </math>
+    </region>
+    <region left="243" top="108" width="115" height="43" color="#000000" fontSize="10">
+      <math decimalPlaces="7" exponentialThreshold="7">
+        <input>
+          <e type="operand">x</e>
+          <e type="function" args="1">v</e>
+        </input>
+        <result action="symbolic">
+          <e type="operand">1</e>
+          <e type="operand">x</e>
+          <e type="function" args="1">exp</e>
+          <e type="operator" args="2">/</e>
+        </result>
+      </math>
+    </region>
+    <region left="36" top="135" width="181" height="44" color="#008000" fontSize="10">
+      <math decimalPlaces="7" exponentialThreshold="7">
+        <input>
+          <e type="operand">x</e>
+          <e type="function" args="1">w</e>
+          <e type="operand">1</e>
+          <e type="operand">x</e>
+          <e type="operand">2</e>
+          <e type="operator" args="1">-</e>
+          <e type="operator" args="2">^</e>
+          <e type="function" args="1">exp</e>
+          <e type="operand">1</e>
+          <e type="operator" args="1">-</e>
+          <e type="operator" args="2">^</e>
+          <e type="operator" args="2">-</e>
+          <e type="operator" args="2">:</e>
+        </input>
+      </math>
+    </region>
+    <region left="306" top="135" width="152" height="97" color="#000000" fontSize="10">
+      <math decimalPlaces="7" exponentialThreshold="7">
+        <input>
+          <e type="operand">x</e>
+          <e type="function" args="1">w</e>
+        </input>
+        <result action="symbolic">
+          <e type="operand">1</e>
+          <e type="operand">x</e>
+          <e type="operand">2</e>
+          <e type="operator" args="2">^</e>
+          <e type="operator" args="2">/</e>
+          <e type="function" args="1">exp</e>
+          <e type="operand">1</e>
+          <e type="operator" args="2">-</e>
+          <e type="operand">1</e>
+          <e type="operand">x</e>
+          <e type="operand">2</e>
+          <e type="operator" args="2">^</e>
+          <e type="operator" args="2">/</e>
+          <e type="function" args="1">exp</e>
+          <e type="operator" args="2">/</e>
+        </result>
+      </math>
+    </region>
+    <region left="36" top="198" width="161" height="44" color="#800080" fontSize="10">
+      <math decimalPlaces="7" exponentialThreshold="7">
+        <input>
+          <e type="operand">x</e>
+          <e type="function" args="1">z</e>
+          <e type="operand">x</e>
+          <e type="operand">2</e>
+          <e type="operator" args="2">^</e>
+          <e type="function" args="1">exp</e>
+          <e type="operand">0.5</e>
+          <e type="operator" args="1">-</e>
+          <e type="operator" args="2">^</e>
+          <e type="operator" args="2">:</e>
+        </input>
+      </math>
+    </region>
+    <region left="243" top="225" width="139" height="54" color="#000000" fontSize="10">
+      <math decimalPlaces="7" exponentialThreshold="7">
+        <input>
+          <e type="operand">x</e>
+          <e type="function" args="1">z</e>
+        </input>
+        <result action="symbolic">
+          <e type="operand">1</e>
+          <e type="operand">x</e>
+          <e type="operand">2</e>
+          <e type="operator" args="2">^</e>
+          <e type="function" args="1">exp</e>
+          <e type="function" args="1">sqrt</e>
+          <e type="operator" args="2">/</e>
+        </result>
+      </math>
+    </region>
+    <region left="9" top="288" width="757" height="394" color="#000000" fontSize="10">
+      <xyplot width="747" height="386" points="1000" name="XYPlot">
+        <chartstyle usedefault="false" backcolor="White" bordercolor="Black" />
+        <grid gridcolor="LightGray" gridpattern="Dash" gridthickness="1" isxgrid="true" isygrid="true" isy2grid="false" />
+        <xaxes xmin="-4.032128" xmax="3.967871" xtick="1" visible="True" decimalplaces="3" numberformat="General" />
+        <yaxes ymin="-0.3553638" ymax="2.024296" ytick="0.5" visible="True" decimalplaces="3" numberformat="General" />
+        <y2axes isy2axis="false" y2min="-1" y2max="1" y2tick="0.5" visible="True" decimalplaces="3" numberformat="General" />
+        <title2d title="" titlefont="Arial, 10pt" titlefontcolor="Black" />
+        <xylabel labelfont="Arial, 10pt" labelfontcolor="Black" tickfont="Arial, 8pt" tickfontcolor="Black" xlabel="x" ylabel="y" y2label="y2" />
+        <legend isbordervisible="true" islegendvisible="true" legendbackcolor="White" legendbordercolor="Black" legendfont="Arial, 8pt" legendposition="NorthEast" textcolor="Black" />
+        <traces>
+          <trace seriesname="y" isy2data="false" isvisible="true" plotmethod="Lines" lineantialias="true" linecolor="Blue" linethickness="1" linepattern="Solid" filled="false" hatched="false" fillcolor="64, 0, 0, 255" hatchstyle="Percent20" symbolantialias="true" symbolsize="8" symboltype="None" symbolborderthickness="1" symbolbordercolor="Black" symbolfillcolor="White" />
+          <trace seriesname="v" isy2data="false" isvisible="true" plotmethod="Lines" lineantialias="true" linecolor="Red" linethickness="1" linepattern="Solid" filled="false" hatched="false" fillcolor="64, 0, 0, 255" hatchstyle="Percent20" symbolantialias="true" symbolsize="8" symboltype="None" symbolborderthickness="1" symbolbordercolor="Black" symbolfillcolor="White" />
+          <trace seriesname="w" isy2data="false" isvisible="true" plotmethod="Lines" lineantialias="true" linecolor="Green" linethickness="1" linepattern="Solid" filled="false" hatched="false" fillcolor="64, 0, 0, 255" hatchstyle="Percent20" symbolantialias="true" symbolsize="8" symboltype="None" symbolborderthickness="1" symbolbordercolor="Black" symbolfillcolor="White" />
+          <trace seriesname="z" isy2data="false" isvisible="true" plotmethod="Lines" lineantialias="true" linecolor="Fuchsia" linethickness="1" linepattern="Solid" filled="false" hatched="false" fillcolor="64, 0, 0, 255" hatchstyle="Percent20" symbolantialias="true" symbolsize="8" symboltype="None" symbolborderthickness="1" symbolbordercolor="Black" symbolfillcolor="White" />
+        </traces>
+        <input>
+          <e type="operand">x</e>
+          <e type="function" args="1">y</e>
+          <e type="operand">x</e>
+          <e type="function" args="1">v</e>
+          <e type="operand">x</e>
+          <e type="function" args="1">w</e>
+          <e type="operand">x</e>
+          <e type="function" args="1">z</e>
+          <e type="operand">4</e>
+          <e type="operand">1</e>
+          <e type="function" args="6">sys</e>
+        </input>
+      </xyplot>
+    </region>
+  </regions>
+</worksheet>

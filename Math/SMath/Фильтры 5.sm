@@ -1,0 +1,955 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?application progid="SMath Studio Desktop" version="0.99.7822.147"?>
+<worksheet xmlns="http://smath.info/schemas/worksheet/1.0">
+  <settings ppi="96">
+    <identity>
+      <id>ed635f5e-ed8a-4935-8d47-95a3a943079d</id>
+      <revision>20</revision>
+    </identity>
+    <calculation>
+      <precision>7</precision>
+      <exponentialThreshold>7</exponentialThreshold>
+      <trailingZeros>false</trailingZeros>
+      <significantDigitsMode>false</significantDigitsMode>
+      <roundingMode>0</roundingMode>
+      <fractions>decimal</fractions>
+    </calculation>
+    <pageModel active="false" viewMode="2" printGrid="false" printAreas="true" simpleEqualsOnly="false" printBackgroundImages="true">
+      <paper id="9" orientation="Landscape" width="1169" height="827" />
+      <margins left="39" right="39" top="49" bottom="49" />
+      <header alignment="Center" color="#a9a9a9">&amp;[DATE] &amp;[TIME] - &amp;[FILENAME]</header>
+      <footer alignment="Center" color="#a9a9a9">&amp;[PAGENUM] / &amp;[COUNT]</footer>
+      <backgrounds />
+    </pageModel>
+    <dependencies>
+      <assembly name="SMath Studio Desktop" version="0.99.7822.147" guid="a37cba83-b69c-4c71-9992-55ff666763bd" />
+      <assembly name="MathRegion" version="1.11.7822.147" guid="02f1ab51-215b-466e-a74d-5d8b1cf85e8d" />
+      <assembly name="SpecialFunctions" version="1.12.7822.147" guid="2814e667-4e12-48b1-8d51-194e480eabc5" />
+      <assembly name="TextRegion" version="1.11.7822.147" guid="485d28c5-349a-48b6-93be-12a35a1c1e39" />
+    </dependencies>
+  </settings>
+  <regions type="content">
+    <region left="0" top="0" width="1069" height="83" color="#000080" fontSize="10">
+      <math decimalPlaces="4" exponentialThreshold="5" breaking="210">
+        <input>
+          <e type="operand">x</e>
+          <e type="function" args="1">F</e>
+          <e type="operand">f0</e>
+          <e type="operand">x</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">x0</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">/</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">x0</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">/</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">x0</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">/</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">x0</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">/</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">f1</e>
+          <e type="operand">x</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">x1</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">/</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">x1</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">/</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">x1</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">/</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">x1</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">/</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">+</e>
+          <e type="operand">f2</e>
+          <e type="operand">x</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">x2</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">/</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">x2</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">/</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">x2</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">/</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">x2</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">/</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">f3</e>
+          <e type="operand">x</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">x3</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">/</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">x3</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">/</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">x3</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">/</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">x3</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">/</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">+</e>
+          <e type="operand">f4</e>
+          <e type="operand">x</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">x4</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">/</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">x4</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">/</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">x4</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">/</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">x4</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">/</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">+</e>
+          <e type="operator" args="2">+</e>
+          <e type="operator" args="2">:</e>
+        </input>
+      </math>
+    </region>
+    <region left="0" top="81" width="4319" height="60" color="#008000" fontSize="8">
+      <math fractionType="fraction" decimalPlaces="4" exponentialThreshold="5" breaking="466">
+        <input>
+          <e type="operand">x</e>
+          <e type="function" args="1">F</e>
+        </input>
+        <result action="symbolic">
+          <e type="operand">x</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">x</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">x</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">f0</e>
+          <e type="operand">x</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x1</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x1</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x1</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x1</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">f1</e>
+          <e type="operand">x</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x0</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x0</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x0</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x0</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">+</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x2</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x2</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x2</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x2</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">f2</e>
+          <e type="operand">x</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x1</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x1</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x1</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x1</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x0</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x0</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x0</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x0</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">+</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x3</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x3</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x3</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x3</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">f3</e>
+          <e type="operand">x</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x2</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x2</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x2</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x2</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x1</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x1</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x1</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x1</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x0</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x0</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x0</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x0</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">+</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x4</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x4</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x4</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x4</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">f4</e>
+          <e type="operand">x</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x3</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x3</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x3</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x3</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x2</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x2</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x2</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x2</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x1</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x1</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x1</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x1</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x0</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x0</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x0</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x0</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">+</e>
+          <e type="operand">x4</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">x4</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x4</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x4</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x3</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x3</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x3</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x3</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x2</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x2</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x2</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x2</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x1</e>
+          <e type="operand">x0</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x1</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x1</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x1</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x0</e>
+          <e type="operand">x1</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x0</e>
+          <e type="operand">x2</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x0</e>
+          <e type="operand">x3</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">x0</e>
+          <e type="operand">x4</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">/</e>
+        </result>
+      </math>
+    </region>
+    <region left="81" top="198" width="334" height="29" color="#004080" fontSize="14">
+      <text lang="rus" fontFamily="Arial" fontSize="10">
+        <content>
+          <p style="font-size: 14px; color: #004080;">Симметричный треугольный фильтр</p>
+        </content>
+      </text>
+    </region>
+    <region left="450" top="198" width="337" height="29" color="#004080" fontSize="14">
+      <text lang="rus" fontFamily="Arial" fontSize="10">
+        <content>
+          <p style="font-size: 14px; color: #004080;">Односторонний треугольный фильтр</p>
+        </content>
+      </text>
+    </region>
+    <region left="0" top="234" width="83" height="30" color="#000000" fontSize="14">
+      <math decimalPlaces="4" exponentialThreshold="5">
+        <input>
+          <e type="operand">n</e>
+          <e type="operand">5.0</e>
+          <e type="operator" args="2">:</e>
+        </input>
+      </math>
+    </region>
+    <region left="0" top="252" width="367" height="75" color="#000000" fontSize="20">
+      <math decimalPlaces="4" exponentialThreshold="5">
+        <input>
+          <e type="operand">i</e>
+          <e type="function" args="1">w</e>
+          <e type="operand">n</e>
+          <e type="operand">n</e>
+          <e type="operand">2</e>
+          <e type="operand">i</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">-</e>
+          <e type="operand">0.5</e>
+          <e type="operator" args="2">-</e>
+          <e type="function" args="1">abs</e>
+          <e type="operator" args="2">-</e>
+          <e type="operand">n</e>
+          <e type="operand">n</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">/</e>
+          <e type="operand">2</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">:</e>
+        </input>
+      </math>
+    </region>
+    <region left="459" top="252" width="201" height="73" color="#000000" fontSize="20">
+      <math decimalPlaces="4" exponentialThreshold="5">
+        <input>
+          <e type="operand">i</e>
+          <e type="function" args="1">p</e>
+          <e type="operand">i</e>
+          <e type="operand">0.5</e>
+          <e type="operator" args="2">+</e>
+          <e type="operand">n</e>
+          <e type="operand">n</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">/</e>
+          <e type="operator" args="2">:</e>
+        </input>
+      </math>
+    </region>
+    <region left="9" top="324" width="91" height="26" color="#000000" fontSize="10">
+      <math decimalPlaces="4" exponentialThreshold="5">
+        <input>
+          <e type="operand">0</e>
+          <e type="function" args="1">w</e>
+        </input>
+        <result action="numeric">
+          <e type="operand">0.04</e>
+        </result>
+      </math>
+    </region>
+    <region left="180" top="324" width="154" height="107" color="#ff0000" fontSize="16">
+      <math decimalPlaces="4" exponentialThreshold="5">
+        <input>
+          <e type="operand">j</e>
+          <e type="function" args="1">w</e>
+          <e type="operand">j</e>
+          <e type="operand">0</e>
+          <e type="operand">n</e>
+          <e type="operand">1</e>
+          <e type="operator" args="2">-</e>
+          <e type="function" args="4">sum</e>
+        </input>
+        <result action="numeric">
+          <e type="operand">1</e>
+        </result>
+      </math>
+    </region>
+    <region left="468" top="324" width="91" height="26" color="#000000" fontSize="10">
+      <math decimalPlaces="4" exponentialThreshold="5">
+        <input>
+          <e type="operand">0</e>
+          <e type="function" args="1">p</e>
+        </input>
+        <result action="numeric">
+          <e type="operand">0.02</e>
+        </result>
+      </math>
+    </region>
+    <region left="639" top="324" width="179" height="107" color="#ff0000" fontSize="16">
+      <math decimalPlaces="4" exponentialThreshold="5">
+        <input>
+          <e type="operand">j</e>
+          <e type="function" args="1">p</e>
+          <e type="operand">j</e>
+          <e type="operand">0</e>
+          <e type="operand">n</e>
+          <e type="operand">1</e>
+          <e type="operator" args="2">-</e>
+          <e type="function" args="4">sum</e>
+        </input>
+        <result action="numeric">
+          <e type="operand">0.5</e>
+        </result>
+      </math>
+    </region>
+    <region left="9" top="342" width="120" height="43" color="#000000" fontSize="10">
+      <math decimalPlaces="4" exponentialThreshold="5">
+        <input>
+          <e type="operand">n</e>
+          <e type="operand">2</e>
+          <e type="operator" args="2">/</e>
+          <e type="operand">1</e>
+          <e type="operator" args="2">-</e>
+          <e type="function" args="1">w</e>
+        </input>
+        <result action="numeric">
+          <e type="operand">0.28</e>
+        </result>
+      </math>
+    </region>
+    <region left="468" top="342" width="120" height="43" color="#000000" fontSize="10">
+      <math decimalPlaces="4" exponentialThreshold="5">
+        <input>
+          <e type="operand">n</e>
+          <e type="operand">2</e>
+          <e type="operator" args="2">/</e>
+          <e type="operand">1</e>
+          <e type="operator" args="2">-</e>
+          <e type="function" args="1">p</e>
+        </input>
+        <result action="numeric">
+          <e type="operand">0.08</e>
+        </result>
+      </math>
+    </region>
+    <region left="9" top="378" width="97" height="43" color="#000000" fontSize="10">
+      <math decimalPlaces="4" exponentialThreshold="5">
+        <input>
+          <e type="operand">n</e>
+          <e type="operand">2</e>
+          <e type="operator" args="2">/</e>
+          <e type="function" args="1">w</e>
+        </input>
+        <result action="numeric">
+          <e type="operand">0.36</e>
+        </result>
+      </math>
+    </region>
+    <region left="468" top="378" width="97" height="43" color="#000000" fontSize="10">
+      <math decimalPlaces="4" exponentialThreshold="5">
+        <input>
+          <e type="operand">n</e>
+          <e type="operand">2</e>
+          <e type="operator" args="2">/</e>
+          <e type="function" args="1">p</e>
+        </input>
+        <result action="numeric">
+          <e type="operand">0.12</e>
+        </result>
+      </math>
+    </region>
+    <region left="9" top="414" width="114" height="43" color="#000000" fontSize="10">
+      <math decimalPlaces="4" exponentialThreshold="5">
+        <input>
+          <e type="operand">n</e>
+          <e type="operand">2</e>
+          <e type="operator" args="2">/</e>
+          <e type="operand">1</e>
+          <e type="operator" args="2">+</e>
+          <e type="function" args="1">w</e>
+        </input>
+        <result action="numeric">
+          <e type="operand">0.2</e>
+        </result>
+      </math>
+    </region>
+    <region left="468" top="414" width="122" height="43" color="#000000" fontSize="10">
+      <math decimalPlaces="4" exponentialThreshold="5">
+        <input>
+          <e type="operand">n</e>
+          <e type="operand">2</e>
+          <e type="operator" args="2">/</e>
+          <e type="operand">1</e>
+          <e type="operator" args="2">+</e>
+          <e type="function" args="1">p</e>
+        </input>
+        <result action="numeric">
+          <e type="operand">0.16</e>
+        </result>
+      </math>
+    </region>
+    <region left="9" top="450" width="116" height="26" color="#000000" fontSize="10">
+      <math decimalPlaces="4" exponentialThreshold="5">
+        <input>
+          <e type="operand">n</e>
+          <e type="operand">1</e>
+          <e type="operator" args="2">-</e>
+          <e type="function" args="1">w</e>
+        </input>
+        <result action="numeric">
+          <e type="operand">0.12</e>
+        </result>
+      </math>
+    </region>
+    <region left="468" top="450" width="116" height="26" color="#000000" fontSize="10">
+      <math decimalPlaces="4" exponentialThreshold="5">
+        <input>
+          <e type="operand">n</e>
+          <e type="operand">1</e>
+          <e type="operator" args="2">-</e>
+          <e type="function" args="1">p</e>
+        </input>
+        <result action="numeric">
+          <e type="operand">0.18</e>
+        </result>
+      </math>
+    </region>
+  </regions>
+</worksheet>

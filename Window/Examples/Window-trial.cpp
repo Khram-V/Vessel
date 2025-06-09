@@ -146,6 +146,27 @@ int main( int argc, char **argv )
     printf("Hello world: %d => Thread_num %d, num_threads %d, max_threads %d\n",
       np++,omp_get_thread_num(),omp_get_num_threads(),omp_get_max_threads() );
   }
+DISPLAY_DEVICE display_device;
+display_device.cb = sizeof(display_device);
+  printf( "\nsizeof(DISPLAY_DEVICE) = %d\n",display_device.cb );
+  for( int i=0; EnumDisplayDevices( NULL,i,&display_device,0 ); ++i )
+  if( display_device.StateFlags )
+  {                   // дальше выводите информацию из структуры display_device
+    printf( "Display(%d), ",i+1 );   display_device.DeviceKey[69]=0;
+    printf( "DeviceName=%s  ",display_device.DeviceName );
+    printf( "StateFlags=%u\n",display_device.StateFlags );
+    printf( "DeviceID  =%s\n",display_device.DeviceID );
+    printf( "DeviceKey =%s\n",display_device.DeviceKey );
+/*DWORD cb;
+  CHAR DeviceString[128];
+  DWORD StateFlags;
+  CHAR DeviceID[128];
+  CHAR DeviceKey[128];
+*/
+  }
+
+
+
   Visual3D_Lightening();            // здесь пока существует только первое окно
   One.Above();
   One.Window::Mouse( ::MouseMove );

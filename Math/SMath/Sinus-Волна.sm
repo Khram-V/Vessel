@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?application progid="SMath Solver" version="1.3.0.9126"?>
+<worksheet xmlns="http://smath.info/schemas/worksheet/1.0">
+  <settings ppi="96">
+    <identity>
+      <id>506b5899-49b4-473b-a1a0-8577bd788fbc</id>
+      <revision>7</revision>
+    </identity>
+    <metadata lang="rus">
+      <author>Василий Николаевич Храмушин</author>
+    </metadata>
+    <calculation>
+      <precision>4</precision>
+      <exponentialThreshold>5</exponentialThreshold>
+      <trailingZeros>false</trailingZeros>
+      <significantDigitsMode>false</significantDigitsMode>
+      <mixedNumbers>false</mixedNumbers>
+      <roundingMode>0</roundingMode>
+      <approximateEqualAccuracy>0</approximateEqualAccuracy>
+      <fractions>decimal</fractions>
+    </calculation>
+    <pageModel active="false" viewMode="2" printGrid="false" printAreas="true" simpleEqualsOnly="false" printBackgroundImages="true" hideElementsHighlightings="true">
+      <paper id="9" orientation="Portrait" width="827" height="1169" />
+      <margins left="39" right="39" top="49" bottom="49" />
+      <header alignment="Center" color="#a9a9a9">&amp;[DATE] &amp;[TIME] - &amp;[FILENAME]</header>
+      <footer alignment="Center" color="#a9a9a9">&amp;[PAGENUM] / &amp;[COUNT]</footer>
+      <backgrounds />
+    </pageModel>
+    <dependencies>
+      <assembly name="SMath Core" version="1.73.9126.0" guid="a37cba83-b69c-4c71-9992-55ff666763bd" />
+      <assembly name="MathRegion" version="1.73.9126.0" guid="02f1ab51-215b-466e-a74d-5d8b1cf85e8d" />
+      <assembly name="PlotRegion" version="1.73.9126.0" guid="c451c2b5-798b-4f08-b9ec-b90963d1ddaa" />
+    </dependencies>
+  </settings>
+  <regions type="content">
+    <region left="0" top="18" width="153" height="26" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand">x</e>
+          <e type="function" args="1">Y</e>
+          <e type="operand">x</e>
+          <e type="operand">1.15</e>
+          <e type="operator" args="2">*</e>
+          <e type="function" args="1">sin</e>
+          <e type="operator" args="2">:</e>
+        </input>
+      </math>
+    </region>
+    <region left="0" top="36" width="113" height="26" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand">x</e>
+          <e type="function" args="1">Z</e>
+          <e type="operand">x</e>
+          <e type="function" args="1">cos</e>
+          <e type="operator" args="2">:</e>
+        </input>
+      </math>
+    </region>
+    <region left="0" top="81" width="177" height="28" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand">x</e>
+          <e type="function" args="1">W</e>
+          <e type="operand">x</e>
+          <e type="function" args="1">cos</e>
+          <e type="operand">x</e>
+          <e type="function" args="1">Y</e>
+          <e type="operator" args="2">+</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">:</e>
+        </input>
+      </math>
+    </region>
+    <region left="0" top="180" width="652" height="227" color="#000000" fontSize="10">
+      <plot type="2d" render="lines" scale_x="1.72900306746997" scale_y="0.199337075777875" scale_z="1.72900306746997" rotate_x="0" rotate_y="0" rotate_z="0" transpose_x="-50" transpose_y="-7" transpose_z="0">
+        <description active="true" position="Top" lang="eng">
+          <content>
+            <p>W</p>
+          </content>
+        </description>
+        <input>
+          <e type="operand">x</e>
+          <e type="function" args="1">W</e>
+        </input>
+      </plot>
+    </region>
+  </regions>
+</worksheet>

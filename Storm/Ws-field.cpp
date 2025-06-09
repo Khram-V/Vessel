@@ -155,7 +155,8 @@ Field& Field::Simulation()  // моделирование волнения в и
         if( Exp.wave ){
 #pragma omp parallel for
           for( int y=0; y<mY; y++ )         // Общие результаты по уровням моря
-          for( int x=0; x<mX; x++ )if( Exp.peak )
+          for( int x=0; x<mX; x++ )
+          if( Exp.peak )
           { Vector W={ dS*x-Long/2,dS*(y-Real(mY-1)/2),0 };
               Ws[y][x] = Wind.Amd( W ) + Swell.Amd( W ) + Surge.Amd( W ) - 2*W;
           } else

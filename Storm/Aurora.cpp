@@ -454,6 +454,10 @@ int main()                                 // ( int ans, char **av, char **ac )
 //_clearfp(); unsigned CW=_control87
 //(_EM_OVERFLOW|_EM_UNDERFLOW|_EM_ZERODIVIDE|_EM_INVALID|_EM_DENORMAL,_MCW_EM);
   feclearexcept( FE_ALL_EXCEPT );     // feclear{raise}except( FE_ALL_EXCEPT );
+#ifdef _OPENMP
+  omp_set_dynamic( true );
+  omp_set_nested( true );
+#endif
   textsize( 92,40 ),
   texttitle( Title ),
   textcolor( WHITE ),print( 2,1,Title ),textcolor( LIGHTCYAN ),print(SubTitle),
@@ -505,21 +509,15 @@ int main()                                 // ( int ans, char **av, char **ac )
       .Floating( false ); // расчётами по корпусу, без графической визуализации
   Sea.SetTimer( 100 );    // вычисления по волнению с механикой корабля (½ сек)
   Ship.SetTimer( 156,Hull_and_Waves_Draw );       // изображение корабля и моря
-                   // часы и прочая оперативная информация в оконных заголовках
-//WaitTime( 600,Hull_and_Waves_Draw,10 ); Break( "????" );
+                          // часы и оперативная информация в оконных заголовках
   WaitTime( 600 );        // и ожидание исполнения вычислительных конструкторов
-#ifdef _OPENMP
-  omp_set_dynamic( true );
-  omp_set_nested( true );
-#endif
+//WaitTime( 600,Hull_and_Waves_Draw,10 ); Break( "????" );
+
 //#pragma omp parallel //sections
-//{
-//#pragma omp master
-//{
 //#pragma omp section
-//{
 //#pragma omp task
-//{
+//#pragma omp single //master
+
   do                                                                  // -=+*&#
   { static int i=0; print( 1,23,"%c",( "#0123456789ABCDEF=" )[++i%=18] ); // 🌀
     WaitTime( 333 );     // три проверки работоспособности транзакций в секунду
@@ -527,9 +525,7 @@ int main()                                 // ( int ans, char **av, char **ac )
     if( !Ship.Ready() )Sea.Close();
     if( !Sea.Ready() )Ship.Close();
   } while( WinReady() );
-//} // task
-//} // master
-//} // parallel
+
 //#pragma omp taskwait
 
   logStop();

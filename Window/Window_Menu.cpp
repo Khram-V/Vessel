@@ -170,10 +170,12 @@ static int State=0; // связка для двух Mouse - повторение
 bool TextMenu::Mouse( int x, int y )
 { if( !Up )return Place::Mouse( x,y ); x/=AlfaWidth(),y=(y-8)/AlfaHeight()+1;
   for( int k=0; k<Num; k++ )
-  { mlist &L=((mlist*)M)[k]; int l=Mestr( &L )+L.X;  // это длина строки
+  { mlist &L=((mlist*)M)[k]; int l=Mestr( &L )+L.X;         // это длина строки
     if( x<l^x<=l+L.lf && y<L.Y+0.2^y<=L.Y+1 )
       { K=k; kurs=minmax( 0,x-l,L.lf-1 ); break; }
-  } Draw(); State=0; return true; //Place::Mouse( x,y );
+    if( ked!=K )Get( &L,ked );             // и по выходу считывание результата
+  }
+  Draw(); State=0; return true; //Place::Mouse( x,y );
 }
 bool TextMenu::Mouse( int b, int x, int y )
 { if( !Up )return Place::Mouse( b,x,y );

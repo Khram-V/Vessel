@@ -1,0 +1,258 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?application progid="SMath Solver" version="1.3.0.9126"?>
+<worksheet xmlns="http://smath.info/schemas/worksheet/1.0">
+  <settings ppi="96">
+    <identity>
+      <id>894f1678-aeee-4dfd-9385-70df62f21149</id>
+      <revision>9</revision>
+    </identity>
+    <metadata lang="rus">
+      <author>Khram@mail.ru</author>
+    </metadata>
+    <calculation>
+      <precision>4</precision>
+      <exponentialThreshold>5</exponentialThreshold>
+      <trailingZeros>false</trailingZeros>
+      <significantDigitsMode>false</significantDigitsMode>
+      <mixedNumbers>false</mixedNumbers>
+      <roundingMode>0</roundingMode>
+      <approximateEqualAccuracy>0</approximateEqualAccuracy>
+      <fractions>decimal</fractions>
+    </calculation>
+    <pageModel active="false" viewMode="2" printGrid="false" printAreas="true" simpleEqualsOnly="false" printBackgroundImages="true" hideElementsHighlightings="false">
+      <paper id="9" orientation="Portrait" width="827" height="1169" />
+      <margins left="39" right="39" top="49" bottom="49" />
+      <header alignment="Center" color="#a9a9a9">&amp;[DATE] &amp;[TIME] - &amp;[FILENAME]</header>
+      <footer alignment="Center" color="#a9a9a9">&amp;[PAGENUM] / &amp;[COUNT]</footer>
+      <backgrounds />
+    </pageModel>
+    <dependencies>
+      <assembly name="SMath Core" version="1.73.9126.0" guid="a37cba83-b69c-4c71-9992-55ff666763bd" />
+      <assembly name="MathRegion" version="1.73.9126.0" guid="02f1ab51-215b-466e-a74d-5d8b1cf85e8d" />
+      <assembly name="SpecialFunctions" version="1.73.9126.0" guid="2814e667-4e12-48b1-8d51-194e480eabc5" />
+      <assembly name="PlotRegion" version="1.73.9126.0" guid="c451c2b5-798b-4f08-b9ec-b90963d1ddaa" />
+    </dependencies>
+  </settings>
+  <regions type="content">
+    <region left="63" top="9" width="62" height="24" color="#000000" fontSize="10">
+      <math decimalPlaces="7" exponentialThreshold="7">
+        <input>
+          <e type="operand">vζ</e>
+          <e type="operand">10</e>
+          <e type="operator" args="2">:</e>
+        </input>
+      </math>
+    </region>
+    <region left="63" top="45" width="70" height="24" color="#000000" fontSize="10">
+      <math decimalPlaces="7" exponentialThreshold="7">
+        <input>
+          <e type="operand">nζ</e>
+          <e type="operand">0.4</e>
+          <e type="operator" args="2">:</e>
+        </input>
+      </math>
+    </region>
+    <region left="63" top="81" width="70" height="24" color="#000000" fontSize="10">
+      <math decimalPlaces="7" exponentialThreshold="7">
+        <input>
+          <e type="operand">t</e>
+          <e type="operand">0.01</e>
+          <e type="operator" args="2">:</e>
+        </input>
+      </math>
+    </region>
+    <region left="54" top="99" width="251" height="41" color="#000000" fontSize="10">
+      <math decimalPlaces="7" exponentialThreshold="7">
+        <input>
+          <e type="operand">t</e>
+          <e type="function" args="1">ξ</e>
+          <e type="operand">vζ</e>
+          <e type="operand">2</e>
+          <e type="operand">nζ</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">/</e>
+          <e type="operand">1</e>
+          <e type="operand">2</e>
+          <e type="operand">nζ</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">t</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="1">-</e>
+          <e type="function" args="1">exp</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">:</e>
+        </input>
+      </math>
+    </region>
+    <region left="54" top="135" width="236" height="41" color="#000000" fontSize="10">
+      <math decimalPlaces="7" exponentialThreshold="7">
+        <input>
+          <e type="operand">t</e>
+          <e type="function" args="1">ζ</e>
+          <e type="operand">vζ</e>
+          <e type="operand">nζ</e>
+          <e type="operand">t</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">/</e>
+          <e type="operand">1</e>
+          <e type="operand">nζ</e>
+          <e type="operand">t</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="1">-</e>
+          <e type="function" args="1">exp</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">:</e>
+        </input>
+      </math>
+    </region>
+    <region left="54" top="171" width="133" height="26" color="#000000" fontSize="10">
+      <math decimalPlaces="7" exponentialThreshold="7">
+        <input>
+          <e type="operand">t</e>
+          <e type="function" args="1">ζ</e>
+        </input>
+        <result action="numeric">
+          <e type="operand">9.9800266</e>
+        </result>
+      </math>
+    </region>
+    <region left="369" top="198" width="403" height="279" color="#000000" fontSize="10">
+      <plot type="2d" render="lines" scale_x="0.606727349945264" scale_y="0.606727349945264" scale_z="0.606727349945264" rotate_x="0" rotate_y="0" rotate_z="0" transpose_x="-37" transpose_y="-26" transpose_z="0">
+        <input>
+          <e type="operand">x</e>
+          <e type="function" args="1">ζ</e>
+          <e type="operand">x</e>
+          <e type="function" args="1">ζ</e>
+          <e type="operand">x</e>
+          <e type="function" args="2">diff</e>
+          <e type="operand">x</e>
+          <e type="function" args="1">ξ</e>
+          <e type="operand">x</e>
+          <e type="function" args="1">ξ</e>
+          <e type="operand">x</e>
+          <e type="function" args="2">diff</e>
+          <e type="operand">4</e>
+          <e type="operand">1</e>
+          <e type="function" args="6">sys</e>
+        </input>
+      </plot>
+    </region>
+    <region left="63" top="270" width="230" height="58" color="#000000" fontSize="10">
+      <math decimalPlaces="7" exponentialThreshold="7">
+        <input>
+          <e type="operand">x</e>
+          <e type="function" args="1">f</e>
+          <e type="operand">x</e>
+          <e type="function" args="1">abs</e>
+          <e type="operand">0.6</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operand">1.1</e>
+          <e type="operator" args="2">/</e>
+          <e type="function" args="1">tanh</e>
+          <e type="bracket">(</e>
+          <e type="operand">2</e>
+          <e type="operator" args="2">^</e>
+          <e type="operand">2</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">1</e>
+          <e type="operator" args="2">+</e>
+          <e type="operator" args="2">:</e>
+        </input>
+      </math>
+    </region>
+    <region left="0" top="342" width="320" height="201" color="#000000" fontSize="10">
+      <plot type="2d" render="lines" scale_x="3.35926552849788" scale_y="3.35926552849788" scale_z="3.35926552849788" rotate_x="0" rotate_y="0" rotate_z="0" transpose_x="-21" transpose_y="-62" transpose_z="0">
+        <input>
+          <e type="operand">x</e>
+          <e type="function" args="1">f</e>
+        </input>
+      </plot>
+    </region>
+    <region left="9" top="603" width="206" height="28" color="#000000" fontSize="10">
+      <math>
+        <input>
+          <e type="operand">a</e>
+          <e type="function" args="1">w</e>
+          <e type="operand">a</e>
+          <e type="function" args="1">cos</e>
+          <e type="operand">1</e>
+          <e type="operand">a</e>
+          <e type="function" args="1">cos</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">:</e>
+        </input>
+      </math>
+    </region>
+    <region left="0" top="630" width="423" height="215" color="#000000" fontSize="10">
+      <plot type="2d" render="lines" scale_x="6.13949510659287" scale_y="6.13949510659287" scale_z="6.13949510659287" rotate_x="0" rotate_y="0" rotate_z="0" transpose_x="-15" transpose_y="-15" transpose_z="0">
+        <description active="false" position="Top" lang="eng" />
+        <input>
+          <e type="operand">x</e>
+          <e type="operand">0</e>
+          <e type="operator" args="2">&gt;</e>
+          <e type="operand">x</e>
+          <e type="function" args="1">cos</e>
+          <e type="operand">x</e>
+          <e type="function" args="1">cos</e>
+          <e type="operand">1</e>
+          <e type="operand">x</e>
+          <e type="function" args="1">cos</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="function" args="3">if</e>
+          <e type="operand">x</e>
+          <e type="function" args="1">cos</e>
+          <e type="operand">x</e>
+          <e type="function" args="1">cos</e>
+          <e type="operand">0.75</e>
+          <e type="operand">0.25</e>
+          <e type="operand">x</e>
+          <e type="function" args="1">cos</e>
+          <e type="operand">2</e>
+          <e type="operator" args="2">^</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">1</e>
+          <e type="operator" args="2">-</e>
+          <e type="operand">x</e>
+          <e type="function" args="1">cos</e>
+          <e type="operand">1</e>
+          <e type="operand">0.5</e>
+          <e type="operand">x</e>
+          <e type="function" args="1">cos</e>
+          <e type="operand">2</e>
+          <e type="operator" args="2">^</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">1</e>
+          <e type="operator" args="2">-</e>
+          <e type="operand">x</e>
+          <e type="function" args="1">cos</e>
+          <e type="operand">1</e>
+          <e type="operand">0.5</e>
+          <e type="operand">x</e>
+          <e type="function" args="1">cos</e>
+          <e type="operator" args="2">*</e>
+          <e type="operator" args="2">-</e>
+          <e type="bracket">(</e>
+          <e type="operator" args="2">*</e>
+          <e type="operand">5</e>
+          <e type="operand">1</e>
+          <e type="function" args="7">sys</e>
+        </input>
+      </plot>
+    </region>
+  </regions>
+</worksheet>

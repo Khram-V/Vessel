@@ -119,7 +119,8 @@ bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
        default:
         if( !(HIWORD( lParam )&KF_REPEAT) )    // повторение F-команд исключено
           { if( wParam>=VK_F1 && wParam<=VK_F12 )Key=_F1+wParam-VK_F1; }
-      } if( Key )PutChar( Key );               // запись в буфер клавиатуры
+      }
+      if( Key )PutChar( Key );               // запись в буфер клавиатуры
     }   break;
 //  case WM_TIMER: if( idEvent==wParam )       // 275 -> внутренняя процедура
 //                 { PutTimer(); return true; } break;
@@ -163,7 +164,7 @@ Window::Window( const char *_title, int x,int y, int w,int h )
    ZeroMemory( &wc,sizeof( WNDCLASSW ) );
 // memset( (void*)KeyBuffer,0,sizeof( KeyBuffer ) );
 //
-//  включение нового объекта в конец простого списка - перечисления
+// включение нового объекта в конец простого списка - перечисления
 //
   static WCHAR ws[16]=L"WGL";
    if( !First )First=this; else
@@ -172,48 +173,48 @@ Window::Window( const char *_title, int x,int y, int w,int h )
    }
 //  регистрация класса с особыми определениями для Microsoft Windows
 //
-   wc.style = CS_HREDRAW|CS_VREDRAW|CS_OWNDC; // тип окна
-   wc.lpfnWndProc = WindowInterruptProcedure; // адрес оконной функции
-// wc.cbClsExtra = 0;                        // дополнительные данные класса
+   wc.style = CS_HREDRAW|CS_VREDRAW|CS_OWNDC;   // тип окна
+   wc.lpfnWndProc = WindowInterruptProcedure;  // адрес оконной функции
+// wc.cbClsExtra = 0;                         // дополнительные данные класса
 // wc.cbWndExtra = 0;                        // дополнительные данные для окна
    wc.hInstance = hInstance;                // дескриптор экземпляра приложения
    wc.hIcon=LoadIcon( hInstance,"Icon" );   // IDI_APPLICATION иконки для окна
    wc.hCursor=LoadCursor( NULL,IDC_ARROW ); // дескриптор курсора для окна
 // wc.hbrBackground=NULL; // GetStockObject( BLACK_BRUSH ) цвет заполнения окна
-// wc.lpszMenuName =NULL;                   // имя главного меню
-   wc.lpszClassName=ws;                     // имя класса окна
- /*atom=*/ RegisterClassW( &wc );           // ==0 => "\n!\7RegisterClass\n "
-   Locate( x,y,w,h );                       // -- без hWnd - только размерности
-   hWnd = CreateWindowW                     // Create main window
-   ( wc.lpszClassName,                      // имя класса окна
-     _title ? U2W(_title):L"Window-Place",  //   и заголовок окна
-     ( _title ? WS_OVERLAPPEDWINDOW:0 )     // ? если без заголовка - нет рамки
+// wc.lpszMenuName =NULL;                  // имя главного меню
+   wc.lpszClassName=ws;                    // имя класса окна
+ /*atom=*/ RegisterClassW( &wc );          // ==0 => "\n!\7RegisterClass\n "
+   Locate( x,y,w,h );                      // -- без hWnd - только размерности
+   hWnd = CreateWindowW                    // Create main window
+   ( wc.lpszClassName,                     // имя класса окна
+     _title ? U2W(_title):L"Window-Place", //   и заголовок окна
+     ( _title ? WS_OVERLAPPEDWINDOW:0 )    // ? если без заголовка - нет рамки
               | WS_CLIPSIBLINGS | WS_CLIPCHILDREN
-              | WS_POPUPWINDOW | WS_VISIBLE,// стиль окна ? WS_CAPTION
-     WindowX,                               // координаты верхнего левого угла
-     WindowY,                               // CW_USEDEFAULT
+              | WS_POPUPWINDOW | WS_VISIBLE, // стиль окна ? WS_CAPTION
+     WindowX,                              // координаты верхнего левого угла
+     WindowY,                              // CW_USEDEFAULT
      Width +( !_title ? 2 : GetSystemMetrics( SM_CXSIZEFRAME )*2 ),
      Height+( !_title ? 2 : GetSystemMetrics( SM_CYSIZEFRAME )*2
                           + GetSystemMetrics( SM_CYCAPTION ) ),
-     HWND_DESKTOP,                          // дескриптор родительского окна
-     NULL,                                  // дескриптор главного меню
-     hInstance,                             // дескриптор приложения
-     NULL                                   // указатель доп. информации
+     HWND_DESKTOP,                         // дескриптор родительского окна
+     NULL,                                 // дескриптор главного меню
+     hInstance,                            // дескриптор приложения
+     NULL                                  // указатель доп. информации
    );
    ZeroMemory( &pfd,sizeof( PIXELFORMATDESCRIPTOR ) );
    pfd.nSize = sizeof( PIXELFORMATDESCRIPTOR );
-   pfd.nVersion = 1;                        // set the pixel format for the DC
-   pfd.dwFlags = PFD_DRAW_TO_WINDOW         // Draw to Window (not to bitmap)
-               | PFD_SUPPORT_OPENGL         // Support OpenGL calls in window
-               | PFD_DOUBLEBUFFER;          // Double buffered mode ~ PFD_SWAP_COPY | PFD_SWAP_LAYER_BUFFERS | PFD_GENERIC_FORMAT
-   pfd.iPixelType = PFD_TYPE_RGBA;          // RGBA Color mode
-   pfd.cColorBits = 24;      //32
-   pfd.cDepthBits = 16;      //32
+   pfd.nVersion = 1;                 // set the pixel format for the DC
+   pfd.dwFlags = PFD_DRAW_TO_WINDOW  // Draw to Window (not to bitmap)
+               | PFD_SUPPORT_OPENGL  // Support OpenGL calls in window
+               | PFD_DOUBLEBUFFER;   // Double buffered mode ~ PFD_SWAP_COPY | PFD_SWAP_LAYER_BUFFERS | PFD_GENERIC_FORMAT
+   pfd.iPixelType = PFD_TYPE_RGBA;   // RGBA Color mode
+   pfd.cColorBits = 24;   // 32
+   pfd.cDepthBits = 16;   // 32
    pfd.iLayerType = PFD_MAIN_PLANE;
-   hDC = GetDC( hWnd );                    // get the device context ( DC )
+   hDC = GetDC( hWnd );              // get the device context ( DC )
    SetPixelFormat( hDC,ChoosePixelFormat( hDC,&pfd ),&pfd );
-   hRC=wglCreateContext( hDC );            // create
-       wglMakeCurrent( hDC,hRC );          // and enable render context ( RC )
+   hRC=wglCreateContext( hDC );      // create
+       wglMakeCurrent( hDC,hRC );    // and enable render context ( RC )
 //
 //  Установка выполнена, теперь прописка размерностей, шрифтов и вложенных окон
 //
@@ -286,16 +287,17 @@ static fixed WinAsyncKeyStates( fixed code=0 )          // простой опр
 #define lKey 0x3F               // маска(длина) клавиатурного буфера=64 символа
 
 void Window::PutChar( fixed Key )        // занесение одного символа и его кода
-{ KeyBuffer[++KeyPas&=lKey].Key=Key;          // в кольцевой буфер для символов
+{ // WinExecute( hWnd );          // на входе ожидается чистый ключ даного окна
+  KeyBuffer[++KeyPas&=lKey].Key=Key;          // в кольцевой буфер для символов
   KeyBuffer[KeyPas].Code=WinAsyncKeyStates();  // и клавиш управляющих аккордов
   if( KeyPas==KeyPos ){ MessageBeep(MB_OK); ++KeyPos&=lKey; }  // сброс-перебор
   if( !onKey )                 // блок рекурсивных прерываний от активного окна
-  while( KeyPos!=KeyPas )      // нагромождение очереди запросов от клавиатуры
+  while( KeyPos!=KeyPas )      //  нагромождение очереди запросов от клавиатуры
   { int oK=KeyPos;             // Фиксированная предустановка графической среды
     { glAct( this );           // со сбоем других внешних транзакций над OpenGL
       if( !KeyBoard( KeyBuffer[++KeyPos&=lKey].Key ) ){ KeyPos=oK; break; }
-  } } WinExecute();  // при отказе возвращается обратно в цикл ожидания очереди
-}                    // новый символ единожды опробовается к считыванию (=true)
+  } } WinExecute( hWnd );    // при отказе возвращается в цикл ожидания очереди
+}                            // новый символ опробовается к считыванию (=true)
 bool Window::KeyBoard( fixed key )// виртуальная процедура обработки прерываний
 { if( extKey ){ glContext S( this );  // установка графического контента OpenGL
               return extKey( key ); // true - символ принят, false - к возврату
@@ -304,20 +306,21 @@ bool Window::KeyBoard( fixed key )// виртуальная процедура �
 //!  Обращение к клавиатуре через активное и контекстно настроенное окно Window
 //                  ! осторожно, здесь предполагается отсутствие вызовов OpenGL
 fixed Window::WaitKey()   // стандартный цикл ожидания нового символа в Windows
-{ onKey=true; while( KeyPos==KeyPas )                    // || isTimer>0 )
-  { if( !WinRequest( hWnd ) )WaitMessage();              // ожидание символа כל
-    if( !Site )return onKey=false;                       //   в том же окне:
-  } onKey=false; return KeyBuffer[ ++KeyPos&=lKey ].Key; //   wctob( key )=>
+{ onKey=true; WinExecute( hWnd );
+  while( KeyPos==KeyPas )                                // || isTimer>0 )
+  { if( !WinRequest( hWnd ) )WaitMessage(); // Above();  // ожидание символа כל
+//  if( !Site )return onKey=false;                       //   в том же окне:
+  } onKey=false; return KeyBuffer[++KeyPos&=lKey].Key;   //   wctob( key )=>
 }                                                        //   Uni16=>Win1251
 fixed Window::GetKey()         // запрос появления нового символа на клавиатуре
-   { if( KeyPas==KeyPos )return 0; return KeyBuffer[ ++KeyPos&=lKey ].Key; }
+  { if( KeyPas==KeyPos )return 0; return KeyBuffer[ ++KeyPos&=lKey ].Key; }
 #undef lKey
 fixed Window::ScanKey()        // просто проверка текущей активности клавиатуры
-   { return KeyPas==KeyPos ? 0 : KeyBuffer[KeyPos].Key; }
+  { return KeyPas==KeyPos ? 0 : KeyBuffer[KeyPos].Key; }
 fixed Window::ScanStatus()      // обновление в случае отсутствия новых запросов
-   { if( KeyPas==KeyPos )return WinAsyncKeyStates();
-                         return KeyBuffer[KeyPos].Code;
-   }
+  { if( KeyPas==KeyPos )return WinAsyncKeyStates();
+                        return KeyBuffer[KeyPos].Code;
+  }
 // мышка работает на площадках, однако прерывания организуются из главного окна
 //                                           предотвращение рекурсии прерываний
 #define call if( !isMouse){ isMouse=true; glContext S(this); bool ret=P->Mouse(
@@ -438,6 +441,8 @@ DWORD WaitTime( DWORD Wait,        // активная задержка для �
   while( mWait )if( !WinRequest() )WaitMessage();     // ожидание чистки mWait
   return RealTime;                                    // выход в особом случае
 }
+                    //while( isTimer>1 )if( !WinRequest( hWnd ) )WaitMessage();
+
 //  ...  все согласованные процедуры объединяются в единый модуль интерактивной
 //  графической среды Window::Place в/исключая независимые операции с Юлианским
 //        календарем и перекодировками Unicode/UTF-8 для Windows-1251 и OEM-866

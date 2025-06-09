@@ -19,7 +19,7 @@ typedef enum { svRegular, svCrease, svDart, svCorner } VertexType;
 typedef enum { fiFree,fiStation,fiButtock,fiWaterline,fiDiagonal } IntersectionType;
      // intersection lines: free,stations,buttocks,waterlines and diagonal type
 struct Plane { Real a,b,c,d; }; // Description of 3D plane: a*x+b*y+c*z-d=0.0;
-union Color{ unsigned int C; byte c[4]; };
+union Color{ unsigned C; byte c[4]; };
 
 extern Vector Min,Max;         // Экстремумы исходного графического изображения
 extern byte  UnderWaterColorAlpha;
@@ -118,7 +118,8 @@ class Surface
   struct Layers
   { char *Description;
     int ID;
-    unsigned int Color;
+//  unsigned int Color;
+    Color LClr;
     bool Visible,
          Symmetric,
          Developable,
@@ -128,27 +129,35 @@ class Surface
          Thickness;
     bool ShowInLineSpan;     // fv>=201
     byte AlphaBlend;         // fv>=261
-  } *L, ActiveLayer;
+  } *L, ActiveLayer;         //! NoLayers
+
   struct CoPoint             /// Control Point
-  { Vector V;
-    VertexType T;
-    bool Selected,Locked;
-  } *P;
+  { Vector V;                // координаты
+    VertexType T;            // тип узла: svRegular, svCrease, svDart, svCorner
+    bool Selected,           // -- выбор
+         Locked;             // -- блокировка >=fv198
+  } *P;                      //! NoCoPoint
+
   struct Edges               /// Control Edges
-  { int StartIndex,EndIndex;  // --> Points
-    Vector StartPoint,EndPoint; // -- как бы лишнее
-    bool Crease,Selected;
-  } *G;
+  { int StartIndex,EndIndex; // --> Points индексы
+    bool Crease,             // -- ребро по сломанной поверхности
+         Selected,           // -- выбор
+         ControlEdge;        // == True на считывании ребра
+    Vector StartPoint,EndPoint; //~~ излишнее переприсваивание -- безобидно
+  } *G;                      //! NoEdges
+
   struct Curves              /// Control Curves FV >= 195
-  { int *P,Capacity;          // --> Points
-    bool Selected;
-  } *C;
+  { int *P,Capacity;         // --> Points индексные ссылки
+    bool Selected;           // дополнительно: Edge[N-1] + Points[N] !!! грубо
+  } *C;                      //! NoCurves
+
   struct Faces               /// Control Faces
-  { int *P,Capacity;          // --> Points
-    int LayerIndex;
+  { int *P,Capacity;         // --> Points
+    int LayerIndex;          // -- слой для всего набора площадок
     bool Selected;
-  } *F;
-  void Extents();             // экстремумы по расчетным площадкам
+  } *F;                      //! NoFaces
+
+  void Extents();            // экстремумы по расчетным площадкам
 public:
   Surface(){ memset( this,0,sizeof( Surface ) ); }
   void Read();

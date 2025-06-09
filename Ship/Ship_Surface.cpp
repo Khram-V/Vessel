@@ -9,23 +9,28 @@ void Surface::Drawing( BoardView Sides )
   if( (K=F[N].Capacity)>2 )
   { Layers &Layer=L[F[N].LayerIndex];
 //  V.len=0; C.C=L[F[N].LayerIndex].Color;
-    V.len=0; C.C=Layer.Color;
+    V.len=0; C.C=Layer.LClr.C;
     for( I=0; I<K; I++)V+=P[F[N].P[I]].V;              // C.c[3]=V[0].z>=Draught?0xFF:0x7F; glColor4ubv(C.c);
     glNormal3dv( W=(V[2]-V[0])*(V[1]-V[0]) ); glBegin( GL_POLYGON );
     for( I=0; I<K; I++ )
-      { C.c[3]=V[I].z>Draft+Min.z?0xFF:0xBF; glColor4ubv( C.c ); dot( V[I] ); }
-    glEnd();
+    { C.C=Layer.LClr.C;
+      if( V[I].z<Draft+Min.z )
+      { C.c[3]-=C.c[3]/6;  //C.c[3]=V[I].z>Draft+Min.z?0xFF:0xBF;
+        C.c[0] = ( C.c[0]+UnderWaterColor.c[0] )/2;
+        C.c[1] = ( C.c[0]+UnderWaterColor.c[1] )/2;
+        C.c[2] = ( C.c[0]+UnderWaterColor.c[2] )/2;
+      } glColor4ubv( C.c ); dot( V[I] );
+    } glEnd();
     if( Sides==mvBoth && Layer.Symmetric )
     { glNormal3dv( ~W ); glBegin( GL_POLYGON );
       for( I=K-1; I>=0; I-- )
-      { C.c[3]=V[I].z>Draft+Min.z?0xFF:0xBF;
-/*      Real a=Real( UnderWaterColorAlpha )/255.0;
-        if( V[I].z>(Draught+Min.z) )C.c[3]=0xFF; else
-        { C.c[0] = byte( C.c[0]*(1-a)+UnderWaterColor.c[0]*a )/2; //C.c*(1-a)+Uwc*a
-          C.c[1] = byte( C.c[1]*(1-a)+UnderWaterColor.c[1]*a )/2;
-          C.c[2] = byte( C.c[2]*(1-a)+UnderWaterColor.c[2]*a )/2;
-        } C.c[3]=UnderWaterColorAlpha;
-*/      glColor4ubv( C.c ); dot( ~V[I] );
+      { C.C=Layer.LClr.C;
+        if( V[I].z<Draft+Min.z )
+        { C.c[3]-=C.c[3]/6;  //C.c[3]=V[I].z>Draft+Min.z?0xFF:0xBF;
+          C.c[0] = ( C.c[0]+UnderWaterColor.c[0] )/2;
+          C.c[1] = ( C.c[0]+UnderWaterColor.c[1] )/2;
+          C.c[2] = ( C.c[0]+UnderWaterColor.c[2] )/2;
+        } glColor4ubv( C.c ); dot( ~V[I] );
       } glEnd();
     }
   } glLineWidth( 0.2 );

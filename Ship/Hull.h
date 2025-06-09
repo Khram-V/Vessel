@@ -12,6 +12,7 @@
 //                                        ©75 Калининград-Сахалин-‏יְרוּשָׁלַיִם
 #include <Math.h>
 #include "../Window/Window.h"
+#define eps 1.0e-12
 
 extern const char *_Mnt[],*_Day[];       // названия месяцев и дней недели
 extern Real              //               разметка: { Xo,Do },{ Xo+Lmx,Depth }
@@ -58,6 +59,7 @@ public: Frame( int l=0 ); ~Frame();
  Real operator()( _Real Z ){ return G( Z ); }
  void Double( int k );                 // вставка сломанной точки на шпангоуте
  void AYZ( Real A, Real &Y,Real &Z );  // и, - не совсем последовательный поиск
+ void Opt( _Real Lc, _Real Ac );       // сброс отрезков меньше Lc под углом Ac
 };
 ///   Уточненный вариант корпуса, разделенного на шпангоуты
 //
@@ -70,9 +72,12 @@ class Hull{ public:
   void Analytics();                           // варианты аналитических обводов
   void allocate( int N );                     // вектор адресов для шпангоутов
   void Init();                                // водоизмещение, площади и др.
-  void Aphines( _Real cX,_Real cY,_Real cZ ); // абсциссы, ординаты, аппликаты
-  void ModelEx( Real &L,Real &B,int N,int M ); // Кубик, Эллипс, Шлюпка, Шлюпик
-  void BilgeEx();                             // скуловые формирования в обводы
+  void Aphines( _Real cX,_Real cY,_Real cZ,   // абсциссы, ординаты, аппликаты
+                _Real dX,_Real dZ,            // смещение абсциссы и аппликаты
+                 Real Lc, Real Ac );          // min.отрезок под max.углом
+  void ModelEx( Real &L,Real &B,int N,int M ); // Кубик, Эллипс, Шлюпка, Корпус
+  void BilgeEx( _Real Height,  // скуловые формирования обводов по осадке
+                _Real Power ); // или по борту и cо степенью заострения
   Real Y( _Real X,_Real Z ); // ордината-Y корпуса по абсциссе-X и аппликате-Z
   int Write();          // запись таблицы ординат корпуса в обновлённом формате
   bool Read();          // чтение корпуса: <имя> - новый; * ЛКИ; ' ' - Польша
@@ -148,8 +153,10 @@ struct complex
   complex& operator+=( const complex& c ){ x+=c.x; y+=c.y; return *this; }
   complex& operator*=( const complex& c ){ double w=(x*c.x)-(y*c.y); y=(x*c.y)+(y*c.x); x=w; return *this; }
 };
+inline double const abs( const complex& c ){ return hypot( c.x,c.y ); }
 inline double const norm( const double& x, const double& y ){ return x*x+y*y; }
 inline double const norm( const complex& c ){ return c.x*c.x+c.y*c.y; }
+inline double operator % ( const complex& a,const complex& b ){ return a.x*b.x+a.y*b.y; }
 inline complex operator * ( complex c,const double& r ){ c.x*=r; c.y*=r; return c; }
 inline complex operator + ( complex c,const complex& e ){ c.x+=e.x; c.y+=e.y; return c; }
 inline complex polar( const double& a ){ return (complex){ cos( a ),sin( a ) }; }
