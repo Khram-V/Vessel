@@ -33,7 +33,7 @@ Hull& Hull::Contour_Lines()      // рисуем контуры габаритн
   glLineWidth( 0.01 ); arrow( -Traverse,Traverse,0.005,lightcyan );
                        arrow( -Ahead,Ahead,0.005,yellow );
   glLineWidth( 1 );                           // ускоренная прорисовка без волн
-  if( !F.Exp.wave )return *this; color( lightblue );
+  if( !F.Exp.wave )goto Exit; color( lightblue );
   for( Real w=0; w>=D; w+=dP )
   { S=abs( Ahead ); glBegin( GL_LINE_STRIP );
     for( Real s=0; s<S*2; s+=dS )              // профили волн по курсу корабля
@@ -55,7 +55,8 @@ Hull& Hull::Contour_Lines()      // рисуем контуры габаритн
   { R=( s/S )*Ahead-Ahead; color( lightgreen ); glBegin( GL_LINE_STRIP );
     for( R.z=0; R.z>=D; R.z+=dQ )dot( F.Wave(Trun,R) ); glEnd(); color( green );
     for( R.z=0; R.z>=D; R.z+=dP ){ P=F.WaveV(Trun,R,V); arrow(P,P+V,0.2 ); }   //abs(V)/6); }
-  } glLineWidth( 1 ); return *this;
+  }
+Exit: glLineWidth( 1 ); return *this;
 }
 //! общая навигационная информация о состоянии корабля
 //
@@ -387,7 +388,6 @@ bool Hull::Draw()                  // Виртуальная процедура 
 { static bool Recurse=false;
   if( !IsWindowVisible( hWnd ) || IsIconic( hWnd ) )return false;
   if( Recurse || !ShipName )return false; Recurse=true; Activate();
-  glEnable( GL_LIGHTING );                                // OpenGL - на корпус
   glEnable( GL_CULL_FACE );
   glEnable( GL_DEPTH_TEST );
   glClearColor( BkColor,1 );                  // голубоватый цвет фона и полная

@@ -26,18 +26,20 @@ Waves& Waves::Ghost( _Real Tr ){
   { Vector W=Wave(Tr,j,i); if( Storm->Exp.peak )H[j][i]=W; else H[j][i].z=W.z;
   } return *this;
 }
-#define colcel( z ) shadow? colors( black+Color( z ) ): z>0?Surf:Subw
+#define colcel( z ) shadow? colors( black+Color( z ) ): z>=0?Surf:Subw
 
 Waves& Waves::View( _Real z, int k, bool shadow )
-{ if( Storm->Exp.peak )    // .peak=1 просмотр в регулярной неравномерной сетке
+{ glEnable( GL_LIGHTING );
+  glShadeModel( shadow?GL_SMOOTH:GL_FLAT );
+  if( Storm->Exp.peak )    // .peak=1 просмотр в регулярной неравномерной сетке
   { const Vector oZ={ 0,0,z };    // с искусственным смещением z по вертикали
     for( int j=0; j<=My-k; j+=k ) // работа в векторном поле верна на удивленье
-    { Vector *_p=H[j],*_q=H[j+k]; glBegin( GL_QUAD_STRIP );
+    { Vector *_p=H[j],*_q=H[j+k]; glBegin( GL_QUAD_STRIP ); //GL_TRIANGLE_STRIP
       for( int i=0; i<=Mx; i+=k )
       { _Vector p=*_p,q=*_q; _p+=k,_q+=k;            // нормаль косым крестиком
         dot( q+oZ,colcel( q.z ) );
         dot( p+oZ,colcel( p.z ) );
-        if( !Storm->Exp.draw )if( i<=Mx-k )glNormal3dv( (*_p-q)*(*_q-p) );
+//      if( !Storm->Exp.draw )if( i<=Mx-k )glNormal3dv( -(*_p-q)*(*_q-p) );
       } glEnd();
   } } else                // .peak=0 - иначе на регулярной сетке с равным шагом
   { Real y=-0.5*Ds*My,d=Ds*k;     // с перерасчётом координат на этом же месте,
@@ -47,12 +49,15 @@ Waves& Waves::View( _Real z, int k, bool shadow )
       qi.y=q.y=y+d; q.z=(_q=H[j+k])->z; glBegin( GL_QUAD_STRIP );
       for( int i=0; i<=Mx; i+=k )
       { if( i<=Mx-k ){ pi.z=(_p+=k)->z; pi.x=qi.x=p.x+d;
-                       qi.z=(_q+=k)->z;
-                       if( !Storm->Exp.draw )glNormal3dv( (pi-q)*(qi-p) ); }
+                       qi.z=(_q+=k)->z;  //  glNormal3i( 0,-1,0 );
+//                     if( !Storm->Exp.draw )glNormal3dv( (pi-q)*(qi-p) );
+                     }
         color( colcel( q.z ) ); q.z+=z; dot( q ); q=qi;
         color( colcel( p.z ) ); p.z+=z; dot( p ); p=pi;
       } glEnd(); y+=d;
   } } const Real x=Ds*Mx/2,y=Ds*My/2;
+  glDisable( GL_LIGHTING );
+  if( !shadow )glShadeModel( GL_SMOOTH );
   liney( (Vector){-x,0,z},(Vector){-x,y,z},lightgray ), // граничная рамка для
   liney( (Vector){-x,y,z},(Vector){ x,y,z} ),         // контроля контура волны
   liney( (Vector){ x,y,z},(Vector){ x,0,z} ); return *this;
@@ -70,8 +75,8 @@ bool Field::Draw()
 { static bool Recurse=false;
   if( !IsWindowVisible( hWnd ) || IsIconic( hWnd ) )return false;
   if( Recurse || !Kt )return false; Recurse=true; Activate();
-  glEnable( GL_LIGHTING );
-//  glEnable( GL_CULL_FACE );
+//glEnable( GL_LIGHTING );
+//glEnable( GL_CULL_FACE );
   glEnable( GL_DEPTH_TEST );
   glMatrixMode( GL_PROJECTION );     // размерах фрагмента экрана сброс текущих
   glLoadIdentity();                  // матричных координат, настройка обзора и
@@ -100,7 +105,8 @@ bool Field::Draw()
   //
   glPolygonMode( GL_FRONT_AND_BACK,GL_FILL );
   Vessel->Drawing( Exp.draw==3?2:1 );   // доступ к рисунку корпуса корабля
-  Activate();                           // без исключения двойной перенастройки
+  Activate();                          // без исключения двойной перенастройки
+  glNormal3i( 0,1,0 );                // волновая нормаль вверх без перехлёстов
   //
   //   собственно рисование для начала ведется в самом волновом объекте
   //
@@ -118,12 +124,13 @@ bool Field::Draw()
       Swell.View( Long/-5.333,k,!(Exp.view&1) );   // -150 три разделённые
        Wind.View( Long/-8,    k,!(Exp.view&1) );   // -100 структуры волн
     }
+    glEnable( GL_LIGHTING );
     if( Exp.view&1 )                         // светлая вода с ватерлинией
     for( int y=0; y<mY-k; y+=k )             // монотонные раскраски с цветовым
     { glBegin( GL_QUAD_STRIP );              // разделением по нулевому контуру
       for( int x=0; x<mX; x+=k )
       { Vector &p=Ws[y][x],&q=Ws[y+k][x];
-        if( x<mX-k )glNormal3dv( (q-p)*(Ws[y][x+k]-p) );
+//      if( x<mX-k )glNormal3dv( (q-p)*(Ws[y][x+k]-p) );
         color( q.z>0?Surf:Subw,-0.1,Exp.view&2?1:0.75 ),dot( q );
         color( p.z>0?Surf:Subw,-0.1,Exp.view&2?1:0.75 ),dot( p );
       } glEnd();
@@ -142,12 +149,10 @@ bool Field::Draw()
 //          C=minmax(0,int(C*(1.0+0.12*(0.5-Real(rand())/RAND_MAX))),255);
             Clr[y][x]=C+black+1;
       }
-     bool f2=Exp.view&2 && !Exp.draw;   // Тёмная вода на четыре уровня
-      glNormal3i( 0,0,-1 ); //static int r=0; r^=1;
-      while( true )
+     bool f2=Exp.view&2 && !Exp.draw;        // Тёмная вода на четыре уровня
+      while( true )                          //? GL_TRIANGLE_STRIP
       { for( int y=0; y<mY-k; y+=k )         // тёмная вода в световых оттенках
-//      { glBegin( GL_QUAD_STRIP );          // раскраска общего волнового поля
-        { glBegin( GL_TRIANGLE_STRIP );     // раскраска общего волнового поля
+        { glBegin( GL_QUAD_STRIP );          // раскраска общего волнового поля
           for( int x=0; x<mX; x+=k )         // в оттенках сине-зеленого цветов
           { Vector &p=Ws[y][x],&q=Ws[y+k][x]; //Real R;
 //          if( x<mX-k )glNormal3dv( (q-p)*(Ws[y][x+k]-p) );
@@ -161,6 +166,7 @@ bool Field::Draw()
         if( f2 ){ glPolygonMode( GL_FRONT,GL_LINE ); f2=0; continue; } else break;
       } // восстановление закраски полигонов толщины обычных контурных линий
     } glPolygonMode( GL_FRONT_AND_BACK,GL_FILL ); glLineWidth( 1 );
+      glDisable( GL_LIGHTING );
   }
 //! Информационная табличка c режимами проведения вычислительного эксперимента
 //

@@ -34,7 +34,7 @@ Place& Place::Area( int X,int Y, int W,int H )     // достаточно сд�
 //#include <GL/Glu.h>
 RasterSector::RasterSector
   ( int pX,int pY, int W,int H, Real Scale )  // настройка чисто
-  { PushMatrix();
+  { PushMatrix(); glPushAttrib( GL_ENABLE_BIT );
     glLoadIdentity(); glMatrixMode( GL_PROJECTION ); //cX=cY=0;
     glLoadIdentity(); glViewport( pX,pY,W,H );
     glOrtho( 0,W/Scale,0,H/Scale,0,1 );   // gluOrtho2D( 0,W/Scale,0,H/Scale );
@@ -42,8 +42,7 @@ RasterSector::RasterSector
     glDisable( GL_DEPTH_TEST );
     glDisable( GL_LIGHTING );
   }
-
-RasterSector::~RasterSector(){ PopMatrix(); }
+RasterSector::~RasterSector(){ PopMatrix(); glPopAttrib(); }
 
 TextContext::TextContext( bool b ): Base( b )
 //    dp( glIsEnabled( GL_DEPTH_TEST ) ),

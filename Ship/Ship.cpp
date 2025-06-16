@@ -30,8 +30,9 @@ void InterSection::Drawing( BoardView Sides )                  // mvPort,mvBoth
 bool FreeShip::Draw()               // виртуальная процедура с настройкой сцены
 { BoardView &B=Visio.ModelView; int i,k;
   View::Draw();
-  glTranslated( (Max.x+Min.x)/-1.75,0,      // -Set.SplitSectionLocation
-                (Max.z+Min.z)/-2 );         // Set.Length/-2
+  glEnable( GL_LIGHTING );                    // расцветка под теневые закраски
+  glTranslated( (Max.x+Min.x)/-1.75,0,        // -Set.SplitSectionLocation
+                (Max.z+Min.z)/-2 );           // Set.Length/-2
   Clear(); color( lightcyan );                 glLineWidth( .2 );
   axis(*this,Length,Beam,Draft*2,"x","y","z"); glLineWidth( .5 );
   Shell.Drawing( B );
@@ -51,7 +52,8 @@ bool FreeShip::Draw()               // виртуальная процедура
 inline WCHAR* Slower( WCHAR *str )
 { int l=wcslen( str ); while( --l>=0 )str[l]=towlower( str[l] ); return str;
 }
-Ship::Ship()   //! конструктор с расчисткой и считыванием новой числовой модели
+//!                конструктор с расчисткой и считыванием новой числовой модели
+Ship::Ship()
 { memset( this,0,sizeof( Ship ) );
   textcolor( YELLOW );              print( "Free!Ship [*.fbm,*.ftm]\n" );
   int argc; WCHAR **argv=CommandLineToArgvW( GetCommandLineW(),&argc );
@@ -75,17 +77,11 @@ FreeShip::FreeShip():Ship(),View("Free!ship in C++ ",-12,12,640,480) //Matrix()
 { Icon( "Ship" ).AlfaVector( 16 );
   Locate( Xpm( 4 ),Ypm( 4 ),min( 1280,Xpm( 64 ) ),
                             min( 1024,Ypm( 72 ) ) );
-  glCullFace( GL_FRONT_AND_BACK );                    // какие отбираются грани
+//  glCullFace( GL_FRONT_AND_BACK );                    // какие отбираются грани
   Distance=-1.75*( Max.x+Max.y-Min.x-Min.y + Width*(Max.z-Min.z)*0.9/Height );
   eyeX=135;  // lookX=-60;
   glDisable( GL_FOG );
-  glDisable( GL_LIGHT1 );
-  glLightfv( GL_LIGHT0,GL_AMBIENT,(const float[]){.01,.03,.02,1}); // окружение
-  glLighti ( GL_LIGHT0,GL_SPOT_CUTOFF,60 );
-  glLightfv( GL_LIGHT0,GL_POSITION,(const float[]){0,.1*Distance,-Distance,.5});
-  glLightfv( GL_LIGHT0,GL_SPOT_DIRECTION,(const float[]){0,0,-1,0 });
-  glMateriali( GL_FRONT_AND_BACK,GL_SHININESS,255 );     // степень отсветки
-  Draw();                                               // начальная прорисовка
+  Draw(); // начальная прорисовка
 }
 //   Интерактивная настройка/управление графическим отображением проекта
 //

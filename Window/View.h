@@ -1,9 +1,9 @@
 #ifndef __View_      //#define __View_      // Очередная отработка элементарных графических примитивов                     //                                    ©2018-08-22  יְרוּשָׁלַיִם
 #include <GL/glu.h>#include "Window.h"              // собственно графическая среда Window-Place
 //#include "../Math/Vector.h"   // извне базовые структуры тензорной математики
-typedef enum{ white,silver,lightgray,gray,dimgray,darkgray,yellow,green,lime,olive,
-  lightgreen,navy,blue,lightblue,cyan,aqua,lightcyan,maroon,red,lightred,
-  orange,pink,purple,magenta,fuchsia,lightmagenta,black,empty=-1 //!=27\{28}
+typedef enum{ white,silver,lightgray,gray,dimgray,darkgray,freeboard,yellow,green,lime,
+  olive,lightgreen,navy,blue,lightblue,cyan,aqua,lightcyan,maroon,red,lightred,
+  orange,pink,purple,magenta,fuchsia,lightmagenta,black,empty=-1   //!=27\{28}
 } colors;                                           // словесные прописи имён
 extern const char *_Mnt[],*_Day[];                 // месяцев года, дней недели
 //// Настройка начальной раскраски и освещенности графического пространства/сцены//                                   ... предустановка графической среды OpenGLvoid View_initial( _Real Distance=600 );//

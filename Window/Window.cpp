@@ -106,29 +106,30 @@ bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
     { fixed Key=0;
       WinExecute( hWnd );                       // на входе чистый ключ
       switch( wParam )                          // командные перекодировки
-      { case VK_PRIOR : Key=_North_East; break; // 33
-        case VK_NEXT  : Key=_South_East; break; // 34
-        case VK_END   : Key=_South_West; break; // 35
-        case VK_HOME  : Key=_North_West; break; // 36
-        case VK_LEFT  : Key=_West;       break; // 37
-        case VK_UP    : Key=_North;      break; // 38
-        case VK_RIGHT : Key=_East;       break; // 39
-        case VK_DOWN  : Key=_South;      break; // 40
-        case VK_INSERT: Key=_Ins;        break; // 45
-        case VK_DELETE: Key=_Del;        break; // 46
+      { case VK_RETURN: Key=_Enter;      break; // 13≡13
+        case VK_PRIOR : Key=_North_East; break; // 33⇒ 9 - 8+1
+        case VK_NEXT  : Key=_South_East; break; // 34⇒12 - 8+4
+        case VK_END   : Key=_South_West; break; // 35⇒ 6 - 2+4
+        case VK_HOME  : Key=_North_West; break; // 36⇒ 3 - 2+1
+        case VK_LEFT  : Key=_West;       break; // 37⇒ 2
+        case VK_UP    : Key=_North;      break; // 38⇒ 1
+        case VK_RIGHT : Key=_East;       break; // 39⇒ 8
+        case VK_DOWN  : Key=_South;      break; // 40⇒ 4
+        case VK_INSERT: Key=_Ins;        break; // 45⇒28
+        case VK_DELETE: Key=_Del;        break; // 46⇒29
        default:
         if( !(HIWORD( lParam )&KF_REPEAT) )    // повторение F-команд исключено
           { if( wParam>=VK_F1 && wParam<=VK_F12 )Key=_F1+wParam-VK_F1; }
       }
-      if( Key )PutChar( Key );               // запись в буфер клавиатуры
+      if( Key )PutChar( Key );                 // запись в буфер клавиатуры
     }   break;
 //  case WM_TIMER: if( idEvent==wParam )       // 275 -> внутренняя процедура
 //                 { PutTimer(); return true; } break;
     case WM_CHAR:                              // 258 = WM_CHAR message handler
     { WPARAM Key;
       switch( Key=wParam )
-      { case VK_BACK  : Key=_BkSp; break;      // 8 -> _BkSp(14)
-        case VK_TAB   : Key=_Tab;  break;      // 9 -> _Tab(30)
+      { case VK_BACK  : Key=_BkSp;  break;     // 8 -> _BkSp(14)
+        case VK_TAB   : Key=_Tab;   break;     // 9 -> _Tab (30)
         case VK_CANCEL: while( First )First->Close();
                         PostQuitMessage( VK_CANCEL ); // exit( VK_CANCEL );
                         return false;                 // 3 -> просто на выход
@@ -309,7 +310,7 @@ fixed Window::WaitKey()   // стандартный цикл ожидания н
 { onKey=true; WinExecute( hWnd );
   while( KeyPos==KeyPas )                                // || isTimer>0 )
   { if( !WinRequest( hWnd ) )WaitMessage(); // Above();  // ожидание символа כל
-//  if( !Site )return onKey=false;                       //   в том же окне:
+    if( !Site )return onKey=false;                       //   в том же окне:
   } onKey=false; return KeyBuffer[++KeyPos&=lKey].Key;   //   wctob( key )=>
 }                                                        //   Uni16=>Win1251
 fixed Window::GetKey()         // запрос появления нового символа на клавиатуре

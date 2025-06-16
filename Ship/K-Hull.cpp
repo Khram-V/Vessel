@@ -44,11 +44,11 @@ void Hull::Simple_Hull( int Nx, int Nz, int Nf )
 }
 void Hull::Aphines
 ( _Real cX,_Real cY,_Real cZ, _Real dX,_Real dZ, Real Lc,Real Ac )
-{ if( Lc>eps ){ Lc/=1000.0; Ac=cos( Ac*_dR );
+{ if( fabs( Lc )>eps ){ Lc/=1000.0; Ac=cos( Ac*_dR );
     for( int i; i<Ns; i++ )F[i].Opt( Lc,Ac );          // сброс лишних узлов
     Stx.Opt( Lc,Ac ); Asx.Opt( Lc,Ac );                // на отрезках меньше Lc
     Sty.Opt( Lc,Ac ); Asy.Opt( Lc,Ac );                //          под углом Ac
-  }
+  } Hull_Keys&=~1;                                     // отключение сплайнов
   Length*=cX;  Lwl*=cX; Lmx*=cY;                       // масштабирование всех
   Breadth*=cY; Bwl*=cY; Bmx*=cY;                       // главных размерений
   Draught*=cZ; Depth*=cZ;
@@ -57,7 +57,8 @@ void Hull::Aphines
   Xo=(Xo+dX)*cX; Xm=(Xm+dX)*cX; Do=(Do+dZ)*cZ;
   for( int k=0; k<Ns; k++ )
   { for( int i=0; i<=F[k].N; i++ )F[k].z[i]=(F[k].z[i]+dZ)*cZ,F[k].y[i]*=cY;
-    F[k].X=(F[k].X+dX)*cX; F[k].SpLine();
+    F[k].X=(F[k].X+dX)*cX;
+//  if( Hull_Keys&0x01 )F[k].SpLine();
   }
   for( int i=0; i<=Stx.N; i++ )Stx[i]=(Stx[i]+dX)*cX,Stx(i)=(Stx(i)+dZ)*cZ; //Stx.Easy();
   for( int i=0; i<=Asx.N; i++ )Asx[i]=(Asx[i]+dX)*cX,Asx(i)=(Asx(i)+dZ)*cZ; //Asx.Easy();

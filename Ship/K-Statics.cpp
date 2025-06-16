@@ -25,8 +25,8 @@ const int nA=180,         // Количество углов накренени�
 
 struct WinStability: public Window
 { WinStability( int W,int H ):
-  Window( " Ship Hull Hydrostatics", 0,0,W,H ){}
- virtual bool Draw();     // главная процедура для прорисовки всех результатов
+  Window( " Ship Hull Hydrostatics",0,0,W,H ){}
+  virtual bool Draw();     // главная процедура для прорисовки всех результатов
 };
 static WinStability *stWin=0;
 static Plane  *wS=0,      // Окно проекции корпус
@@ -529,22 +529,23 @@ void Hull_Statics()             // кривых элементов теорет�
     LD.Initial();             // проведение расчетов гидростатических кривых
     LD.Graphics();            // расчет кривых элементов теоретического чертежа
     LD.Stability();           // процедура сделает видимыми плечи остойчивости
-    Zmet=LD.In( Draught-Do,LD.zM ); // h=0 нулевая поперечная остойчивость
+    Zmet=LD.In( Draught-Do,LD.zM );    // h=0 нулевая поперечная остойчивость
 MainLoop:
   switch( ans )
-  { case _Esc:StabWin.Close(); break;
+  { case _Esc: goto Ret; // StabWin.Close(); break;
     case _F1: StabWin.Help( Name,Cmds,Plus,0,1 ); break;
     case _F4: do{ Real A=Amax;
                   if( !(ans=LD.Stability_Menu()) )goto Ret;
                   if( A!=Amax )LD.Stability(); StabWin.Draw();
                 } while( ans!=_Esc && stWin->Ready() ); break;
     case _Enter: StabWin.Draw();                  // принудительная перерисовка
-  } ans=StabWin.WaitKey();
+  }
+  if( ans=StabWin.WaitKey() )
   if( StabWin.Ready() )goto MainLoop;
-
 Ret:  W=StabWin.Width;                            // сохраняются размеры экрана
       H=StabWin.Height;                           // для последующих обращений
+//    while( StabWin.GetKey() );
         First=false;
-        stWin=NULL; //while( StabWin.GetKey() );
+        stWin=NULL;
         stLD=NULL;
 }
