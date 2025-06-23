@@ -661,7 +661,8 @@ static void Axis( bool isMar, int Cl )
 //if( !Fmt )y=-y;
                     needle( k+2-x,g-k+y,k+2+x,g-k-y );
   if( Tv_getk()&SHIFT )return;
-  Tv.Font( _Small_font,15 );   //Tv.mY/59+3 );
+  Tv.Font( _Simplex_font,16 );
+//Tv.Font( _Small_font,15 );   //Tv.mY/59+3 );
   if( Cl )cl=color( Cl|0x18 );
   //
   //  Data Title & Size of Image Field Calculating
@@ -692,7 +693,9 @@ static void Axis( bool isMar, int Cl )
   //            Названия пунктов
   //
   if( isMar )
-  { Tv.Font( _Small_font,15 ); hidevisualpage();
+  { Tv.Font( _Simplex_font,16 );
+//  Tv.Font( _Small_font,15 );
+    hidevisualpage();
     for( k=0; k<Nm; k++ )
     { Q=Mar[k].G; DtI( Q );
       if( Q.x>=jX && Q.x<jX+lX && Q.y>=jY && Q.y<jY+lY )

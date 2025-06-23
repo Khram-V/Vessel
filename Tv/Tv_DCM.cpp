@@ -265,7 +265,7 @@ int Field_Window::DCReadItem()
   } return feof( DC );
 }
 
-//#include "..\Graphics\BGI\simplex_font.c++"
+//#include "simplex_font.c++"
 
 void Field_Window::Draw( Field& wF ) // Typ = 5,6 типа входного файла
 { //
@@ -306,31 +306,28 @@ void Field_Window::Draw( Field& wF ) // Typ = 5,6 типа входного файла
       } Ghelp();    F.Lx-=F.Jx; Active=5; // 0x01 | 0x04
       rewind( DC ); F.Ly-=F.Jy;           //
   } }
-
   if( !Active ){ if( DC )fclose( DC ); Break( "? %s не открыт",Name ); } else
   { Real Ly,Lx,dF,dL;
-    Ly=Tv_port.bottom-Tv_port.top;      // Выборка текущих размерностей
-    Lx=Tv_port.right-Tv_port.left;      // и пересчет их в меркаторскую
-    if( !wF.Ly || !wF.Lx )wF=F;         //                     проекцию
+    Ly=Tv_port.bottom-Tv_port.top;       // Выборка текущих размерностей и
+    Lx=Tv_port.right-Tv_port.left;       // пересчет их в меркаторскую проекцию
+    if( !wF.Ly || !wF.Lx )wF=F;
     { int ax,ay; getaspectratio( &ax,&ay );
-      if( wF.Lx<0 )wF.Jx+=wF.Lx,wF.Lx=-wF.Lx; // на случай опрокидывания
-      if( wF.Ly<0 )wF.Jy+=wF.Ly,wF.Ly=-wF.Ly; // размерности прямоугольника
+      if( wF.Lx<0 )wF.Jx+=wF.Lx,wF.Lx=-wF.Lx;     // на случай опрокидывания
+      if( wF.Ly<0 )wF.Jy+=wF.Ly,wF.Ly=-wF.Ly;     // размерности прямоугольника
           dF = ax*wF.Ly/Ly/ay;
           dL = ay*wF.Lx/Lx/ax;
-      if( dF>dL )
-        { dL = ax*dF*Lx/ay; wF.Jx-=dL/2-wF.Lx/2; wF.Lx=dL;
-        } else
-        { dF = ay*dL*Ly/ax; wF.Jy-=dF/2-wF.Ly/2; wF.Ly=dF;
-        } F=wF;                 //
-          Focus();              // Установка пересчитанного масштаба
-    }                           //
+      if( dF>dL ){ dL=ax*dF*Lx/ay; wF.Jx-=dL/2-wF.Lx/2; wF.Lx=dL; }
+            else { dF=ay*dL*Ly/ax; wF.Jy-=dF/2-wF.Ly/2; wF.Ly=dF; }
+      F=wF;
+      Focus();                             // Установка пересчитанного масштаба
+    }
     if( !(Active&0x04) )
     { Points_Scale=hypot( Tv_Y( 0 )-Tv_Y( 1 ),
                           Tv_X( 0 )-Tv_X( 1 ) )*2;
       P=(Point*)Allocate( 201*sizeof( Point ) );
       p=(point*)Allocate( 201*sizeof( point ) );
-      Tv.Font( _Small_font );
-//    Tv.Font( simplex_font );
+//    Tv.Font( _Small_font );
+      Tv.Font( _Simplex_font );
       while( !DCReadItem() )                       // Прорисовка Design-CAD 5/6
       if( DT )if( Entity_Type==1 || Entity_Type==4 )
       { fprintf( DT,"%3d %2u",Number_of_Points,Entity_Type );
@@ -368,21 +365,21 @@ void Field_Window::Draw( Field& wF ) // Typ = 5,6 типа входного файла
       pattern( Active&4?(int)WHITE:(int)_WHITE );
   }
 }
-//um{ _0,_1=51<<2,_2=104<<2,_3=153<<2,_4=204<<2,_5=255<<2 };
-enum{ _0,_1=51,_2=104,_3=153,_4=204,_5=255 };
-                                         //
-static RGB_colors DC_colors_16[16] =     //
-        { { _5,_5,_5,0 },{ _0,_0,_0,0 }  //  0 - WHITE,    BLACK
-        , { _0,_0,_2,0 },{ _0,_2,_0,0 }  //  2 - BROWN,    GREEN
-        , { _3,_0,_0,0 },{ _0,_1,_3,0 }  //  4 - BLUE,     LIGHTBROWN
-        , { _2,_3,_0,0 },{ _3,_0,_3,0 }  //  6 - CYAN,     LIGHTMAGENTA
-        , { 84,84,84,0 },{ _3,_3,_3,0 }  //  8 - GRAY,     LIGHTGRAY
-        , { _0,_0,_5,0 },{ _1,_3,_0,0 }  // 10 - RED,      LIGHTGREEN
-        , { _5,_3,_1,0 },{ _1,_5,_5,0 }  // 12 - LIGHTBLUE,YELLOW
-        , { _4,_4,_0,0 },{ _5,_2,_5,0 }  // 14 - LIGHTCYAN,LIGHTMAGENTA
-        };                               //
-static Course Console();                 // Процедура интерактивного управления
-                                         // Инициализация графического
+// enum{ _0,_1=51<<2,_2=104<<2,_3=153<<2,_4=204<<2,_5=255<<2 }
+enum{ _0,_1=51,$1=84,_2=104,_3=153,$3=192,_4=204,_5=255 };
+                                        //
+static RGB_colors DC_colors_16[16] =    //
+        { { _5,_5,_5,0 },{ _0,_0,_0,0 } //  0 - WHITE,    BLACK
+        , { _0,_0,_2,0 },{ _0,_2,_0,0 } //  2 - BROWN,    GREEN
+        , { _3,_0,_0,0 },{ _0,_1,_3,0 } //  4 - BLUE,     LIGHTBROWN
+        , { _2,_3,_0,0 },{ _3,_0,_3,0 } //  6 - CYAN,     LIGHTMAGENTA
+        , { $1,$1,$1,0 },{ _3,_3,_3,0 } //  8 - GRAY,     LIGHTGRAY
+        , { _0,_0,_5,0 },{ _1,_3,_0,0 } // 10 - RED,      LIGHTGREEN
+        , { _5,_3,_1,0 },{ _1,$3,_4,0 } // 12 - LIGHTBLUE,YELLOW
+        , { _4,_4,_0,0 },{ _5,_2,_5,0 } // 14 - LIGHTCYAN,LIGHTMAGENTA
+        };                              //
+static Course Console();                // Процедура интерактивного управления
+                                        // Инициализация графического
 void DCM_View( char *Name, const int Type )
 { Tv_Graphics_Start(); setwindowtitle( "Tv - Design-CAD ver.5,6" );
   if( !Msg )Msg=(char*)malloc( MAX_PATH*12 );

@@ -38,7 +38,8 @@ static struct _ScreenSave_{ _ScreenSave_(){ FreeConsole(),AllocConsole(); // о
                   clrscr();
 //                setlocale( LC_ALL,".1251" );           // LC_TYPE
 //                setlocale( LC_ALL,".UTF8" );
-                }#if 0
+                }
+#if 0
  ~_ScreenSave_(){ SetConsoleWindowInfo( StdOut,true,&(Screen.srWindow) );                  SetConsoleScreenBufferSize( StdOut,Screen.dwSize );                  SetConsoleTextAttribute( StdOut,Screen.wAttributes );                  Screen.dwCursorPosition.Y=Screen.srWindow.Bottom-2;
                   SetConsoleCursorPosition( StdOut,Screen.dwCursorPosition );
                   FreeConsole();

@@ -35,3 +35,8 @@ void Window::Help
   } P.Show(); //Save().Refresh();            // среда восстанавливается, а
     WaitKey();                               // окно будет снято Р-деструктором
 }
+//#pragma omp master // single
+//#pragma omp taskwait
+//#pragma omp task
+// while( WinReady( this ) && !GetKey() )WaitTime( 50 ); //Sleep( 500 );
+
