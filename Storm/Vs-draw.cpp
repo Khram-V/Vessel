@@ -386,7 +386,7 @@ Hull& Hull::NavigaInform( Window *Win )
 //
 bool Hull::Draw()                  // Виртуальная процедура простой перерисовки
 { static bool Recurse=false;
-  if( !IsWindowVisible( hWnd ) || IsIconic( hWnd ) )return false;
+//if( !IsWindowVisible( hWnd ) || IsIconic( hWnd ) )return false;
   if( Recurse || !ShipName )return false; Recurse=true; Activate();
   glEnable( GL_CULL_FACE );
   glEnable( GL_DEPTH_TEST );

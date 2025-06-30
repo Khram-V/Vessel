@@ -16,19 +16,20 @@ Place::Place( Window *Win, byte Mode ): Site( Win ),Signs( Mode ),Up( NULL ),
            Img( NULL ),      // фоновый растр с наложенной площадкой PlaceAbove
         isDraw( false ),     //  прорисовка сбрасывается по случаю незавершения
        isMouse( false )      //     предыдущей операции (во избежание рекурсии)
-{ if( glAct( Win ) )         // связь контекста OpenGL с требуемым окном Window
+{ //if( glAct( Win ) )       // связь контекста OpenGL с требуемым окном Window
   if( this!=(Place*)Win )    // обход неприкасаемого базового окна Window.Place
   { Place *S=(Place*)Win;    // Tw=S->Tw; Th=S->Th; Bit=NULL;
-    chY=Height-Win->Ft->Th; // буквенная позиция изначально будет сверху/слева
     while( S->Up )S=S->Up; S->Up=this;   // новая площадка набрасывается сверху
 //  if( Site->Up==this )Site->Save();    // первый фрагмент сохраняет фон окна?
+    glAct( Win );            // связь контекста OpenGL с требуемым окном Window
+    chY=Height-AlfaHeight(); // буквенная позиция изначально будет сверху/слева
   }
 }
 //
 //!   блок контекстно-зависимых (дружественных) процедур управления фрагментами
 //                  возможно нужна единая ссылка к чистому выходу из прерываний
 Place& Place::Activate( bool act )        // активизация графического контекста
-{ wglMakeCurrent( Site->hDC,Site->hRC );          // предустановленной страницы
+{ glAct( Site ); //wglMakeCurrent( Site->hDC,Site->hRC ); // предустановленной страницы
   glViewport( pX,pY,Width,Height );               // установка  растрового поля
  //glScissor( pX,pY,Width,Height );               // обрезка внешнего окружения
   if( act )                                       // если без внешней настройки

@@ -21,10 +21,6 @@
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Compiler>
-					<Add directory="../Tools/Glut" />
-					<Add directory="../Window" />
-				</Compiler>
 				<Linker>
 					<Add library="comdlg32" />
 				</Linker>
@@ -92,14 +88,12 @@
 				<Option projectLinkerOptionsRelation="2" />
 				<Option projectIncludeDirsRelation="2" />
 				<Compiler>
-					<Add directory="../Window" />
-					<Add directory="../Tools/Glut" />
-					<Add directory="../Tools/GlFw" />
-					<Add directory="../../SoftWare/GLfw/include/GLFW" />
+					<Add option="-DGLFW" />
+					<Add directory="../../../SoftWare/GLfw/include/GLFW" />
 				</Compiler>
 				<Linker>
-					<Add library="../../SoftWare/Dev/Lib/libglfw3_static.a" />
-					<Add library="comdlg32" />
+					<Add library="libglfw3_static.a" />
+					<Add directory="../../../SoftWare/Dev/Lib" />
 				</Linker>
 			</Target>
 			<Target title="GLFW Trial">
@@ -110,11 +104,12 @@
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
+					<Add option="-DGLFW" />
 					<Add directory="../Tools/GlFw" />
-					<Add directory="../../SoftWare/GLfw/include/GLFW" />
+					<Add directory="../../../SoftWare/GLfw/include/GLFW" />
 				</Compiler>
 				<Linker>
-					<Add library="../../SoftWare/Dev/Lib/libglfw3_static.a" />
+					<Add library="../../../SoftWare/Dev/Lib/libglfw3_static.a" />
 					<Add library="comdlg32" />
 					<Add library="gomp" />
 				</Linker>
@@ -214,21 +209,6 @@
 			<Option target="UTF-8-Unicode-OEM(866)alt" />
 			<Option target="Window Shapes" />
 		</Unit>
-		<Unit filename="../Tools/GlFw/Utility.cpp">
-			<Option target="GLFW Shapes" />
-			<Option target="GLFW Trial" />
-		</Unit>
-		<Unit filename="../Tools/GlFw/View.h">
-			<Option target="GLFW Shapes" />
-			<Option target="GLFW Trial" />
-		</Unit>
-		<Unit filename="../Tools/GlFw/Window.cpp">
-			<Option target="GLFW Shapes" />
-			<Option target="GLFW Trial" />
-		</Unit>
-		<Unit filename="../Tools/GlFw/Window.h">
-			<Option target="GLFW Trial" />
-		</Unit>
 		<Unit filename="../Tools/Glut/Geometry.cpp">
 			<Option target="Window Shapes" />
 			<Option target="Window Trial" />
@@ -306,6 +286,8 @@
 			<Option target="Window Shapes" />
 			<Option target="A-lib32" />
 			<Option target="A-lib64" />
+			<Option target="GLFW Shapes" />
+			<Option target="GLFW Trial" />
 		</Unit>
 		<Unit filename="../Window/Julian.cpp">
 			<Option target="A-lib64" />
@@ -348,6 +330,23 @@
 			<Option target="A-lib32" />
 			<Option target="A-lib64" />
 		</Unit>
+		<Unit filename="../Window/WinGLFW.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option target="GLFW Shapes" />
+			<Option target="GLFW Trial" />
+		</Unit>
+		<Unit filename="../Window/WinGLFW.h">
+			<Option target="GLFW Shapes" />
+			<Option target="GLFW Trial" />
+		</Unit>
+		<Unit filename="../Window/WinMSoft.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option target="Window Shapes" />
+			<Option target="Window Trial" />
+			<Option target="A-lib64" />
+		</Unit>
 		<Unit filename="../Window/Window-Free.cpp">
 			<Option compile="0" />
 			<Option link="0" />
@@ -365,6 +364,8 @@
 			<Option target="A-lib64" />
 			<Option target="Window Shapes" />
 			<Option target="Window Trial" />
+			<Option target="GLFW Shapes" />
+			<Option target="GLFW Trial" />
 		</Unit>
 		<Unit filename="../Window/Window.h">
 			<Option target="A-lib32" />
@@ -377,11 +378,14 @@
 			<Option target="A-lib64" />
 			<Option target="Window Shapes" />
 			<Option target="Window Trial" />
+			<Option target="GLFW Shapes" />
+			<Option target="GLFW Trial" />
 		</Unit>
 		<Unit filename="../Window/Window_Menu.cpp">
 			<Option target="A-lib64" />
 			<Option target="Window Shapes" />
 			<Option target="A-lib32" />
+			<Option target="GLFW Shapes" />
 		</Unit>
 		<Extensions>
 			<wxsmith version="1">

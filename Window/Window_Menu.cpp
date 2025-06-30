@@ -137,9 +137,9 @@ Rep: ins=GetKeyState( VK_INSERT );            // признак 1-вставки
      }
      if( ked!=-1 && ked!=K ){ K=ked; Get( Ls,ked ); }     // будет новое число?
      Draw();
-     if( !(ans=A->WaitKey() ) )break; // случай закрытия окна
+     if( !(ans=A->WaitKey() ) )break;                  // случай закрытия окна
      if( ans>=_F1 && ans<=_F12 )return ans;
-   }                                  // по выходу из процедуры ???
+   }                                   // по выходу из процедуры ???
 Fin: if( ans )Draw(); return ans?K:0; // площадка с текстом остается на экране
 }
 bool TextMenu::Draw()            // картинка со списком строк запросов/форматов

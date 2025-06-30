@@ -127,7 +127,7 @@ Place::Place( Window *Win, byte Mode ): Site( Win ),Up( NULL ),Signs( Mode ),
   { Place *S=(Place*)Win;
     while( S->Up )S=S->Up; S->Up=this;  // новая площадка набрасывается сверху
     glfwMakeContextCurrent( Win->glfwWindow );     // временная привязка к окну
-    Alfabet().Activate();               // Courier New \ Bit( _8x16 )
+//  Alfabet().Activate();               // Courier New \ Bit( _8x16 )
     chY=Height-FontHeight;   // буквенная позиция изначально будет сверху/слева
 } }
 Place::~Place()  // освобождение площадки, шрифтов, картинки и всех точек входа
@@ -163,7 +163,7 @@ Window* Place::Ready(){ if(Site){Site->WaitEvents(); } return Site; }
 //
 Window::Window( const char *_title,int x,int y,int w,int h )
       : Place( this,PlaceAbove|PlaceOrtho ),         // ортогонализуется [-1:1]
-        Title( _title ), Next( NULL ),               //    и сохраняется
+        Caption( _title ), Next( NULL ),               //    и сохраняется
         isCursorInside( true ),     // Flag if cursor inside this window or not
         glfwWindow( NULL ),
         ScreenWidth( GetSystemMetrics( SM_CXSCREEN ) ),
@@ -215,7 +215,7 @@ Window::Window( const char *_title,int x,int y,int w,int h )
     Up=NULL;                        // верхний фрагмент в списке наложений
     Site=this;                      // связанный Place ссылается на Window
     Locate( x,y,w,h );              // установка размерений нового окна
-    Alfabet();                      // исходный шрифт участвует в размерностях
+    AlfaVector();                   // исходный шрифт участвует в размерностях
     Activate().Clear();             // включение всего окна в качестве площадки
     chY=Height-FontHeight;          // позиция текстового курсора сверху/слева
 }
@@ -289,7 +289,7 @@ byte Window::ModifyKeyWithState( byte code )
   return code;
 }
 #endif
-void Window::PutChar( byte Key )                    // занесение одного символа
+void Window::PutChar( unsigned short Key )                    // занесение одного символа
 {  ++KeyPas; KeyPas&=0x3F;                          //  и его кода в кольцевой
      KeyBuffer[KeyPas].Key=Key;                     //  буфер для букв и кодов
      KeyBuffer[KeyPas].Code=ModifyKeyWithState();
@@ -432,6 +432,7 @@ void Window::WaitEvents( bool stop )
 }
 ///    Начальная установка базового шрифта, связанного с текущим окном OpenGL
 ///
+#if 0
 Place& Place::AlfaBit( unsigned char *DispCCCP )     /// старый советский растр
 { if( !( BitFont=DispCCCP ) )BitFont=_8x16;           // в GLFW линкуется сходу
          FontWidth=BitFont[0]+1,FontHeight=BitFont[1]+2; return *this;
@@ -485,6 +486,7 @@ SIZE Place::AlfaRect( const char *s, bool ANSI ) // предварительнo 
        if( oFont )SelectObject( hDC,oFont );
      } return F;
 }
+#endif
 //! Подборка независимых от среды программирования транзакций в OpenGL
 //  (пере)Установка размеров рабочей площадки/фрагмента внутри окна Window
 //   если X,Y > 0 - отсчеты от левого верхнего угла, иначе - правого нижнего
@@ -594,6 +596,7 @@ Place& Place::Rest()     //! прямое восстановление раст�
 //
 //!   Работа с текстами в стиле Microsoft-Windows
 //
+#if 0
 static		               // Растровый шрифт DOS-OEM(866)alt из эпохи CCCP
 void _OutBitText( const char *s, const byte *font, int& X,int& Y )
 { int w=font[0]+1,h=font[1]+2;               // в разборе текста контролируется
@@ -651,6 +654,7 @@ Place& Place::String( Course Dir, const Real *P, const char* str )
           else  _OutText( str,FontBase,dx,dy,0 );            // здесь отключены
    return *this;
 }
+#endif
 #include <StdIO.h>                            // блок разных текстовых надписей
 #include <StdArg.h>
 #define ArgStr int len; va_list aV; va_start( aV,fmt );                    \
@@ -658,6 +662,12 @@ Place& Place::String( Course Dir, const Real *P, const char* str )
   vsnprintf( wl,len+1,fmt,aV ); } va_end( aV ); if( len<=0 )return *this;
 
 static string wl;                // просто "временная" строчка на всё и про всё
+
+//Place& Place::AlfaVector(_Real H,_Real T ){ return *this; } // только UTF-8, Н=0 - без масштаба
+//Place& Place::Print(_Real x,_Real y,const char *f,... ){ return *this; } // лист y/x<=0 -снизу/справа
+//Place& Place::Print( const char *f, ... ){ return *this; }              // контекстная печать
+
+#if 0
 Place& Place::Print( const char *fmt,... ){ ArgStr String(wl); return *this; }
 Place& Place::Print( int x, int y, const char *fmt, ... )
 { ArgStr char *s,*w=wl; --x;
@@ -668,11 +678,12 @@ Place& Place::Print( int x, int y, const char *fmt, ... )
          else chX=max( 0L,Width+FontWidth*x-AlfaRect( s ).cx ); String( s );
   } return *this;
 }
+//#endif
 Place& Place::Text( Course Dir, const Real *P, const char* fmt, ... )
      { ArgStr String( Dir,P,wl ); return *this; }
 Place& Place::Text( Course Dir, _Real X,_Real Y,_Real Z, const char* fmt, ... )
      { Real P[3]={ X,Y,Z }; ArgStr String( Dir,P,wl ); return *this; }
-#if 0
+//#if 0
 /**
  *\brief       Function for converting utf-8 string to cp1251 using winapi.
  *\warning     Result string must be free after using.
@@ -690,9 +701,53 @@ char* win_from_utf8_to_cp1251(const char * s)
   delete[] wstr;
   return str;
 }                                    //             win_from_utf8_to_cp1251(s);
-#endif
 void Break( const char Msg[], ... )   // Случай аварийного завершения программы
 { va_list V; va_start( V,Msg );
   char str[vsprintf( 0,Msg,V )+1]; vsprintf( str,Msg,V ); va_end( V );
   MessageBox( NULL,UtA( str ),"Break",MB_ICONASTERISK|MB_OK ); exit( 1 );
 }
+#endif
+Window& Window::Title( const char* A )
+{ if( Caption ){ char S[strlen(Caption)+strlen(A)+8];
+//  SetWindowTextW( hWnd,U2W( strcat(strcat(strcpy(S,Caption),"  ↔  " ),A) ) ); ????
+  } return *this;
+}
+Window& Window::Icon( const char* A )
+{ if( Caption ){ HICON hIcon=LoadIcon(GetModuleHandle(NULL),A); // ~~ hInstance
+//  SendMessage( hWnd,WM_SETICON,ICON_BIG,(LPARAM)hIcon );      //   ICON_SMALL
+  } return *this;
+}
+Window& Window::Above(){} // SetForegroundWindow( hWnd ); return Refresh(); }
+
+void Break( const char Msg[],... )    // Случай аварийного завершения программы
+{ va_list V; va_start( V,Msg );       // или приостановка с первым символом "~"
+ char str[vsprintf( 0,Msg,V )+4]; vsprintf( str,Msg,V ); va_end( V );
+  if( First )glFinish(); //,WinExecute();
+  MessageBoxW( NULL,U2W(str),*Msg=='~'?L"Info":L"Break",MB_ICONASTERISK|MB_OK );
+  if( *Msg!='~' )exit( MB_OK );
+}
+
+void Window::Help( const char *N[],const char *C[],const char *P[],int X,int Y ){}
+
+static void PushMatrix()     //! сброс в стек координатных систем OpenGL-Window
+{ glPushAttrib( GL_VIEWPORT_BIT | GL_POLYGON_BIT | GL_ENABLE_BIT ); // что надо
+  glPushMatrix(),glMatrixMode( GL_PROJECTION ),glPushMatrix(),
+                 glMatrixMode( GL_MODELVIEW );
+}
+static void PopMatrix()          //! и затем восстановление исходного состояния
+{ glMatrixMode( GL_PROJECTION ),glPopMatrix(),
+  glMatrixMode( GL_MODELVIEW ),glPopMatrix(),glPopAttrib(); // обратный порядок
+}
+
+RasterSector::RasterSector
+  ( int pX,int pY, int W,int H, Real Scale )  // настройка чисто
+  { PushMatrix(); glPushAttrib( GL_ENABLE_BIT );
+    glLoadIdentity(); glMatrixMode( GL_PROJECTION ); //cX=cY=0;
+    glLoadIdentity(); glViewport( pX,pY,W,H );
+    glOrtho( 0,W/Scale,0,H/Scale,0,1 );   // gluOrtho2D( 0,W/Scale,0,H/Scale );
+    glMatrixMode( GL_MODELVIEW );
+    glDisable( GL_DEPTH_TEST );
+    glDisable( GL_LIGHTING );
+  }
+RasterSector::~RasterSector(){ PopMatrix(); glPopAttrib(); }
+

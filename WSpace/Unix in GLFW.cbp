@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="GLFW to Unix" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Aurora Storm">
+				<Option output="../WSpace/Dev/Aurora-GLFW" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../Vessel" />
+				<Option object_output="../../Work/Obj" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+				<Option parameters='&quot;БПК «Стерегущий»-61&quot;' />
+				<Option projectCompilerOptionsRelation="2" />
+				<Option projectLinkerOptionsRelation="2" />
+			</Target>
+			<Target title="Waves Profile">
+				<Option output="../WSpace/Dev/Wave-GLFW" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../Vessel" />
+				<Option object_output="../../Work/Obj" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+				<Option projectCompilerOptionsRelation="0" />
+				<Option projectLinkerOptionsRelation="2" />
+			</Target>
+			<Target title="Hull Theory">
+				<Option output="../WSpace/Dev/Hull-GLFW" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../Vessel" />
+				<Option object_output="../../Work/Obj" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option parameters="«Аврора»(а)" />
+				<Option projectCompilerOptionsRelation="0" />
+				<Option projectLinkerOptionsRelation="2" />
+			</Target>
+			<Target title="Ship Viewer">
+				<Option output="../WSpace/Dev/Ship-GLFW" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../Ship/Save" />
+				<Option object_output="../../Work/Obj" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+				<Option parameters='&quot;Лидер эсминцев «Ташкент».fef&quot;' />
+				<Option projectCompilerOptionsRelation="0" />
+				<Option projectLinkerOptionsRelation="2" />
+			</Target>
+			<Target title="Window-shapes">
+				<Option output="../WSpace/Dev/Window-Shapes" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../Vessel" />
+				<Option object_output="../../Work/Obj" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+				<Option projectCompilerOptionsRelation="0" />
+				<Option projectLinkerOptionsRelation="2" />
+			</Target>
+			<Target title="Window-trial">
+				<Option output="../WSpace/Dev/Window-trial" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../Vessel" />
+				<Option object_output="../../Work/Obj" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+				<Option projectCompilerOptionsRelation="0" />
+				<Option projectLinkerOptionsRelation="2" />
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Os" />
+			<Add option="-funsigned-char" />
+			<Add option="-fopenmp" />
+			<Add option="-ffast-math" />
+			<Add option="-Wunused" />
+			<Add option="-DGLFW" />
+			<Add option="-D_GLFW_WIN32" />
+			<Add directory="../Window/GLFW" />
+		</Compiler>
+		<Linker>
+			<Add option="-s" />
+			<Add library="opengl32" />
+			<Add library="glu32" />
+			<Add library="comdlg32" />
+			<Add library="gdi32" />
+			<Add library="gomp" />
+		</Linker>
+		<Unit filename="../Math/Function.cpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="../Math/Function.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="../Math/Tensor.cpp">
+			<Option target="Waves Profile" />
+			<Option target="Window-shapes" />
+		</Unit>
+		<Unit filename="../Math/Tensor.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="../Math/Vector.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="../Math/Volume.cpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="../Math/Volume.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="../Ship/Hull.cpp">
+			<Option target="Hull Theory" />
+		</Unit>
+		<Unit filename="../Ship/Hull.h">
+			<Option target="Hull Theory" />
+		</Unit>
+		<Unit filename="../Ship/K-Frame.cpp">
+			<Option target="Hull Theory" />
+		</Unit>
+		<Unit filename="../Ship/K-Hull.cpp">
+			<Option target="Hull Theory" />
+		</Unit>
+		<Unit filename="../Ship/K-Math.cpp">
+			<Option target="Hull Theory" />
+		</Unit>
+		<Unit filename="../Ship/K-Statics.cpp">
+			<Option target="Hull Theory" />
+		</Unit>
+		<Unit filename="../Ship/K_Michell.cpp">
+			<Option target="Hull Theory" />
+		</Unit>
+		<Unit filename="../Ship/K_Wave.cpp">
+			<Option target="Hull Theory" />
+		</Unit>
+		<Unit filename="../Ship/K_WaveAta.cpp">
+			<Option target="Hull Theory" />
+		</Unit>
+		<Unit filename="../Ship/K_WaveGot.cpp">
+			<Option target="Hull Theory" />
+		</Unit>
+		<Unit filename="../Ship/Ship.cpp">
+			<Option target="Ship Viewer" />
+		</Unit>
+		<Unit filename="../Ship/Ship.h">
+			<Option target="Ship Viewer" />
+		</Unit>
+		<Unit filename="../Ship/Ship_IO.cpp">
+			<Option target="Ship Viewer" />
+		</Unit>
+		<Unit filename="../Ship/Ship_Surface.cpp">
+			<Option target="Ship Viewer" />
+		</Unit>
+		<Unit filename="../Storm/Aurora.cpp">
+			<Option target="Aurora Storm" />
+		</Unit>
+		<Unit filename="../Storm/Aurora.h">
+			<Option target="Aurora Storm" />
+		</Unit>
+		<Unit filename="../Storm/Aurora.inc">
+			<Option target="Aurora Storm" />
+		</Unit>
+		<Unit filename="../Storm/Flex.cpp">
+			<Option target="Aurora Storm" />
+			<Option target="Ship Viewer" />
+		</Unit>
+		<Unit filename="../Storm/Flex.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="../Storm/Vs-conf.cpp">
+			<Option target="Aurora Storm" />
+		</Unit>
+		<Unit filename="../Storm/Vs-draw.cpp">
+			<Option target="Aurora Storm" />
+		</Unit>
+		<Unit filename="../Storm/Vs-hull.cpp">
+			<Option target="Aurora Storm" />
+		</Unit>
+		<Unit filename="../Storm/Vs-math.cpp">
+			<Option target="Aurora Storm" />
+		</Unit>
+		<Unit filename="../Storm/Vs-regst.cpp">
+			<Option target="Aurora Storm" />
+		</Unit>
+		<Unit filename="../Storm/Vs-view.cpp">
+			<Option target="Aurora Storm" />
+		</Unit>
+		<Unit filename="../Storm/Vs-write.cpp">
+			<Option target="Aurora Storm" />
+		</Unit>
+		<Unit filename="../Storm/Wave/Draw.cpp">
+			<Option target="Waves Profile" />
+		</Unit>
+		<Unit filename="../Storm/Wave/Math.cpp">
+			<Option target="Waves Profile" />
+		</Unit>
+		<Unit filename="../Storm/Wave/Wave.cpp">
+			<Option target="Waves Profile" />
+		</Unit>
+		<Unit filename="../Storm/Wave/Wave.h">
+			<Option target="Waves Profile" />
+		</Unit>
+		<Unit filename="../Storm/Ws-field.cpp">
+			<Option target="Aurora Storm" />
+		</Unit>
+		<Unit filename="../Storm/Ws-view.cpp">
+			<Option target="Aurora Storm" />
+		</Unit>
+		<Unit filename="../Tools/Allocate.cpp">
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Window-shapes" />
+			<Option target="Hull Theory" />
+			<Option target="Ship Viewer" />
+		</Unit>
+		<Unit filename="../Tools/Allocate.h">
+			<Option target="Aurora Storm" />
+		</Unit>
+		<Unit filename="../Tools/FileOpen.cpp">
+			<Option target="Aurora Storm" />
+			<Option target="Hull Theory" />
+			<Option target="Ship Viewer" />
+		</Unit>
+		<Unit filename="../Tools/Glut/Geometry.cpp">
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
+		</Unit>
+		<Unit filename="../Tools/Glut/Geometry.h">
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
+		</Unit>
+		<Unit filename="../Tools/Glut/Teapot.cpp">
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
+		</Unit>
+		<Unit filename="../Tools/Ship.Rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
+		<Unit filename="../Tools/StrCpy.cpp" />
+		<Unit filename="../Tools/Utah/Tea.cpp">
+			<Option target="Window-trial" />
+		</Unit>
+		<Unit filename="../Tools/Utah/Tea.inc">
+			<Option target="Window-trial" />
+		</Unit>
+		<Unit filename="../Type.h" />
+		<Unit filename="../Window/ConIO.cpp">
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Window-shapes" />
+			<Option target="Ship Viewer" />
+			<Option target="Window-trial" />
+		</Unit>
+		<Unit filename="../Window/ConIO.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="../Window/Examples/Window-shapes.cpp">
+			<Option target="Window-shapes" />
+		</Unit>
+		<Unit filename="../Window/Examples/Window-trial.cpp">
+			<Option target="Window-trial" />
+		</Unit>
+		<Unit filename="../Window/Font.cpp" />
+		<Unit filename="../Window/GLFW/context.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Window/GLFW/egl_context.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Window/GLFW/init.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Window/GLFW/input.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Window/GLFW/monitor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Window/GLFW/null_init.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Window/GLFW/null_joystick.c">
+			<Option compilerVar="CC" />
+			<Option compile="0" />
+			<Option link="0" />
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
+		</Unit>
+		<Unit filename="../Window/GLFW/null_monitor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Window/GLFW/null_window.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Window/GLFW/osmesa_context.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Window/GLFW/platform.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Window/GLFW/vulkan.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Window/GLFW/wgl_context.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Window/GLFW/win32_init.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Window/GLFW/win32_joystick.c">
+			<Option compilerVar="CC" />
+			<Option compile="0" />
+			<Option link="0" />
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
+		</Unit>
+		<Unit filename="../Window/GLFW/win32_module.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Window/GLFW/win32_monitor.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Window/GLFW/win32_thread.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Window/GLFW/win32_time.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Window/GLFW/win32_window.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Window/GLFW/window.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Window/Julian.cpp" />
+		<Unit filename="../Window/Sym_CCCP.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../Window/UniCode.cpp" />
+		<Unit filename="../Window/View.cpp">
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Window-shapes" />
+			<Option target="Ship Viewer" />
+			<Option target="Window-trial" />
+		</Unit>
+		<Unit filename="../Window/View.h">
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Window-shapes" />
+		</Unit>
+		<Unit filename="../Window/WinGLFW.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
+		</Unit>
+		<Unit filename="../Window/WinGLFW.h">
+			<Option target="Window-shapes" />
+		</Unit>
+		<Unit filename="../Window/WinMSoft.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option target="Window-shapes" />
+		</Unit>
+		<Unit filename="../Window/Window-Free.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option target="Waves Profile" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
+		</Unit>
+		<Unit filename="../Window/Window-Place.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option target="Waves Profile" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
+		</Unit>
+		<Unit filename="../Window/Window.cpp" />
+		<Unit filename="../Window/Window.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="../Window/Window_Help.cpp" />
+		<Unit filename="../Window/Window_Menu.cpp" />
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

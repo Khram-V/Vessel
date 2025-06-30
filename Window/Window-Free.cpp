@@ -32,6 +32,16 @@ Place& Place::Area( int X,int Y, int W,int H )     // достаточно сд�
 //      Подготовка площадки для растровых манипуляций
 //
 //#include <GL/Glu.h>
+
+static void PushMatrix()     //! сброс в стек координатных систем OpenGL-Window
+{ glPushAttrib( GL_VIEWPORT_BIT | GL_POLYGON_BIT | GL_ENABLE_BIT ); // что надо
+  glPushMatrix(),glMatrixMode( GL_PROJECTION ),glPushMatrix(),
+                 glMatrixMode( GL_MODELVIEW );
+}
+static void PopMatrix()          //! и затем восстановление исходного состояния
+{ glMatrixMode( GL_PROJECTION ),glPopMatrix(),
+  glMatrixMode( GL_MODELVIEW ),glPopMatrix(),glPopAttrib(); // обратный порядок
+}
 RasterSector::RasterSector
   ( int pX,int pY, int W,int H, Real Scale )  // настройка чисто
   { PushMatrix(); glPushAttrib( GL_ENABLE_BIT );
@@ -73,6 +83,7 @@ Place& Place::Show()                     //! прорисовка растров
 { if( Site )
   { RasterSector Sv( pX,pY,Width,Height ); // фонового буфера в видимый рисунок
     glRasterPos2i( 0,0 );                        glDrawBuffer( GL_FRONT );
+    glCopyPixels( 0,0,Width,Height,GL_COLOR );   glDrawBuffer( GL_BACK );
     glCopyPixels( pX,pY,Width,Height,GL_COLOR ); glDrawBuffer( GL_BACK );
   //if( Site->Up==this )Site->Save();      // первая площадка сохраняет фоновую
     if( Signs&PlaceAbove && Site!=this )Save();// на фоне идёт сборная картинка
@@ -99,23 +110,11 @@ Place& Place::Rest()     //! прямое восстановление раст�
 { if( Img )              //  в фоновый буфер изображения с перемасштабированием
   { RasterSector Sv( pX,pY,Width,Height ); glRasterPos2i( 0,0 );
     if( Width!=int( Img[1] ) || Height!=int( Img[2] ) )
-     glPixelZoom( float( Width )/Img[1],float( Height )/Img[2] );
+      glPixelZoom( float( Width )/Img[1],float( Height )/Img[2] );
     glDrawPixels( Img[1],Img[2],GL_RGBA,GL_UNSIGNED_BYTE,Img+4 );
     glPixelZoom ( 1.0,1.0 );
   } glFlush(); return *this;
 }
-//   восстановление картинки для всех фрагментов с опцией PlaceAbove+(Img)
-//
-Window& Window::Refresh()    // сборка изображения с копий в оперативной памяти
-{ glContext Set( this ); Clear();           // glAdjust( this ) => навсегда
-  for( Place *S=(Place*)this; S; S=S->Up )S->Rest();  // если есть Show()
-  Show();                                   // только обновление новой картинки
-//SwapBuffers( hDC );                       // возможно так значительно быстрее
-  glFlush();                                // картинка исполнена и - сохранена
-  return *this;                             // и больше ничего рисовать не надо
-}
-Place& Place::Refresh(){ Site->Refresh(); return *this; }// туда же на всё окно
-Window& Window::Above(){ SetForegroundWindow( hWnd ); return Refresh(); }
 
 //glEnable( GL_SCISSOR_TEST ); glScissor( pX,pY,W,H );
 //glDisable( GL_SCISSOR_TEST );

@@ -1,6 +1,6 @@
-///
-///  Динамическое окошко для кратких подсказок с управляющими кодами программы
-///
+//
+//!  Динамическое окошко для кратких подсказок с управляющими кодами программы
+//
 #include "Window.h"
   //   Name[0]   Title подзаголовок - название набора инструкций для Window
   //   Name[1-3] – три строки расширенного названия (–и признак движения)
@@ -21,7 +21,7 @@ void Window::Help
   for( c=1; c<n; c++ )if( (k=i+P.AlfaRect( Name[c] ).cx+1)>l )l=k;
   { TextContext TX;  // до запроса клавиатуры восстанавливается контекст OpenGL
     P.Area( X,Y,3+(l+4)/P.AlfaWidth(),h ).Activate( true ); // текст по строкам
-    glColor4f( .6,.8, 1, .6),glRecti( 0,P.Height-3,P.Width,0 );  //    и столбцам
+    glColor4f( .6,.8, 1, .6),glRecti( 0,P.Height-3,P.Width,0 );  //  и столбцам
     glColor4f(.98,.98,.9,.8),glRecti( 3,P.Height-6,P.Width-3,12 );
     glColor3f( 0,0,0.8 );    P.Print( 2,2,Name[0] );
     glColor3f( 0,0,0 );      P.Print( Name[1] );
@@ -31,8 +31,8 @@ void Window::Help
     for( c++,k=0; k<p; k+=2 )glColor3f( 0,.8,0 ),P.Print( 2,c++,Plus[k] ),
                              glColor3f( 0,.6,.6 ),P.Print( Plus[k+1] );
     P.AlfaVector( 7,0 );
-    glColor4f( 1,.9,.8,.5 ); P.Print( -1,0,"©75÷24 В.Храмушин" );
-  } P.Show(); //Save().Refresh();            // среда восстанавливается, а
+    glColor4f( 1,.9,.8,.5 ); P.Print( -1,0,"©75÷25 В.Храмушин" );
+  } P.Show(); // P.Save().Refresh();         // среда восстанавливается, а
     WaitKey();                               // окно будет снято Р-деструктором
 }
 //#pragma omp master // single
