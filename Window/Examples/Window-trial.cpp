@@ -6,7 +6,7 @@
 //
 #include <Omp.h>
 #include <StdIO.h>
-#include "Window.h"
+#include "../Window.h"
 #include "../ConIO.h"
 #include "../../Tools/Glut/Geometry.h"
 
@@ -164,9 +164,6 @@ display_device.cb = sizeof(display_device);
   CHAR DeviceKey[128];
 */
   }
-
-
-
   Visual3D_Lightening();            // здесь пока существует только первое окно
   One.Above();
   One.Window::Mouse( ::MouseMove );

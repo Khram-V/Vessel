@@ -6,21 +6,22 @@
 //
 #include "glfw3.h"
 
-class Window: public Place            // стандартное окно Windows для OpenGL
-{ const char* Caption;                // изначальный титульный заголовок окна
+class Window: public Place         // стандартное окно Windows для OpenGL
+{ const char* Caption;             // изначальный титульный заголовок окна
 public:
-  friend class Place;               // доступ для базовой графической площадки
+  friend class Place;              // доступ для базовой графической площадки
   Window *Next;                    // следующее окно в простом списке от начала
   GLFWwindow *glfwWindow;  // pointer to glfw window associated with this class
   //
   //    Локальные данные для обслуживания главного/большого окна Windows
-  int ScreenWidth,ScreenHeight;       // размеры графического экрана компьютера
-  int WindowX,WindowY;              // выделенное местоположение активного окна
+  int ScreenWidth,ScreenHeight;    // размеры графического экрана компьютера
+  int WindowX,WindowY;             // выделенное местоположение активного окна
   //
   //    X,Y {>0 левый/верхний}~{0,0=>2/3 остатка,1/4 высоты}~{<0 правый/нижний}
   //        Width,Height >0 -> ширина/высота {0,0 => 800,600}
   //             исходный шрифт в конструкторе: Courier-18
- explicit Window( const char* T=NULL, int X=0,int Y=0, int W=0,int H=0 );
+  //
+ explicit Window( const char* T=NULL, int X=0,int Y=0, int W=800,int H=600 );
  virtual ~Window();   // деструктор срабатывает в эпилогах производных структур
   void Close();       // иначе: вариант завершения только для базовой структуры
   //      -- позиционирование +левого/-правого +верхнего/-нижнего угла Window и
@@ -86,11 +87,11 @@ public:
 };
 //    Активация с последующим восстановлением исходной графической среды
 //
-class glContext{ GLFWwindow *was;  // временное задействование контекстного
-public:                            // графического 3D-интерфейса того же OpenGL
+struct glContext                   // временное задействование контекстного
+   { GLFWwindow *was; bool Active; // графического 3D-интерфейса того же OpenGL
 explicit glContext(const Window*); // конструктор=пролог графического конвейера
-        ~glContext();             // деструктор=эпилог-возврат былого контекста
-};
+        ~glContext();              // деструктор = эпилог-возврат былой графики
+   };                              //
 #define Xpm( X ) ( GetSystemMetrics( SM_CXSCREEN )*Real( X )/100.0 )     // %%X
 #define Ypm( Y ) ( GetSystemMetrics( SM_CYSCREEN )*Real( Y )/100.0 )     // %%Y
 

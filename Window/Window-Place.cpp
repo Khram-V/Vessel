@@ -24,12 +24,12 @@ Place::Place( Window *Win, byte Mode ): Site( Win ),Signs( Mode ),Up( NULL ),
     glAct( Win );            // связь контекста OpenGL с требуемым окном Window
     chY=Height-AlfaHeight(); // буквенная позиция изначально будет сверху/слева
   }
-}
+}                                     // wglMakeCurrent( Site->hDC,Site->hRC );
 //
 //!   блок контекстно-зависимых (дружественных) процедур управления фрагментами
 //                  возможно нужна единая ссылка к чистому выходу из прерываний
 Place& Place::Activate( bool act )        // активизация графического контекста
-{ glAct( Site ); //wglMakeCurrent( Site->hDC,Site->hRC ); // предустановленной страницы
+{ glAct( Site );                                  // предустановленной страницы
   glViewport( pX,pY,Width,Height );               // установка  растрового поля
  //glScissor( pX,pY,Width,Height );               // обрезка внешнего окружения
   if( act )                                       // если без внешней настройки
@@ -40,7 +40,7 @@ Place& Place::Activate( bool act )        // активизация графич
           else glOrtho( -1,1,-1/r,1/r,-1,1 );     // внутренний 3D-размер[-1:1]
     } else     glOrtho( 0,Width,0,Height,-1,1 );  // +отсчет растра слева/снизу
     glMatrixMode(GL_MODELVIEW); glLoadIdentity(); // единичная  матрица  модели
-  } return *this;
+  } return *this;                                 //
 }
 bool Place::Draw()       // в виртуальной среде Draw доступен внутренний пролог
 { if( Site && extDraw )  // настройки OpenGL с контекстным эпилогом прорисовки
@@ -62,7 +62,7 @@ bool Place::Mouse( int b, int x,int y )
   return false;
 }
 Place::~Place()  // освобождение площадки, шрифтов, картинки и всех точек входа
-{ if( Site )if( glAct( Site ) )              // +++ средняя площадка вышибается
+{ if( glAct( Site ) )                        // +++ средняя площадка вышибается
   { if( Img ){ free( Img ); Img=NULL; }      // все связные объекты расчищаются
     if( Ft ){ free( Ft ); Ft=NULL; }         // отключение привязанного шрифта
 //  AlfaBit( 0 );                            // здесь полный destructor шрифтам

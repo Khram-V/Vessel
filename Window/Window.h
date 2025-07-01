@@ -119,7 +119,7 @@ public:
        HGLRC hRC;     //   ++  ATOM atom;
        DWORD mSec;    // интервал прерываний активированного таймера [мил.сек]
   bool InterruptProcedure( UINT message,WPARAM wParam,LPARAM lParam );
- explicit Window( const char* T=NULL, int X=0,int Y=0, int W=0,int H=0 );
+ explicit Window( const char* T=NULL, int X=0,int Y=0, int W=800,int H=600 );
  virtual ~Window();   // деструктор срабатывает в эпилогах производных структур
   void Close();       // иначе: вариант завершения только для базовой структуры
   //        -- позиционирование +левого/-правого +верхнего/-нижнего угла Window
@@ -176,8 +176,8 @@ private:      //! подборка скрытых параметров и сво
 #define Ypm( Y ) ( ( GetSystemMetrics( SM_CYSCREEN )*long( Y ) )/100 ) // %%Y
 //#define Xpm(X) ( ( GetSystemMetrics( SM_CXFULLSCREEN )*long(X) )/100 ) // %%X
 //#define Ypm(Y) ( ( GetSystemMetrics( SM_CYFULLSCREEN )*long(Y) )/100 ) // %%Y
-class glContext{ HDC DC; HGLRC RC; // временное задействование контекстного
-public:                            // графического 3D-интерфейса того же OpenGL
+struct glContext{ HDC DC; HGLRC RC; // временное задействование контекстного
+                  bool Active;     // графического 3D-интерфейса того же OpenGL
 explicit glContext(const Window*); // конструктор=пролог графического конвейера
         ~glContext();             // деструктор=эпилог-возврат былого контекста
 };

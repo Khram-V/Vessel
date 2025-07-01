@@ -35,10 +35,12 @@ bool WinReady( Window *Win )       // без указания адреса оп�
 //     - переключение и временное сохранение состояния контекстной среды OpenGL
 //               с отработкой деструктора для восстановления исходного контента
 //
-bool glAct( const Window *W ){ return wglMakeCurrent( W->hDC,W->hRC ); }
+bool glAct( const Window *W )
+{ if( !W )return false; return wglMakeCurrent( W->hDC,W->hRC );
+}
 //             конструктор = пролог с восстановлением через эпилог = деструктор
 glContext::glContext( const Window* W ) : DC( wglGetCurrentDC() )   // prologue
-  { if( W->hDC==DC )DC=0; else { RC=wglGetCurrentContext(); glAct( W ); } }
+  { if( W->hDC==DC )DC=0; else RC=wglGetCurrentContext(); Active=glAct( W ); }
 glContext::~glContext()     // деструктор = эпилог с возвратом былого контекста
   { if( DC )wglMakeCurrent( DC,RC );                                // epilogue
   }
@@ -92,6 +94,7 @@ bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
         case VK_DOWN  : Key=_South;      break; // 40⇒ 4
         case VK_INSERT: Key=_Ins;        break; // 45⇒28
         case VK_DELETE: Key=_Del;        break; // 46⇒29
+        case VK_ESCAPE: Key=_Esc;        break; // 27⇒27
        default:
         if( !(HIWORD( lParam )&KF_REPEAT) )    // повторение F-команд исключено
           { if( wParam>=VK_F1 && wParam<=VK_F12 )Key=_F1+wParam-VK_F1; }
@@ -199,9 +202,7 @@ Window::Window( const char *_title, int x,int y, int w,int h )
    Activate().AlfaVector().Clear();  // исходный шрифт и настройка площадки
    chY=Height-AlfaHeight();          // позиция текстового курсора сверху/слева
 }
-Window::~Window(){ Close(); }        // закрытие окна может не разрушать Window
-
-void Window::Close()                 // Разрушение окна в обработке прерываний
+Window::~Window()                     // Разрушение окна в обработке прерываний
 { if( Site )                                     // не без предосторожностей
   { KillTimer();                                 // отключение таймера вручную
     while( GetKey() );                           // очистка запросов клавиатуры
@@ -220,8 +221,12 @@ void Window::Close()                 // Разрушение окна в обр�
     ReleaseDC( hWnd,hDC );   hDC=0;              // освобождение всех ресурсов
     DestroyWindow( hWnd );  hWnd=0;              // - запрос на закрытие окна
     if( Cur )glAct( Cur ); //else                // - на смежный нижний уровень
+//  if( Cur )Activate( Cur ); //else             // - на смежный нижний уровень
     //       PostQuitMessage( WM_QUIT );         // ~~ закрытие последнего окна
-} }
+} }                                // закрытие окна может не разрушать Window ???
+
+void Window::Close(){ if( glAct( this ) )this->~Window(); }
+//
 //!   Позиционирование окон по правилам Windows
 //!
 Window& Window::Locate( int X,int Y, int W,int H )     // по правилам Windows
@@ -236,8 +241,7 @@ Window& Window::Locate( int X,int Y, int W,int H )     // по правилам 
   WindowX = minmax( 0,X,ScreenWidth-W );  pX=0;
   WindowY = minmax( 0,Y,ScreenHeight-H ); pY=0;
   if( hWnd )
-  { // glAct( this );
-//  wglMakeCurrent( NULL,NULL );                  // - закрытие OpenGL
+  { //glAct( this );          //  wglMakeCurrent( NULL,NULL ) - закрытие OpenGL
     ReleaseDC( hWnd,hDC ); hDC=0;
 //  SetWindowPos( hWnd,HWND_TOP,WindowX,WindowY,W,H,SWP_SHOWWINDOW );
 //  MoveWindow( hWnd,x,y,w,h,true );

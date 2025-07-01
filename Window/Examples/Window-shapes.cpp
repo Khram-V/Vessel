@@ -18,44 +18,44 @@ static const char
            "PgUp/PgDn ","Next shape-drawing function",
            "Esc/<altX>/<ctrlC>"," стоп ",0
          },
- *_Mnt[]={ "январь","февраль","март","апрель","май","июнь","июль","август","сентябрь","октябрь","ноябрь","декабрь" },
- *_Day[]={ "понедельник","вторник","среда","четверг","пятница","суббота","воскресенье" };
+ *_Mnt[]={"январь","февраль","март","апрель","май","июнь","июль","август","сентябрь","октябрь","ноябрь","декабрь"},
+ *_Day[]={"понедельник","вторник","среда","четверг","пятница","суббота","воскресенье"};
 
-#include "../Math/Vector.h"   // извне базовые структуры тензорной математики
-#include "View.h"
-#include "ConIO.h"
-#include "Geometry.h"
 #include <StdIO.h>
+#include "../ConIO.h"
+#include "../View.h"
+#include "../../Math/Vector.h"   // извне базовые структуры тензорной математики
+#include "../../Tools/GLut/Geometry.h"
 #define NUMBEROF( x ) ((sizeof(x))/(sizeof(x[0])))
 
 static int   function_index, slices=16, stacks=16, depth=4;;
 static float irad=0.3, orad=0.6, offset[3]={ 0,0,0 };
 static bool  show_info=true;
 
-inline void drawSolidTetrahedron()        { glutSolidTetrahedron();                    }
-inline void drawWireTetrahedron()         { glutWireTetrahedron();                     }
-inline void drawSolidCube()               { glutSolidCube( 1 );                        }
-inline void drawWireCube()                { glutWireCube( 1 );                         }
-inline void drawSolidOctahedron()         { glutSolidOctahedron();                     }
-inline void drawWireOctahedron()          { glutWireOctahedron();                      }
-inline void drawSolidDodecahedron()       { glutSolidDodecahedron();                   }
-inline void drawWireDodecahedron()        { glutWireDodecahedron();                    }
-inline void drawSolidRhombicDodecahedron(){ glutSolidRhombicDodecahedron();            }
-inline void drawWireRhombicDodecahedron() { glutWireRhombicDodecahedron();             }
-inline void drawSolidIcosahedron()        { glutSolidIcosahedron();                    }
-inline void drawWireIcosahedron()         { glutWireIcosahedron();                     }
-inline void drawSolidSierpinskiSponge()   { glutSolidSierpinskiSponge(depth,offset,1); }
-inline void drawWireSierpinskiSponge()    { glutWireSierpinskiSponge( depth,offset,1); }
-inline void drawSolidTeapot()             { glutSolidTeapot( 0.85 );                   }
-inline void drawWireTeapot()              { glutWireTeapot( 0.85 );                    }
-inline void drawSolidTorus()              { glutSolidTorus( irad,orad,slices,stacks ); }
-inline void drawWireTorus()               { glutWireTorus( irad,orad,slices,stacks );  }
-inline void drawSolidSphere()             { glutSolidSphere( 0.9,slices,stacks );      }
-inline void drawWireSphere()              { glutWireSphere( 0.9,slices,stacks );       }
-inline void drawSolidCone()               { glutSolidCone( 1,1,slices,stacks );        }
-inline void drawWireCone()                { glutWireCone( 1,1,slices,stacks );         }
-inline void drawSolidCylinder()           { glutSolidCylinder( 0.75,1,slices,stacks ); }
-inline void drawWireCylinder()            { glutWireCylinder( 0.75,1,slices,stacks );  }
+inline void drawSolidCube()               { glutSolidCube( 1 );             }
+inline void drawWireCube()                { glutWireCube( 1 );              }
+inline void drawSolidOctahedron()         { glutSolidOctahedron();          }
+inline void drawWireOctahedron()          { glutWireOctahedron();           }
+inline void drawSolidIcosahedron()        { glutSolidIcosahedron();         }
+inline void drawWireIcosahedron()         { glutWireIcosahedron();          }
+inline void drawSolidTetrahedron()        { glutSolidTetrahedron();         }
+inline void drawWireTetrahedron()         { glutWireTetrahedron();          }
+inline void drawSolidDodecahedron()       { glutSolidDodecahedron();        }
+inline void drawWireDodecahedron()        { glutWireDodecahedron();         }
+inline void drawSolidRhombicDodecahedron(){ glutSolidRhombicDodecahedron(); }
+inline void drawWireRhombicDodecahedron() { glutWireRhombicDodecahedron();  }
+inline void drawSolidTeapot()             { glutSolidTeapot( 0.85 );        }
+inline void drawWireTeapot()              { glutWireTeapot( 0.85 );         }
+inline void drawSolidTorus()              { glutSolidTorus( irad,orad,slices,stacks );}
+inline void drawWireTorus()               { glutWireTorus( irad,orad,slices,stacks ); }
+inline void drawSolidSphere()             { glutSolidSphere( 0.9,slices,stacks );     }
+inline void drawWireSphere()              { glutWireSphere( 0.9,slices,stacks );      }
+inline void drawSolidCone()               { glutSolidCone( 1,1,slices,stacks );       }
+inline void drawWireCone()                { glutWireCone( 1,1,slices,stacks );        }
+inline void drawSolidCylinder()           { glutSolidCylinder( 0.75,1,slices,stacks );}
+inline void drawWireCylinder()            { glutWireCylinder( 0.75,1,slices,stacks ); }
+inline void drawSolidSierpinskiSponge()   { glutSolidSierpinskiSponge(depth,offset,1);}
+inline void drawWireSierpinskiSponge()    { glutWireSierpinskiSponge( depth,offset,1);}
 //
 // This structure defines an entry in our function-table.
 //
@@ -88,8 +88,9 @@ static Mlist Menu_a[]=
 , { 1,3,"     slices: %d",&slices },{ 0,3,",  stacks: %d",&stacks }
 };
 bool Pro::KeyBoard( fixed key )
-{ textcolor( LIGHTGREEN,BLACK ),
-  print(2,7,"Key = %d\\x%X = '%s' + <%X>",key,key,CtU(key),ScanStatus() );
+{ static int Kc=0;
+  textcolor( LIGHTGREEN,BLACK ),
+  print(2,7,"Key[%d] = %d\\x%X = '%s' + <%X>",++Kc,key,key,CtU(key),ScanStatus() );
   switch( key )
   { case 'I': case 'i': show_info^=true;         break;
     case '=': case '+': slices++;                break;
@@ -119,8 +120,8 @@ bool Pro::KeyBoard( fixed key )
          "│ ₧┤╡╢╖╕╣╗╝╜╛┐└┴┬├┼╞╟╚╔╩╦╠╬╧╨╤╥╙╘╒╓╫╪┘┌█▄▌▐▀░▒▓ \n"
          "│ ΄΅ΎΏΐµ¿ÄÅÆÇÉÑÖÜßàáâäåçèéêëìíîïñòóôöùúûüÿ🌀  \n"
          "│ ________________________________________________";
-      R.AlfaVector( 0 ).Area( 3,2,71,15 ).Clear().Print( 1,1,s ).Show();
       glClearColor( 0.9,1,0.95,1 );            // восстановление фонового цвета
+      R.AlfaVector( 0 ).Area( 3,2,71,15 ).Clear().Print( 1,1,s ).Show();
       WaitKey();
     } break;
     case _F4:
@@ -144,6 +145,7 @@ bool Pro::KeyBoard( fixed key )
         case _Down : orad /= 2;        break;
         case _Right: irad *= 2;        break;
         case _Left : irad /= 2;        break;
+        case _Esc: delete this;
        default: key=0;
   } } }
   if( function_index<0 )function_index = NUMBEROF( table )-1;
@@ -257,7 +259,7 @@ static bool Clock()    // - регулярное обновление карти
   if( Init )display( *aOne );
   return false;                             // все картинки уже выведены в окно
 }
-#if 0
+#if 1
 static void Lighting()      // простая настройка OpenGL - может быть вовне
 { glClearColor( 0.9,1,0.95,1 );
   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -315,7 +317,8 @@ int main( int argc,char *argv[] )
       rectangle( (Point){ -1+1.9*i/Real(black+1),-0.9 },
                  (Point){ -1+1.9*(i+1)/Real(black+1),-0.8 } );
     }
-    Tvm.Save();   //Refresh(); //Show();
+    Tvm.Save(); //.Show();
+  //Refresh();
     Tvm.Above();
     //
     //  Теперь устраивается перехват мышки и таймера независимыми транзакциями
@@ -346,7 +349,7 @@ int main( int argc,char *argv[] )
 //     .Area( 0,0,0,0 )
        .Activate( true )
        ;
-    Tvm.Icon( "Flag" ).AlfaVector( 12 );
+    Tvm.Icon( "Flag" ).AlfaVector( 12 ); Lighting();
     while( Tvm.Ready() )
     { fixed ans=Tvm.GetKey();
       if( ans==_Esc )break;

@@ -16,6 +16,12 @@
 				<Option parameters='&quot;БПК «Стерегущий»-61&quot;' />
 				<Option projectCompilerOptionsRelation="2" />
 				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-fopenmp" />
+				</Compiler>
+				<Linker>
+					<Add library="gomp" />
+				</Linker>
 			</Target>
 			<Target title="Waves Profile">
 				<Option output="../WSpace/Dev/Wave-GLFW" prefix_auto="1" extension_auto="1" />
@@ -34,8 +40,12 @@
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option parameters="«Аврора»(а)" />
-				<Option projectCompilerOptionsRelation="0" />
-				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-fopenmp" />
+				</Compiler>
+				<Linker>
+					<Add library="gomp" />
+				</Linker>
 			</Target>
 			<Target title="Ship Viewer">
 				<Option output="../WSpace/Dev/Ship-GLFW" prefix_auto="1" extension_auto="1" />
@@ -67,12 +77,15 @@
 				<Option use_console_runner="0" />
 				<Option projectCompilerOptionsRelation="0" />
 				<Option projectLinkerOptionsRelation="2" />
+				<Linker>
+					<Add library="gomp" />
+				</Linker>
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-fexpensive-optimizations" />
 			<Add option="-Os" />
 			<Add option="-funsigned-char" />
-			<Add option="-fopenmp" />
 			<Add option="-ffast-math" />
 			<Add option="-Wunused" />
 			<Add option="-DGLFW" />
@@ -85,7 +98,6 @@
 			<Add library="glu32" />
 			<Add library="comdlg32" />
 			<Add library="gdi32" />
-			<Add library="gomp" />
 		</Linker>
 		<Unit filename="../Math/Function.cpp">
 			<Option target="&lt;{~None~}&gt;" />
@@ -281,12 +293,6 @@
 		</Unit>
 		<Unit filename="../Window/GLFW/null_joystick.c">
 			<Option compilerVar="CC" />
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="Aurora Storm" />
-			<Option target="Waves Profile" />
-			<Option target="Window-shapes" />
-			<Option target="Window-trial" />
 		</Unit>
 		<Unit filename="../Window/GLFW/null_monitor.c">
 			<Option compilerVar="CC" />
@@ -313,8 +319,6 @@
 			<Option compilerVar="CC" />
 			<Option compile="0" />
 			<Option link="0" />
-			<Option target="Aurora Storm" />
-			<Option target="Waves Profile" />
 			<Option target="Window-shapes" />
 			<Option target="Window-trial" />
 		</Unit>
@@ -382,9 +386,7 @@
 			<Option target="Window-trial" />
 		</Unit>
 		<Unit filename="../Window/Window.cpp" />
-		<Unit filename="../Window/Window.h">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
+		<Unit filename="../Window/Window.h" />
 		<Unit filename="../Window/Window_Help.cpp" />
 		<Unit filename="../Window/Window_Menu.cpp" />
 		<Extensions>
