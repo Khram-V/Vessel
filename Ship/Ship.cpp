@@ -28,7 +28,8 @@ void InterSection::Drawing( BoardView Sides )                  // mvPort,mvBoth
 //   Главная виртуальна процедура изображения всего корабля/проекта
 //
 bool FreeShip::Draw()               // виртуальная процедура с настройкой сцены
-{ BoardView &B=Visio.ModelView; int i,k;
+{ BoardView &B=Visio.ModelView; int i,k;  // glDepthRange( -Distance,0 ); // Distance );
+                                          // glDepthFunc( GL_LESS ); // ~EQUAL~GEQUAL GREATER LEQUAL NOTEQUAL LESS ALWAYS взаимное накрытие объектов
   View::Draw();
   glEnable( GL_LIGHTING );                    // расцветка под теневые закраски
   glTranslated( (Max.x+Min.x)/-1.75,0,        // -Set.SplitSectionLocation
@@ -75,19 +76,19 @@ Ship::Ship()
 //
 FreeShip::FreeShip():Ship(),View("Free!ship in C++ ",-12,12,640,480) //Matrix()
 { Icon( "Ship" ).AlfaVector( 16 );
-  Locate( Xpm( 4 ),Ypm( 4 ),min( 1280,Xpm( 64 ) ),
-                            min( 1024,Ypm( 72 ) ) );
+  Locate( Xpm( 4 ),Ypm( 4 ),min( 1280L,Xpm( 64 ) ),
+                            min( 1024L,Ypm( 72 ) ) );
 //  glCullFace( GL_FRONT_AND_BACK );                    // какие отбираются грани
   Distance=-1.75*( Max.x+Max.y-Min.x-Min.y + Width*(Max.z-Min.z)*0.9/Height );
-  eyeX=135;  // lookX=-60;
+  eyeX=135; // lookX=-60;
   glDisable( GL_FOG );
   Draw(); // начальная прорисовка
 }
 //   Интерактивная настройка/управление графическим отображением проекта
 //
 bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой подсказкой
-const static char                                    // по настройкам и методам
-     *Id[]={"Ship"," Корабельные форматы ",        // визуализации корпуса
+ const static char                                   // по настройкам и методам
+     *Id[]={"Ship"," Корабельные форматы ",          // визуализации корпуса
                    " Free!Ship: *.ftm,*fbm.*fef..",0 },
      *Cmds[]={ " F1 "," - cправка",0 },
      *Plus[]={ " <Space>            ","борт\\полборта",
@@ -96,19 +97,19 @@ const static char                                    // по настройка�
                " <+Shift·rightMouse>"," смещение",
                " <+Ctrl·(roll)>"," дальность, наклон",
                " <Home>  "," вместить корпус в экран",0 };
-  BoardView &B=Visio.ModelView;
-  if( Keyb==_F1 )Window::Help( Id,Cmds,Plus,1,1 ),Draw(); else       // справка
-  if( Keyb==_Blank )
-  { if( ScanStatus()&CTRL )
-    { static bool xd=false;
-      if( xd^=true )glPolygonMode( GL_FRONT_AND_BACK,GL_FILL );
-              else  glPolygonMode( GL_FRONT,GL_FILL ),
-                    glPolygonMode( GL_BACK,GL_LINE );
-    } else
-    if( B==mvPort )B=mvBoth; else B=mvPort;
-    return Draw();
-  }
-  else return View::KeyBoard( Keyb );
+ BoardView &B=Visio.ModelView;
+  switch( Keyb )
+  { case _F1: Window::Help( Id,Cmds,Plus,1,1 ); break;
+    case _Blank:
+      if( ScanStatus()&CTRL )
+        { static bool xd=false;
+          if( xd^=true )glPolygonMode( GL_FRONT_AND_BACK,GL_FILL ); //,glEnable( GL_FRONT_FACE ); //,glEnable( GL_CULL_FACE )
+                  else  glPolygonMode( GL_FRONT,GL_FILL ),
+                        glPolygonMode( GL_BACK,GL_LINE ); //,glDisable( GL_FRONT_FACE ); //,glDisable( GL_CULL_FACE )
+        } else
+      if( B==mvPort )B=mvBoth; else B=mvPort; break;
+    default: return View::KeyBoard( Keyb );
+  } return Draw();
 }
 int main() // int argc, char **argv )
 { texttitle( "FREE!Ship view in C++ " ); FreeShip Hull;            // заголовок

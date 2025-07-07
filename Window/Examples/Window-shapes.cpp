@@ -354,10 +354,11 @@ int main( int argc,char *argv[] )
     { fixed ans=Tvm.GetKey();
       if( ans==_Esc )break;
       if( ans ){ textcolor( YELLOW,BLUE );
-                 print( 2,8,"Key = %d\\x%X = '%s' + <%X> ",
+                 print( 2,8,"MainKey = %d\\x%X = '%s' + <%X> ",
                          ans,ans,CtU(ans),Tvm.ScanStatus() ); }
       display( Tvm ); WaitTime( 1000 );
-    }
+    } textcolor( LIGHTRED,YELLOW ); print( 48,20,"  При(у)ехали  " );
+
   //Tvm.KillTimer();
   Break( "~Как бы всё благополучно" );
   return EXIT_SUCCESS;

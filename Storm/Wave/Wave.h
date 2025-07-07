@@ -74,6 +74,6 @@ inline Real Cross( _Real Y, _Real x3,_Real y3, _Real x4,_Real y4 )
        ( Y*(x4-x3) + (x3*y4-y3*x4) )/(y4-y3);
 }
 inline bool Cross( Real &X,Real Y, Real x3,Real y3, Real x4,Real y4 )
-{ Real Det=( y4-y3 ); if( abs( Det )<1e-24 )return false;
+{ Real Det=( y4-y3 ); if( fabs( Det )<1e-24 )return false;
        X=( Y*(x4-x3) + (x3*y4-y3*x4) )/Det; return true;
 }

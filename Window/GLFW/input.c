@@ -49,6 +49,7 @@
                        GLFW_MOD_CAPS_LOCK | \
                        GLFW_MOD_NUM_LOCK)
 
+#if 0
 // Initializes the platform joystick API if it has not been already
 //
 static GLFWbool initJoysticks(void)
@@ -64,7 +65,6 @@ static GLFWbool initJoysticks(void)
 
     return _glfw.joysticksInitialized = GLFW_TRUE;
 }
-#if 0
 // Finds a mapping based on joystick GUID
 //
 static _GLFWmapping* findMapping(const char* guid)
@@ -425,8 +425,8 @@ void _glfwInputJoystick(_GLFWjoystick* js, int event)
     else if (event == GLFW_DISCONNECTED)
         js->connected = GLFW_FALSE;
 
-    if (_glfw.callbacks.joystick)
-        _glfw.callbacks.joystick((int) (js - _glfw.joysticks), event);
+//  if (_glfw.callbacks.joystick)
+//      _glfw.callbacks.joystick((int) (js - _glfw.joysticks), event);
 }
 
 // Notifies shared code of the new value of a joystick axis
@@ -1045,7 +1045,7 @@ GLFWAPI GLFWdropfun glfwSetDropCallback(GLFWwindow* handle, GLFWdropfun cbfun)
     _GLFW_SWAP(GLFWdropfun, window->callbacks.drop, cbfun);
     return cbfun;
 }
-
+#if 0
 GLFWAPI int glfwJoystickPresent(int jid)
 {
     _GLFWjoystick* js;
@@ -1269,7 +1269,7 @@ GLFWAPI GLFWjoystickfun glfwSetJoystickCallback(GLFWjoystickfun cbfun)
     _GLFW_SWAP(GLFWjoystickfun, _glfw.callbacks.joystick, cbfun);
     return cbfun;
 }
-#if 0
+
 GLFWAPI int glfwUpdateGamepadMappings(const char* string)
 {
     int jid;
@@ -1329,7 +1329,6 @@ GLFWAPI int glfwUpdateGamepadMappings(const char* string)
 
     return GLFW_TRUE;
 }
-#endif
 GLFWAPI int glfwJoystickIsGamepad(int jid)
 {
     _GLFWjoystick* js;
@@ -1474,6 +1473,7 @@ GLFWAPI int glfwGetGamepadState(int jid, GLFWgamepadstate* state)
 
     return GLFW_TRUE;
 }
+#endif
 
 GLFWAPI void glfwSetClipboardString(GLFWwindow* handle, const char* string)
 {

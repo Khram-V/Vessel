@@ -10,9 +10,6 @@ static Window* getWindow( GLFWwindow* window )   // , bool status=false
 {//if( status )glfwMakeContextCurrent( window ); // выбор в списке окон Windows
   return (Window*)glfwGetWindowUserPointer(window);  // к возникшему прерыванию
 }
-bool WinReady( Window *W )         // без указания адреса опрашиваются все окна
-{ if( W )return W->Ready()!=NULL; return First!=NULL;
-}
 //  Подборка статических процедур обработки прерываний
 //
 static void glfw_window_pos_callback( GLFWwindow* window, int xpos,int ypos )
@@ -22,7 +19,8 @@ static void glfw_window_pos_callback( GLFWwindow* window, int xpos,int ypos )
 static void glfw_window_size_callback( GLFWwindow* window,int width,int height )
 { Window *Win=getWindow( window );
    Win->Height=height;
-   Win->Width=width; glContext Set( Win ); Win->Rest().Show();
+   Win->Width=width;   // glContext Set( Win );
+   Win->Rest().Show();
 }
 /// мышка
 static void glfw_cursor_enter_callback( GLFWwindow* window, int entered )
@@ -37,17 +35,17 @@ static void glfw_mouse_button_callback
     case GLFW_MOUSE_BUTTON_3    : scan=action==GLFW_PRESS?WM_MBUTTONDOWN:WM_MBUTTONUP; break;
    default: return;
   }
- Window *Win=getWindow( window ); glContext Set( Win );
+ Window *Win=getWindow( window ); // glContext Set( Win );
       glfwGetCursorPos( window,&x,&y );
       Win->setMods( mods );
   if( Win->isCursorInside )Win->PutMouse( scan,x,y );
 }
 static void glfw_cursor_position_callback( GLFWwindow* window, Real x,Real y )
-{ Window *Win=getWindow( window ); glContext Set( Win );
+{ Window *Win=getWindow( window ); // glContext Set( Win );
   if( Win->isCursorInside )Win->PutMouse( WM_MOUSEMOVE,x,y );
 }
 static void glfw_scroll_callback( GLFWwindow* window, Real xoff,Real yoff )
-{ Window *Win=getWindow( window ); glContext Set( Win );
+{ Window *Win=getWindow( window ); // glContext Set( Win );
   if( Win->isCursorInside )Win->PutMouse( WM_MOUSEWHEEL,xoff,yoff );
 }
 /// Клавиатура
@@ -59,7 +57,7 @@ static void glfw_charmods_callback
 }
 static void glfw_input_key_callback
 ( GLFWwindow* window, int _key, int scancode, int action, int mods )
-{ Window *Win=getWindow( window ); glContext Set( Win );
+{ Window *Win=getWindow( window ); // glContext Set( Win );
           Win->setMods( mods );
   if( action!=GLFW_RELEASE )                // !=0
 //if( action==GLFW_PRESS )                  //  =1
@@ -73,48 +71,59 @@ static void glfw_input_key_callback
       case GLFW_KEY_PAGE_DOWN: Key=_South_East; break;
       case GLFW_KEY_END      : Key=_South_West; break;
       case GLFW_KEY_PAGE_UP  : Key=_North_East; break;
+      case GLFW_KEY_ESCAPE   : Key=_Esc;        break;
       case GLFW_KEY_INSERT   : Key=_Ins;        break;
+      case GLFW_KEY_TAB      : Key=_Tab;        break;
       case GLFW_KEY_DELETE   : Key=_Del;        break;
       case GLFW_KEY_BACKSPACE: Key=_BkSp;       break;
-      case GLFW_KEY_TAB      : Key=_Tab;        break;
       case GLFW_KEY_ENTER    : Key=_Enter;      break;
-      case GLFW_KEY_ESCAPE   : Key=_Esc;        break;
      default:
       if( action!=GLFW_REPEAT )                // повторение F-команд исключено
       { if( _key>=GLFW_KEY_F1 && _key<=GLFW_KEY_F12 )Key=_F1+_key-GLFW_KEY_F1;
                                              // else Key=_key&0xFF;
       }
     } if( Key )Win->PutChar( Key );
-  }
-} /*
+} }
+/*
 static void glfw_draw_callback( GLFWwindow* window )
   { getWindow( window )->Activate().Save().Show();
   }
 static void glfw_focus_callback( GLFWwindow* window, int focus )
   { glfwFocusWindow( window ); getWindow( window )->Show();
-  } */
-static void glfw_window_close_callback( GLFWwindow* window )
-  { getWindow( window )->~Window();
   }
+*/
 static void callbackError( int error, const char* description )
-  { Break( "glfw ошибка( %d ):\n %s ",error,description );
+  { Break( "~Ошибка GLFW( %d ):\n %s ",error,description );
+  }
+static void glfw_window_close_callback( GLFWwindow* window )
+//{ if( window )getWindow( window )->Close(); }
+  { if( First )if( window )
+    { Window *W; if( (W=getWindow( window ))!=NULL )W->Close();
+//               for( W=First; W->Next; W=W->Next )W->KillTimer();
+    }
   }
 //
-//!    Window Procedure - общая для всех процедура запросов состояния GLFW
+//!  Window Procedure - общая для всех процедура запросов состояния GLFW
 //!
-Window* Place::Ready(){ if( Site ){ Site->WaitEvents(); } return Site; }
-//
-//!   Конструктор создает окно OpenGL, и ... не образует цикла прерываний ...
+Window* Place::Ready()
+{ if( Site )Site->WaitEvents(); else WinReady(); return Site;
+}
+bool WinReady( Window *W )    // без указания адреса опрашиваются корень списка
+{ if( W )return W->Ready()!=NULL; else if( First )
+    for( Window *Win=First; Win->Next; Win=Win->Next )Win->WaitEvents();
+  return First!=NULL;
+}
+//!  Конструктор создает окно OpenGL, и ... не образует цикла прерываний ...
 //      площадка Place в основании окна ортогонализуется и пересохраняется
 //
 Window::Window( const char *_title, int x,int y,int w,int h )
       : Place( this,PlaceAbove|PlaceOrtho ),         // ортогонализуется [-1:1]
         Next( NULL ),glfwWindow( NULL ),Caption( _title ), // и сохраняется
-      ScreenWidth( GetSystemMetrics( SM_CXSCREEN ) ),
-      ScreenHeight( GetSystemMetrics( SM_CYSCREEN ) ),
+        ScreenWidth( GetSystemMetrics( SM_CXSCREEN ) ),
+        ScreenHeight( GetSystemMetrics( SM_CYSCREEN ) ),
         WindowX( 0 ),WindowY( 0 ),KeyPos( 0 ),KeyPas( 0 ),
         isCursorInside( true ),     // Flag if cursor inside this window or not
-        dTime(0.0),nextTime(0.0),   // шаг и ожидаемое прерывание таймера [сек]
+        dTime( 0 ),nextTime( 0 ),   // шаг и ожидаемое прерывание таймера [µсек]
         isTimer( 0 ),isMouse( 0 ),onKey( false ),mods( 0 ),
         extKey( NULL ),extTime( NULL )
 {
@@ -124,7 +133,7 @@ Window::Window( const char *_title, int x,int y,int w,int h )
     Locate( x,y,w,h );  // -- без glfwWindow - просто исходные размерности окна
     if( !First )
     { glfwSetErrorCallback( callbackError ); glfwInit(); First=this; } else
-    { Window *W=First; while( W->Next )W=W->Next; W->Next=this; } // ++ ячейка
+    { Window *W=First; while( W->Next )W=W->Next; W->Next=this; }  // ++ ячейка
  // glfwInitHint( GLFW_PLATFORM,GLFW_PLATFORM_WIN32 );
     if( !_title )
     glfwWindowHint( GLFW_DECORATED,false );  // случай без оконтуривающих рамок
@@ -142,11 +151,22 @@ Window::Window( const char *_title, int x,int y,int w,int h )
     glfwWindow=glfwCreateWindow                   // Создание независимого окна
       ( Width,Height,_title?_title:"Window-Place",   // glfwGetPrimaryMonitor()
                                       NULL,NULL );
-    if( !glfwWindow )glfwTerminate(),Break( "GLFW-error" );
-
+    if( !glfwWindow ){ glfwTerminate(); Break( "GLFW-error" ); }
     glfwMakeContextCurrent( glfwWindow );       // добавление callback процедур
     glfwSetWindowUserPointer( glfwWindow,this );
-    dTime=0.0; nextTime=glfwGetTime();          // начальная установка таймера
+    dTime=0; nextTime=glfwGetTime()*1e3;      // начальная установка таймера
+//
+//  Установка выполнена, теперь прописка размерностей, шрифтов и вложенных окон
+//
+    Up=NULL;                        // верхний фрагмент в списке наложений
+    Site=this;                      // связанный Place ссылается на Window
+    Locate( x,y,Width,Height );     // установка размерений нового окна
+    AlfaVector();                   // исходный шрифт участвует в размерностях
+    Activate().Clear();             // включение всего окна в качестве площадки
+    chY=Height-AlfaHeight();        // позиция текстового курсора сверху/слева
+//
+//  Блок прерываний от внешних устройств и внутренних процессов
+//
     glfwSetKeyCallback            ( glfwWindow,glfw_input_key_callback );//Ctrl
     glfwSetCharModsCallback       ( glfwWindow,glfw_charmods_callback ); //Char
     glfwSetWindowPosCallback      ( glfwWindow,glfw_window_pos_callback );
@@ -166,39 +186,34 @@ Window::Window( const char *_title, int x,int y,int w,int h )
        ScreenHeight=mode->height;
  //или glfwGetWindowSize( glfwWindow,&ScreenWidth,&ScreenHeight );
        Break( "~ Locate: %d·%d => %d x %d",pX,pY,ScreenWidth,ScreenHeight ); */
-//
-//  Установка выполнена, теперь прописка размерностей, шрифтов и вложенных окон
-//
-    Up=NULL;                        // верхний фрагмент в списке наложений
-    Site=this;                      // связанный Place ссылается на Window
-    Locate( x,y,Width,Height );     // установка размерений нового окна
-    AlfaVector();                   // исходный шрифт участвует в размерностях
-    Activate().Clear();             // включение всего окна в качестве площадки
-    chY=Height-AlfaHeight();        // позиция текстового курсора сверху/слева
 }
 Window::~Window()                     // Разрушение окна в обработке прерываний
-{ if( Site )                                     // не без предосторожностей
-  { Window *Cur=First;                           // обработка/очистка списка
-    KillTimer();                                 // отключение таймера
-    while( GetKey() );
+{ if( Site )                          // не без предосторожностей
+  { KillTimer();                                 // отключение таймера
     while( Up )Up->~Place();                     // сброс наложенных фрагментов
-    WaitEvents();
-    //  PutChar( 0 );                            // отмена запроса клавиатуры
+    //       Site->~Place();                     // обрушение графического поля
+    if( glfwWindow ){
+//      glfwFocusWindow( glfwWindow );
+//      glfwSetWindowShouldClose( glfwWindow,GLFW_TRUE );
+//      glfwRequestWindowAttention( glfwWindow );
+        glfwDestroyWindow( glfwWindow );         // закрытие окна с переходом
+        glfwWindow = NULL;
+      }
+    //  PutChar( 0 );                            // отмена запросов клавиатуры
     //  ScanStatus();                            // очистка запросов Windows
-    //  Site->~Place();                          // обрушение графического поля
-    if( Cur==this )First=Cur=Next; else          // первое Window-вхождение
+    //  while( GetKey() );
+    //  WaitEvents();
+    Site = NULL;                                 //! сброс повторов деструктора
+   Window *Cur=First;                            // обработка/очистка списка
+    if( First==this )First=Cur=Next; else        // первое Window-вхождение
     while( Cur->Next )                           // и надо особо уважить поиски
        if( Cur->Next!=this )Cur=Cur->Next; else  // себя самого с удалением
          { Cur->Next=Next; break; }              // самого первого из найденных
-    Site=NULL;                                   //! сброс повторов деструктора
-    if( glfwWindow )
-      { glfwDestroyWindow( glfwWindow );         // закрытие окна с переходом
-        glfwWindow = NULL;
-      }
-    if( Cur )glAct( Cur ); // Cur->Activate(); //else exit( 4 );  // - на смежный нижний уровень
+    if( Cur )glAct( Cur ); //else First=NULL;    // - на смежный нижний уровень
+//     else{ First=NULL; glfwTerminate(); } // WinReady(),exit( 3 ); // Cur->Activate();
   }
 }
-void Window::Close(){ if( glAct( this ) )this->~Window(); } //delete this; }; //~Window(); }
+void Window::Close(){ if( Site )this->~Window(); } //delete this; }; //~Window(); }
 //!
 //!   Позиционирование окон по правилам Windows
 //!
@@ -212,8 +227,8 @@ Window& Window::Locate( int X,int Y, int W,int H )   // по правилам Wi
   if( glAct( this ) )                                             // glfwWindow
   { glfwSetWindowPos( glfwWindow,WindowX,WindowY );
     glfwSetWindowSize( glfwWindow,W,H );
-    Refresh();
-    WaitEvents();
+    //Refresh();
+    //WaitEvents();
   } return *this; //Refresh();
 }
 //!  Блок накопления данных клавиатуры в текущем кольцевом буфере класса Window
@@ -280,13 +295,13 @@ void Window::PutMouse( UINT State, int x,int y )
     }
    static volatile int xo=0,yo=-1;        //! рекурсия мышиных прерываний c
     if( !MouseState )                     //! координатами предыдущих вхождений
-    { glContext( this ); yo=-1; P->Mouse( px,py );
+    { glContext S( this ); yo=-1; P->Mouse( px,py );
     } else                                          //! yo=-1 окно не захвачено
     { if( KeyStates()==L_ALT && MouseState==_MouseLeft )
       { if( yo<0 )xo=x,yo=y; else     // перемещение окна left<Alt> и left<Btn>
         if( x!=xo || y!=yo )Locate( WindowX+x-xo,WindowY+y-yo,Width,Height );
       } else
-      { glContext( this ); yo=-1; P->Mouse( MouseState,px,py );
+      { glContext S( this ); yo=-1; P->Mouse( MouseState,px,py );
       }
     }
   } isMouse=0; // MouseState &= ~_MouseWheel;
@@ -294,52 +309,66 @@ void Window::PutMouse( UINT State, int x,int y )
 //!  Прямое и параллельное обращение к таймеру с соблюдением очередей Windows
 //!       (все расчеты в миллисекундах, опрокидывание через 49,7 суток)
 //!
+#if 1
 DWORD volatile                                          // тики [мс] от времени
       StartTime=GetTickCount();                         //     запуска Windows
 DWORD ElapsedTime(){ return GetTickCount()-StartTime; } //  от старта программы
 DWORD GetTime()
     { DWORD T=GetTickCount(); if( StartTime>T )StartTime=T; return T; }
+#else
+DWORD volatile                                          // тики [мс] от времени
+      StartTime=glfwGetTime()*1e3;                         //     запуска Windows
+DWORD ElapsedTime(){ return glfwGetTime()*1e3-StartTime; } //  от старта программы
+DWORD GetTime()
+    { DWORD T=glfwGetTime()*1e3; if( StartTime>T )StartTime=T; return T; }
+#endif
 bool Window::Timer()
-{ if( extTime )        // настройка OpenGL с контекстным эпилогом перерисовки
-  if( !isTimer )       // подготовка среды, вызов процедуры внешнего исполнения
-  { bool Res; isTimer=true; Res=extTime(); isTimer=false; return Res;
+{ //if( First )
+  if( extTime )        // настройка OpenGL с контекстным эпилогом перерисовки
+//if( !isTimer )       // подготовка среды, вызов процедуры внешнего исполнения
+  { bool Res; /*isTimer=true;*/ Res=extTime(); /*isTimer=false;*/ return Res;
   } return false;
 }
 Window& Window::SetTimer( DWORD mSec,bool(*inTm)() )// время и адрес исполнения
-{ if( !mSec )                                      // пока только таймер №12
-  { dTime=0.0; extTime=NULL; } else                // идентификатор не привязан
-  { dTime=Real( mSec )/1000.0;               // glfwWaitEventsTimeout( dTime );
-    nextTime=glfwGetTime()+dTime; extTime=inTm;
+{ if( First )
+  if( !mSec )                                      // пока только таймер №12
+  { dTime=0; extTime=NULL; } else                  // идентификатор не привязан
+  { dTime=mSec;                              // glfwWaitEventsTimeout( dTime );
+    nextTime=glfwGetTime()*1e3+dTime; extTime=inTm;
   } return *this;
 }
 void Window::PutTimer()             //? внутренняя обработка допускает пропуски
-{ //if( !isTimer )                  //! потрясающе ! вдруг обнаружились повторы
+{ //if( First )
+  if( !isTimer )                    //! потрясающе ! вдруг обнаружились повторы
   //if( !KeyInterrupt )             // внешних прерываний без исполнения первых
   //if( !isMouse )                  // ! еще и с клавиатурой - проблемы
-  { //++isTimer;                    // на повторах - сбрасываются расчеты
+  if( Ready() )
+  { ++isTimer;                        // на повторах - сбрасываются расчеты
     { glContext( this );
-//    if( Timer() )Save().Refresh(); // с восстановлением наложенных страничек
-//    if( Timer() )Show();           // с перерисовкой картинки
-      if( Timer() )Refresh();        // с перерисовкой картинки
-    } // isTimer=0;                  // разрешение повторных вхождений таймера
-  }   // WaitEvents()                // после завершения всех операций OpenGL
+//    if( Timer() )Save().Refresh();  // с восстановлением наложенных страничек
+//    if( Timer() )Show();            // с перерисовкой картинки
+      if( Timer() )Refresh();         // с перерисовкой картинки
+    } isTimer=0;                      // разрешение повторных вхождений таймера
+  }// WaitEvents()                    // после завершения всех операций OpenGL
 }
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 void Window::WaitEvents( bool stop )
-{ if( !glAct( this ) )return;
-  for( Window *aW=First; aW; aW=aW->Next ) // перебор всех активированных окон
-   if( aW->dTime )                         // если таймер установлен
-   if( glfwGetTime()>=aW->nextTime )       // и текущее время больше заданного
-    { aW->nextTime=glfwGetTime()+aW->dTime; aW->PutTimer(); } // новый шаг-такт
-  if( stop )
-  { Show();
-    if( dTime )glfwWaitEventsTimeout( dTime );
-    else glfwWaitEvents();
-  } else glfwPollEvents();
+{ //if( First )
+  if( Site )if( glAct( this ) )
+  { for( Window *aW=First; aW; aW=aW->Next ) // перебор активированных окон
+    if( aW->dTime )                          // если таймер установлен и
+    if( glfwGetTime()*1e3>=aW->nextTime )        // текущее время больше заданного
+    { aW->nextTime=glfwGetTime()*1e3+aW->dTime; aW->PutTimer(); } // новый шаг-такт
+    if( stop )
+    { Show();
+      if( dTime )glfwWaitEventsTimeout( Real( dTime )/1e3 );
+      else glfwWaitEvents();
+    } else glfwPollEvents();
+  }
 }
 #include <StdArg.h>                           // блок разных текстовых надписей
-#define GLFW_EXPOSE_NATIVE_WIN32
-#include "glfw3native.h"
+//#define GLFW_EXPOSE_NATIVE_WIN32
+//#include "glfw3native.h"
 
 Window& Window::Title( const char* A )
 { if( Caption ){ char S[strlen(Caption)+strlen(A)+8];
@@ -358,20 +387,22 @@ Window& Window::Icon( const char* A ) // по resource файлу здесь е�
 //}
   return *this;
 }
-Window& Window::Above(){ if( glAct( this ) )glfwFocusWindow( glfwWindow ); }
-//
+Window& Window::Above()
+{ if( glAct( this ) )glfwFocusWindow( glfwWindow ); return *this;
+}
 //     - переключение и временное сохранение состояния контекстной среды OpenGL
 //               с отработкой деструктора для восстановления исходного контента
 //
 bool glAct( const Window *W )
-{ if( W )
-  if( W->glfwWindow ){ glfwMakeContextCurrent( W->glfwWindow ); return true; }
+{ if( W )if( W->glfwWindow )
+  { glfwMakeContextCurrent( W->glfwWindow ); return true; }
   return false;
 }
 //             конструктор = пролог с восстановлением через эпилог = деструктор
 glContext::glContext( const Window *W ) :                           // prologue
   was( glfwGetCurrentContext() )
-  { if( W->glfwWindow==was )was=0; Active=glAct( W );
+  { if( W->glfwWindow==was )was=0,Active=true; // W->glfwWindow!=0;
+    else Active=glAct( W );
 //  else glfwMakeContextCurrent( W->glfwWindow );
   }
 glContext::~glContext()     // деструктор = эпилог с возвратом былого контекста
@@ -382,7 +413,11 @@ glContext::~glContext()     // деструктор = эпилог с возвр
 DWORD WaitTime( DWORD mWait,       // активная задержка для внешнего управления
                 bool(*inStay)(),   // собственно сам вычислительный эксперимент
                 DWORD mWork )      // время на исполнение рабочего цикла [мСек]
-              { Sleep( mWait ); }
+{  glfwWaitEventsTimeout( Real( mWait )/1e3 );
+   if( inStay )(*inStay)();
+   return 1;
+}
+//              { Sleep( mWait ); }
 
 //  ...  все согласованные процедуры объединяются в единый модуль интерактивной
 //  графической среды Window::Place в/исключая независимые операции с Юлианским

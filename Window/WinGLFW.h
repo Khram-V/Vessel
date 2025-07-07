@@ -59,18 +59,18 @@ public:
   void Help( const char *N[],const char *C[],const char *P[],int X=-1,int Y=1 );
 
   Window& SetTimer( DWORD mSec,bool(*in)()=NULL );  // время и адрес исполнения
-  Window& KillTimer(){ SetTimer( 0 ); }             // сброс таймера - если 0
+  Window& KillTimer(){ SetTimer( 0 ); return *this; } // сброс таймера - если 0
   //
   //   подборка скрытых параметров и свободных/отвязных транзакций
 private:
  struct{ fixed Code,Key; } KeyBuffer[lKey+1]; // накопительный буфер клавиатуры
-  int KeyPos,KeyPas;   // кольцевые счетчики для последовательности символов
-  int volatile         // отметки рекурсивности сдерживают повтор изображений
-      isTimer,         // по таймеру отслеживается уровень рекурсии транзакций
+  int KeyPos,KeyPas;      // кольцевые счетчики для последовательности символов
+  int volatile           // отметки рекурсивности сдерживают повтор изображений
+      isTimer,          // по таймеру отслеживается уровень рекурсии транзакций
       isMouse,         // мышка тоже перехлестывается в обрывочной рекурсии
       onKey;           // признаки вхождения в прерывание или ожидание символа
 //    KeyInterrupt;    // признак первого/неоднократного вхождения в прерывание
-  Real dTime,nextTime; // шаг времени и ожидаемое прерывание от таймера   [сек]
+  DWORD dTime,nextTime; // шаг времени и ожидаемое прерывание от таймера [µсек]
   fixed KeyStates( fixed Code=0 ); // выбор модификации по специальным символам
   bool(*extKey)(fixed); // свободная процедура обработки прерываний клавиатуры
   bool(*extTime)();    // внешняя процедура, на выход запрос нового изображения
@@ -87,11 +87,8 @@ public:
 };
 //    Активация с последующим восстановлением исходной графической среды
 //
-struct glContext                   // временное задействование контекстного
-   { GLFWwindow *was; bool Active; // графического 3D-интерфейса того же OpenGL
+class glContext{ GLFWwindow *was; // временное задействование контекстного
+public:              bool Active; // графического 3D-интерфейса того же OpenGL
 explicit glContext(const Window*); // конструктор=пролог графического конвейера
         ~glContext();              // деструктор = эпилог-возврат былой графики
    };                              //
-#define Xpm( X ) ( GetSystemMetrics( SM_CXSCREEN )*Real( X )/100.0 )     // %%X
-#define Ypm( Y ) ( GetSystemMetrics( SM_CYSCREEN )*Real( Y )/100.0 )     // %%Y
-

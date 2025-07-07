@@ -33,6 +33,7 @@
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
+					<Add option="-fopenmp" />
 					<Add directory="../Window" />
 				</Compiler>
 				<Linker>
@@ -104,6 +105,7 @@
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
+					<Add option="-fopenmp" />
 					<Add option="-DGLFW" />
 					<Add directory="../Tools/GlFw" />
 					<Add directory="../../../SoftWare/GLfw/include/GLFW" />

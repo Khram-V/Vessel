@@ -115,6 +115,7 @@ Hull& Hull::Floating( bool onlyDraw )
  int i,k; Part=false;             // разделение корпуса на прозрачные подуровни
         drawHull=onlyDraw;        // копия режима расчетов(-) или прорисовки(+)
   if( !onlyDraw )ThreeInitial();  // начальная чистка для интегрируемых величин
+//else if( !Ready() )return *this;
 //else if( !IsWindowVisible( hWnd ) || IsIconic( hWnd ) )return *this;
   wL.len=0;      // ватерлиния с нормалями и запутанными разделёнными отрезками
 Part_of_hull:    // разделение корпуса по уровням надводной и смоченной обшивки

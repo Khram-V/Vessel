@@ -21,7 +21,7 @@ static Window *First=NULL; // первое окно в последовател�
 //       теряются после переобъявления в охватывающих(производных) классах
 //
 #ifdef GLFW
-#include "WinGLFW.cpp"                      // GLFW
+#include "WinGLFW.cpp"                      // GLFW OpenGL
 #else
 #include "WinMSoft.cpp"                     // MicroSoft Windows (MSDK)
 #endif
@@ -43,15 +43,18 @@ Place& Place::Refresh(){ if( Site )Site->Refresh(); return *this; }
 void Window::PutChar( fixed Key )        // занесение одного символа и его кода
 {    KeyBuffer[++KeyPas&=lKey].Key=Key;   // в кольцевой буфер для букв и кодов
      KeyBuffer[KeyPas].Code=KeyStates();
- if( KeyPas==KeyPos ){ MessageBeep( MB_OK ); ++KeyPos&=lKey; } // сброс-перебор
- if( !onKey )                 // блок рекурсивных прерываний от активного окна
- while( KeyPos!=KeyPas )      //  нагромождение очереди запросов от клавиатуры
- { int oK=KeyPos;             // Фиксированная предустановка графической среды
-   { glAct( this );           // со сбоем других внешних транзакций над OpenGL
-     if( !KeyBoard( KeyBuffer[++KeyPos&=lKey].Key ) ){ KeyPos=oK; break; }
-   } glFinish();             // при/пере/пред/установка фона графической среды
- } // WaitEvents();          // при отказе возвращается в цикл ожидания очереди
+  if( KeyPas==KeyPos ){ MessageBeep( MB_OK ); ++KeyPos&=lKey; } // сброс-перебор
+  if( !onKey )                // блок рекурсивных прерываний от активного окна
+  while( KeyPos!=KeyPas )     //  нагромождение очереди запросов от клавиатуры
+  { int oK=KeyPos;            // Фиксированная предустановка графической среды
+    { glContext Act( this );  // со сбоем других внешних транзакций над OpenGL
+      if( Act.Active )
+      { if( !KeyBoard( KeyBuffer[++KeyPos&=lKey].Key ) ){ KeyPos=oK; break; }
+//      WaitEvents();        // при отказе возвращается в цикл ожидания очереди
+//      glFinish();          // при/пере/пред/установка фона графической среды
+  } } }
 }
+#if 0
 bool Window::KeyBoard( fixed key )// виртуальная процедура обработки прерываний
 { if( extKey ){ glContext S( this );  // установка графического контента OpenGL
               return extKey( key ); // true - символ принят, false - к возврату
@@ -65,13 +68,26 @@ fixed Window::ScanStatus()      // обновление в случае отсу
   { WaitEvents(); if( KeyPas==KeyPos )return KeyStates();
                         return KeyBuffer[KeyPos].Code;
   }
-void Break( const char Msg[],... )    // Случай аварийного завершения программы
-{ va_list V; va_start( V,Msg );       // или приостановка с первым символом "~"
- char str[vsprintf( 0,Msg,V )+4]; vsprintf( str,Msg,V ); va_end( V );
-  if( First )glFinish();
-  MessageBoxW( NULL,U2W(str),*Msg=='~'?L"Info":L"Break",MB_ICONASTERISK|MB_OK );
-  if( *Msg!='~' )exit( MB_OK );
+#else
+bool Window::KeyBoard( fixed key )// виртуальная процедура обработки прерываний
+{ if( extKey ){ glContext S( this );  // установка графического контента OpenGL
+              return extKey( key ); // true - символ принят, false - к возврату
+  } return false; //!KeyPas!=KeyPos; либо все недочитанные символы сбрасываются
 }
+fixed Window::GetKey()         // запрос появления нового символа на клавиатуре
+{ if( Ready() )
+  if( KeyPas!=KeyPos )return KeyBuffer[++KeyPos&=lKey].Key; return 0;
+}
+fixed Window::ScanKey()        // просто проверка текущей активности клавиатуры
+{ if( Ready() )
+  if( KeyPas!=KeyPos )return KeyBuffer[KeyPos].Key; return 0;
+}
+fixed Window::ScanStatus()      // обновление в случае отсутствия новых запросов
+{ if( Ready() )
+  if( KeyPas!=KeyPos )return KeyBuffer[KeyPos].Code;
+                      return KeyStates();
+}
+#endif
 //  ...  все согласованные процедуры объединяются в единый модуль интерактивной
 //  графической среды Window::Place в/исключая независимые операции с Юлианским
 //        календарем и перекодировками Unicode/UTF-8 для Windows-1251 и OEM-866
@@ -81,6 +97,14 @@ void Break( const char Msg[],... )    // Случай аварийного за�
 // #include "UniCode.cpp"
 // #include "Julian.cpp"
 // #include "Sym_CCCP.c"
-
-
+//
+void Break( const char Msg[],... )    // Случай аварийного завершения программы
+{ va_list V; va_start( V,Msg );       // или приостановка с первым символом "~"
+ int Len=vsprintf( 0,Msg,V ); char *str=(char*)malloc( Len+16 );
+         vsprintf( str,Msg,V ); va_end( V );       //! с длиной что-то не то ??
+//if( First )glFinish();
+  MessageBoxW( NULL,U2W(str),*Msg=='~'?L"Info":L"Break",MB_ICONASTERISK|MB_OK );
+  free( str ); if( *Msg!='~' )exit( MB_OK );
+}
+// char str[vsprintf( 0,Msg,V )+4+100];
 

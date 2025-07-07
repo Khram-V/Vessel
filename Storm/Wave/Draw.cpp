@@ -88,7 +88,7 @@ Waves& Waves::Drawing()
   }
   //  разметка зоны отражаемой волны внутри подвижной отражающей границы
   //
-  if( abs( wH )<Long/2 )
+  if( fabs( wH )<Long/2 )
   { Real X1,X2; x=0; X1=hX( H,0,0,0 ).x;    for( x=1; x<=Nx; X1=X2,x++ )    if( X1<wH^(X2=hX( H,0,0,0 ).x)<=wH )
     { glBegin( GL_POLYGON ); dot( (Vector){ X2,0,Depth/3 },lightcyan ); //gray );                             dot( (Vector){ X1,0,Depth/3 } );                             dot( (Vector){ X1,0,Depth/5.9 } );                             dot( (Vector){ X2,0,Depth/5.9 } ); glEnd();                             spot( hX(H,0,.1,Depth/6),9.0,blue );
     }    x=0;        X1=hX( V,0,0,0 ).x+Ds/2;    for( x=1; x<=Nx; X1=X2,x++ )    if( X1<wH^(X2=hX( V,0,0,0 ).x+Ds/2)<=wH || X1>X2 )
@@ -112,7 +112,7 @@ Waves& Waves::Drawing()
 
 //color( magenta ); curve( x,0,Nx,1,((H[x]*M[x].z*1.2/Rw)+(Vector){Long/-2+(x*Long)/Nx,0,Depth/4} ) ); //Rw+M[x].z/Rw+20}) );
   color( lightmagenta );  // собственно результат мультипликации двух волн
-  curve( x,0,Nx,1,(H[x]*abs(M[x].z)/4 + vX( 0,0.1,Depth/4 ) ) ); // (Vector){Long/-2+(x*Long)/Nx,.1,Depth/4}) ); //Rw+M[x].z/Rw+20}) );
+  curve( x,0,Nx,1,(H[x]*fabs(M[x].z)/4 + vX( 0,0.1,Depth/4 ) ) ); // (Vector){Long/-2+(x*Long)/Nx,.1,Depth/4}) ); //Rw+M[x].z/Rw+20}) );
 //curve( x,0,Nx,1,((H[x]+M[x])/2+(Vector){Long/-2+(x*Long)/Nx,.1,Depth/4}) ); //Rw+M[x].z/Rw+20}) );
   color( green );         // отметка величины и смещения вектора скорости
   curve( x,0,Nx-1,1,hX(V,Ds/2,.1,Depth/6 ) );  //  //    отметка текущего времени вычислительного эксперимента  //  { Event T( Instant+Tcalc/3600.0 ); char S[24];     // реальный отсчет времени
@@ -142,9 +142,9 @@ Waves& Waves::Drawing()
 // Справка о ходе вычислительного эксперимента на текстовой консоли
 //
 #define Amax( n,V,S )for( W=K=0,i=0; i<n; i++ ){                  \                      if( abs( V[i] )>abs( W ) )W=V[i];           \
-                      if( abs( V[i].x )>abs( K.x ) )K.x=V[i].x;   \
-                      if( abs( V[i].y )>abs( K.y ) )K.y=V[i].y;   \
-                      if( abs( V[i].z )>abs( K.z ) )K.z=V[i].z; } \
+                      if( fabs( V[i].x )>fabs( K.x ) )K.x=V[i].x;   \
+                      if( fabs( V[i].y )>fabs( K.y ) )K.y=V[i].y;   \
+                      if( fabs( V[i].z )>fabs( K.z ) )K.z=V[i].z; } \
  printf( "\n%6.1f{ %6.1f /%g/ %-6.1f } <= [ %6.1f /%g/ %-6.1f ] -- экстремумы %s  ",abs( W ),W.x,W.y,W.z,K.x,K.y,K.z,S );
 
 void Waves::TextInfo()
@@ -158,7 +158,7 @@ void Waves::TextInfo()
   } else
   { Vector W,K; int i;
     textcolor( WHITE ); print( 1,7,"%12s \\ %d/%-6d -- время[сек] \\ шаг  \n",DtoA( Tlaps/3600 ),Kt,Kd ),clreol();
-    if( abs( wH )<Long/2-2 )
+    if( fabs( wH )<Long/2-2 )
     textcolor( YELLOW,BLUE ),print( 8,8,"wV=%.2f \\ wH=%-.1f -- скорость[м/с] \\ граница[м] ",wV,wH );
     textcolor( LIGHTCYAN,BLACK ); clreol(); gotoxy( 1,9 );Amax( Nx+1,H,"уровня" )
     textcolor( LIGHTGREEN ); Amax( Nx,V,"скорости" ) printf( "\n" ),clreol();

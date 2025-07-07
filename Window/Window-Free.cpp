@@ -67,9 +67,9 @@ TextContext::TextContext( bool b ): Base( b )
 TextContext::~TextContext(){ if( Base )PopMatrix(); else glPopAttrib(); }
 
 Place& Place::Clear( bool back ) // очистка фоном/true или текущим/false цветом
-{ if( glAct( Site ) )                 // есть окно - есть картинка
-  { glScissor( pX,pY,Width,Height );  // Режим обрезки внешнего окружения и его
-    glEnable ( GL_SCISSOR_TEST );     // временное включение для очистки площадки
+{ //if( glAct( Site ) )              // есть окно - есть картинка
+  { glScissor( pX,pY,Width,Height ); // Режим обрезки внешнего окружения и его
+    glEnable ( GL_SCISSOR_TEST );   // временное включение для очистки площадки
     if( back )glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); else
     { float c[8]; glGetFloatv( GL_COLOR_CLEAR_VALUE,c );
                   glGetFloatv( GL_CURRENT_COLOR,c+4 );
@@ -77,7 +77,7 @@ Place& Place::Clear( bool back ) // очистка фоном/true или тек
                   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
                   glClearColor( *c,c[1],c[2],c[3] );
     } //glScissor( 0,0,0,0 );         // разблокирование графических фрагментов
-    glDisable( GL_SCISSOR_TEST );       //   и отключение обрезки
+    glDisable( GL_SCISSOR_TEST );     //   и отключение обрезки
   } return *this;
 }
 Place& Place::Show()                     //! прорисовка растрового фрагмента из
@@ -94,9 +94,9 @@ Place& Place::Show()                     //! прорисовка растров
 //        Img[0] - общая, контрольная длина массива
 //        Img[1] x Img[2] x Img[3] - x·y·z - трехмерные размерности изображения
 Place& Place::Save()                   // фрагментация здесь вполне естественна
-{ if( glAct( Site ) )
-  if( Width>0 && Height>0 )  // и не требует особой работы со списком
-  { unsigned Size=sizeof( unsigned )*( Width*Height+4 ); glAct( Site );
+{ if( Width>0 && Height>0 )            // и не требует особой работы со списком
+  if( glAct( Site ) )
+  { unsigned Size=sizeof( unsigned )*( Width*Height+4 ); // glAct( Site );
   //glPushAttrib( GL_VIEWPORT_BIT );
     glViewport( 0,0,Site->Width,Site->Height );   // возврат размерений полного
     if( !Img )(Img=(unsigned*)malloc(Size))[0]=Size; else        // окна Window
@@ -108,17 +108,15 @@ Place& Place::Save()                   // фрагментация здесь в
   } return *this;
 }
 Place& Place::Rest()     //! прямое восстановление растра из собственной памяти
-{ if( glAct( Site ) )
-  if( Img )    //  в фоновый буфер изображения с перемасштабированием
-  { glAct( Site );
+{ if( Img )    //  в фоновый буфер изображения с перемасштабированием
+  { if( glAct( Site ) )
     { RasterSector Sv( pX,pY,Width,Height ); glRasterPos2i( 0,0 );
       if( Width!=int( Img[1] ) || Height!=int( Img[2] ) )
         glPixelZoom( float( Width )/Img[1],float( Height )/Img[2] );
       glDrawPixels( Img[1],Img[2],GL_RGBA,GL_UNSIGNED_BYTE,Img+4 );
-      glPixelZoom ( 1.0,1.0 );
-  } } glFlush(); return *this;
+      glPixelZoom ( 1.0,1.0 ); glFlush();
+  } } return *this;
 }
-
 //glEnable( GL_SCISSOR_TEST ); glScissor( pX,pY,W,H );
 //glDisable( GL_SCISSOR_TEST );
 //glListBase( FontBase );

@@ -14,10 +14,9 @@ Place::Place( Window *Win, byte Mode ): Site( Win ),Signs( Mode ),Up( NULL ),
        extPush( NULL ),      // процедур для параллельного контроля хода мышки
             Ft( NULL ),      // шрифтовой блок, b при нуле включается DesignCAD
            Img( NULL ),      // фоновый растр с наложенной площадкой PlaceAbove
-        isDraw( false ),     //  прорисовка сбрасывается по случаю незавершения
-       isMouse( false )      //     предыдущей операции (во избежание рекурсии)
-{ //if( glAct( Win ) )       // связь контекста OpenGL с требуемым окном Window
-  if( this!=(Place*)Win )    // обход неприкасаемого базового окна Window.Place
+       isDraw( false ),      //  прорисовка сбрасывается по случаю незавершения
+      isMouse( false )       //     предыдущей операции (во избежание рекурсии)
+{ if( this!=(Place*)Win )    // обход неприкасаемого базового окна Window.Place
   { Place *S=(Place*)Win;    // Tw=S->Tw; Th=S->Th; Bit=NULL;
     while( S->Up )S=S->Up; S->Up=this;   // новая площадка набрасывается сверху
 //  if( Site->Up==this )Site->Save();    // первый фрагмент сохраняет фон окна?
@@ -45,6 +44,7 @@ Place& Place::Activate( bool act )        // активизация графич
 bool Place::Draw()       // в виртуальной среде Draw доступен внутренний пролог
 { if( Site && extDraw )  // настройки OpenGL с контекстным эпилогом прорисовки
   { glContext S( Site ); // подготовка среды к внешнему исполнению с рекурсией
+//  if( S.Active )
     if( extDraw() )      // -- исполнение внешней независимой транзакции
       { if( this==Site )Save().Refresh(); else Show(); return false; }
   } return Site!=NULL;
@@ -62,7 +62,7 @@ bool Place::Mouse( int b, int x,int y )
   return false;
 }
 Place::~Place()  // освобождение площадки, шрифтов, картинки и всех точек входа
-{ if( glAct( Site ) )                        // +++ средняя площадка вышибается
+{ if( Site )                                 // +++ средняя площадка вышибается
   { if( Img ){ free( Img ); Img=NULL; }      // все связные объекты расчищаются
     if( Ft ){ free( Ft ); Ft=NULL; }         // отключение привязанного шрифта
 //  AlfaBit( 0 );                            // здесь полный destructor шрифтам

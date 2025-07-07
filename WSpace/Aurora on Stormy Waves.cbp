@@ -220,6 +220,15 @@
 		<Unit filename="../Window/UniCode.cpp" />
 		<Unit filename="../Window/View.cpp" />
 		<Unit filename="../Window/View.h" />
+		<Unit filename="../Window/WinGLFW.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="../Window/WinGLFW.h" />
+		<Unit filename="../Window/WinMSoft.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
 		<Unit filename="../Window/Window-Free.cpp">
 			<Option compile="0" />
 			<Option link="0" />

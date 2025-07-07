@@ -87,7 +87,7 @@ int main()
   textsize( 80,24 );
   texttitle
   ( "Отработка трохоидальных волновых профилей - распространение и отражение" );
-  Waves Side;    do{ WaitTime( 50 );           // Side.Simulation();
+  Waves Side;    do{ WaitTime( 50 );         // Side.Simulation();
       } while( Side.Ready() && Side.GetKey()!=_Esc );
 }
 //   Управление вычислительным экспериментом с клавиатуры компьютера
@@ -150,7 +150,7 @@ bool Waves::KeyBoard( fixed Keyb )
     case _Enter: if( wH>Long )                // четыре режима волнообразования
                 { wH=Exp.bound==Waves_meet?0:Long/(Exp.bound==Wave_right?-4:4);
                   wV=0; break; } else
-    case _Blank: if( abs( wV )<Eps )wH=Long+1; else wV=0;
+    case _Blank: if( fabs( wV )<Eps )wH=Long+1; else wV=0;
                  Initial(); break; // полная очистка и сброс отражающей границы
     case _Left:  wV-=Cw/8; break;
     case _Right: wV+=Cw/8; break;

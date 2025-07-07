@@ -10,12 +10,11 @@ void Surface::Drawing( BoardView Sides )
   { Layers &Layer=L[F[N].LayerIndex];
 //  V.len=0; C.C=L[F[N].LayerIndex].Color;
     V.len=0; C.C=Layer.LClr.C;
-    for( I=0; I<K; I++)V+=P[F[N].P[I]].V;              // C.c[3]=V[0].z>=Draught?0xFF:0x7F; glColor4ubv(C.c);
+    for( I=0; I<K; I++)V+=P[F[N].P[I]].V;  // C.c[3]=V[0].z>=Draught?0xFF:0x7F; glColor4ubv(C.c);
     glNormal3dv( W=(V[2]-V[0])*(V[1]-V[0]) ); glBegin( GL_POLYGON );
-    for( I=0; I<K; I++ )
-    { C.C=Layer.LClr.C;
+    for( I=0; I<K; I++ ){ C.C=Layer.LClr.C;
       if( V[I].z<Draft+Min.z )
-      { C.c[3]-=C.c[3]/6;  //C.c[3]=V[I].z>Draft+Min.z?0xFF:0xBF;
+      { C.c[3]-=C.c[3]/6; //C.c[3]=V[I].z>Draft+Min.z?0xFF:0xBF;
         C.c[0] = ( C.c[0]+UnderWaterColor.c[0] )/2;
         C.c[1] = ( C.c[0]+UnderWaterColor.c[1] )/2;
         C.c[2] = ( C.c[0]+UnderWaterColor.c[2] )/2;
@@ -23,10 +22,9 @@ void Surface::Drawing( BoardView Sides )
     } glEnd();
     if( Sides==mvBoth && Layer.Symmetric )
     { glNormal3dv( ~W ); glBegin( GL_POLYGON );
-      for( I=K-1; I>=0; I-- )
-      { C.C=Layer.LClr.C;
+      for( I=K-1; I>=0; I-- ){ C.C=Layer.LClr.C;
         if( V[I].z<Draft+Min.z )
-        { C.c[3]-=C.c[3]/6;  //C.c[3]=V[I].z>Draft+Min.z?0xFF:0xBF;
+        { C.c[3]-=C.c[3]/6; //C.c[3]=V[I].z>Draft+Min.z?0xFF:0xBF;
           C.c[0] = ( C.c[0]+UnderWaterColor.c[0] )/2;
           C.c[1] = ( C.c[0]+UnderWaterColor.c[1] )/2;
           C.c[2] = ( C.c[0]+UnderWaterColor.c[2] )/2;

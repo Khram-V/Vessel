@@ -172,18 +172,19 @@ private:      //! подборка скрытых параметров и сво
   bool (*extKey)(fixed); // свободная процедура обработки прерываний клавиатуры
   bool (*extTime)();   // внешняя процедура, на выход запрос нового изображения
 };
-#define Xpm( X ) ( ( GetSystemMetrics( SM_CXSCREEN )*long( X ) )/100 ) // %%X
-#define Ypm( Y ) ( ( GetSystemMetrics( SM_CYSCREEN )*long( Y ) )/100 ) // %%Y
-//#define Xpm(X) ( ( GetSystemMetrics( SM_CXFULLSCREEN )*long(X) )/100 ) // %%X
-//#define Ypm(Y) ( ( GetSystemMetrics( SM_CYFULLSCREEN )*long(Y) )/100 ) // %%Y
-struct glContext{ HDC DC; HGLRC RC; // временное задействование контекстного
-                  bool Active;     // графического 3D-интерфейса того же OpenGL
+class glContext{ HDC DC; HGLRC RC; // временное задействование контекстного
+public:          bool Active;      // графического 3D-интерфейса того же OpenGL
 explicit glContext(const Window*); // конструктор=пролог графического конвейера
-        ~glContext();             // деструктор=эпилог-возврат былого контекста
+        ~glContext();              // деструктор=эпилог-возврат былой зарисовки
 };
 #endif
+//#define Xpm(X) ( ( GetSystemMetrics( SM_CXFULLSCREEN )*long(X) )/100 ) // %%X
+//#define Ypm(Y) ( ( GetSystemMetrics( SM_CYFULLSCREEN )*long(Y) )/100 ) // %%Y
+#define Xpm( X ) ( ( GetSystemMetrics( SM_CXSCREEN )*long( X ) )/100 )   // %%X
+#define Ypm( Y ) ( ( GetSystemMetrics( SM_CYSCREEN )*long( Y ) )/100 )   // %%Y
 //
-//!  Определения и процедуры управления наложенными фрагментами экрана
+//!  Window(SDK) ++ GLFW для OpneGL
+//!  Общие определения и процедуры управления наложенными фрагментами экрана
 //   реализуется создание, позиционирование, активизация и очистка фрагментов
 //
 extern DWORD volatile
@@ -203,12 +204,12 @@ extern DWORD volatile
 DWORD WaitTime( DWORD mWait,       // активная задержка для внешнего управления
                 bool(*inStay)()=0, // собственно сам вычислительный эксперимент
                 DWORD mWork=0 );   // время на исполнение рабочего цикла [мСек]
-bool WinReady( Window *W=0 );      // исполнение запросов и проверка активности
+bool WinReady( Window *W=NULL );   // исполнение запросов и проверка активности
                                    // без указания адреса опрашиваются все окна
 //
 //   Предустановки оконного Window и графического интерфейсов OpenGL
 //
-bool glAct( const Window* );       // простое переподключение Window к OpenGL
+bool glAct( const Window* );        // простое переподключение Window к OpenGL
 class TextContext{ const bool Base; // Polygon, Depth_Test, Cool_Face, Lighting
 public: TextContext( bool Space=false );  // ++ Space -> матрицы сцены и модели
        ~TextContext();

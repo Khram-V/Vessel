@@ -784,12 +784,12 @@ struct _GLFWlibrary
 
     _GLFWmonitor**      monitors;
     int                 monitorCount;
-
+/*
     GLFWbool            joysticksInitialized;
     _GLFWjoystick       joysticks[GLFW_JOYSTICK_LAST + 1];
     _GLFWmapping*       mappings;
     int                 mappingCount;
-
+*/
     _GLFWtls            errorSlot;
     _GLFWtls            contextSlot;
     _GLFWmutex          errorLock;

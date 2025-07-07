@@ -304,6 +304,7 @@ void Building()                       //       ___\│ г--+-┼--°°L¬\+/
     if( x>Kh.Asx[0] && x<Kh.Stx[0] )glVertex2d( x,Kh.F[k].z[0] );
   } glEnd();          //            lineto( ~Kh.Asx[0] );
   wH.Focus();         // и в завершение
+//glColor3f( 0.91,0.96,1 );
   Draw_Hull( 1,Win ); //   переход к изображению проекции "Корпус"
   Win.Show();
   Active|=2;
@@ -313,6 +314,7 @@ void Building()                       //       ___\│ г--+-┼--°°L¬\+/
 //
 void Draw_Hull( int ids, Place &_W )                         // Проекция корпус
 { int i,k,m,n; Real x,y,z;
+//glColor3f( 0.91,0.96,1 ); wH.Clear( false );
   if( ids )
   { __Grid z=min( Depth,Draught*2 );                              // Сетка
     for( k=0,y=-0.4*Breadth; k<=8; k++,y+=Breadth/10 )            // -- батоксы

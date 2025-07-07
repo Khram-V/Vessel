@@ -73,6 +73,7 @@ inline int ColorSelect( int a, int b )
 //
 bool Field::Draw()
 { static bool Recurse=false;
+//if( !Ready() )return false;
 //if( !IsWindowVisible( hWnd ) || IsIconic( hWnd ) )return false;
   if( Recurse || !Kt )return false; Recurse=true; Activate();
 //glEnable( GL_LIGHTING );

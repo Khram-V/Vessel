@@ -94,10 +94,10 @@ bool View::KeyBoard( fixed key )   // к спуску из внешних вир
 //+glEnable   ( GL_CULL_FACE );        // включение режима отбора треугольников   glHint     ( GL_POINT_SMOOTH_HINT,GL_NICEST );   glEnable   ( GL_POINT_SMOOTH );   glPointSize( 1.0 );   glHint     ( GL_LINE_SMOOTH_HINT,GL_NICEST );   glEnable   ( GL_LINE_SMOOTH );     // сглаживание линий   glLineWidth( 1.0 );
    glPolygonMode( GL_FRONT,GL_FILL );
    glPolygonMode( GL_BACK,GL_LINE ); //POINT );
-   glHint     ( GL_POLYGON_SMOOTH_HINT,GL_NICEST );   glEnable   ( GL_POLYGON_SMOOTH); // Really Nice Perspective Calculations   glHint     ( GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST );   glBlendFunc( GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA );
+   glEnable   ( GL_POLYGON_SMOOTH); // Really Nice Perspective Calculations   glHint     ( GL_POLYGON_SMOOTH_HINT,GL_NICEST );   glHint     ( GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST );   glBlendFunc( GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA );
    glShadeModel( GL_SMOOTH );       // FLAT закраска с использованием полутонов
    glAlphaFunc( GL_ALWAYS,0 );
-   glEnable( GL_BLEND );
+   glEnable( GL_BLEND );                // Включаем смешивание
    glEnable( GL_DITHER );               // Предопределение графической среды
    glEnable( GL_ALPHA_TEST );
    glFogi( GL_FOG_MODE,GL_EXP2 );       //  GL_EXP2
@@ -136,10 +136,12 @@ bool View::KeyBoard( fixed key )   // к спуску из внешних вир
 #endif   glEnable( GL_COLOR_MATERIAL );                   // glEnable( GL_LIGHTING );
    glEnable( GL_LIGHT0 ); glEnable( GL_LIGHT1 );
 // glEnable( GL_LIGHT2 ); glEnable( GL_LIGHT3 );
-   glDepthRange( 1,-1 ); // ( 0,1 )
-   glDepthMask( GL_TRUE );   glClearDepth( 2000.0 );             // Enables Clearing Of The Depth Buffer
-   glDepthFunc( GL_LEQUAL );          // LESS ALWAYS взаимное накрытие объектов
+// Рендеринг
    glEnable( GL_DEPTH_TEST );        // растровая разборка отсечений по глубине
-   glEnable( GL_AUTO_NORMAL );   glEnable( GL_NORMALIZE );   if( !SeaColor[black+1].u ){ for( int i=0; i<256; i++ )     SeaColor[1+black+i].c[0]=byte(   pow(Real(i)/255,4)*180), // red   красный     SeaColor[1+black+i].c[1]=byte(48+pow(Real(i)/255,2)*162), // green зеленый     SeaColor[1+black+i].c[2]=byte(96+pow(Real(i)/255,3)*94 ); // blue  синий     for( int i=0; i<black+256; i++ )SeaColor[i].c[3]=0xFF;    // alfa-сплошной
+   glDepthMask( GL_TRUE );   glClearDepth( 2e3 ); // 2000.0 );    // Enables Clearing Of The Depth Buffer
+   glDepthRange( 1,0 ); // 0,1 - Distance            взаимное накрытие объектов
+   glDepthFunc( GL_LEQUAL ); // ~EQUAL~GEQUAL GREATER LEQUAL NOTEQUAL LESS ALWAYS
+   glEnable( GL_NORMALIZE );   glEnable( GL_AUTO_NORMAL );
+   if( !SeaColor[black+1].u ){ for( int i=0; i<256; i++ )     SeaColor[1+black+i].c[0]=byte(   pow(Real(i)/255,4)*180), // red   красный     SeaColor[1+black+i].c[1]=byte(48+pow(Real(i)/255,2)*162), // green зеленый     SeaColor[1+black+i].c[2]=byte(96+pow(Real(i)/255,3)*94 ); // blue  синий     for( int i=0; i<black+256; i++ )SeaColor[i].c[3]=0xFF;    // alfa-сплошной
    }
 }

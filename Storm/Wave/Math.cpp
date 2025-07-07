@@ -90,7 +90,7 @@ Waves& Waves::Simulation()
 { Vector A,B,C; int x; bool kDraw=false,inBound=false;
  Real kW=Cw*(dT/=tKrat)/Ds,       // Скорость волны к скорости прохода по сетке      tK=tKrat/(tKrat+1.0),       // граничная поправка однобокого Зоммерфельда      Omega=_Pd*Cw/Length;        //..круговая частота волновых пульсаций [1/с]
   while( Tcalc<=Tlaps+dT )        //  ... расчёты в догонку к реальному времени
-  { inBound=abs( wH )<Long/2-2;   // подвижная граница внутри расчётной области
+  { inBound=fabs( wH )<Long/2-2;  // подвижная граница внутри расчётной области
     if( inBound )wH+=dT*wV;       // сдвиг отражающей границы по скорости хода
             else wH=Long+1;       // исключение воздействия подвижной стенки
     //

@@ -146,8 +146,8 @@ int main( int argc, char **argv )
     printf("Hello world: %d => Thread_num %d, num_threads %d, max_threads %d\n",
       np++,omp_get_thread_num(),omp_get_num_threads(),omp_get_max_threads() );
   }
-DISPLAY_DEVICE display_device;
-display_device.cb = sizeof(display_device);
+  DISPLAY_DEVICE display_device;
+  display_device.cb = sizeof(display_device);
   printf( "\nsizeof(DISPLAY_DEVICE) = %d\n",display_device.cb );
   for( int i=0; EnumDisplayDevices( NULL,i,&display_device,0 ); ++i )
   if( display_device.StateFlags )
@@ -182,16 +182,16 @@ display_device.cb = sizeof(display_device);
   Visual3D_Lightening(); // временно полагается активным второе внутреннее окно
   do
   { switch( Key=One.GetKey() )
-    { case _Esc: One.~_One(); break;
-      case ' ': One.Clear(),clrscr(); break;
+    { case ' ': One.Clear(),clrscr(); break;
+      case _Esc: One.Close(); //~_One();
     }
     switch( Key=Second.GetKey() )
-    { case _Esc:
-           print( 1,19,"Second::Destructor \n" ); gotoxy(1,21);
-           Second.~Window(); break;
-      case ' ': Second.Clear(),clrscr(); break;
-//    case _F1: TextHelp( &Second,Nam2,Cmds,Plus );
+    { case ' ': Second.Clear(),clrscr(); break;
+//    case _F1: TextHelp( &Second,Nam2,Cmds,Plus ); break;
+      case _Esc: print( 1,19,"Second::Destructor \n" ); gotoxy(1,21);
+                 Second.Close(); //~Window();
     }
+//} while( One.Ready() && Second.Ready() );
   } while( WinReady() );
-  Break("\n\n Окончание программы:\n\t { %X,%X } ",One.Ready(),Second.Ready());
+  Break( "~ Окончание программы:\n\t { %X,%X } ",One.Ready(),Second.Ready());
 }
