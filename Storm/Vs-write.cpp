@@ -81,22 +81,22 @@ Hull& Hull::Write( int format )
       { e5V( P=S[i] );
         if( !i )
         { if( P.y>0 )
-          { fprintf( F,"%lg %lg"Vertex"%lg 0"Vertex,P.x,P.y,P.z,P.x,P.z );
+          { fprintf( F,"%lg %lg" Vertex "%lg 0" Vertex,P.x,P.y,P.z,P.x,P.z );
             nt+=2;
         } } else
         if( Q.y<=0 && P.y>0 )
-        { fprintf( F,"%lg 0"Vertex"%lg %lg"Vertex"%lg 0"Vertex,
+        { fprintf( F,"%lg 0" Vertex "%lg %lg" Vertex "%lg 0" Vertex,
                    Q.x,Q.z, P.x,P.y,P.z, P.x,P.z );   // один новый треугольник
           Tri.Add( (Vector){Q.x,0,Q.z},P,(Vector){P.x,0,P.z},
                    nt,nt+2,nt+1,!k ); nt+=3;          // три новые точки
         } else
         if( Q.y>0 && P.y<=0 )
-        { fprintf( F,"%lg 0"Vertex,P.x,P.z );  // один старый треугольник
+        { fprintf( F,"%lg 0" Vertex,P.x,P.z );  // один старый треугольник
           Tri.Add( Q,P,(Vector){P.x,0,P.z},
                   nt-2,nt-1,nt,!k ); ++nt;          // одна новая точка
         } else
         if( Q.y>0 && P.y>0 )
-        { fprintf( F,"%lg %lg"Vertex"%lg 0"Vertex,P.x,P.y,P.z,P.x,P.z );
+        { fprintf( F,"%lg %lg" Vertex "%lg 0" Vertex,P.x,P.y,P.z,P.x,P.z );
           V=P;V.y=0;Tri.Add( Q,P,V,nt-2,nt-1,nt,!k ); // два косых треугольника
           V=Q;V.y=0;Tri.Add( Q,P,V,nt,nt-1,nt+1,!k ); nt+=2; // две новые точки
         } Q=P;
@@ -105,7 +105,7 @@ Hull& Hull::Write( int format )
     oL[0]=nt;
     for( k=0; k<=Nframes+1; k++ )
     { for( i=0; i<Frame[k].len; i++ )
-      { e5V( V=Frame[k][i] ); fprintf( F,"%g %g"Vertex,V.x,V.y,V.z ); ++nt;
+      { e5V( V=Frame[k][i] ); fprintf( F,"%g %g" Vertex,V.x,V.y,V.z ); ++nt;
       } oL[k+1]=nt;
     }
     for( k=0; k<=Nframes; k++ )                // Nframes+1 шпангоутов

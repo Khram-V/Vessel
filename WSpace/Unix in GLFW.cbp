@@ -4,23 +4,21 @@
 	<Project>
 		<Option title="GLFW to Unix" />
 		<Option pch_mode="2" />
-		<Option compiler="gnu_gcc_stable" />
+		<Option compiler="gcc" />
 		<Build>
 			<Target title="Aurora Storm">
 				<Option output="../WSpace/Dev/Aurora-GLFW" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../Vessel" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
-				<Option compiler="gnu_gcc_stable" />
-				<Option parameters='&quot;БПК «Стерегущий»-61&quot;' />
+				<Option compiler="gcc" />
+				<Option parameters='&quot;A-1201 Корвет-Б(а)&quot; &quot;БПК «Стерегущий»-61&quot;' />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-fopenmp" />
 				</Compiler>
 				<Linker>
 					<Add library="gomp" />
-					<Add library="pthread" />
-					<Add library="dl" />
 				</Linker>
 			</Target>
 			<Target title="Waves Profile">
@@ -28,7 +26,7 @@
 				<Option working_dir="../Vessel" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
-				<Option compiler="gnu_gcc_stable" />
+				<Option compiler="gcc" />
 				<Option use_console_runner="0" />
 				<Option projectLinkerOptionsRelation="2" />
 			</Target>
@@ -37,15 +35,13 @@
 				<Option working_dir="../Vessel" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
-				<Option compiler="gnu_gcc_stable" />
+				<Option compiler="gcc" />
 				<Option parameters="«Аврора»(а)" />
 				<Compiler>
 					<Add option="-fopenmp" />
 				</Compiler>
 				<Linker>
 					<Add library="gomp" />
-					<Add library="pthread" />
-					<Add library="dl" />
 				</Linker>
 			</Target>
 			<Target title="Ship Viewer">
@@ -53,7 +49,7 @@
 				<Option working_dir="../../Ship/Save" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
-				<Option compiler="gnu_gcc_stable" />
+				<Option compiler="gcc" />
 				<Option use_console_runner="0" />
 				<Option parameters='&quot;ONR-5613_DDX-2000.fef&quot; &quot;Лидер эсминцев «Ташкент».fef&quot;' />
 				<Option projectLinkerOptionsRelation="2" />
@@ -63,7 +59,7 @@
 				<Option working_dir="../Vessel" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
-				<Option compiler="gnu_gcc_stable" />
+				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 			</Target>
 			<Target title="Window-trial">
@@ -71,14 +67,12 @@
 				<Option working_dir="../Vessel" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
-				<Option compiler="gnu_gcc_stable" />
+				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-fopenmp" />
 				</Compiler>
 				<Linker>
 					<Add library="gomp" />
-					<Add library="pthread" />
-					<Add library="dl" />
 				</Linker>
 			</Target>
 		</Build>
@@ -86,7 +80,6 @@
 			<Add option="-Os" />
 			<Add option="-funsigned-char" />
 			<Add option="-Wunused" />
-			<Add option="-Wno-narrowing" />
 			<Add option="-DGLFW" />
 			<Add option="-D_GLFW_WIN32" />
 			<Add directory="../Window/GLFW" />
@@ -284,31 +277,24 @@
 		</Unit>
 		<Unit filename="../Window/GLFW/glfw3.h" />
 		<Unit filename="../Window/GLFW/glfw3native.h" />
+		<Unit filename="../Window/GLFW/glfw_config.h" />
 		<Unit filename="../Window/GLFW/init.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../Window/GLFW/input.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../Window/GLFW/internal.h" />
 		<Unit filename="../Window/GLFW/monitor.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../Window/GLFW/null_init.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../Window/GLFW/null_joystick.c">
-			<Option compilerVar="CC" />
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="Waves Profile" />
-			<Option target="Hull Theory" />
-			<Option target="Ship Viewer" />
-			<Option target="Window-shapes" />
-			<Option target="Window-trial" />
-		</Unit>
 		<Unit filename="../Window/GLFW/null_monitor.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../Window/GLFW/null_platform.h" />
 		<Unit filename="../Window/GLFW/null_window.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -318,6 +304,7 @@
 		<Unit filename="../Window/GLFW/platform.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../Window/GLFW/platform.h" />
 		<Unit filename="../Window/GLFW/vulkan.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -327,25 +314,21 @@
 		<Unit filename="../Window/GLFW/win32_init.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../Window/GLFW/win32_joystick.c">
-			<Option compilerVar="CC" />
-			<Option compile="0" />
-			<Option link="0" />
-			<Option target="Window-shapes" />
-			<Option target="Window-trial" />
-		</Unit>
 		<Unit filename="../Window/GLFW/win32_module.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../Window/GLFW/win32_monitor.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../Window/GLFW/win32_platform.h" />
 		<Unit filename="../Window/GLFW/win32_thread.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../Window/GLFW/win32_thread.h" />
 		<Unit filename="../Window/GLFW/win32_time.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../Window/GLFW/win32_time.h" />
 		<Unit filename="../Window/GLFW/win32_window.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -361,6 +344,8 @@
 		</Unit>
 		<Unit filename="../Window/Sym_CCCP.c">
 			<Option compilerVar="CC" />
+			<Option compile="0" />
+			<Option link="0" />
 		</Unit>
 		<Unit filename="../Window/UniCode.cpp" />
 		<Unit filename="../Window/View.cpp">

@@ -1,20 +1,19 @@
 //!
 //! проект Aurora - штормовой и экстремальный ход корабля
-//   ┌───────────────────────────────────────────────╖
-//   │  ↓  корпус ─> волны ─> графика                ║
-//   │  ↓  статика ─> динамика ─> реакции            ║
-//   │  ↨  кинематика ─> излучение ─> гидромеханика  ║
-//   ╞═══════════════════════════════════════════════╝
-//   └── ©2018-23 Санкт-Петербург — Южно-Сахалинск — Могилев — Друть — ‏יְרוּשָׁלַיִם
-//
+//  ┌───────────────────────────────────────────────╖
+//  │  ↓  корпус ─> волны ─> графика                ║
+//  │  ↓  статика ─> динамика ─> реакции            ║
+//  │  ↨  кинематика ─> излучение ─> гидромеханика  ║
+//  ╞═══════════════════════════════════════════════╝
+//  └── ©2018-23 Санкт-Петербург — Южно-Сахалинск — Могилев — Друть — ‏יְרוּשָׁלַיִם
 #include "Aurora.h"
 
 bool logTime( bool next )// запрос корректности текущего времени, или шаг назад
-{ const Field &S=*Storm;
-  if( !VIL || S.Kt<2 )return false; else
-  { Real T=S.Trun; if( !next )T -= Ts; // S.Tstep/S.tKrat;
+{ //const Field &S=*Storm;
+  if( !VIL || KtE<2 )return false; else
+  { Real T=Trun; if( !next )T -= Ts; // S.Tstep/S.tKrat;
     return 0<fprintf( VIL,T<60?"\n   %-6s\\%-4d":"\n%-9s/%-4d",
-                      DtoA( T/3600,-3 ),S.Kt-(!next) );
+                      DtoA( T/3600,-3 ),KtE-(!next) );
 } }
 void logMeta(){ if( VIL ){ const Hull &S=*Vessel;
  fprintf(VIL,"\n  ⇒ Гидростатика: С{ x=%.1f, z=%.2f }, zG=%.2f, r=%.2f, h=%.2f"
@@ -73,9 +72,10 @@ static Real wV[40],                                        // W{ x=8 y=16 z=2 }
           *wZ=wV+5,*wA=wV+10,*wM=wV+15,*wF=wV+20,*wC=wV+25,*wX=wV+30,*wY=wV+35;
 static long KS=0;                             // счетчик записей под осреднение
 static bool mV=false;                         // признак минимума скорости хода
+
 void logStop()
 { if( !VIL )return; logTime(); fprintf( VIL,"  ⇒ << успешное завершение >>" );
-  if( KS>0 && Vessel->Educt&0xFF )
+  if( KS>0 && Educt&0xFF )
   { Real RS=Real( KS )/_Rd; fprintf( VIL,"\n\t"
      "скорость хода      ±ξ[м/с]%6.2f < %+4.2f > %-+4.2f\n\t"
      "рыскание на курсе  ±χ[°] %7.2f < %+4.2f > %-+4.2f\n\t"
@@ -92,11 +92,16 @@ void logStop()
       wY[2]*_Rd, wY[4]/RS, wY[3]*_Rd,
       wA[2],wA[4]/KS,wA[3],wM[2],wM[4]/KS,wM[3],wF[2],wF[4]/KS,wF[3] );
   } fprintf( VIL,"\n" ); ftruncate(fileno(VIL),ftell(VIL)); fclose(VIL); VIL=0;
+  textcolor( MAGENTA,LIGHTCYAN );      // подсветка для начала записи протокола
+  print( 1,38,"\n << успешное завершение >>  "
+              " корабль[%X] · море[%X]  ",Vessel->Ready(),Storm->Ready() );
+  textcolor(LIGHTGRAY,BLACK);   // цвет перехода к завершению всех деструкторов
+  Break( "~ Протокол готов ~\n%s  [%d] ~",DtoA( Trun/3600,-3 ),KtE );
 }
 Hull& Hull::Protocol()
 { if( VIL && Educt&0xFF )
   { Field &S=*Storm; Vector Dir=Head[-1];          // в третьей точке экстремум
-    if( S.Kt<2 )                                   // ... { ξ η ζ }м,{ ϑ ψ χ }°
+    if( KtE<2 )                                    // ... { ξ η ζ }м,{ ϑ ψ χ }°
     { fprintf( VIL,
       "\n  ⇒ Время\\Kt    ⇒ Скорость±δ,узл курс±рыскание руль"
       " Z миделя∫волн бортовая килевая « корма мидель нос »/g" ); KS=0;
@@ -104,7 +109,7 @@ Hull& Hull::Protocol()
     } else { byte ev=0;                       // +отличие скорости хода в узлах
      Real w=Course+Dir.z,a=0,m=0,f=0,V=Speed*3600.0/_Mile; //,v=cSp*3600.0/_Mile-V;
       KS++;
-      if( S.Kt>2 )
+      if( KtE>2 )
       { Real w1=Route[-1].z,w2=Route[-2].z,w3=Route[-3].z,
              s1=Length*sin( Head[-1].y )/2, s2=Length*sin( Head[-2].y )/2,
              s3=Length*sin( Head[-3].y )/2, d=Ts; d=_g*d*d;
@@ -120,7 +125,7 @@ Hull& Hull::Protocol()
       if( extFix( wA,a )       )if( Educt&32 )ev|=32;  // ускорение ахтерштевня
       if( extFix( wM,m )       )if( Educt&64 )ev|=64;  // ускорение на миделе
       if( extFix( wF,f )       )if( Educt&128)ev|=128; // и вблизи форштевня
-      if( !mV && V && ev&1 )wV[4]=(wV[2]=V)*S.Kt,mV=true; // усреднение разгона
+      if( !mV && V && ev&1 )wV[4]=(wV[2]=V)*KtE,mV=true; // усреднение разгона
       if( ev )
       { static char str[64]; int i; logTime( false ); // сначала время, отсчеты
         sprintf( str,"  ⇒ %sV±ξ%5.1f%-+5.1f %s±χ%6.1f%-+6.1f",
@@ -172,7 +177,7 @@ void logWave()
 //inline void printB(unsigned B){ if(B>>1)printB(B>>1); putch((B&1)?'1':'0'); }
 
 Hull& Hull::wPrint( bool log ) // информация по смоченному корпусу на текстовой
-{ Field &F=*Storm;            //             консоли и в протоколе эксперимента
+{ //Field &F=*Storm;          //             консоли и в протоколе эксперимента
   textcolor( YELLOW ),       // текстовые данные о состоянии и динамике корабля
   print( 1,14," Time%s +%.2g\"/%.3g \n"
                " Speed %3.1fуз(%4.2f=%3.1fL)  \n"
@@ -181,7 +186,7 @@ Hull& Hull::wPrint( bool log ) // информация по смоченному
                " Floatable %1.0f << %1.0f  \n\n"
                " μCenter %4.1f >> %4.1f -- Gravity.z=%+3.1f  \n"
                "       h %4.2f >> %4.2f -- H %3.1f >> %3.1f   ",
-        DtoA( F.Trun/3600,F.Trun>3600?2:(F.Trun>60?3:-3) ),
+        DtoA( Trun/3600,Trun>3600?2:(Trun>60?3:-3) ),
         TimeStep,tKrat,Speed*3600/_Mile,
         Speed/sqrt(_g*Length),sqr(Speed)*_Pd/_g/Length,Volume,iV,Surface,iS,
         Floatage,iF,Metacenter.x,vM.x,Gravity.z,hX,vM.z,Metacenter.y,vM.y ),
@@ -233,6 +238,6 @@ Hull& Hull::wPrint( bool log ) // информация по смоченному
         Volume,Surface,Floatage,Buoyancy.x,Buoyancy.z,Gravity.z,
         Metacenter.z-Buoyancy.z,hX );
   } }
-  if( F.Kt<2 )logStock(),logDamp(),logHydro(); //fprintf( VIL,"\n" );
+  if( KtE<2 )logStock(),logDamp(),logHydro(); //fprintf( VIL,"\n" );
   return *this;
 }

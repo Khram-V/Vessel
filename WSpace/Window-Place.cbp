@@ -85,7 +85,7 @@
 				<Option working_dir="Dev" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_stable32" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Option projectIncludeDirsRelation="2" />
 				<Compiler>
@@ -103,7 +103,7 @@
 				<Option working_dir="Dev" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_stable32" />
 				<Compiler>
 					<Add option="-fopenmp" />
 					<Add option="-DGLFW" />
@@ -301,6 +301,8 @@
 		</Unit>
 		<Unit filename="../Window/Sym_CCCP.c">
 			<Option compilerVar="CC" />
+			<Option compile="0" />
+			<Option link="0" />
 			<Option target="A-lib32" />
 			<Option target="A-lib64" />
 			<Option target="Window Shapes" />

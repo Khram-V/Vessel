@@ -412,7 +412,7 @@ void _glfwInputDrop(_GLFWwindow* window, int count, const char** paths)
     if (window->callbacks.drop)
         window->callbacks.drop((GLFWwindow*) window, count, paths);
 }
-
+/*
 // Notifies shared code of a joystick connection or disconnection
 //
 void _glfwInputJoystick(_GLFWjoystick* js, int event)
@@ -477,7 +477,7 @@ void _glfwInputJoystickHat(_GLFWjoystick* js, int hat, char value)
 
     js->hats[hat] = value;
 }
-
+*/
 
 //////////////////////////////////////////////////////////////////////////
 //////                       GLFW internal API                      //////

@@ -144,6 +144,8 @@
 		<Unit filename="../Window/Julian.cpp" />
 		<Unit filename="../Window/Sym_CCCP.c">
 			<Option compilerVar="CC" />
+			<Option compile="0" />
+			<Option link="0" />
 		</Unit>
 		<Unit filename="../Window/UniCode.cpp" />
 		<Unit filename="../Window/View.cpp">

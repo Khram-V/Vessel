@@ -77,7 +77,7 @@ bool Field::Timer()                //! к несчастью все расчет
     TextContext Save( true );                            color( aqua,0.6,0.9 );
     Info.AlfaBit(_8x16).Area( 0,0,60,1 ).Clear( false ); color( blue );
     Info.Print( 2,1,"%04d %s %02d, %s%s <= %d",
-         Y,_Mnt[M-1],D,_Day[int(T.D%7)],DtoA(T.T,3),Kt );
+         Y,_Mnt[M-1],D,_Day[int(T.D%7)],DtoA(T.T,3),KtE );
     if( pause||stop ){ color(magenta); Info.Print(stop?" <стоп>":" <pause>" ); }
     if( Tlaps*3600-Trun>1.0 ){ color( red );
         Info.Print( " {%s",DtoA( Tlaps,3 ) );    // реальное время эксперимента
@@ -87,7 +87,7 @@ bool Field::Timer()                //! к несчастью все расчет
 #else
     static string S;
     sprintf( S,"%04d %s %02d, %s%s отсчёт ",Y,_Mnt[M-1],D,_Day[int(T.D%7)],DtoA(T.T,2) );
-             S<<DtoA(Tlaps,-3)<<"<"<<Kt<<"> ";
+             S<<DtoA(Tlaps,-3)<<"<"<<KtE<<"> ";
     if( pause||stop )S<<( stop?" <стоп>":" <пауза>" );
     if( Tlaps*3600-Trun>1.0 )S<<"  ←∆ "<<DtoA(Trun/3600-Tlaps,3);
     if( recurse )S<<" →"<<recurse<<"=затор";
@@ -165,7 +165,7 @@ Field& Field::Simulation()  // моделирование волнения в и
       } } }
       Vessel->Floating()     // наложение уровня + расчёт воздействия на корпус
              .Movement()     // моделирование гидродинамики корабля на волнении
-             .Protocol(); ++Kt;  // счётчик циклов вычислительного эксперимента
+             .Protocol(); ++KtE;  // счётчик циклов вычислительного эксперимента
   } } WinReady(); return *this;  // переисполнение очереди посторонних запросов
 }
 //     Эксперимент выполняется с заданным расчетным шагом до истечения

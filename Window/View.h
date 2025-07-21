@@ -6,7 +6,7 @@
   orange,pink,purple,magenta,fuchsia,lightmagenta,black,empty=-1   //!=27\{28}
 } colors;                                           // словесные прописи имён
 extern const char *_Mnt[],*_Day[];                 // месяцев года, дней недели
-//// Настройка начальной раскраски и освещенности графического пространства/сцены//                                   ... предустановка графической среды OpenGLvoid View_initial( _Real Distance=600 );//
+//// Настройка начальной раскраски и освещенности графического пространства/сцены//                                   ... предустановка графической среды OpenGLvoid View_initial( Real Distance=600 );//
 //  Небольшой комплекс процедур времени проведения вычислительного эксперимента
 //
 void color( const colors );      // выбор цвета в палитре SeaColor
@@ -33,7 +33,7 @@ protected:
         eyeX,eyeY,eyeZ,    // и направление взгляда
         Distance;       // расстояние от точки установки камеры до места обзора
 public: View( const char* Title,int X=0,int Y=0,int W=0,int H=0,_Real Size=0 );
-//     ~View(){}     // - в продолжение последовательности виртуальных операций
+virtual ~View(){ this->~Window(); } // в продолжение последовательности виртуальных операций
 virtual bool KeyBoard( fixed Keyb );
 virtual bool Draw();
 };

@@ -75,7 +75,7 @@ bool Field::Draw()
 { static bool Recurse=false;
 //if( !Ready() )return false;
 //if( !IsWindowVisible( hWnd ) || IsIconic( hWnd ) )return false;
-  if( Recurse || !Kt )return false; Recurse=true; Activate();
+  if( Recurse || !KtE )return false; Recurse=true; Activate();
 //glEnable( GL_LIGHTING );
 //glEnable( GL_CULL_FACE );
   glEnable( GL_DEPTH_TEST );
@@ -138,7 +138,7 @@ bool Field::Draw()
     } else
     { static int nx=0,ny=0,r=1,**Clr=NULL; //r=-r;   //  сборная цветовая матрица
       if( mY>ny || mX>nx )Clr=(int**)Allocate( ny=mY,(nx=mX)*sizeof(int),Clr );
-      if( !(Kt%3) )r=-r;
+      if( !(KtE%3) )r=-r;
 #pragma omp parallel for
       for(int y=0;y<mY;y++) // выборка расцветки волновых склонов выполняется с
       for(int x=0;x<mX;x++) //  раздельным использованием исходных пакетов волн
@@ -178,6 +178,7 @@ bool Field::Draw()
   if( V.Statum>3 && Exp.wave )                // подводные волновые воздействия
   { color( green ); Print(V.lFlow?", увлечение волной":", над волной"); }
     color( gray );  Print( ", сток/ист(%g) ",V.Kv );
+//if( V.Pic.flow )color( yellow ),Print(2,3,VView[V.Pic.flow ] );
   Print( 2,3,
     "Курс %0.1f°, дрейф %0.1f°, скорость %0.1f узлов (Fr=%4.2f, Lw/L=%4.2f) ",
      V.Course*360/_Pd,angle(V.Course,-V.Head[-1].z)*360/_Pd,S*3600/_Mile,

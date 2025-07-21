@@ -88,7 +88,7 @@ bool View::KeyBoard( fixed key )   // к спуску из внешних вир
   } Draw(); return true;                 // либо - запрос от клавиатуры погашен
 }
 // Настройка начальной раскраски и освещенности графического пространства/сцены
-//              ... здесь необходима предварительная установка контекста OpenGLvoid View_initial( _Real D ){  glClearColor( 0.9,0.95,0.99,1 );   // светлый оттенок экранного фона и затем   glClear( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT ); // полная расчистка окна//        | GL_ACCUM_BUFFER_BIT|GL_STENCIL_BUFFER_BIT );
+//              ... здесь необходима предварительная установка контекста OpenGLvoid View_initial( Real D ){  glClearColor( 0.9,0.95,0.99,1 );   // светлый оттенок экранного фона и затем   glClear( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT ); // полная расчистка окна//        | GL_ACCUM_BUFFER_BIT|GL_STENCIL_BUFFER_BIT );
 //+glFrontFace( GL_CCW );              // CW грани с обходом по часовой стрелке
 //+glCullFace ( GL_BACK );             // FRONT_AND_BACK какие отбираются грани
 //+glEnable   ( GL_CULL_FACE );        // включение режима отбора треугольников   glHint     ( GL_POINT_SMOOTH_HINT,GL_NICEST );   glEnable   ( GL_POINT_SMOOTH );   glPointSize( 1.0 );   glHint     ( GL_LINE_SMOOTH_HINT,GL_NICEST );   glEnable   ( GL_LINE_SMOOTH );     // сглаживание линий   glLineWidth( 1.0 );
@@ -107,36 +107,47 @@ bool View::KeyBoard( fixed key )   // к спуску из внешних вир
    glHint( GL_FOG_HINT,GL_NICEST );
    glEnable( GL_FOG );                  // glEnable( GL_STENCIL_TEST );
    glLightModeli( GL_LIGHT_MODEL_TWO_SIDE,true );
-   glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER,true );
-   glColorMaterial( GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE );
+// glLightModeli( GL_LIGHT_MODEL_LOCAL_VIEWER,true );
 // glLightModeli( GL_LIGHT_MODEL_COLOR_CONTROL,GL_SEPARATE_SPECULAR_COLOR );
-#if 0
-   glLightModelfv( GL_LIGHT_MODEL_AMBIENT,(const float[]){.1,.1,.1,1} ); //!??
-// glMaterialfv( GL_FRONT_AND_BACK,GL_AMBIENT, (const float[]){.2,.2,.2,1} ); //{1,1,1,0}
-// glMaterialfv( GL_FRONT_AND_BACK,GL_DIFFUSE, (const float[]){.4,.4,.4,1} ); //{1,1,1,0}
-// glMaterialfv( GL_FRONT_AND_BACK,GL_SPECULAR,(const float[]){.6,.6,.6,1} ); //{1,1,1,0}
-// glMaterialfv( GL_FRONT_AND_BACK,GL_EMISSION,(const float[]){.1,.1,.1,1} ); //{0,0,0,1}
-   glMateriali( GL_FRONT_AND_BACK,GL_SHININESS,255 );   // 255 степень отсветки
-   glLightfv( GL_LIGHT0,GL_AMBIENT, (const float[]){.3,.3,.3,1 }); // окружение
-   glLightfv( GL_LIGHT0,GL_DIFFUSE, (const float[]){.5,.5,.5,1 }); // рассеяние
-   glLightfv( GL_LIGHT0,GL_SPECULAR,(const float[]){.7,.7,.7,1 }); // отражение
-   glLightfv( GL_LIGHT0,GL_EMISSION,(const float[]){.9,.9,.9,1 }); // излучение
-   glLightfv( GL_LIGHT0,GL_POSITION,      (const float[]){-D, D,-D,1 });
-   glLightfv( GL_LIGHT0,GL_SPOT_DIRECTION,(const float[]){ D,-D, D,1 });
-   glLighti ( GL_LIGHT0,GL_SPOT_CUTOFF,270 );
-   glLightfv( GL_LIGHT1,GL_AMBIENT, (const float[]){.3,.3,.3,1 }); // окружение
-   glLightfv( GL_LIGHT1,GL_DIFFUSE, (const float[]){.5,.5,.5,1 }); // рассеяние
-   glLightfv( GL_LIGHT1,GL_SPECULAR,(const float[]){.7,.7,.7,1 }); // отражение
-   glLightfv( GL_LIGHT1,GL_EMISSION,(const float[]){.9,.9,.9,1 }); // излучение
-   glLightfv( GL_LIGHT1,GL_POSITION,      (const float[]){ D, D,-D,1 });
-   glLightfv( GL_LIGHT1,GL_SPOT_DIRECTION,(const float[]){-D,-D, D,1 });
-   glLighti ( GL_LIGHT1,GL_SPOT_CUTOFF,270 );
-// glLightf( GL_LIGHT0,GL_POSITION,D );
-// glLightf( GL_LIGHT1,GL_POSITION,D );
-#endif   glEnable( GL_COLOR_MATERIAL );                   // glEnable( GL_LIGHTING );
-   glEnable( GL_LIGHT0 ); glEnable( GL_LIGHT1 );
-// glEnable( GL_LIGHT2 ); glEnable( GL_LIGHT3 );
+// glLightModelfv( GL_LIGHT_MODEL_AMBIENT,(const float[]){.2,.2,.2,1} );  //!??
+// glColorMaterial( GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE );
+// glMateriali( GL_FRONT_AND_BACK,GL_SHININESS,255 );   // 255 степень отсветки
+// glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT, (const float[]){.2,.2,.2,1}); //{1,1,1,0}
+// glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE, (const float[]){.4,.4,.4,1}); //{1,1,1,0}
+// glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,(const float[]){.6,.6,.6,1}); //{1,1,1,0}
+// glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,(const float[]){.1,.1,.1,1}); //{0,0,0,1}
+// glLightfv( GL_LIGHT0,GL_AMBIENT,           (const float[]){.3,.3,.3,1}); // окружение
+// glLightfv( GL_LIGHT0,GL_DIFFUSE,           (const float[]){.4,.4,.4,1}); // рассеяние
+// glLightfv( GL_LIGHT0,GL_SPECULAR,          (const float[]){.5,.5,.5,1}); // отражение
+// glLightfv( GL_LIGHT0,GL_EMISSION,          (const float[]){.6,.6,.6,1}); // излучение
+// glLightfv( GL_LIGHT0,GL_POSITION,          (const float[]){ D,-D,-D,1});
+// glLightfv( GL_LIGHT0,GL_SPOT_DIRECTION,    (const float[]){-D, D, D,1});
+// glLighti ( GL_LIGHT0,GL_SPOT_CUTOFF,90 );
+// glLightfv( GL_LIGHT1,GL_AMBIENT,           (const float[]){.3,.3,.3,1}); // окружение
+// glLightfv( GL_LIGHT1,GL_DIFFUSE,           (const float[]){.4,.4,.4,1}); // рассеяние
+// glLightfv( GL_LIGHT1,GL_SPECULAR,          (const float[]){.5,.5,.5,1}); // отражение
+// glLightfv( GL_LIGHT1,GL_EMISSION,          (const float[]){.6,.6,.6,1}); // излучение
+// glLightfv( GL_LIGHT1,GL_POSITION,          (const float[]){-D,-D,-D,1});
+// glLightfv( GL_LIGHT1,GL_SPOT_DIRECTION,    (const float[]){ D, D, D,1});
+// glLighti ( GL_LIGHT1,GL_SPOT_CUTOFF,90 );
 // Рендеринг
+#define Light( I )                                                  \
+   glLightfv( GL_LIGHT##I,GL_AMBIENT, (const float[]){.0,.0,.0,1}); \
+   glLightfv( GL_LIGHT##I,GL_DIFFUSE, (const float[]){.5,.5,.5,1}); \
+   glLightfv( GL_LIGHT##I,GL_SPECULAR,(const float[]){.8,.8,.8,1}); \
+   glLighti ( GL_LIGHT##I,GL_SPOT_CUTOFF,45 );
+   Light( 0 ) glLightfv( GL_LIGHT0,GL_POSITION,      (const float[]){0,0,1,0 });
+              glLightfv( GL_LIGHT0,GL_SPOT_DIRECTION,(const float[]){0,0,-1  });
+   Light( 1 ) glLightfv( GL_LIGHT1,GL_POSITION,      (const float[]){0,0,-1,0});
+              glLightfv( GL_LIGHT1,GL_SPOT_DIRECTION,(const float[]){0,0,1   });
+   Light( 2 ) glLightfv( GL_LIGHT2,GL_POSITION,      (const float[]){1,0,0,0 });
+              glLightfv( GL_LIGHT2,GL_SPOT_DIRECTION,(const float[]){-1,0,0  });
+   Light( 3 ) glLightfv( GL_LIGHT3,GL_POSITION,      (const float[]){-1,0,0,0});
+              glLightfv( GL_LIGHT3,GL_SPOT_DIRECTION,(const float[]){ 1,0,0  });
+   glEnable( GL_COLOR_MATERIAL );
+   glEnable( GL_LIGHTING );
+   glEnable( GL_LIGHT0 ); glEnable( GL_LIGHT1 );
+   glEnable( GL_LIGHT2 ); glEnable( GL_LIGHT3 );
    glEnable( GL_DEPTH_TEST );        // растровая разборка отсечений по глубине
    glDepthMask( GL_TRUE );   glClearDepth( 2e3 ); // 2000.0 );    // Enables Clearing Of The Depth Buffer
    glDepthRange( 1,0 ); // 0,1 - Distance            взаимное накрытие объектов

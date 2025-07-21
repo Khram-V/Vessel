@@ -1,17 +1,19 @@
 //
 // Два варианта шрифтов без включения проприетарных буквочек MicroSoft:Windows
 //  или обновлённый вариант (независимых) начертаний векторных и растровых букв
+//
 #include "Window.h"                // аппаратное окружение и стандартная среда
                                    // программирования MinGW_Microsoft-Windows
 #define _Design_len 9633           // допустимое количество букв в _Design_font
 #define LFont Font &L=Ft?*Ft:*(Site->Ft) // выбор активной или оконной площадки
-#include "Sym_Design.c"            //  Borland.chr + DesignCAD.vct Complex font
+#include "Sym_Design.c"            // Borland.chr + DesignCAD.vct, Complex font
+#include "Sym_CCCP.c"              // Русские шрифты DOS(OEM-866)alt эпохи CCCP
 
 static struct Design_Letters
 { int W,H,B;             // ширина высота и вертикальное смещение базы шрифта
   fixed *Af;             // массив индексов прямого доступа к контурам буквочек
   Design_Letters()       // конструктор срабатывает здесь один единственный раз
-  { char *v,*V=(char*)_Design_font; unsigned i,u; //Break( "~Constructor" );
+  { char *v,*V=(char*)_Design_font; unsigned i,u;   // Break( "~Constructor" );
     Af=(fixed*)calloc( sizeof( fixed ),_Design_len );
     W=*V++; H=*V++; B=*V++; V++;
     for( i=0;; )
@@ -56,10 +58,10 @@ static struct Design_Letters
 //!    Начальная установка базового шрифта, связанного с текущим окном OpenGL
 //       ... или destructor с нулевым аргументом
 //
-Place& Place::AlfaBit( unsigned char *DispCCCP )      // старый советский растр
+Place& Place::AlfaBit( const byte *DispCCCP ) // советский альтернативный растр
 { if( !DispCCCP ){ if( Ft ){ free( Ft ); Ft=NULL; } } else     // отмена шрифта
   { if( !Ft )Ft=(Font*)calloc( 1,sizeof( Font ) );
-    if( Ft ){ LFont; L.Bit=DispCCCP; L.Tw=L.Bit[0]+1;
+    if( Ft ){ LFont; L.Bit=(byte*)DispCCCP; L.Tw=L.Bit[0]+1;
                                      L.Th=L.Bit[1]+2; }
   } return *this;
 }
@@ -97,11 +99,11 @@ void _OutBitText( const char *str, byte *bit, Real &X,Real &Y,Real bX )
 { int w=bit[0]+1,h=bit[1]+2; char b,*s=(char*)str;  // в разборе контролируется
   unsigned u; fixed c;                              //
    glPushClientAttrib( GL_CLIENT_PIXEL_STORE_BIT ); // переход на новую строку
-   glPixelStorei( GL_UNPACK_SWAP_BYTES,false );    // Step through the string,
-   glPixelStorei( GL_UNPACK_LSB_FIRST,false );    //  drawing each character.
-   glPixelStorei( GL_UNPACK_ROW_LENGTH, 0 );      // A newline will simply
-   glPixelStorei( GL_UNPACK_SKIP_ROWS,  0 );      // translate the next
-   glPixelStorei( GL_UNPACK_SKIP_PIXELS,0 );      // character's insertion
+   glPixelStorei( GL_UNPACK_SWAP_BYTES,false );     // Step through the string,
+   glPixelStorei( GL_UNPACK_LSB_FIRST,false );      //  drawing each character.
+   glPixelStorei( GL_UNPACK_ROW_LENGTH, 0 );        // A newline will simply
+   glPixelStorei( GL_UNPACK_SKIP_ROWS,  0 );        // translate the next
+   glPixelStorei( GL_UNPACK_SKIP_PIXELS,0 );       // character's insertion
    glPixelStorei( GL_UNPACK_ALIGNMENT,  1 );      // point back to the start of
    while( *s )                                    // the line and down one line
    { s=UtOEM( b,s,u ); c=b;
@@ -177,6 +179,11 @@ Place& Place::Text( Course Dir, const Real *P, const char* fmt, ... )
      { Arg( Dir,P,s )Str }
 Place& Place::Text( Course Dir,_Real X,_Real Y,_Real Z, const char* fmt, ... )
      { Arg( Dir,(const Real[]){X,Y,Z},s )Str }
+
+char* _Format( const char *fmt,... )
+{ va_list a; va_start( a,fmt ); int l=vsnprintf( 0,0,fmt,a )+2;
+  { static string s; s[l]=0; vsnprintf( s,l,fmt,a ); va_end( a ); return s; }
+}
 
 /*  == не п(р)о(д)ходит ~~ оттенение букв утолщением с обратным цветом
     Real _x=X,_y=Y;

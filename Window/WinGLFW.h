@@ -59,7 +59,7 @@ public:
   void Help( const char *N[],const char *C[],const char *P[],int X=-1,int Y=1 );
 
   Window& SetTimer( DWORD mSec,bool(*in)()=NULL );  // время и адрес исполнения
-  Window& KillTimer(){ SetTimer( 0 ); return *this; } // сброс таймера - если 0
+  Window& KillTimer(); //{ if( Site )SetTimer( 0 ); return *this; } // сброс таймера - если 0
   //
   //   подборка скрытых параметров и свободных/отвязных транзакций
 private:

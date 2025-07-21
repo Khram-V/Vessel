@@ -12,10 +12,21 @@
 				<Option working_dir="Dev/" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_stable32" />
 				<Option use_console_runner="0" />
+				<Compiler>
+					<Add option="-m32" />
+					<Add option="-Wno-narrowing" />
+					<Add option="-Wno-literal-suffix" />
+					<Add directory="../../../SoftWare/GLfw/include/GLFW" />
+				</Compiler>
 				<Linker>
+					<Add option="-static-libgcc" />
+					<Add option="-static" />
+					<Add option="-m32" />
 					<Add library="gomp" />
+					<Add library="libglfw3_static.a" />
+					<Add directory="../../../SoftWare/Dev/Lib/" />
 				</Linker>
 			</Target>
 			<Target title="Vector-Tensor">
@@ -107,6 +118,8 @@
 		<Unit filename="../Window/Julian.cpp" />
 		<Unit filename="../Window/Sym_CCCP.c">
 			<Option compilerVar="CC" />
+			<Option compile="0" />
+			<Option link="0" />
 		</Unit>
 		<Unit filename="../Window/UniCode.cpp" />
 		<Unit filename="../Window/View.cpp">

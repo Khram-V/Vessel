@@ -67,7 +67,7 @@ Real Hydrostatic::In( Real z, Real *F ) // nZ>2 всегда
 }
 Hydrostatic::Hydrostatic(): Lmax( Depth ),Lmin( Do )
 { int i,k; Real x,z; EpsV=Volume/1000;
-  dX=Lmx/nX; //(nX-1);
+  dX=Lmx/(nX-1);                         //!?
   dZ=(Depth-Do)/nZ; //(nZ-1);            // Do - предустанавливается при вызове
   for( z=Do,k=0; k<nZ; k++,z+=dZ )       //  Y - таблица плазовых ординат
   { for( x=Xo,i=0; i<nX; i++,x+=dX )Y[k][i]=Kh.Y( x,z );
@@ -86,15 +86,16 @@ void Hydrostatic::Initial()      // Процедура предваритель�
 { int i,k; // bool b;            //  массив и характеристик, необходимых для
   Real R,r,cX,S, x,y,z=Do+dZ/2;  //  построения кривых элементов теоретического
   for( k=0; k<nZ; k++,z+=dZ )    //  чертежа судна по массивам плазовых ординат
-  { x=Xo+dX/2;   //-dX/2;        //  для вычисления площадей, объемов
+  { x=Xo; //+dX/2; //-dX/2;      //  для вычисления площадей, объемов
 //  z=Do+dZ*k; //(Real( k )+0.5) //  их моментов инерции (z+1/2 - центр объема)
     R=r=cX=S=0.0;               // Первый прогон интегрирования, нулевая ширина
     for( i=0; i<nX; i++,x+=dX ) //   и метацентрических радиусов
     if( (y=Y[k][i])>0.0 )
     { S += y;
-      cX+= y*x;
       r += y*y*y;                     // стр.61 у Владимира Вениаминовича С-Т-Ш
       R += y*x*x;
+      if( i && i<nX-1 )cX+=y*x;                        // оконцовки трапеций ??
+//                else r-=y*y*y/2,R-=y*x*x/4;
 #if 0
       if( i>0 )b=Y[k][i-1]<=0.0; else b=false;
       if( !i || b )
@@ -122,8 +123,8 @@ sy=(y+iy)/dX/2;
     }
     Swl[k]=( S*=2*dX );              // Площадь ватерлинии
             cX*=2*dX;                // Статический момент площади ватерлинии
-    if( !k ){ Vol[0]=0; zCV[0]=Do; xCV[0]=Xm; if( S>EpsV/dZ )xCV[0]=cX/S; }else
-    if( !S )Vol[k]=Vol[k-1],zCV[k]=zCV[k-1],xCV[k]=xCV[k-1]; else
+    if( !k ){ Vol[0]=0; zCV[0]=Do; xCV[0]=Xm; if( S>EpsV/dZ )xCV[0]=cX/S; } else
+    if( !S ){ Vol[k]=Vol[k-1]; zCV[k]=zCV[k-1]; xCV[k]=xCV[k-1]; } else
     { Real v=dZ*(S+Swl[k-1])/2;      // Чистый метод трапеций
       Vol[k]=Vol[k-1] + v;           // Грузовой размер
       zCV[k]=zCV[k-1] + v*(z-dZ/2);  // Момент для аппликаты центра величины zC
@@ -131,7 +132,7 @@ sy=(y+iy)/dX/2;
     }
     if( !k && !S )xCW[k]=Xm,Jy[k]=Jx[k]=0; else
     if( k && !S )xCW[k]=xCW[k-1],Jy[k]=Jy[k-1],Jx[k]=Jx[k-1]; else
-    { xCW[k]=cX/S; //+Xo;        // Центр площади ватерлинии
+    { xCW[k]=cX/S;        // Центр площади ватерлинии
       Jy[k]=(R*2*dX-cX*cX/S);    // /Vol[k]->Продольный метацентрический радиус
       Jx[k]= r*2*dX/3;           // /Vol[k]->Поперечный --//--
   } }
@@ -140,7 +141,8 @@ sy=(y+iy)/dX/2;
   { S+=( Y[k][0]+Y[k-1][0]+Y[k][nX-1]+Y[k-1][nX-1] )*dZ;// без двойки два борта
     if( k==1 )
     for( i=1; i<nX; i++ )
-    { S += (Y[0][i-1]+Y[0][i])*dX; //if( i && i<nX-1 )S+=y; // второй борт под трапециями
+    { S += (Y[0][i-1]+Y[0][i])*dX;
+//    if( i && i<nX-1 )S+=y;                      // второй борт под трапециями
     }
     for( i=1; i<nX; i++ )
     { y=Y[k][i]; Real yx=Y[k][i-1],yz=Y[k-1][i];
@@ -153,15 +155,14 @@ sy=(y+iy)/dX/2;
   zCV[0]=Do;
   xCV[0]=xCW[0];
   for( k=0; k<nZ; k++ )
-  { if( !k )Ry[0]=rx[0]=0; else
-    { xCV[k]/=Vol[k]+Swl[k]*dZ;               // половинка счетной ватерлинии
-      zCV[k]/=Vol[k]; // (Vol[k]+Vol[k-1])/2;
-      rx[k]=Jx[k]/Vol[k];
-      Ry[k]=Jy[k]/Vol[k];
+  { if( !k )Ry[0]=0,rx[0]=0; else
+    { S = Vol[k]; //-Swl[k]*dZ/2;
+      xCV[k]/=Vol[k]+Swl[k]*dZ/2;             // половинка счетной ватерлинии
+      zCV[k]/=S;       // Vol[k];             // (Vol[k]+Vol[k-1])/2;
+      rx[k]=Jx[k]/S;   // Vol[k];
+      Ry[k]=Jy[k]/S;   // Vol[k];
     }
-//  zCV[k]-=dZ/2;   //  Do;
-    zM[k]=rx[k]+zCV[k];
-
+    zM[k]=rx[k]+zCV[k]-dZ/2;
   }
 }
 static void MinMax( Real *F, int N, Real &Min, Real &Max, const int mx=0 )
@@ -175,14 +176,14 @@ static void Graphic_for_Element
   Real  I,            // начальный отсчет шкалы
   Real  L,            // длина шкалы оси
   const int up,       // длина маркеров отметки шкалы (-вверх, +вниз, 0-нет)
-  const int sp,       // местоположение метки
+        int sp,       // местоположение метки
   const char Label[], // подпись на шкале и на графике
   const int Scale=1   // признак перемасштабирования (округления) шкалы
 ){
  Real dL,Y,uY;
   if( Scale )
   { if( L==0.0 )MinMax( C,nZ,I,L ); dL=AxisStep( L-I );
-    I=floor( I/dL )*dL;
+    I=floor( I/dL+0.5 )*dL;
     L=ceil( (L-I)/dL )*dL;
   } else dL=AxisStep( L-=I );
      wC->Set( I,0, I+L,nZ );
@@ -199,7 +200,7 @@ static void Graphic_for_Element
             .Text(up>0?_South_East:_North_East,I,Y+uY/5,0,Label );
   }
   if( C )
-  { glBegin( GL_LINE_STRIP );
+  { glBegin( GL_LINE_STRIP ); sp = HiText*sp/4; //   sp = (nZ*sp)/24;
     for( int i=1; i<nZ-1; i++ )glVertex2d( C[i],i );      // !!! -2 или
     glEnd(); stWin->Text( _South_East,C[sp],sp,0,Label ); // без днища и палубы
   }
@@ -207,7 +208,7 @@ static void Graphic_for_Element
 //  Блок расчета грузового размера и смоченной поверхности корпуса
 //
 void Hydrostatic::Graphics()
-{ int i,j,k=nZ/4;
+{ int i,j,k=3; // nZ/4;
   Real mn=0,mx=0,dW=Draught/10;
   stWin->Activate(); wC->Focus().Clear();
   gl_BLUE;
@@ -303,7 +304,7 @@ void Hydrostatic::Axis_Statics( _Real A,bool clear )
   stWin->AlfaVector( HiText*0.9 );
   i = A*180.0/M_PI>90?6: A*180.0/M_PI>45?3:2;
   for( k=0; k<=36 && k*dA<A; k++ )
-   if( !(k%i) )stWin->Text( _South,k*dA,wT->Z( wT->z( Lmin )-2 ),0,"%i",k*5 );
+   if( !(k%i) )stWin->Text( _South,k*dA,wT->Z( wT->z( Lmin )-2 ),0,"%i°",k*5 );
   for( z=dz; z<=Lmax; z+=dz )stWin->Text( _North_East,wT->X( 6 ),z,0,"%.3g",z );
   for( z=-dz; z>Lmin+dz; z-=dz )stWin->Text(_South_East,wT->X(3),z,0,"%.3g",z );
   stWin->AlfaVector( HiText );

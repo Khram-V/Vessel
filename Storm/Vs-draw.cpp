@@ -18,7 +18,7 @@ Hull& Hull::Contour_Lines()      // рисуем контуры габаритн
 //!   прорисовка линий тока и профилей волн по курсу и траверзу корабля
 //
  Field &F=*Storm;
- const Real &Trun=F.Trun,
+ const Real // &Trun=F.Trun,
       D=-hypot( Draught,Breadth/2 ),
       dP=D/9,dQ=dP/6;                   // профильное заглубление и детальность
  Real S=hypot( F.Long,F.Wide ),dS=F.dS; // дистанция и шаг разметки профиля
@@ -193,7 +193,7 @@ Hull& Hull::NavigaInform( Window *Win )
                   " Floatable %.0f << %.0f\n"
                   " Metacenter %.1f << %.1f\n"
                   "            h %.1f << %.1f",
-           DtoA( S.Trun/3600,S.Trun>3600?2:(S.Trun>60?3:-3) ),TimeStep,
+           DtoA( Trun/3600,Trun>3600?2:(Trun>60?3:-3) ),TimeStep,
            tKrat,Speed*3600/_Mile,cSp*3600/_Mile,Speed/sqrt(_g*Length),
            sqr(Speed)*_Pd/_g/Length,Volume,iV,Surface,iS,Floatage,iF,
            Metacenter.x,vM.x,hX,vM.z );
@@ -405,7 +405,14 @@ bool Hull::Draw()                  // Виртуальная процедура 
   Print( 2,1,"%s\n { %s }\n %s",sname( FileName ),ShipName,Model[Statum] );
   if( Statum>3 && Storm->Exp.wave )           // подводные волновые воздействия
     { color( green ); Print( lFlow?", увлечение волной":", над волной" ); }
-  color( gray );  Print( ", сток/ист(%g) ",Kv );
+  color( gray );  Print( ", сток/исток(%g) ",Kv );
+  if( Pic.flow )
+  { color( green ); Print(2,4,VView[Pic.flow] );
+    color( cyan );  Print( " = набегающий поток + " );
+    if( Pic.flow<3 ){ color( lightblue ); Print( "скользящий поток" );
+      if( Pic.flow>1 )color( lightred ),Print( " + исток/сток непротекания " );
+    } else color( lightmagenta ),Print( "вектор отражения (вихреисточник)" );
+  }
   Save().Refresh(); Recurse=false; return false;
 }
 /*

@@ -44,20 +44,22 @@ void Hull::drawTriangle(_Vector a,_Vector b,_Vector c ) // отработка т
     //  ~ 1 - касательные; 2 + нормальные -> вихреисточники
     //    3 - отражённые                  => излучение волн
     //
-    if( Level<0 && Pic.flow ){ Vector V,// скорости отмеряются только под водой
+    if( Level<0 )if( Pic.flow )
+    if( fabs( N.y )>eps || fabs( N.x )<eps ) // штевни мимо, а днище в картинку
+    { Vector V,                         // скорости отмеряются только под водой
         M=( A+B+C )/3.0,m=in( M ),// (a+b+c)/3 центр элементарного треугольника
         n=dir( N ),Vn,Vs;
       if( Statum>3 && Storm->Exp.wave )
-      { Storm->WaveV( Storm->Trun,M,V ); } else V=0; // скорость в потоке волны
+      { Storm->WaveV( Trun,M,V ); } else V=0;         // скорость в потоке волны
       V += (Route[-2]-Route[-1])/Ts+LtA(m*Whirl[-1]); // полный ход с вращением
-         //=+= LtA( -Rate[-1] ) == случай расчётного ходовый набегающего потока
+        //=+= LtA( -Rate[-1] ) == случай расчётного ходового набегающего потока
       Vs=n*( V*n );              // вектор вихревого слоя от обтекающего потока
       Vn=-n*( V%n );             // вектор отраженного (-) по нормали импульса
       glLineWidth(0); arrow(M,M+V,0.1,lightcyan); // суммарный набегающий поток
       glLineWidth(1);                    // вихреисточники -- векторы скоростей
-      if( Pic.flow<3 ){ arrow( M,M+Vs,0.1,blue );          // касательных
-        if( Pic.flow>1 )arrow( M,M+Vn,0.1,red );          //  и нормальных
-      } else            arrow( M,M+Vn+Vs,0.1,magenta );  // + вектор отражения
+      if( Pic.flow<3 ){ arrow( M,M+Vs,0.1,lightblue );      // касательных и
+        if( Pic.flow>1 )arrow( M,M+Vn,0.1,lightred );       // нормальных - или
+      } else            arrow( M,M+Vn+Vs,0.1,lightmagenta );// вектор отражения
   } }
 }
 //!  сборка сортировкой двух фрагментов ватерлинии в интервале одной шпации
@@ -150,7 +152,7 @@ Part_of_hull:    // разделение корпуса по уровням на
               // без ватерлинии будет теоретический центр => ноль на ватерлинии
   if( !Part ) //   теоретическая и действующая ватерлиния готовятся с нормалями
   { static Flex W; Vector wM,fM; Real l,L; bool C; const Real dw=1e-4; // 0.1мм
-    if( !Storm->Kt )             // конструктивная или теоретическая ватерлиния
+    if( !KtE )                   // конструктивная или теоретическая ватерлиния
       for( WaterLine.len=i=0; i<wL.len; i++ )WaterLine+=wL[i]; Level=0;
     while( wL.len )
     { W.len=0; C=false;

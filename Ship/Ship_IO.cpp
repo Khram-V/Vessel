@@ -314,9 +314,9 @@ void Surface::Read()
    P=(Surface::CoPoint*)Allocate( N*sizeof( Surface::CoPoint ) );
    for( I=0; I<N; I++ )
    { P[I].V=getPoint();
-     P[I].T = (VertexType)getInt();
-     P[I].Selected=getByte();
-     if( FV>=fv198 )P[I].Locked=getByte();
+     P[I].T = (VertexType)getInt();         // тип точки: угловая и т.п.
+     P[I].Selected=getByte();               // отмечена жёлтым выбором (чушь.)
+     if( FV>=fv198 )P[I].Locked=getByte();  // и бит блокировки (зачем-то тоже)
    }
                                                                 if( N>0 )print( " = {%g,%g,%g}`0`",P[0].V.x,P[0].V.y,P[0].V.z );
    N=getInt();                                                  print( "\n< ControlEdges > %d",N );
