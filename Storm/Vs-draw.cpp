@@ -1,13 +1,13 @@
 //
 //      Несколько независимых информационных процедур без предустановок
 //      отрабатываются в текущем/произвольном графическом окне OpenGL
-//                                                    2021-03-23 יְרוּשָׁלַיִם
+//                                                           2021-03-23 יְרוּשָׁלַיִם
 //
 #include "Aurora.h"       // объекты и производные операции с корпусом на волне
 
-Hull& Hull::Contour_Lines()      // рисуем контуры габаритного прямоугольного
-{ glLineWidth( 0.05 );           // параллелепипеда по заданным размерениям
-  glEnable( GL_LINE_SMOOTH );    // сглаживание линий
+Hull& Hull::Contour_Lines()        // рисуем контуры габаритного прямоугольного
+{ glLineWidth( 0.05 );             // параллелепипеда по заданным размерениям
+  glEnable( GL_LINE_SMOOTH );      // сглаживание линий
 #define V(a,b,c)glVertex3dv \
       ( out( (Vector){xm a Length/2,b Breadth/2,c Draught/2-Draught/2} ) ),
  Real xm=(Keel[0]+Keel[Nframes+1])/2;
@@ -28,8 +28,8 @@ Hull& Hull::Contour_Lines()      // рисуем контуры габаритн
                R.y=fabs( F.Long/Traverse.x )/2;
   Ahead *= R.x<0.5 ? R.x : F.Wide/fabs( Ahead.y )/2;
   Traverse*=R.y<0.5 ? R.y : F.Wide/fabs( Traverse.y )/2;
-//  glLineWidth( 0.01 ); arrow( -Traverse,Traverse,Length/240,lightcyan );
-//                       arrow( -Ahead,Ahead,Length/240,yellow );
+//glLineWidth( 0.01 ); arrow( -Traverse,Traverse,Length/240,lightcyan );
+//                     arrow( -Ahead,Ahead,Length/240,yellow );
   glLineWidth( 0.01 ); arrow( -Traverse,Traverse,0.005,lightcyan );
                        arrow( -Ahead,Ahead,0.005,yellow );
   glLineWidth( 1 );                           // ускоренная прорисовка без волн
@@ -48,13 +48,13 @@ Hull& Hull::Contour_Lines()      // рисуем контуры габаритн
   for( Real s=0; s<S*2; s+=dS )           //! зелёные стрелки скоростей течений
   { R=( s/S )*Traverse -Traverse; color( lightgreen ); glBegin( GL_LINE_STRIP );
     for( R.z=0; R.z>=D; R.z+=dQ )dot( F.Wave(Trun,R) ); glEnd(); color( green );
-    for( R.z=0; R.z>=D; R.z+=dP ){ P=F.WaveV(Trun,R,V); arrow(P,P+V,0.2 ); }   //abs(V)/6); }
+    for( R.z=0; R.z>=D; R.z+=dP ){ P=F.WaveV(Trun,R,V); arrow(P,P+V,0.2 ); }    //abs(V)/6); }
   }
   dS=( S=abs( Ahead ) )/120.0;
   for( Real s=0; s<S*2; s+=dS )
   { R=( s/S )*Ahead-Ahead; color( lightgreen ); glBegin( GL_LINE_STRIP );
     for( R.z=0; R.z>=D; R.z+=dQ )dot( F.Wave(Trun,R) ); glEnd(); color( green );
-    for( R.z=0; R.z>=D; R.z+=dP ){ P=F.WaveV(Trun,R,V); arrow(P,P+V,0.2 ); }   //abs(V)/6); }
+    for( R.z=0; R.z>=D; R.z+=dP ){ P=F.WaveV(Trun,R,V); arrow(P,P+V,0.2 ); }    //abs(V)/6); }
   }
 Exit: glLineWidth( 1 ); return *this;
 }
@@ -202,7 +202,7 @@ Hull& Hull::NavigaInform( Window *Win )
   {                                                               //~ z=x.y-y.x
 //!      внешний блок графиков по кинематике корпуса на штормовом волнении моря
 //         c масштабированием под размах бортовой, килевой и вертикальной качки
-//       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    Vector Max,Min;                              // экстремумы графиков качки
    Compass.Area( 29,-1,0,7 ).Activate( true );  // семь строк от нижней границы
    Real Lt=12*Compass.AlfaWidth()/Compass.Height, // и удвоенный отступ справа
@@ -239,7 +239,6 @@ Hull& Hull::NavigaInform( Window *Win )
         rectangle( (Vector){-Lp,2*U},(Vector){Lp-Lt,1} );
         rectangle( (Vector){-Lp,-2*U},(Vector){Lp-Lt,-1} ); }
     }
-    //
     //   разметка шкалы времени
     //
    const Real dT=(l-k)*Ts; int j=dT<60?5:6;    // интервал времени эксперимента
@@ -254,11 +253,11 @@ Hull& Hull::NavigaInform( Window *Win )
       liney( (Vector){ mX,1 },(Vector){ mX,i%j?0.92:0.85 } );
       //if( mX<Lp-Lt*1.2 )
       if( i && !( i%j ) )
-        Compass.Text( _South,(Vector){ mX,-1 },DtoA( i*U/3600,3 ) );     //!-0.8
+        Compass.Text( _South,(Vector){ mX,-1 },DtoA( i*U/3600,3 ) );    //!-0.8
     } if( --i%j>1 )
-      Compass.Text( _South_West,(Vector){ Lp,-1 },DtoA( dT/3600,3 ) );
+        Compass.Text( _South_West,(Vector){ Lp,-1 },DtoA( dT/3600,3 ) );
     //
-    //   закрашенный профиль волны с корпусом судна на вертикальной качке
+    //      закрашенный профиль волны под корпусом судна при вертикальной качке
     //
     color( lightgreen,.7,.8 );
     rectangle( (Vector){Lp-Lt,-.5},(Vector){Lp,.46} );
@@ -270,10 +269,10 @@ Hull& Hull::NavigaInform( Window *Win )
     } glEnd();
     color( aqua,-0.2 ); glBegin( GL_LINE_STRIP );
     for( i=k; i<=l; i++ )
-      glVertex3d( -Lp+(i-k)*L,(Mix[i].z*2-Min.z)/Max.z-0.5,0 ); glEnd();
+         glVertex3d( -Lp+(i-k)*L,(Mix[i].z*2-Min.z)/Max.z-0.5,0 ); glEnd();
     color( silver,-0.2 ); glBegin( GL_LINE_STRIP );
     for( i=k; i<=l; i++ )
-      glVertex3d( -Lp+(i-k)*L,(Route[i].z*2-Min.z)/Max.z-0.5,0 ); glEnd();
+         glVertex3d( -Lp+(i-k)*L,(Route[i].z*2-Min.z)/Max.z-0.5,0 ); glEnd();
     //
     //   подпись экстремальных величин на правом незатеняемом участочке
     //
@@ -332,10 +331,10 @@ Hull& Hull::NavigaInform( Window *Win )
     Compass.AlfaVector( Compass.AlfaHeight()*0.85,1 );
     if( GMod )     // центральная подпись для ускорений в средней части корпуса
     { color( lightcyan,.75,.3 ); rectangle( (Vector){Lp-Lt,-1},(Vector){Lp,1} );
-      color( blue );       Compass.Print(    0,4.5,"St)" );
-      color( green );      Compass.Print( -3.8,4.5,"(As·" );
-      color( yellow,-.6 ); Compass.Print(   -1,3.4,"%+3.1f",maxM )
-                                  .Print(   -1,5.6,"%+3.1f",minM );
+      color( blue );       Compass.Print( 0.0,4.5,"St)" );
+      color( green );      Compass.Print(-3.8,4.5,"(As·" );
+      color( yellow,-.6 ); Compass.Print(-1,3.4,"%+3.1f",maxM )
+                                  .Print(-1,5.6,"%+3.1f",minM );
       color( yellow,-.4 );
       liney( (Vector){-Lp,0.5},(Vector){Lp-Lt,0.5} );
       line( (Vector){-Lp},(Vector){Lp-Lt},cyan );           // уровень среднего
@@ -370,10 +369,10 @@ Hull& Hull::NavigaInform( Window *Win )
     }
     //                дополнительная разметка поля графиков с тремя ускорениями
     //
-    color( gray );      Compass.Print( 1,1.2,"3g·{ " );           // максимумы
-    color( blue );      Compass.Print( "%+0.1f,", maxA );         // по корме
-    color( pink,-0.5 ); Compass.Print( "%+0.1f,", maxM );         // на миделе
-    color( green );     Compass.Print( "%+0.1f }",maxF );         // по носу
+    color( gray );      Compass.Print( 1,1.2,"3g·{ " );            // максимумы
+    color( blue );      Compass.Print( "%+0.1f,", maxA );          // по корме
+    color( pink,-0.5 ); Compass.Print( "%+0.1f,", maxM );          // на миделе
+    color( green );     Compass.Print( "%+0.1f }",maxF );          // по носу
     color( gray );      Compass.Text( _Center,-Lp,0,0,"+g" )
                                .Print( 1,-.25,"-g·{ " );
     color( blue );      Compass.Print( "%+0.1f,", minA );
@@ -395,10 +394,10 @@ bool Hull::Draw()                  // Виртуальная процедура 
   glMatrixMode( GL_PROJECTION ); glLoadIdentity(); // сброс матричных координат
   gluPerspective( 15,Real(Width)/Height,-1e6,1e1 ); // к перспективной проекции
   gluLookAt( 0,0,Distance,lookX,lookY,lookZ,0,1,0 );    // позиция точки обзора
-  glMatrixMode( GL_MODELVIEW ); glLoadIdentity();         // исходное состояние
-  glRotated( eyeY-90,1,0,0 );                            //  поставить на киль
-  glRotated( eyeX+atan2(x.x,x.y)*_Rd,0,0,1 );            //           рыскание
-  glRotated( eyeZ,0,1,0 );                               //          дифферент
+  glMatrixMode( GL_MODELVIEW ); glLoadIdentity();        //  исходное состояние
+  glRotated( eyeY-90,1,0,0 );                            //   поставить на киль
+  glRotated( eyeX+atan2(x.x,x.y)*_Rd,0,0,1 );            //            рыскание
+  glRotated( eyeZ,0,1,0 );                               //           дифферент
 //axis(*this,Length/1.8,Breadth/1.8,Draught,"X","Y","Z"); // Координатные оси и
   AlfaVector( Height/WinLines ); Drawing();               //   рисунок в памяти
   color( blue );

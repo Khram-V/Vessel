@@ -64,7 +64,7 @@ Waves& Waves::View( _Real z, int k, bool shadow )
 }
 //     Пусть прорисовка идет вместе с настройкой графической площадки\сцены
 //
-inline int ColorSelect( int a, int b )
+static int ColorSelect( const int a, const int b )
 { if( a*b<0 )return copysign( sqrt( fabs( a*b ) ),a+b );
   if( a>=0 )return max( a,b ); return min( a,b );
 }

@@ -153,6 +153,12 @@ bool View::KeyBoard( fixed key )   // к спуску из внешних вир
    glDepthRange( 1,0 ); // 0,1 - Distance            взаимное накрытие объектов
    glDepthFunc( GL_LEQUAL ); // ~EQUAL~GEQUAL GREATER LEQUAL NOTEQUAL LESS ALWAYS
    glEnable( GL_NORMALIZE );   glEnable( GL_AUTO_NORMAL );
-   if( !SeaColor[black+1].u ){ for( int i=0; i<256; i++ )     SeaColor[1+black+i].c[0]=byte(   pow(Real(i)/255,4)*180), // red   красный     SeaColor[1+black+i].c[1]=byte(48+pow(Real(i)/255,2)*162), // green зеленый     SeaColor[1+black+i].c[2]=byte(96+pow(Real(i)/255,3)*94 ); // blue  синий     for( int i=0; i<black+256; i++ )SeaColor[i].c[3]=0xFF;    // alfa-сплошной
+   if( !SeaColor[black+1].u ){ for( int i=0; i<256; i++ )/*   SeaColor[1+black+i].c[0]=byte(   pow(Real(i)/255,4)*180), // red   красный
+     SeaColor[1+black+i].c[1]=byte(48+pow(Real(i)/255,2)*162), // green зеленый
+     SeaColor[1+black+i].c[2]=byte(96+pow(Real(i)/255,3)*94 ); // blue  синий
+*/   SeaColor[1+black+i].c[0]=byte(    pow(Real(i)/255,4 )*210 ), //+ 210 red   красный
+     SeaColor[1+black+i].c[1]=byte( 96+pow(Real(i)/255,.8)*134 ), //+ 230 green зеленый
+     SeaColor[1+black+i].c[2]=byte(192+pow(Real(i)/255,3 )*63 );  //+ 255 blue  синий
+     for( int i=0; i<black+256; i++ )SeaColor[i].c[3]=0xFF;      // alfa-сплошной
    }
 }

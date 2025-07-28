@@ -224,9 +224,9 @@ static bool FullDraw()
     mHull->ax=mResw->ux=(2*W)/3; // -- здесь настройка размерений всех картинок
     mHull->az=mResw->az=24;
     mHull->uz=mResw->uz=mLine->az=mHull->az+(W-mHull->ax)*(Draught-Do)/Breadth;
-    mLine->uz=mWave->az=mHull->uz+(W*Breadth)/Lmx/2;
-    mWave->uz=H;
-    MPL->AlfaVector( 14 ).Area( 0,1,54,-16 );    // информационная подстрочка
+    mWave->az=(mLine->uz=mHull->uz+(W*Breadth)/Lmx/2)+4;
+    mWave->uz=H;                           // странный пролёт по ширине корпуса
+    MPL->AlfaVector( 14 ).Area( 0,1,54,-16 );      // информационная подстрочка
     PL->Drawing();
   } return false;
 }
