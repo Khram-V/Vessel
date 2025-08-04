@@ -128,6 +128,7 @@ int main( int argc,char** argv )
     Win.Draw( drawing );
     glClearColor( 0.5,0.8,1,1 );  // glMatrixMode(GL_PROJECTION);
     glOrtho(-2,Npt+1,-7,6,-1,1 ); // glMatrixMode(GL_MODELVIEW),glLoadIdentity()
+    glDisable( GL_LIGHTING );
   int key=0;
     do
     { Real com=0;

@@ -137,9 +137,9 @@ bool MainDraw::Draw()               // Здесь также будет прив
 }
 static bool Win_Timer() // Регулярное обновление картинки делается в вызывающей
 { if( Active&2 )        // процедуре обработки прерываний от таймера
-  { Event T; int M,D,Y; T.UnPack( M,D,Y ); TPL.Activate().Clear(); gl_GREEN;
-    TPL.Print( 0,0," %04d %s %02d, %s%-10s ",
-                   Y,_Mnt[M-1],D,_Day[int( T.D%7 )],DtoA( T.T,3 ) ).Show();
+  { Event T; int M,D,Y; T.UnPack( M,D,Y ); gl_GREEN;
+    TPL.Activate().Clear().Print( 0,0," %04d %s %02d, %s%-10s ",
+        Y,_Mnt[M-1],D,_Day[int( T.D%7 )],DtoA( T.T,3 ) ).Show();
   } return false;       // все уже на экране
 }
 //     Информационные процедуры для активного окна
@@ -163,11 +163,9 @@ void glInitial()
 //glEnable( GL_DITHER );                  // Предопределение графической среды
   glEnable( GL_BLEND );
   glBlendFunc( GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA );
-
 //glDisable( GL_SCISSOR_TEST );
 //glDisable( GL_SCISSOR_BOX );
 //glDisable( GL_CLIP_PLANE1 );
-
 }
 int main() // int ans, char *argv[], char *envp[] )
 { feclearexcept( FE_ALL_EXCEPT );

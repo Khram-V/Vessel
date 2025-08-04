@@ -75,7 +75,7 @@
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option projectCompilerOptionsRelation="0" />
+				<Option projectCompilerOptionsRelation="2" />
 				<Option projectLinkerOptionsRelation="2" />
 			</Target>
 		</Build>

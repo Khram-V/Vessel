@@ -73,20 +73,21 @@ fixed Window::ScanStatus()      // обновление в случае отсу
   }
 #else
 bool Window::KeyBoard( fixed key )// виртуальная процедура обработки прерываний
-{ if( extKey ){ glContext S( this );  // установка графического контента OpenGL
+{ if( Ready() )
+  if( extKey ){ glContext S( this );  // установка графического контента OpenGL
               return extKey( key ); // true - символ принят, false - к возврату
   } return false; //!KeyPas!=KeyPos; либо все недочитанные символы сбрасываются
 }
 fixed Window::GetKey()         // запрос появления нового символа на клавиатуре
-{ //if( Ready() )
+{ if( Ready() )
   if( KeyPas!=KeyPos )return KeyBuffer[++KeyPos&=lKey].Key; return 0;
 }
 fixed Window::ScanKey()        // просто проверка текущей активности клавиатуры
-{ //if( Ready() )
+{ if( Ready() )
   if( KeyPas!=KeyPos )return KeyBuffer[KeyPos].Key; return 0;
 }
 fixed Window::ScanStatus()      // обновление в случае отсутствия новых запросов
-{ //if( Ready() )
+{ if( Ready() )
   if( KeyPas!=KeyPos )return KeyBuffer[KeyPos].Code;
                       return KeyStates();
 }
@@ -101,13 +102,15 @@ fixed Window::ScanStatus()      // обновление в случае отсу
 // #include "Julian.cpp"
 // #include "Sym_CCCP.c"
 //
-void Break( const char Msg[],... )    // Случай аварийного завершения программы
-{ va_list V; va_start( V,Msg );       // или приостановка с первым символом "~"
- int Len=vsprintf( 0,Msg,V ); char *str=(char*)malloc( Len+16 );
-         vsprintf( str,Msg,V ); va_end( V );       //! с длиной что-то не то ??
-//if( First )glFinish();
-  MessageBoxW( NULL,U2W(str),*Msg=='~'?L"Info":L"Break",MB_ICONASTERISK|MB_OK );
-  free( str ); if( *Msg!='~' )exit( MB_OK );
+void Break( const char *Msg, ... )    // Случай аварийного завершения программы
+//{ static int Len=0; static char *str=NULL;
+{ char str[256];
+  va_list V; va_start( V,Msg );       // или приостановка с первым символом "~"
+//int L=vsprintf( 0,Msg,V )*2+1600; if( L>Len )str=(char*)realloc( str,Len=L ); _vscprintf
+       vsnprintf( str,255,Msg,V ); va_end( V );   //! с длиной что-то не то ??
+  MessageBoxW( NULL,U2W(str),*Msg=='~'?L"...к сведению":L"Завершение",
+               MB_ICONASTERISK|MB_OK );
+  if( *Msg!='~' )exit( MB_OK+4 );     // ! со всеми деструкторами ...
+//free( str ); str=NULL; Len=0;       // очистка к безуспешному продолжению
 }
-// char str[vsprintf( 0,Msg,V )+4+100];
-
+// char str[vsprintf( 0,Msg,V )*2+16]; // автоматическая память из стека

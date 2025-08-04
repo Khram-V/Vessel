@@ -21,8 +21,8 @@ static void WaitEvents( HWND hW=NULL )
     while( W ){ if( W->hWnd )while( WinRequest( W->hWnd) ); W=W->Next; }
 } } */
 Window* Place::Ready()             // либо одно активное, либо все окна Windows
-{ if( Site )WaitEvents( Site->hWnd ); // else if( First )WaitEvents();
-  return Site;
+{ if( First )if( Site )if( Site->hWnd )
+    { WaitEvents( Site->hWnd ); return Site; } return NULL;
 }
 bool WinReady( Window *Win )       // без указания адреса опрашиваются все окна
 { WaitEvents(); if( Win )return Win->Ready()!=NULL; else //if( First )WaitEvents();
@@ -88,7 +88,8 @@ bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
     { fixed Key=0;
       WaitEvents( hWnd );                       // на входе чистый ключ
       switch( wParam )                          // командные перекодировки
-      { case VK_RETURN: Key=_Enter;      break; // 13≡13
+      {
+      //case VK_RETURN: Key=_Enter;      break; // 13≡13 => так будет повтор
         case VK_PRIOR : Key=_North_East; break; // 33⇒ 9 - 8+1
         case VK_NEXT  : Key=_South_East; break; // 34⇒12 - 8+4
         case VK_END   : Key=_South_West; break; // 35⇒ 6 - 2+4
@@ -244,7 +245,7 @@ Window::~Window(){ if(this)Close(); } // Разрушение окна в обр
 }
 #endif
 void Window::Close()
-{ if( this )if( Site && hWnd )// не без предосторожностей this->~Window();
+{ if( First )if( Site && hWnd )// не без предосторожностей this->~Window();
   { KillTimer();                                 // отключение таймера вручную
     while( GetKey() );                           // очистка запросов клавиатуры
     while( Up )Up->~Place();                     // сброс наложенных фрагментов

@@ -155,6 +155,7 @@ int main() // int argc, char** argv )
   Win.Icon( "Flag" ).Draw( drawing ).AlfaVector( 48 ).Activate( true );
   glClearColor( 1,0.98,0.95,0.8 );
   glScaled( .8/Sz,.8/Sz,1 );
+  glDisable( GL_LIGHTING );
   do
   { switch( key )
     { case ' ': ViewVektorSwitch^=true; break;

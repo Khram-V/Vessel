@@ -6,8 +6,9 @@
 #include "Aurora.h"       // объекты и производные операции с корпусом на волне
 
 Hull& Hull::Contour_Lines()        // рисуем контуры габаритного прямоугольного
-{ glLineWidth( 0.05 );             // параллелепипеда по заданным размерениям
-  glEnable( GL_LINE_SMOOTH );      // сглаживание линий
+{ glAct( this );                   // параллелепипеда по заданным размерениям
+  glLineWidth( 0.05 );             // сглаживание линий
+  glEnable( GL_LINE_SMOOTH );
 #define V(a,b,c)glVertex3dv \
       ( out( (Vector){xm a Length/2,b Breadth/2,c Draught/2-Draught/2} ) ),
  Real xm=(Keel[0]+Keel[Nframes+1])/2;
@@ -81,7 +82,7 @@ static void DirWave( const Waves &W, colors C, Place &D )
   }
 }
 Hull& Hull::NavigaInform( Window *Win )
-{ Field &S=*Storm;
+{ Field &S=*Storm; glAct( Win );
  Vector C=Head[-1]; C.z+=_Ph;   // крен, дифферент и курс корабля (в геобазисе)
  int i,l=-0.18*hypot( Win->Width,Win->Height );       // размер из аксонометрии
  bool GMod = Pic.kart==0;      // режим с разделением графиков качки и ходкости

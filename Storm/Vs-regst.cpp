@@ -92,11 +92,12 @@ void logStop()
       wY[2]*_Rd, wY[4]/RS, wY[3]*_Rd,
       wA[2],wA[4]/KS,wA[3],wM[2],wM[4]/KS,wM[3],wF[2],wF[4]/KS,wF[3] );
   } fprintf( VIL,"\n" ); ftruncate(fileno(VIL),ftell(VIL)); fclose(VIL); VIL=0;
-  textcolor( MAGENTA,LIGHTCYAN );      // подсветка для начала записи протокола
-  print( 1,38,"\n << успешное завершение >>  "
-              " корабль[%X] · море[%X]  ",Vessel->Ready(),Storm->Ready() );
-  textcolor(LIGHTGRAY,BLACK);   // цвет перехода к завершению всех деструкторов
-  Break( "~ Протокол готов ~\n%s  [%d] ~",DtoA( Trun/3600,-3 ),KtE );
+//textcolor( MAGENTA,LIGHTCYAN );      // подсветка для начала записи протокола
+//print( 1,38,"\n << успешное завершение >>  "
+//            " корабль[%X] · море[%X]  ",Vessel->Ready(),Storm->Ready() );
+//textcolor(LIGHTGRAY,BLACK);   // цвет перехода к завершению всех деструкторов
+//_exit( 12 );
+  Break( "~ Протокол готов ~\n    ~ %s [%d] ~",DtoA( Trun/3600,-3 ),KtE );
 }
 Hull& Hull::Protocol()
 { if( VIL && Educt&0xFF )

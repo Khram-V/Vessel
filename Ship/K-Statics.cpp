@@ -364,9 +364,10 @@ void Hydrostatic::Stability()
     //
     // Предварительная прорисовка результатов в левом нижнем поле экрана
     //
-    if( !stWin->Ready() )return; else
+//  if( !stWin->Ready() )return; else
     if( j>0 )
-    { glBegin( GL_LINES );
+    { glAct( stWin );        //->Activate();
+      glBegin( GL_LINES );
       gl_CYAN; glVertex2d( A-dA,aC[j-1][k].x ),glVertex2d( A,aC[j][k].x );
       gl_BLUE; glVertex2d( A-dA,aC[j-1][k].y ),glVertex2d( A,aC[j][k].y );
       glEnd();

@@ -91,7 +91,7 @@ char* W2U( const wchar_t *str ) /// входная str не может быть 
    for( i=l=0; i<iL; i++ ){ strcpy( &LS[l],CtU( str[i] ) ); l+=nS; } return LS;
 }
 wchar_t* U2W( const char* str )   // и здесь только в пределах имеющейся LS.len
-{ if( str )if( *str ){ LS[0]=0;   //LS[Usize( str )*2]=0;
+{ if( str )if( *str ){ LS[0]=0;   // LS[Usize( str )*2]=0;
     char *s=(char*)str; unsigned u=0; wchar_t *w=(wchar_t*)( (char*)LS );
     while( *s ){ s=UtC( u,s ); *w++=wchar_t( u ); } *w=0;
   } return (wchar_t*)( (char*)LS );

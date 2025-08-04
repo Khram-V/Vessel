@@ -108,8 +108,8 @@ static void glfw_window_close_callback( GLFWwindow* window )
 //!  Window Procedure - общая для всех процедура запросов состояния GLFW
 //!
 Window* Place::Ready()
-{ //if( Site )Site->WaitEvents();
-  return Site; // else WinReady();
+{ if( First )if( Site ){ Site->WaitEvents(); return Site; } return NULL;
+  // else WinReady();
 }
 bool WinReady( Window *W )    // без указания адреса опрашиваются корень списка
 { if( W )return W->Ready()!=NULL; else
@@ -328,9 +328,11 @@ DWORD GetTime()
 #endif
 bool Window::Timer()
 { if( glfwWindow )
-  if( extTime )        // настройка OpenGL с контекстным эпилогом перерисовки
-//if( !isTimer )       // подготовка среды, вызов процедуры внешнего исполнения
-  { bool Res; /*isTimer=true;*/ Res=extTime(); /*isTimer=false;*/ return Res;
+  { //WaitEvents();
+    if( extTime )        // настройка OpenGL с контекстным эпилогом перерисовки
+//  if( !isTimer )       // подготовка среды, вызов процедуры внешнего исполнения
+    { bool Res; /*isTimer=true;*/ Res=extTime(); /*isTimer=false;*/ return Res;
+    }
   } return false;
 }
 Window& Window::SetTimer( DWORD mSec,bool(*inTm)() )// время и адрес исполнения
@@ -355,6 +357,8 @@ void Window::PutTimer()             //? внутренняя обработка 
 //    if( Timer() )Save().Refresh();  // с восстановлением наложенных страничек
 //    if( Timer() )Show();            // с перерисовкой картинки
       if( Timer() )Refresh();         // с перерисовкой картинки
+//    Timer();
+//    Refresh(); WaitEvents();
     } isTimer=0;                      // разрешение повторных вхождений таймера
   }// WaitEvents()                    // после завершения всех операций OpenGL
 }
@@ -418,7 +422,10 @@ glContext::~glContext()     // деструктор = эпилог с возвр
 DWORD WaitTime( DWORD mWait,       // активная задержка для внешнего управления
                 bool(*inStay)(),   // собственно сам вычислительный эксперимент
                 DWORD mWork )      // время на исполнение рабочего цикла [мСек]
-{  glfwWaitEventsTimeout( Real( mWait )/1e3 );
+{
+ //Sleep( mWait );
+   First->ScanKey();
+   glfwWaitEventsTimeout( 0.03*Real( mWait )/1e3 ); //! [ 0.03 ]
    if( inStay )(*inStay)();
    return ElapsedTime();
 }

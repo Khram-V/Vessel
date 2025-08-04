@@ -546,8 +546,6 @@ int main()                                 // ( int ans, char **av, char **ac )
   { WaitTime( 1000,TryTimer ); // секунда проверки работоспособности транзакций
   //Sleep( 1000 );           // или вариант приостаноки по блокирующему таймеру
   } while( Active_Key &= Storm->Ready() && Vessel->Ready() );
-//  WaitTime( 0 );
-//WinReady();                 // ожидание завершения всех параллельных процедур
 #endif
 //#pragma omp taskwait
 //if( VIL )                   //...и сразу контроль записи протоколов испытаний
@@ -558,9 +556,11 @@ int main()                                 // ( int ans, char **av, char **ac )
 //  textcolor(LIGHTGRAY,BLACK); // цвет перехода к завершению всех деструкторов
 //  Break( "~ Протокол готов ~\n%s  [%d] ~",DtoA( Trun/3600,-3 ),KtE );
 //}
-//Ship.KillTimer();
-//Sea.KillTimer();
+/*WaitTime( 0 );
+  WinReady();                 // ожидание завершения всех параллельных процедур
+  Ship.KillTimer();
+  Sea.KillTimer();*/
 //WinReady();          //  прогон незавершённых операций из основного алгоритма
-//return EXIT_SUCCESS;
-_exit( EXIT_SUCCESS+3 ); // с отменой исполнения всех деструкторов
+  return EXIT_SUCCESS;
+//_exit( EXIT_SUCCESS+3 ); // с отменой исполнения всех деструкторов
 }

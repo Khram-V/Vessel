@@ -50,8 +50,8 @@ void Hull::drawTriangle(_Vector a,_Vector b,_Vector c ) // отработка т
         M=( A+B+C )/3.0,m=in( M ),// (a+b+c)/3 центр элементарного треугольника
         n=dir( N ),Vn,Vs;
       if( Statum>3 && Storm->Exp.wave )
-      { Storm->WaveV( Trun,M,V ); } else V=0;         // скорость в потоке волны
-      V += (Route[-2]-Route[-1])/Ts+LtA(m*Whirl[-1]); // полный ход с вращением
+        { Storm->WaveV( Trun,M,V ); } else V=0;       // скорость в потоке волны
+      V += (Route[-2]-Route[-1])/Ts + LtA( m*Whirl[-1] ); // полный ход с вращением
         //=+= LtA( -Rate[-1] ) == случай расчётного ходового набегающего потока
       Vs=n*( V*n );              // вектор вихревого слоя от обтекающего потока
       Vn=-n*( V%n );             // вектор отраженного (-) по нормали импульса
@@ -69,6 +69,7 @@ void Hull::waterPoints( _Vector N,_Vector Q,_Vector P )
 { //if( Q==P )return;
   wL+=N; /// dir( N )??
   if( LtA( N*(P-Q) ).z>=0 ){ wL+=Q; wL+=P; } else { wL+=P; wL+=Q; }
+//if( out( N*(P-Q) ).z>=0 ){ wL+=Q; wL+=P; } else { wL+=P; wL+=Q; }
 }
 void Hull::divideTriangle
 ( _Vector T,_Real t, _Vector R,_Real r, _Vector L,_Real l )
@@ -175,12 +176,12 @@ Part_of_hull:    // разделение корпуса по уровням на
 //Break( "~выборка wL=%d(%d) W=%d C=%d i=%d(%d)",wL.len,wL.len/3,W.len,C,i,i/3 );
 
       if( !C )W+=W[0];;
-      L=0.0; wM=0.0; fM=0.0;    // co разделением разрывных контуров ватерлинии
+      L=0.0; wM=0.0; fM=0.0;     // c разделением разрывных контуров ватерлинии
       for( i=0; i<W.len-1; i++ )
-        { L+=(l=abs( W[i]-W[i+1] )); wM+=l*( W[i]+W[i+1] ); } // длина контура
+        { L+=(l=abs( W[i]-W[i+1] )); wM+=l*( W[i]+W[i+1] ); }  // длина контура
       if( L>eps )wM/=2*L;                                   // центр ватерлинии
       for( i=0; i<W.len-1; i++ )fM+=(W[i]-wM)*(W[i+1]-wM); // площадь для знака
-      if( Zenit%( LtA( fM ) )<0.0 )           // ориентация по вертикали
+      if( Zenit%( LtA( fM ) )<0.0 )                  // ориентация по вертикали
           for( i=0; i<W.len-1; i++ )drawTriangle( W[i+1],W[i],wM ); else
           for( i=0; i<W.len-1; i++ )drawTriangle( W[i],W[i+1],wM );
     }
