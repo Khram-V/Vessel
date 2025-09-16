@@ -9,8 +9,8 @@
  **
  **                                            (c)2021 ‏יְרוּשָׁלַיִם
  **/
-#include "Dipoles.h"
-#include "../Window/Window.h"
+#include "Dipoles.h"                              // Win64: -Wno-narrowing
+#include "../Window/Window.h"                     //        -Wno-literal-suffix
 
 Dipoles *Dipoles_array=0;  // множество или рой из групп диполей в пространстве
 unsigned nDip=0,           // количество корпускул в активном эксперименте
@@ -23,6 +23,7 @@ void ReInstall_TimeSpace( int N )  // продолжительность во в
   //
   //  начальная установка с обнулением счётчика исполненных тактов эксперимента
   //
+  glDisable( GL_LIGHTING );
   Time_count=0;
 //clrscr();
 }

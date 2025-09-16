@@ -1,4 +1,5 @@
-#include <stdio.h>#include "ConIO.h"extern "C"
+#include <stdio.h>#include "ConIO.h"
+// #define __ { if( GetActiveWindow()==NULL )exit( 25 ); }extern "C"
 {static COLORS __BACK = BLACK, __FORE = LIGHTGRAY;static HANDLE StdOut = NULL;static CONSOLE_SCREEN_BUFFER_INFO Screen;//
 //       COORD dwSize;            -- of the screen buffer//       COORD dwCursorPosition;//       WORD  wAttributes;//       SMALL_RECT srWindow      { SHORT Left,Top,Right,Bottom }//       COORD dwMaximumWindowSize{ SHORT X,Y } maximum size of console window//void gotoxy( short x,short y )         // при x или y<=0 их отсчеты сохраняются  { if( --x<0 )x=Screen.dwCursorPosition.X;
     if( --y<0 )y=Screen.dwCursorPosition.Y;
@@ -46,7 +47,7 @@ static struct _ScreenSave_{ _ScreenSave_(){
 //                SetConsoleWindowInfo( StdOut,true,&(Screen.srWindow) );//                SetConsoleScreenBufferSize( StdOut,Screen.dwSize );//                SetConsoleTextAttribute( StdOut,Screen.wAttributes );//                Screen.dwCursorPosition.Y=Screen.srWindow.Bottom-2;
 //                SetConsoleCursorPosition( StdOut,Screen.dwCursorPosition );
 //                FreeConsole(); // printf( "\n Conio_Destructor \n" );
-                                 //_exit( 12 ); }
+                                 _exit( 25 ); }
 #endif} // __attribute__( (init_priority(100)) )
   // __attribute__( (constructor) )
   // __attribute__( (destructor) )

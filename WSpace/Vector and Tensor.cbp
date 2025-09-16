@@ -12,20 +12,14 @@
 				<Option working_dir="Dev/" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
-				<Option compiler="gnu_gcc_stable32" />
+				<Option compiler="gcc" />
 				<Option use_console_runner="0" />
 				<Compiler>
-					<Add option="-m32" />
-					<Add option="-Wno-narrowing" />
-					<Add option="-Wno-literal-suffix" />
+					<Add option="-fopenmp" />
 					<Add directory="../../../SoftWare/GLfw/include/GLFW" />
 				</Compiler>
 				<Linker>
-					<Add option="-static-libgcc" />
-					<Add option="-static" />
-					<Add option="-m32" />
 					<Add library="gomp" />
-					<Add library="libglfw3_static.a" />
 					<Add directory="../../../SoftWare/Dev/Lib/" />
 				</Linker>
 			</Target>
@@ -128,6 +122,11 @@
 			<Option target="Dipole" />
 		</Unit>
 		<Unit filename="../Window/View.h" />
+		<Unit filename="../Window/WinMSoft.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+			<Option target="Dipole" />
+		</Unit>
 		<Unit filename="../Window/Window.cpp" />
 		<Unit filename="../Window/Window.h" />
 		<Unit filename="../Window/Window_Help.cpp" />

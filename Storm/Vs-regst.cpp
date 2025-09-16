@@ -60,7 +60,7 @@ static bool extFix( Real *W, Real &c )
 static void PtoG( char *s )
 { for( int i=0; s[i]; i++ )if( s[i]=='.' )Uset( s+i,0,"°" );        // градусы°
 }
-#include <unistd.h>
+//#include <unistd.h>
 //!   регистрация экстремальных событий в ходе вычислительно эксперимента
 //    Текущая величинах[0],prev[1], min[2],max[3], SUM[4]
 //    смещение { ξ η ζ }м, углы поворота { ϑ ψ χ }°
@@ -91,13 +91,16 @@ void logStop()
       wX[2]*_Rd, wX[4]/RS, wX[3]*_Rd,
       wY[2]*_Rd, wY[4]/RS, wY[3]*_Rd,
       wA[2],wA[4]/KS,wA[3],wM[2],wM[4]/KS,wM[3],wF[2],wF[4]/KS,wF[3] );
-  } fprintf( VIL,"\n" ); ftruncate(fileno(VIL),ftell(VIL)); fclose(VIL); VIL=0;
+  } fprintf( VIL,"\n" );
+/*
+  ftruncate(fileno(VIL),ftell(VIL)); fclose(VIL); VIL=0;
 //textcolor( MAGENTA,LIGHTCYAN );      // подсветка для начала записи протокола
 //print( 1,38,"\n << успешное завершение >>  "
 //            " корабль[%X] · море[%X]  ",Vessel->Ready(),Storm->Ready() );
 //textcolor(LIGHTGRAY,BLACK);   // цвет перехода к завершению всех деструкторов
 //_exit( 12 );
   Break( "~ Протокол готов ~\n    ~ %s [%d] ~",DtoA( Trun/3600,-3 ),KtE );
+*/
 }
 Hull& Hull::Protocol()
 { if( VIL && Educt&0xFF )

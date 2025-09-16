@@ -187,8 +187,21 @@ Ok:
     Frame=(Flex*)Allocate( (Nframes+2)*sizeof(Flex),Frame );// точки шпангоутов
     for( i=0; i<=Nframes+1; i++ )Frame[i].len=0;    // вычистка всех шпангоутов
     Stem.len=Stern.len=L.len=R.len=0;  // расчистка и обнуление адресных ссылок
-    if( newDraught )Draught=newDraught;// новое пересчитывание с переустановкой
-    //                                                    конструктивной осадки
+    if( newDraught>eps )Draught=newDraught; //else // новое пересчитывание с
+//      else KtE=0,Trun=Tlaps=0.0;      // переустановкой конструктивной осадки
+//    if( KtE>0 )Storm->Original( true );
+/*    if( KtE>0 )
+    {
+      Trun=Tlaps=0.0;
+      KtE=0;     // реальное время для моделирования [сек, час]
+//      Storm->Instant.Now();      // текущее время к фазе волн на данный момент
+      Storm->Wind.Clear();       // ветер
+      Storm->Swell.Clear();      // зыбь
+      Storm->Surge.Clear();      // вал
+//      Initial().Floating();
+    }
+*/
+    //
     //  Ахтерштевень (начало считывания последовательного потока данных)
     //
     n=strtol( stringData( Fh ),&s,0 );          // штевни выбираются как есть
