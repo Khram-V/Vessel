@@ -135,7 +135,7 @@ Dipoles& Dipoles::Average( _Real Time )
 Dipoles& Dipoles::Install( int N )     // количество условных нуклонов в группе
 {                                              // динамическое добавление точек
   if( nDip<N )D=(Dipole*)Allocate( N*sizeof( Dipole ),D );  // по необходимости
-  for( int k=0; k<nDip; k++ ) // без повторений но с предварительной расчисткой
+  for( int k=0; k<N; k++ )    // без повторений но с предварительной расчисткой
   { D[k].M=(Vector){ 1,0,0 }, // дипольные моменты
     D[k].V=(Vector){ 0,0,0 }, // изначальная скорость набегающего потока
     D[k].W=(Vector){ 0,0,0 }, // скорость частицы в инерциальной(глобальной) СК
@@ -144,7 +144,8 @@ Dipoles& Dipoles::Install( int N )     // количество условных 
   } return *this;
 }
 Dipoles& Dipoles::Initial()
-{ switch( int k=nDip )        // в предустановке только начальный рой корпускул
+{ int k=nDip;
+  switch( nDip )        // в предустановке только начальный рой корпускул
   { case 1: break;                                               //  H водород
     case 2: D[1].R.y=-(D[0].R.y=0.5); break;                     // ²H дейтерий
     case 3: D[0].R=(Vector){0,0.5,.28866},                       // ³H тритий

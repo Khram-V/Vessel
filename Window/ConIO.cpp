@@ -24,24 +24,24 @@ void textcolor( COLORS clr ){ textattr( clr|(__BACK<<4) ); }
 static bool CtrlHandler( DWORD fdwCtrlType )               // ExitProcess( 0 );
                        { if( StdOut )fclose( stdout ); StdOut=NULL; // exit(0);
                          return true; } */
-static struct _ScreenSave_{ _ScreenSave_(){
-//                FreeConsole(),  // отсоединение
-                  AllocConsole(); //   с пересозданием
-                  *stderr=*stdout=*freopen( "CONOUT$","w",stdout ); // == "CON"
-//                *stdin=*freopen( "CONIN$","r",stdin );
-//                SetConsoleMode( GetStdHandle( STD_INPUT_HANDLE ),0 );
-//                fclose( stdin );
-                  StdOut=GetStdHandle( STD_OUTPUT_HANDLE );                  SetConsoleMode( StdOut,ENABLE_PROCESSED_OUTPUT );
-//                StdOut=CreateConsoleScreenBuffer( GENERIC_WRITE,FILE_SHARE_WRITE,0,CONSOLE_TEXTMODE_BUFFER,0 );
-//                SetConsoleCtrlHandler( (PHANDLER_ROUTINE)CtrlHandler,true );
-                  GetConsoleScreenBufferInfo( StdOut,&Screen );                  SetConsoleCP( CP_UTF8 );               //    1251
-                  SetConsoleOutputCP( CP_UTF8 );         //    1251
-//                FlushConsoleInputBuffer( StdOut );     ~~ GENERIC_WRITE
-//                EnableWindow( GetConsoleWindow(),false );
-//                clrscr();
-//                setlocale( LC_ALL,".1251" );           // LC_TYPE
-//                setlocale( LC_ALL,".UTF8" );
-                }
+static struct _ScreenSave_{ _ScreenSave_()
+  { // FreeConsole(),  // отсоединение
+    AllocConsole(); //   с пересозданием
+    *stderr=*stdout=*freopen( "CONOUT$","w",stdout ); // == "CON"
+    // *stdin=*freopen( "CONIN$","r",stdin );
+    // SetConsoleMode( GetStdHandle( STD_INPUT_HANDLE ),0 );
+    // fclose( stdin );
+    StdOut=GetStdHandle( STD_OUTPUT_HANDLE );    SetConsoleMode( StdOut,ENABLE_PROCESSED_OUTPUT );
+    // StdOut=CreateConsoleScreenBuffer( GENERIC_WRITE,FILE_SHARE_WRITE,0,CONSOLE_TEXTMODE_BUFFER,0 );
+    // SetConsoleCtrlHandler( (PHANDLER_ROUTINE)CtrlHandler,true );
+    GetConsoleScreenBufferInfo( StdOut,&Screen );    SetConsoleCP( CP_UTF8 );              //    1251
+    SetConsoleOutputCP( CP_UTF8 );        //    1251
+    // FlushConsoleInputBuffer( StdOut ); ~~ GENERIC_WRITE
+    // EnableWindow( GetConsoleWindow(),false );
+    // clrscr();
+    // setlocale( LC_ALL,".1251" );       // LC_TYPE
+    // setlocale( LC_ALL,".UTF8" );
+  }
 #if 0
  ~_ScreenSave_(){ //StdOut=NULL;
 //                SetConsoleWindowInfo( StdOut,true,&(Screen.srWindow) );//                SetConsoleScreenBufferSize( StdOut,Screen.dwSize );//                SetConsoleTextAttribute( StdOut,Screen.wAttributes );//                Screen.dwCursorPosition.Y=Screen.srWindow.Bottom-2;

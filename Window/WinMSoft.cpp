@@ -115,18 +115,20 @@ bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
       switch( Key=wParam )
       { case VK_BACK  : Key=_BkSp;  break;      // 8 -> _BkSp(14)
         case VK_TAB   : Key=_Tab;   break;      // 9 -> _Tab (30)
-        case VK_CANCEL: while( First )First->Close();   // WaitEvents();
-                     // PostQuitMessage( VK_CANCEL );   // exit( VK_CANCEL );
-                        return false;                   // 3 -> просто на выход
+        case VK_CANCEL: while( First )First->Close();
+                        PostQuitMessage( VK_CANCEL );   // exit( VK_CANCEL );
+                        break; //return false;          // 3 -> просто на выход
       } WaitEvents( hWnd ),PutChar( Key );   // и ещё запись в буфер UniCode-16
     }   break;
-    case WM_CLOSE: Close(); break;  // =16 - сигнал о возможности закрытия окна
+    case WM_CLOSE: Close(); break;   //=16 - сигнал о возможности закрытия окна
     //DestroyWindow( hWnd ); break; // внутри идёт запрос закрытия окна Windows
     case WM_DESTROY:     // =2 здесь должны быть закрыты все внутренние объекты
-         Close(); break; // безусловно (вторично) срабатывает деструктор Window
-    case WM_QUIT: while( First )First->Close(); break; // exit( 16 );
-   default:return false;                          //  => DefWindowProc
-  }        return true;                           // на выход
+      if( !First )PostQuitMessage( 0 );// выход с кодом 0—нормальное завершение
+      case WM_QUIT: break; // безусловно (вторично) срабатывает деструктор Window
+           while( First )First->Close(); break; // exit( 16 );
+    default: return false; // DefWindowProc( hWnd,message,wParam,lParam );
+                           // освобождение очереди от нераспознаных => DefWindowProc
+  }         return true;   // на выход
 }
 //!   Конструктор создает окно OpenGL, и ... не образует цикла прерываний ...
 //     площадка Place в основании окна ортогонализуется и пересохраняется
