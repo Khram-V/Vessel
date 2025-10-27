@@ -91,10 +91,10 @@ bool View::KeyBoard( fixed key )   // к спуску из внешних вир
 //              ... здесь необходима предварительная установка контекста OpenGLvoid View_initial( Real D ){  glClearColor( 0.9,0.95,0.99,1 );   // светлый оттенок экранного фона и затем   glClear( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT ); // полная расчистка окна//        | GL_ACCUM_BUFFER_BIT|GL_STENCIL_BUFFER_BIT );
 //+glFrontFace( GL_CCW );              // CW грани с обходом по часовой стрелке
 //+glCullFace ( GL_BACK );             // FRONT_AND_BACK какие отбираются грани
-//+glEnable   ( GL_CULL_FACE );        // включение режима отбора треугольников   glHint     ( GL_POINT_SMOOTH_HINT,GL_NICEST );   glEnable   ( GL_POINT_SMOOTH );   glPointSize( 1.0 );   glHint     ( GL_LINE_SMOOTH_HINT,GL_NICEST );   glEnable   ( GL_LINE_SMOOTH );     // сглаживание линий   glLineWidth( 1.0 );
+//+glEnable   ( GL_CULL_FACE );        // включение режима отбора треугольников   glHint     ( GL_POINT_SMOOTH_HINT,GL_NICEST );   glEnable   ( GL_POINT_SMOOTH );   glPointSize( 1.0 );   glHint     ( GL_LINE_SMOOTH_HINT,GL_NICEST );   glEnable   ( GL_LINE_SMOOTH );       // сглаживание линий   glLineWidth( 1.0 );
    glPolygonMode( GL_FRONT,GL_FILL );
-   glPolygonMode( GL_BACK,GL_LINE ); //POINT );
-   glEnable   ( GL_POLYGON_SMOOTH); // Really Nice Perspective Calculations   glHint     ( GL_POLYGON_SMOOTH_HINT,GL_NICEST );   glHint     ( GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST );   glBlendFunc( GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA );
+   glPolygonMode( GL_BACK,GL_LINE );    // POINT );
+   glEnable   ( GL_POLYGON_SMOOTH);     // Really Nice Perspective Calculations   glHint     ( GL_POLYGON_SMOOTH_HINT,GL_NICEST );   glHint     ( GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST );   glBlendFunc( GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA );
    glShadeModel( GL_SMOOTH );       // FLAT закраска с использованием полутонов
    glAlphaFunc( GL_ALWAYS,0 );
    glEnable( GL_BLEND );                // Включаем смешивание
@@ -130,7 +130,7 @@ bool View::KeyBoard( fixed key )   // к спуску из внешних вир
 // glLightfv( GL_LIGHT1,GL_POSITION,          (const float[]){-D,-D,-D,1});
 // glLightfv( GL_LIGHT1,GL_SPOT_DIRECTION,    (const float[]){ D, D, D,1});
 // glLighti ( GL_LIGHT1,GL_SPOT_CUTOFF,90 );
-// Рендеринг
+//! Рендеринг
 #define Light( I )                                                  \
    glLightfv( GL_LIGHT##I,GL_AMBIENT, (const float[]){.0,.0,.0,1}); \
    glLightfv( GL_LIGHT##I,GL_DIFFUSE, (const float[]){.5,.5,.5,1}); \
@@ -149,9 +149,9 @@ bool View::KeyBoard( fixed key )   // к спуску из внешних вир
    glEnable( GL_LIGHT0 ); glEnable( GL_LIGHT1 );
    glEnable( GL_LIGHT2 ); glEnable( GL_LIGHT3 );
    glEnable( GL_DEPTH_TEST );        // растровая разборка отсечений по глубине
-   glDepthMask( GL_TRUE );   glClearDepth( 2e3 ); // 2000.0 );    // Enables Clearing Of The Depth Buffer
-   glDepthRange( 1,0 ); // 0,1 - Distance            взаимное накрытие объектов
-   glDepthFunc( GL_LEQUAL ); // ~EQUAL~GEQUAL GREATER LEQUAL NOTEQUAL LESS ALWAYS
+   glDepthMask( GL_TRUE );   glClearDepth( 2e3 );  // 2000.0 );   // Enables Clearing Of The Depth Buffer
+   glDepthRange( 1,0 );  // 0,1 - Distance           взаимное накрытие объектов
+   glDepthFunc( GL_LEQUAL );//~EQUAL~GEQUAL GREATER LEQUAL NOTEQUAL LESS ALWAYS
    glEnable( GL_NORMALIZE );   glEnable( GL_AUTO_NORMAL );
    if( !SeaColor[black+1].u ){ for( int i=0; i<256; i++ )/*   SeaColor[1+black+i].c[0]=byte(   pow(Real(i)/255,4)*180), // red   красный
      SeaColor[1+black+i].c[1]=byte(48+pow(Real(i)/255,2)*162), // green зеленый

@@ -93,9 +93,9 @@ void BackImage::Read()
 }
 //   Основная процедура считывания цифрового проекта корабля
 //
-bool Ship::LoadProject( WCHAR* FileName )
-{ isBin=OpenFile( FileName );
-   if( !F )return Ready=false;                                  print( "Открыт %s файл: %s\n",isBin?"двоичный":"текстовый",W2U(FileName)); textcolor(LIGHTBLUE);
+bool Ship::LoadProject()
+{ isBin=OpenFile( FName );
+   if( !F )return Ready=false;                                  print( "Открыт %s файл: %s\n",isBin?"двоичный":"текстовый",Name); textcolor(LIGHTBLUE);
    FV=(FileVersion)getVersion();                                print( "Версия = %d = '%s'\n",FV,sVer[FV]);
    PT=(PrecisionType)getInt();                                  print( "Точность = %s[%d]\n",((const char*[]){"Low","Medium","High","VeryHigh"})[PT],PT);
    //
@@ -159,8 +159,8 @@ bool Ship::LoadProject( WCHAR* FileName )
      if( Set.SavePreview )
      { Image Fon;                                               print( "210+ " );
        Fon.Read();
-//       int W,H,Size; W=getInt(); H=getInt(); Size=getInt();
-//       if( isBin )fseek( F,Size,SEEK_CUR ); else getString( F ); print( "210+ Картинка[%d·%d]=%d байт\n",W,H,Size );
+//     int W,H,Size; W=getInt(); H=getInt(); Size=getInt();
+//     if( isBin )fseek( F,Size,SEEK_CUR ); else getString( F ); print( "210+ Картинка[%d·%d]=%d байт\n",W,H,Size );
      }
      if( FV>=fv230 )
      { Set.SimplifyIntersections=getByte();                     textcolor( LIGHTCYAN ),print( "230+ SimplifyIntersections=%d\n",Set.SimplifyIntersections );
@@ -210,10 +210,10 @@ bool Ship::LoadProject( WCHAR* FileName )
   int I,K,N;
    NoStations=getInt();                                         print( "< Stations > = %d frames\n",NoStations );
    Stations=(InterSection*)Allocate( NoStations*sizeof( InterSection ) );
-   for( I=0; I<NoStations; I++ )Stations[I].Read();
+   for( I=0; I<NoStations; I++ ){ Stations[I].Read(); Stations[I].ReStation(); }
    NoButtocks=getInt();                                         print( "< Buttocks > = %d curves\n",NoButtocks );
    Buttocks=(InterSection*)Allocate( NoButtocks*sizeof( InterSection ) );
-   for( I=0; I<NoButtocks; I++ )Buttocks[I].Read();
+   for( I=0; I<NoButtocks; I++ ){ Buttocks[I].Read(); Buttocks[I].ReConnect(); }
    NoWaterlines=getInt();                                       print( "< Waterlines > = %d lines\n",NoWaterlines );
    Waterlines=(InterSection*)Allocate( NoWaterlines*sizeof( InterSection ) );
    for( I=0; I<NoWaterlines; I++ )Waterlines[I].Read();
@@ -265,10 +265,7 @@ bool Ship::LoadProject( WCHAR* FileName )
        }   // =210
      }     // =191
    }       // =180
-   textcolor( YELLOW );
-   print( "\n Длина : [ %6.2f - %-6.2f ] = %g ",Min.x,Max.x,Max.x-Min.x );
-   print( "\n Ширина: [ %6.2f - %-6.2f ] = %g ",Min.y,Max.y,(Max.y>-Min.y?Max.y:-Min.y)*2 );
-   print( "\n Высота: [ %6.2f - %-6.2f ] = %g ",Min.z,Max.z,Max.z-Min.z );
+   fclose( F );
    return Ready=true;
 }
 //!  считывание собственно секций всех сплайновых геометрических поверхностей
@@ -367,16 +364,16 @@ void Surface::Read()
 //
 void InterSection::Read()
 { int K,N;
-  IT=(IntersectionType)getInt();                             // print( "\n IT=%d",K );
+  IT=(IntersectionType)getInt();                           //   print( "\n IT=%d",K );
   if( FV>=fv191 )ShowCurvature=getByte();
-            else ShowCurvature=false;                        // print( " ShowCurvature=%d",St[I].ShowCurvature );
+            else ShowCurvature=false;                      //   print( " ShowCurvature=%d",St[I].ShowCurvature );
   Pl=getPlane();
   Build=getByte();
-  NoItems=N=getInt();
-  T=(Items*)Allocate( N*sizeof(Items) );                     // textcolor( YELLOW );print( "\n a=%g,b=%g,c=%g,d=%g,Build=%d,N=%d",St[I].a,St[I].b,St[I].c,St[I].d,St[I].Build,N );
+  NIt=N=getInt(); NPt=0;
+  T=(Items*)Allocate( N*sizeof(Items) );                   //   textcolor( YELLOW );print( "\n a=%g,b=%g,c=%g,d=%g,Build=%d,N=%d",St[I].a,St[I].b,St[I].c,St[I].d,St[I].Build,N );
   for( int n=0; n<N; n++ )
-  { T[n].NoSplines=K=getInt();
-    T[n].S=(Spline*)Allocate( K*sizeof( Spline ) );          // print( "\nN=%d, K=%d  ",N,K ); getch();
+  { T[n].NoSplines=K=getInt(); NPt+=K;
+    T[n].S=(Spline*)Allocate( K*sizeof( Spline ) );        //   print( "\nN=%d, K=%d  ",N,K ); getch();
     for( int k=0; k<K; k++ )
     { Vector &P=T[n].S[k].P;
       if( FV >=fv160 )
@@ -391,34 +388,31 @@ void InterSection::Read()
 }
 //   Полноценный вариант в варианте с базовым форматом, без излишеств
 //
-bool Ship::LoadFEF( WCHAR *FName )      // Ship.fef == FreeShip Exchange Format
+bool Ship::LoadFEF()      // Ship.fef == FreeShip Exchange Format
 { int I; //char *str;
-  if( !(F=_wfopen( FName,L"rb" ) ) )return false;               textcolor( WHITE );
-  readText( &Set.Name );                                        print( "< Project >\nName     =%s\n",Set.Name );
-  readText( &Set.Designer );                                    print(              "Designer =%s\n",Set.Designer );
-  readText( &Set.Comment );                                     print(              "Comment  =%s\n",Set.Comment );
-  readText( &Set.CreatedBy );                                   print(              "CreatedBy=%s\n",Set.CreatedBy );
+  if( !(F=_wfopen( FName,L"rb" ) ) )return false; print( "Открыт файл: %s (Free!Ship exchange format)\n",Name); textcolor(LIGHTCYAN);
+  readText( &Set.Name );                          print( "< Project >\nName     =%s\n",Set.Name );
+  readText( &Set.Designer );                      print(              "Designer =%s\n",Set.Designer );
+  readText( &Set.Comment );                       print(              "Comment  =%s\n",Set.Comment );
+  readText( &Set.CreatedBy );                     print(              "CreatedBy=%s\n",Set.CreatedBy );
   sscanf( getString( F ),"%lg%lg%lg%lg%lg%d%d%d",
    &Length,&Beam,&Draft,
    &Set.WaterDensity,
    &Set.AppendageCoefficient,
    &Set.Units,&I,&PT );
-   Set.MainparticularsHasBeenset=I;                             print( "L,B,T={ %g, %g, %g },\n\t WaterDensity=%g, A?C=%g, Units=%d, Been=%d, Точность=%d\n\n",Length,Beam,Draft,Set.WaterDensity,Set.AppendageCoefficient,Set.Units,Set.MainparticularsHasBeenset,PT );
+   Set.MainparticularsHasBeenset=I;               print( "L,B,T={ %g, %g, %g },\n\t WaterDensity=%g, A?C=%g, Units=%d, Been=%d, Точность=%d\n\n",Length,Beam,Draft,Set.WaterDensity,Set.AppendageCoefficient,Set.Units,Set.MainparticularsHasBeenset,PT );
 //
 // TFreeSubdivisionSurface.ImportFEFFile
 //
    Shell.ReadFEF();
-   textcolor( YELLOW );
-   print( "\n Длина : [ %6.2f - %-6.2f ] = %g ",Min.x,Max.x,Max.x-Min.x );
-   print( "\n Ширина: [ %6.2f - %-6.2f ] = %g ",Min.y,Max.y,(Max.y>-Min.y?Max.y:-Min.y)*2 );
-   print( "\n Высота: [ %6.2f - %-6.2f ] = %g ",Min.z,Max.z,Max.z-Min.z );
+   fclose( F );
    return Ready=true;
 }
 //   чтение собственно секций всех сплайновых геометрических поверхностей
 //
 void Surface::ReadFEF()
 { int I,K;
-   isLoad=true; textbackground( BLUE );                // First load layerdata
+   isLoad=true;                                              // First load layerdata
    K=getInt();                                                  print( "< Surface.LaeyrData >\nNoLaeyrs = %d -> %d\n",NoLayers,K );
    if( !K )K=getInt();                                          print( "NoLaeyrs(повтор) = %d\n",K );
    NoLayers=K;
@@ -427,13 +421,13 @@ void Surface::ReadFEF()
    { Layers &T=L[I]; int v,d,s,u,w,p; char str[12]="";
      readText( &T.Description );                                print( "[%d]'%-12s'",I,T.Description );
      sscanf( getString( ::F ),"%d%s%i%i%i%i%i%i%lg%lg",&T.ID,
-             str,&v,&d,&s,&u,&w,&p,&T.MaterialDensity,&T.Thickness );
-           T.Visible=v;     T.LClr.C=S2I( str ); T.LClr.c[3]=255-T.LClr.c[3];
-           T.Developable=d,
-           T.Symmetric=s,
-           T.UseforIntersection=u,
-           T.UswinHydrostatic=w,
-           T.ShowInLineSpan=p;                                  print( ", ID=%d, Color=%X, Vis=%i, Symm=%i, ... Плотность=%g, Толщина=%g \n",T.ID,T.LClr.C,T.Visible,T.Symmetric,T.MaterialDensity,T.Thickness );
+       str,&v,&d,&s,&u,&w,&p,&T.MaterialDensity,&T.Thickness );
+       T.Visible=v; T.LClr.C=S2I( str ); T.LClr.c[3]=255-T.LClr.c[3];
+       T.Developable=d,
+       T.Symmetric=s,
+       T.UseforIntersection=u,
+       T.UswinHydrostatic=w,
+       T.ShowInLineSpan=p;                                      print( ", ID=%d, Color=%X, Vis=%i, Symm=%i, ... Плотность=%g, Толщина=%g \n",T.ID,T.LClr.C,T.Visible,T.Symmetric,T.MaterialDensity,T.Thickness );
    }
    if( NoCoPoint>0 )memset( P,0,NoCoPoint*sizeof( Surface::CoPoint ) );   print( "< ControlPoints > %d",NoCoPoint );
    NoCoPoint=getInt();
@@ -463,5 +457,111 @@ void Surface::ReadFEF()
    }                                                            textbackground( BLACK );
    Extents();               // расчёт - переопределение графических экстремумов
 }
+//#include <wctype.h>
 
+void Ship::WriteVSL()
+{ int i,j,n,M;
+  if( NoStations<1 )
+  { Break( "~Для числовой модели необходимы\n контуры теоретических шпангоутов" ); return;
+  }
+  if( (F=_wfopen( U2W( fext( Name,"vsl" )),L"wt" ))==NULL )
+//  if( (F=FileOpen( Name,L"wt",L"vsl",
+//         L"Ship Hull Form (*.vsl)\0*.vsl\0All Files\0*.*\0\0",
+//         L"Запись числовой модели в формате Hull+Aurora.vsl" ))==NULL )
+  { Break( "~Запись $s\n не получается, странно...",Name ); return;
+  }
+  fprintf( F,";\n; %s\n; %s\n; %s\n; %s\n;\n\x1E < %s >\n %d %d\n %g %g %g\n", // \x1E=
+           Set.Name,Set.Designer,Set.Comment,Set.CreatedBy,
+           fext( fname( W2U( FName ) ),"" ),NoStations,NoStations/2,
+           Length,Beam,Draft  );
+  //
+  //  Ахтерштевень
+  //
+ Vector *VB; int N;        //                NoButtocks=0;
+  if( !NoButtocks )fprintf( F,"\n\n 0\n 0\n\n" ); else
+  { Real D=Buttocks[0].T[0].S[0].P.y; int I=0;
+    for( i=1; i<NoButtocks; i++ )                  // поиск ближайшего к ДП
+      if( Buttocks[i].T[0].S[0].P.y<D ){ D=Buttocks[i].T[0].S[0].P.y; I=i; }
+     VB=Buttocks[I].ReButtocks( M );
+     N=Buttocks[I].NPt;
+     fprintf( F,"\n\n%3d",N-M );
+     for( i=N-1; i>M; i-- )fprintf( F," %8.4f %8.4f",VB[i].z,VB[i].x );
+//     fprintf( F,"\n\n%3d %8.4f %8.4f",N-M+2,VB[0].z,VB[0].x );
+//     for( i=N-1; i>=M; i-- )fprintf( F," %8.4f %8.4f",VB[i].z,VB[i].x );
+//    fprintf( F,"\n%3d",M );
+//    for( i=0; i<=M; i++ )fprintf( F," %8.4f %8.4f",VB[i].z,VB[i].x );
+    fprintf( F,"\n 0\n" );
+
+
+  }
+//fclose( F ); exit( 0 );
+
+/*
+/*
+    fprintf( F,"\n%3d",Bt.NPt );
+    for( j=0; j<Bt.NIt; j++ )
+    { for( n=0; n<Bt.T[j].NoSplines; n++ )
+      { Vector &V=Bt.T[j].S[n].P;
+        fprintf( F,"  %8.4f %8.4f",V.z,V.x );
+      } fprintf( F,"  " );
+    }   fprintf( F," <%d>\n 0\n\n",j );
+  }
+*/
+
+  //
+  //  Теоретические шпангоуты - таблица плазовых ординат
+  //
+  for( i=0; i<NoStations; i++ ){ InterSection &St=Stations[i];
+    fprintf( F,"\n%3d %8.4f ",St.NPt,St.T[0].S[0].P.x );     // St.ReStation();
+    for( j=0; j<St.NIt; j++ )
+    { for( n=0; n<St.T[j].NoSplines; n++ ){ Vector &V=St.T[j].S[n].P;
+        fprintf( F,"  %8.4f %8.4f",V.z,V.y );
+      } fprintf( F,"  " );
+    }   fprintf( F," <%d>",j );
+  }
+  //
+  //  Форштевень
+  //
+  if( !NoButtocks )fprintf( F,"\n\n 0\n 0\n\n" ); else
+  { fprintf( F,"\n 0\n%3d",M );
+    for( i=0; i<M; i++ )fprintf( F," %8.4f %8.4f",VB[i].z,VB[i].x );
+    fprintf( F,"\n\n" );
+  }
+  //
+  //!  ...и вся пропущенная информация в заключение
+  //
+  fprintf( F,"\n\n%s\n",fname( W2U( FName ) ) );
+  fprintf( F,"\n Длина:  [ %6.2f - %-6.2f ] = %g,  мидель : %g  ",Min.x,Max.x,Max.x-Min.x,Set.SplitSectionLocation );
+  fprintf( F,"\n Ширина: [ %6.2f - %-6.2f ] = %g ",Min.y,Max.y,(Max.y>-Min.y?Max.y:-Min.y)*2 );
+  fprintf( F,"\n Высота: [ %6.2f - %-6.2f ] = %g,  осадка : %g ",Min.z,Max.z,Max.z-Min.z,Draft );
+
+  fprintf( F,"\n\nБатоксы");
+  for( i=0; i<NoButtocks; i++ ){ InterSection &C=Buttocks[i];
+    fprintf( F,"\n%3d %8.4f",C.NPt,C.T[0].S[0].P.y );
+    for( j=0; j<C.NIt; j++ )
+    { for( n=0; n<C.T[j].NoSplines; n++ ){ Vector &V=C.T[j].S[n].P;
+        fprintf( F,"  %8.4f %8.4f",V.z,V.x );
+      } fprintf( F,"  " );
+    }   fprintf( F," <%d>",j );
+  }
+  fprintf( F,"\n\nВатерлинии" );
+  for( i=0; i<NoWaterlines; i++ ){ InterSection &C=Waterlines[i];
+    fprintf( F,"\n%3d %8.4f",C.NPt,C.T[0].S[0].P.z );
+    for( j=0; j<C.NIt; j++ )
+    { for( n=0; n<C.T[j].NoSplines; n++ ){ Vector &V=C.T[j].S[n].P;
+        fprintf( F,"  %8.4f %8.4f",V.x,V.y );
+      } fprintf( F,"  " );
+    }   fprintf( F," <%d>",j );
+  }
+  fprintf( F,"\n\nРыбины" );
+  for( i=0; i<NoDiagonals; i++ ){ InterSection &C=Diagonals[i];
+    fprintf( F,"\n%3d",C.NPt );
+    for( j=0; j<C.NIt; j++ )
+    { for( n=0; n<C.T[j].NoSplines; n++ ){ Vector &V=C.T[j].S[n].P;
+        fprintf( F,"  %8.4f %8.4f %8.4f",V.x,V.y,V.z );
+      } fprintf( F,"  " );
+    }   fprintf( F," <%d>",j );
+  }     fprintf( F,"\n\n" );
+        fclose( F );
+}
 

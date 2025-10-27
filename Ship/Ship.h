@@ -2,7 +2,7 @@
 #include <StdIO.h>
 #include "..\Window\ConIO.h"
 #include "..\Storm\Flex.h"
-//#include "..\Type.h"
+#include "..\Type.h"
 
 typedef enum { fv100,fv110,fv120,fv130,fv140, fv150,fv160,fv165,fv170,fv180,
                fv190,fv191,fv195,fv198,fv200, fv201,fv210,fv220,fv230,fv240,
@@ -171,9 +171,13 @@ struct InterSection //: Plane
 { IntersectionType IT;
   bool ShowCurvature,Build;
   Plane Pl;
-  int NoItems; Items *T;
+  int NIt,NPt; Items *T;
+//int NoItems; Items *T;
   InterSection(){ memset( this,0,sizeof( InterSection ) ); }
   void Read();
+  void ReConnect();              // перенастройка по первому фрагменту образцу
+  void ReStation();              // упорядочение шпангоута по нижней точке в ДП
+ Vector *ReButtocks( int &Iu ); // штевни перестроенные в контур
   void Drawing( BoardView=mvPort );
 };
 struct Marker
@@ -181,29 +185,31 @@ struct Marker
   Real CurvatureScale;
   int NoSplines; Spline *S;
 };
-struct Ship                       // Сборка корпуса в целом
-{ PrecisionType PT;               // Precision of the ship-model
-  Visibility   Visio;             // Show настройка графической визуализации
-  Project      Set;               // характеристики и размерности корабля
-  Surface      Shell;             // Shell оболочка поверхности обшивки корпуса
+struct Ship                      // Сборка корпуса в целом
+{ WCHAR *FName; char *Name;      // Единожды представляемое имя числовой модели
+  PrecisionType PT;              // Precision of the ship-model
+  Visibility Visio;              // Show настройка графической визуализации
+  Project      Set;              // характеристики и размерности корабля
+  Surface    Shell;              // Shell оболочка поверхности обшивки корпуса
 
   int NoStations,NoButtocks,NoWaterlines,NoDiagonals,NoMarkers,NoFlowLines;
-  InterSection *Stations,         // шпангоуты  LoadStation
-               *Buttocks,         // батоксы    LoadButtocks
-               *Waterlines,       // ватерлинии LoadWaterlines
-               *Diagonals;        // рыбины      LoadDiagonals
+  InterSection *Stations,        // шпангоуты  LoadStation
+               *Buttocks,        // батоксы    LoadButtocks
+               *Waterlines,      // ватерлинии LoadWaterlines
+               *Diagonals;       // рыбины      LoadDiagonals
   Marker *Marks;
   Flex* FlowLines;
   bool Ready;
-  Ship();                           // очищающий конструктор
-  bool LoadProject( WCHAR *FName ); // быстрая выборка всего комплекса данных
-                                    // в общие структуры в оперативной памяти
-  bool LoadFEF( WCHAR *FName );     // здесь Ship.fef == File Exchange Format
-  bool LoadPart( WCHAR *FName );    // или просто фрагмент цифровой модели
+  Ship();                        // очищающий конструктор
+  bool LoadProject();            // быстрая выборка всего комплекса данных
+                                 // в общие структуры в оперативной памяти
+  bool LoadFEF();                // здесь Ship.fef == File Exchange Format
+  bool LoadPart();               // или просто фрагмент цифровой модели
+  void WriteVSL();               // запись теоретических контуров k Hull+Aurora
 };
-struct FreeShip: Ship,View        // , Matrix
+struct FreeShip: Ship,View       // , Matrix
 { FreeShip();
-  virtual bool Draw();            // виртуальная процедура с настройкой сцены
+  virtual bool Draw();           // виртуальная процедура с настройкой сцены
   virtual bool KeyBoard( fixed ); //
 };
 

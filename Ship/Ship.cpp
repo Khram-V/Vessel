@@ -14,12 +14,12 @@ Color UnderWaterColor={ 0xFFFFFF }; // ~~~ выведены в общий дос
 //
 void InterSection::Drawing( BoardView Sides )                  // mvPort,mvBoth
 { if( Sides==mvBoth )
-  for( int j=0; j<NoItems; j++ )
+  for( int j=0; j<NIt; j++ )
   if( T[j].NoSplines>0 )
   { glBegin( GL_LINE_STRIP ); //dot( ~(T[j].S[0].P) );
     for( int i=0; i<T[j].NoSplines; i++ )dot( ~(T[j].S[i].P) ); glEnd();
   }
-  for( int j=0; j<NoItems; j++ )
+  for( int j=0; j<NIt; j++ )
   if( T[j].NoSplines>0 )
   { glBegin( GL_LINE_STRIP ); //dot( T[j].S[0].P );
     for( int i=0; i<T[j].NoSplines; i++ )dot( T[j].S[i].P ); glEnd();
@@ -34,43 +34,57 @@ bool FreeShip::Draw()               // виртуальная процедура
   glEnable( GL_LIGHTING );                    // расцветка под теневые закраски
   glTranslated( (Max.x+Min.x)/-1.75,0,        // -Set.SplitSectionLocation
                 (Max.z+Min.z)/-2 );           // Set.Length/-2
-  Clear(); color( lightcyan );                 glLineWidth( .2 );
+  Clear(); color( lightgray );                 glLineWidth( .2 );
   axis(*this,Length,Beam,Draft*2,"x","y","z"); glLineWidth( .5 );
-  Shell.Drawing( B );
-  color( lightblue );  for( k=0; k<NoStations; k++ )Stations[k].Drawing( B );
+  Shell.Drawing( B );                          glLineWidth( 1 );
+  color( cyan );  for( k=0; k<NoStations;   k++ )Stations[k].Drawing( B );
   color( green ); for( k=0; k<NoWaterlines; k++ )Waterlines[k].Drawing( B );
-  color( cyan );  for( k=0; k<NoButtocks; k++ )Buttocks[k].Drawing( B );
-  color( olive ); for( k=0; k<NoDiagonals; k++ )Diagonals[k].Drawing( B );
-  color( lightgreen );                                      glLineWidth( 2 );
+  color( blue );  for( k=0; k<NoButtocks;   k++ )Buttocks[k].Drawing( B );
+  color( olive ); for( k=0; k<NoDiagonals;  k++ )Diagonals[k].Drawing( B );
+  color( lightgreen );                         glLineWidth( 2 );
   for( k=0; k<NoFlowLines; k++ ){ glBegin( GL_LINE_STRIP );
     for( i=0; i<FlowLines[k].len; i++ )dot( FlowLines[k][i] ); glEnd();
     if( B==mvBoth ){ glBegin( GL_LINE_STRIP );
       for( i=0; i<FlowLines[k].len; i++ )dot( ~FlowLines[k][i] ); glEnd();
-  } }
+  } }                                          glLineWidth( 1 );
   Window::Show(); return true;
 }
 #include <wctype.h>
+
 inline WCHAR* Slower( WCHAR *str )
 { int l=wcslen( str ); while( --l>=0 )str[l]=towlower( str[l] ); return str;
 }
 //!                конструктор с расчисткой и считыванием новой числовой модели
 Ship::Ship()
 { memset( this,0,sizeof( Ship ) );
-  textcolor( YELLOW );              print( "Free!Ship [*.fbm,*.ftm]\n" );
+  textcolor( YELLOW );              print( "Free!Ship [*.fbm,*.ftm,*.fef]\n" );
   int argc; WCHAR **argv=CommandLineToArgvW( GetCommandLineW(),&argc );
-  if( argc<2 ){ printf( "Start Ship <имя файла модели корпуса.[ftm|fbm]>" ); getch(); exit( 1 ); }
-  argc=wcslen( argv[1] );
+  if( argc>1 )FName=argv[1]; else
+  { printf( "Start Ship <имя файла модели корпуса.[fbm|ftm|fef]>" );
+                getch(); exit( 1 );
+  }
+  Name=strdup( W2U( FName ) ); // копия имени входного файла
+  argc=wcslen( FName );
   Visio.ModelView=mvBoth;     // на оба борта, всё другое может быть вычищенным
+
+//  print( "Открыт %s файл: %s\n",isBin?"двоичный":"текстовый",W2U(FileName)); textcolor(LIGHTBLUE);
+
   if( argc>4 && wcscmp( Slower( argv[1]+argc-4 ),L".fef" )==0 )
-  { if( !LoadFEF( argv[1]) )
+  { if( !LoadFEF() )
     { textcolor( LIGHTMAGENTA );
-      printf( "?File Exchange Format %s не срабатывает",W2U( argv[1] ) ); getch(); exit( argc );
+      printf( "?File Exchange Format %s не срабатывает",Name );
+      getch(); exit( argc );
     }
   } else
-  if( !LoadProject( argv[1] ) )
+  if( !LoadProject() )
   { textcolor( LIGHTMAGENTA );
-    printf( "?Free!Ship неверный файл/incorrect datafile: %s ",W2U( argv[1] ) ); getch(); exit( argc );
+    printf( "?Free!Ship неверный файл/incorrect datafile: %s ",Name );
+    getch(); exit( argc );
   }
+  textcolor( YELLOW );
+  print( "\n Длина : [ %6.2f - %-6.2f ] = %g ",Min.x,Max.x,Max.x-Min.x );
+  print( "\n Ширина: [ %6.2f - %-6.2f ] = %g ",Min.y,Max.y,(Max.y>-Min.y?Max.y:-Min.y)*2 );
+  print( "\n Высота: [ %6.2f - %-6.2f ] = %g ",Min.z,Max.z,Max.z-Min.z );
 }
 //     Конструктор не содержит Matrix для движений корпуса в корабельном базисе
 //
@@ -78,7 +92,7 @@ FreeShip::FreeShip():Ship(),View("Free!ship in C++ ",-12,12,640,480) //Matrix()
 { Icon( "Ship" ).AlfaVector( 16 );
   Locate( Xpm( 4 ),Ypm( 4 ),min( 1280L,Xpm( 64 ) ),
                             min( 1024L,Ypm( 72 ) ) );
-//  glCullFace( GL_FRONT_AND_BACK );                    // какие отбираются грани
+//glCullFace( GL_FRONT_AND_BACK );                    // какие отбираются грани
   Distance=-1.75*( Max.x+Max.y-Min.x-Min.y + Width*(Max.z-Min.z)*0.9/Height );
   eyeX=135; // lookX=-60;
   glDisable( GL_FOG );
@@ -90,7 +104,8 @@ bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой под
  const static char                                   // по настройкам и методам
      *Id[]={"Ship"," Корабельные форматы ",          // визуализации корпуса
                    " Free!Ship: *.ftm,*fbm.*fef..",0 },
-     *Cmds[]={ " F1 "," - cправка",0 },
+     *Cmds[]={ " F1 "," - справка",
+               " F2 "," формат «Aurora»: <имя>.vsl",0 },
      *Plus[]={ " <Space>            ","борт\\полборта",
                " <Ctrl+Space>       "," грани\\рёбра",
                " <стрелки·leftMouse>"," ориентация",
@@ -100,6 +115,7 @@ bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой под
  BoardView &B=Visio.ModelView;
   switch( Keyb )
   { case _F1: Window::Help( Id,Cmds,Plus,1,1 ); break;
+    case _F2: WriteVSL(); break;
     case _Blank:
       if( ScanStatus()&CTRL )
         { static bool xd=false;
@@ -114,7 +130,7 @@ bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой под
 int main() // int argc, char **argv )
 { texttitle( "FREE!Ship view in C++ " ); FreeShip Hull;            // заголовок
   do{ Hull.Title( DtoA( Real(ElapsedTime())/3600000.0,-3 ) ); WaitTime( 500 );
-    } while( WinReady() && Hull.GetKey()!=_Esc ); return 0;
+    } while( WinReady() && Hull.GetKey()!=_Esc ); _exit( 0 ); //return 0;
 }
 
 
