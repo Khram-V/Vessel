@@ -111,24 +111,22 @@ bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
 //                 { PutTimer(); return true; } break;
     case WM_CHAR:                              // 258 = WM_CHAR message handler
     { WPARAM Key;
-    //WaitEvents( hWnd );                       // на входе чистый ключ
+    //WaitEvents( hWnd );                             // на входе чистый ключ
       switch( Key=wParam )
-      { case VK_BACK  : Key=_BkSp;  break;      // 8 -> _BkSp(14)
-        case VK_TAB   : Key=_Tab;   break;      // 9 -> _Tab (30)
-        case VK_CANCEL: while( First )First->Close();
-                        PostQuitMessage( VK_CANCEL );   // exit( VK_CANCEL );
-                        break; //return false;          // 3 -> просто на выход
-      } WaitEvents( hWnd ),PutChar( Key );   // и ещё запись в буфер UniCode-16
+      { case VK_BACK  : Key=_BkSp;  break;            // 8 -> _BkSp(14)
+        case VK_TAB   : Key=_Tab;   break;            // 9 -> _Tab (30)
+        case VK_CANCEL: while( First )First->Close(); // 3 -> просто на выход
+                        PostQuitMessage( VK_CANCEL ); return false;
+      } WaitEvents(),PutChar( Key );    // hWnd и ещё запись в буфер UniCode-16
     }   break;
-    case WM_CLOSE: Close(); break;   //=16 - сигнал о возможности закрытия окна
+    case WM_CLOSE: Close(); // break;   //=16 - сигнал о возможности закрытия окна
     //DestroyWindow( hWnd ); break; // внутри идёт запрос закрытия окна Windows
     case WM_DESTROY:     // =2 здесь должны быть закрыты все внутренние объекты
-      if( !First )PostQuitMessage( 0 );// выход с кодом 0—нормальное завершение
-      case WM_QUIT: break; // безусловно (вторично) срабатывает деструктор Window
-           while( First )First->Close(); break; // exit( 16 );
-    default: return false; // DefWindowProc( hWnd,message,wParam,lParam );
-                           // освобождение очереди от нераспознаных => DefWindowProc
-  }         return true;   // на выход
+      if( !First )PostQuitMessage(0); break; // выход с кодом 0—нормальное завершение
+    case WM_QUIT:        // безусловно (вторично) срабатывает деструктор Window
+         while( First )First->Close();
+    default: return false;   // DefWindowProc( hWnd,message,wParam,lParam );
+  }          return true;    // освобождение очереди от нераспознанных на выход
 }
 //!   Конструктор создает окно OpenGL, и ... не образует цикла прерываний ...
 //     площадка Place в основании окна ортогонализуется и пересохраняется
@@ -402,10 +400,8 @@ static void CALLBACK TimerProc( HWND hWind,UINT uMsg,UINT_PTR timerId,DWORD St)
         Win->isTimer=0;              //  isTimer--;   с проблемами незавершёнки
     } } return;                      // фиксируется фоновая подложка всего окна
   }
-//if( IdT )
-  { if( IdT!=timerId )return;            // всякие Sleep и т.п. пусть идут мимо
+  if( IdT!=timerId )return;              // всякие Sleep и т.п. пусть идут мимо
     ::KillTimer( 0,timerId );            // отключаем таймер, пока не изменился
-  }
   if( extFree )                          // запуск вычислений на заданное время
   { DWORD Rt,T;    //, St=GetTickCount() -- отсчет начала приоритетных расчётов
     do
@@ -416,18 +412,15 @@ static void CALLBACK TimerProc( HWND hWind,UINT uMsg,UINT_PTR timerId,DWORD St)
       { IdT=::SetTimer( 0,0,mWait,TimerProc );   // рабочего кванта времени и
         break;                                   // тогда к повтору безвременья
     } } while( mWait );
-  } else mWait=0;
-//if( IdT ){ ::KillTimer( 0,IdT ); IdT=0; }
+  } else mWait=0;                  //if( IdT ){ ::KillTimer( 0,IdT ); IdT=0; }
 }
 DWORD WaitTime( DWORD Wait,        // активная задержка для внешнего управления
                 bool( *inStay )(), // собственно сам вычислительный эксперимент
                 DWORD Work )       // время исполнения рабочего процесса [мСек]
 { extFree=inStay,mWork=Work,mWait=Wait;               // инициализация таймеров
   if( Wait )IdT=::SetTimer( 0,0,Wait,TimerProc );     // כל = (со всеми окнами)
-  while( mWait )WaitEvents();                         // ожидание чистки mWait
-  //while( mWait )if( !WinRequest() )WaitMessage();   // ожидание чистки mWait
-  //IdT=0;
-  return RealTime;                             // выход в особом случае
+  while( First && mWait )WaitEvents();                // ожидание чистки mWait
+  return RealTime;                                    // выход в особом случае
 }
                     //while( isTimer>1 )if( !WinRequest( hWnd ) )WaitMessage();
 #else
@@ -516,7 +509,7 @@ Window& Window::Icon( const char* A )
     SendMessage( hWnd,WM_SETICON,ICON_BIG,(LPARAM)hIcon );      //   ICON_SMALL
   } return *this;
 }
-#if 0
+/*
 Window& Above(){ SetForegroundWindow( hWnd ); SetFocus( hWnd );
   SetActiveWindow( hWnd ); ShowWindow( hWnd,SW_SHOWNA ); return Refresh(); }
   while( isTimer>0 )if( !WinRequest() )WaitMessage(); glFinish(); WinExecute();
@@ -526,8 +519,6 @@ static void CALLBACK TimerProc(HWND hWind,UINT uMsg,UINT_PTR timerId,DWORD St);
 #define retkey return wctob( KeyBuffer[KeyPos].Key );
 #define retkey { fixed r=KeyBuffer[KeyPos].Key; return r<128?r:wctob( r ); }
 
-
-/*
 #if 0
 Window& Window::KillTimer()           //! сверить ещё раз...
 { if( mSec ){ mSec=0; extTime=NULL;   // полная остановка без ожидания начатого
@@ -544,5 +535,3 @@ Window& Window::KillTimer()
 }
 #endif
 */
-#endif
-

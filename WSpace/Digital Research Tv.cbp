@@ -60,6 +60,7 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-fexpensive-optimizations" />
 			<Add option="-Os" />
 			<Add option="-funsigned-char" />
 			<Add option="-ffast-math" />

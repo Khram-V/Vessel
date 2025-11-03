@@ -130,7 +130,7 @@ bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой под
 int main() // int argc, char **argv )
 { texttitle( "FREE!Ship view in C++ " ); FreeShip Hull;            // заголовок
   do{ Hull.Title( DtoA( Real(ElapsedTime())/3600000.0,-3 ) ); WaitTime( 500 );
-    } while( WinReady() && Hull.GetKey()!=_Esc ); _exit( 0 ); //return 0;
+    } while( Hull.Ready() && Hull.GetKey()!=_Esc ); return 12; //_exit( 0 );
 }
 
 

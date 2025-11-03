@@ -22,7 +22,7 @@ int print( short x,short y, const char *fmt,... ){ gotoxy( x,y ); ArgStr( x ) }
 void textcolor( COLORS clr ){ textattr( clr|(__BACK<<4) ); }
 ////   Неявная и не особо управляемая инициализация нового окна текстовой консоли/*                              Rus-Windows/Cyr(1251) DOS/OEM(866) UTF-8(65001)#include <locale.h>
 static bool CtrlHandler( DWORD fdwCtrlType )               // ExitProcess( 0 );
-                       { if( StdOut )fclose( stdout ); StdOut=NULL; // exit(0);
+                       { if( StdOut )fclose( stdout ); StdOut=NULL; exit(44);
                          return true; } */
 static struct _ScreenSave_{ _ScreenSave_()
   { // FreeConsole(),  // отсоединение
@@ -42,12 +42,13 @@ static struct _ScreenSave_{ _ScreenSave_()
     // setlocale( LC_ALL,".1251" );       // LC_TYPE
     // setlocale( LC_ALL,".UTF8" );
   }
-#if 0
+#if 1
  ~_ScreenSave_(){ //StdOut=NULL;
 //                SetConsoleWindowInfo( StdOut,true,&(Screen.srWindow) );//                SetConsoleScreenBufferSize( StdOut,Screen.dwSize );//                SetConsoleTextAttribute( StdOut,Screen.wAttributes );//                Screen.dwCursorPosition.Y=Screen.srWindow.Bottom-2;
 //                SetConsoleCursorPosition( StdOut,Screen.dwCursorPosition );
-//                FreeConsole(); // printf( "\n Conio_Destructor \n" );
-                                 _exit( 25 ); }
+                  FreeConsole(); // printf( "\n Conio_Destructor \n" );
+                  // _exit( 25 );
+                }
 #endif} // __attribute__( (init_priority(100)) )
   // __attribute__( (constructor) )
   // __attribute__( (destructor) )

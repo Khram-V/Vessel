@@ -95,7 +95,7 @@ void BackImage::Read()
 //
 bool Ship::LoadProject()
 { isBin=OpenFile( FName );
-   if( !F )return Ready=false;                                  print( "Открыт %s файл: %s\n",isBin?"двоичный":"текстовый",Name); textcolor(LIGHTBLUE);
+   if( !F )return YesShip=false;                                print( "Открыт %s файл: %s\n",isBin?"двоичный":"текстовый",Name); textcolor(LIGHTBLUE);
    FV=(FileVersion)getVersion();                                print( "Версия = %d = '%s'\n",FV,sVer[FV]);
    PT=(PrecisionType)getInt();                                  print( "Точность = %s[%d]\n",((const char*[]){"Low","Medium","High","VeryHigh"})[PT],PT);
    //
@@ -210,7 +210,7 @@ bool Ship::LoadProject()
   int I,K,N;
    NoStations=getInt();                                         print( "< Stations > = %d frames\n",NoStations );
    Stations=(InterSection*)Allocate( NoStations*sizeof( InterSection ) );
-   for( I=0; I<NoStations; I++ ){ Stations[I].Read(); Stations[I].ReStation(); }
+   for( I=0; I<NoStations; I++ ){ Stations[I].Read(); Stations[I].ReConnect(); } //Station(); }
    NoButtocks=getInt();                                         print( "< Buttocks > = %d curves\n",NoButtocks );
    Buttocks=(InterSection*)Allocate( NoButtocks*sizeof( InterSection ) );
    for( I=0; I<NoButtocks; I++ ){ Buttocks[I].Read(); Buttocks[I].ReConnect(); }
@@ -266,7 +266,7 @@ bool Ship::LoadProject()
      }     // =191
    }       // =180
    fclose( F );
-   return Ready=true;
+   return YesShip=true;
 }
 //!  считывание собственно секций всех сплайновых геометрических поверхностей
 //
@@ -406,7 +406,7 @@ bool Ship::LoadFEF()      // Ship.fef == FreeShip Exchange Format
 //
    Shell.ReadFEF();
    fclose( F );
-   return Ready=true;
+   return YesShip=true;
 }
 //   чтение собственно секций всех сплайновых геометрических поверхностей
 //
@@ -470,63 +470,65 @@ void Ship::WriteVSL()
 //         L"Запись числовой модели в формате Hull+Aurora.vsl" ))==NULL )
   { Break( "~Запись $s\n не получается, странно...",Name ); return;
   }
-  fprintf( F,";\n; %s\n; %s\n; %s\n; %s\n;\n\x1E < %s >\n %d %d\n %g %g %g\n", // \x1E=
+  fprintf( F,";\n; %s\n; %s\n; %s\n; %s\n;\n\x1E < %s >\n %d %d\n %g %g %g %g\n", // \x1E=
            Set.Name,Set.Designer,Set.Comment,Set.CreatedBy,
            fext( fname( W2U( FName ) ),"" ),NoStations,NoStations/2,
-           Length,Beam,Draft  );
+           Length,Beam,Draft,Min.z ); // Set.StartDraft  );
   //
   //  Ахтерштевень
   //
- Vector *VB; int N;        //                NoButtocks=0;
+ Vector *VB; int N,Id,Iu;        //                NoButtocks=0;
   if( !NoButtocks )fprintf( F,"\n\n 0\n 0\n\n" ); else
   { Real D=Buttocks[0].T[0].S[0].P.y; int I=0;
-    for( i=1; i<NoButtocks; i++ )                  // поиск ближайшего к ДП
+     for( i=1; i<NoButtocks; i++ )                  // поиск ближайшего к ДП
       if( Buttocks[i].T[0].S[0].P.y<D ){ D=Buttocks[i].T[0].S[0].P.y; I=i; }
-     VB=Buttocks[I].ReButtocks( M );
+     VB=Buttocks[I].ReButtocks( Id,Iu );
      N=Buttocks[I].NPt;
-     fprintf( F,"\n\n%3d",N-M );
-     for( i=N-1; i>M; i-- )fprintf( F," %8.4f %8.4f",VB[i].z,VB[i].x );
-//     fprintf( F,"\n\n%3d %8.4f %8.4f",N-M+2,VB[0].z,VB[0].x );
-//     for( i=N-1; i>=M; i-- )fprintf( F," %8.4f %8.4f",VB[i].z,VB[i].x );
-//    fprintf( F,"\n%3d",M );
-//    for( i=0; i<=M; i++ )fprintf( F," %8.4f %8.4f",VB[i].z,VB[i].x );
-    fprintf( F,"\n 0\n" );
-
-
+     M=Id-Iu; if( M<0 )M+=N; // M++;
+     fprintf( F,"\n\n%3d",M );
+     for( i=Id; i!=Iu; i=(i+N-1)%N )fprintf( F," %7.4f %7.4f",VB[i].z,VB[i].x );
+     fprintf( F,"\n 0\n" );
   }
-//fclose( F ); exit( 0 );
-
-/*
-/*
-    fprintf( F,"\n%3d",Bt.NPt );
-    for( j=0; j<Bt.NIt; j++ )
-    { for( n=0; n<Bt.T[j].NoSplines; n++ )
-      { Vector &V=Bt.T[j].S[n].P;
-        fprintf( F,"  %8.4f %8.4f",V.z,V.x );
-      } fprintf( F,"  " );
-    }   fprintf( F," <%d>\n 0\n\n",j );
-  }
-*/
-
   //
-  //  Теоретические шпангоуты - таблица плазовых ординат
+  //   Теоретические шпангоуты - таблица плазовых ординат
+  //          ~!~ и где-то они уже предварительно отсортированы от кормы к носу
   //
-  for( i=0; i<NoStations; i++ ){ InterSection &St=Stations[i];
-    fprintf( F,"\n%3d %8.4f ",St.NPt,St.T[0].S[0].P.x );     // St.ReStation();
+  for( i=0; i<NoStations; i++ )
+  { InterSection &St=Stations[i];                            // St.ReStation();
+    Vector &First=St.T[0].S[0].P,                            // St.ReConnect();
+           &Last=St.T[St.NIt-1].S[St.T[St.NIt-1].NoSplines-1].P;
+    fprintf( F,"\n%3d %7.4f ",St.NPt,First.x );
+    if( First.z<Last.z || (First.z==Last.z && Last.y>=First.y) )
     for( j=0; j<St.NIt; j++ )
     { for( n=0; n<St.T[j].NoSplines; n++ ){ Vector &V=St.T[j].S[n].P;
-        fprintf( F,"  %8.4f %8.4f",V.z,V.y );
+        fprintf( F,"  %7.4f %7.4f",V.z,V.y );
       } fprintf( F,"  " );
-    }   fprintf( F," <%d>",j );
+    } else
+    for( j=St.NIt-1; j>=0; j-- )
+      { for( n=St.T[j].NoSplines-1; n>=0; n-- ){ Vector &V=St.T[j].S[n].P;
+        fprintf( F,"  %7.4f %7.4f",V.z,V.y );
+      } fprintf( F,"  " );
+    }   fprintf( F," <%d>",St.NIt );
   }
   //
   //  Форштевень
   //
-  if( !NoButtocks )fprintf( F,"\n\n 0\n 0\n\n" ); else
-  { fprintf( F,"\n 0\n%3d",M );
-    for( i=0; i<M; i++ )fprintf( F," %8.4f %8.4f",VB[i].z,VB[i].x );
+  if( !NoButtocks )fprintf( F,"\n\n 0\n 0\n" ); else
+  { M=Iu-Id+1; if( M<0 )M+=N; //..M++;
+    fprintf( F,"\n\n 0\n%3d",M );
+    for( i=Id; ; (++i)%=N )
+       { fprintf( F," %7.4f %7.4f",VB[i].z,VB[i].x ); if( i==Iu )break; }
+  //for( i=Id,j=0; j<M; j++,i=(i+1)%N )fprintf( F," %7.4f %7.4f",VB[i].z,VB[i].x );
     fprintf( F,"\n\n" );
-  }
+//} //
+    // Это чисто для сверки батоксовых связок для прояснения сбоев в алгоритмах
+    //
+    fprintf( F,"\n\n%3d < %g:[%d-%d] >",N,VB[0].y,Id,Iu );
+    for( i=0; i<N; i++ )                  // контрольный батокс - весь как есть
+    { if( i==Id )fprintf( F,"  Id:< %d > ",Id );
+                 fprintf( F,"  %3.2f %3.2f",VB[i].z,VB[i].x );
+      if( i==Iu )fprintf( F,"  Iu:< %d > ",Iu );
+  } }
   //
   //!  ...и вся пропущенная информация в заключение
   //
@@ -535,31 +537,31 @@ void Ship::WriteVSL()
   fprintf( F,"\n Ширина: [ %6.2f - %-6.2f ] = %g ",Min.y,Max.y,(Max.y>-Min.y?Max.y:-Min.y)*2 );
   fprintf( F,"\n Высота: [ %6.2f - %-6.2f ] = %g,  осадка : %g ",Min.z,Max.z,Max.z-Min.z,Draft );
 
-  fprintf( F,"\n\nБатоксы");
   for( i=0; i<NoButtocks; i++ ){ InterSection &C=Buttocks[i];
-    fprintf( F,"\n%3d %8.4f",C.NPt,C.T[0].S[0].P.y );
+    if( !i )fprintf( F,"\n\nБатоксы");
+    fprintf( F,"\n%3d %6.4f",C.NPt,C.T[0].S[0].P.y );
     for( j=0; j<C.NIt; j++ )
     { for( n=0; n<C.T[j].NoSplines; n++ ){ Vector &V=C.T[j].S[n].P;
-        fprintf( F,"  %8.4f %8.4f",V.z,V.x );
-      } fprintf( F,"  " );
+        fprintf( F,"  %6.4f %6.4f",V.z,V.x );
+      } fprintf( F," | ",n );
     }   fprintf( F," <%d>",j );
   }
-  fprintf( F,"\n\nВатерлинии" );
   for( i=0; i<NoWaterlines; i++ ){ InterSection &C=Waterlines[i];
-    fprintf( F,"\n%3d %8.4f",C.NPt,C.T[0].S[0].P.z );
+    if( !i )fprintf( F,"\n\nВатерлинии" );
+    fprintf( F,"\n%3d %6.4f",C.NPt,C.T[0].S[0].P.z );
     for( j=0; j<C.NIt; j++ )
     { for( n=0; n<C.T[j].NoSplines; n++ ){ Vector &V=C.T[j].S[n].P;
-        fprintf( F,"  %8.4f %8.4f",V.x,V.y );
-      } fprintf( F,"  " );
+        fprintf( F,"  %6.4f %6.4f",V.x,V.y );
+      } fprintf( F," | " );
     }   fprintf( F," <%d>",j );
   }
-  fprintf( F,"\n\nРыбины" );
   for( i=0; i<NoDiagonals; i++ ){ InterSection &C=Diagonals[i];
+    if( !i )fprintf( F,"\n\nРыбины" );
     fprintf( F,"\n%3d",C.NPt );
     for( j=0; j<C.NIt; j++ )
     { for( n=0; n<C.T[j].NoSplines; n++ ){ Vector &V=C.T[j].S[n].P;
-        fprintf( F,"  %8.4f %8.4f %8.4f",V.x,V.y,V.z );
-      } fprintf( F,"  " );
+        fprintf( F,"  %6.4f %6.4f %6.4f",V.x,V.y,V.z );
+      } fprintf( F," | " );
     }   fprintf( F," <%d>",j );
   }     fprintf( F,"\n\n" );
         fclose( F );

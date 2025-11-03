@@ -52,7 +52,7 @@ bool UseDefaultSplitSectionLocation; // If set to true, the midship/mainframe lo
      // то используется значение в FProjectMainframeLocation.
 bool ShadeUnderwaterShip,
      SavePreview;
-UnitType      Units;
+UnitType Units;
 PrecisionType Precision;
 bool SimplifyIntersections;
 
@@ -172,12 +172,11 @@ struct InterSection //: Plane
   bool ShowCurvature,Build;
   Plane Pl;
   int NIt,NPt; Items *T;
-//int NoItems; Items *T;
   InterSection(){ memset( this,0,sizeof( InterSection ) ); }
   void Read();
   void ReConnect();              // перенастройка по первому фрагменту образцу
-  void ReStation();              // упорядочение шпангоута по нижней точке в ДП
- Vector *ReButtocks( int &Iu ); // штевни перестроенные в контур
+//void ReStation();              // упорядочение шпангоута по нижней точке в ДП
+ Vector *ReButtocks( int &Id, int &Iu ); // штевни перестроенные в контур
   void Drawing( BoardView=mvPort );
 };
 struct Marker
@@ -199,7 +198,7 @@ struct Ship                      // Сборка корпуса в целом
                *Diagonals;       // рыбины      LoadDiagonals
   Marker *Marks;
   Flex* FlowLines;
-  bool Ready;
+  bool YesShip;                  // ... и это здесь не особо-то необходимо ?
   Ship();                        // очищающий конструктор
   bool LoadProject();            // быстрая выборка всего комплекса данных
                                  // в общие структуры в оперативной памяти

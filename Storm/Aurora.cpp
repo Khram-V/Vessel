@@ -570,6 +570,6 @@ int main()                                 // ( int ans, char **av, char **ac )
     Break( "~ Протокол готов ~\n   ~ %s ~ [%d] ~",DtoA( Trun/3600,-3 ),KtE );
   }
 //WinReady();          //  прогон незавершённых операций из основного алгоритма
-//return EXIT_SUCCESS+3;
- _exit( EXIT_SUCCESS+25 );            // с отменой исполнения всех деструкторов
+  return EXIT_SUCCESS;
+//_exit( EXIT_SUCCESS );              // с отменой исполнения всех деструкторов
 }
