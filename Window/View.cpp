@@ -34,7 +34,7 @@ void rectangle( const Real *LD,const Real *RU,bool fill )  // прямоугол
   glVertex3dv( RU ),glVertex3d( LD[0],RU[1],RU[2] ),glEnd();
 }
 View::View( const char* Tt, int X,int Y, int W,int H, _Real Size )
-    : Window( Tt,X,Y,W,H ), eyeX( -130 ),eyeY( -10 ),eyeZ( 0 ),
+    : Window( Tt,X,Y,W,H ),eyeX(-130),eyeY( -10 ),eyeZ( 0 ),
                            lookX( 0 ),lookY( 0 ),lookZ( 0 ),
     Distance( Size?-Size:-.8*Width ),   // расстояние от камеры до места съёмки
     mx( 0 ),my( 0 )                     //  указатель мышки в нулевое положение

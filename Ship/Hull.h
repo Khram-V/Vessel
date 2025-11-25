@@ -14,8 +14,8 @@
 #include "../Window/Window.h"
 #define eps 1.0e-12
 
-extern const char *_Mnt[],*_Day[];       // названия месяцев и дней недели
-extern Real              //               разметка: { Xo,Do },{ Xo+Lmx,Depth }
+extern const char *_Mnt[],*_Day[];      // названия месяцев и дней недели
+extern Real              //                разметка: { Xo,Do },{ Xo+Lmx,Depth }
  Xo,Xm,Length,Lmx,Lwl,   // Длина конструктивная, максимальная и по ватерлинии
        Breadth,Bmx,Bwl,  // Ширина конструктивная, максимальная и по ватерлинии
  Do,   Draught,Depth,    // Осадка и высота борта
@@ -138,7 +138,7 @@ public: int ax,az,ux,uz;  // Угловые точки листа растров
 //int xw( _Real X ){ return x( X )+ax; }
 //int zw( _Real Z ){ return H-z( Z )-az; } - ??
 };
-//     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 extern fixed Active;      // 0x0001 - файл считанн и подготовлен к работе
                           // 0x0002 - полностью выполнена первая прорисовка
@@ -148,38 +148,38 @@ void Draw_Hull( int id, Place &_W );       // Проекция корпус в �
 void line( _Real x1,_Real z1,_Real x2,_Real z2 );
 
 struct complex
-{ double x,y;                                         // real & imaginary part
-  complex& operator=( const double& r ){ x=r,y=0.0; return *this; }
+{ Real x,y;                                         // real & imaginary part
+  complex& operator=( const Real& r ){ x=r,y=0.0; return *this; }
   complex& operator+=( const complex& c ){ x+=c.x; y+=c.y; return *this; }
-  complex& operator*=( const complex& c ){ double w=(x*c.x)-(y*c.y); y=(x*c.y)+(y*c.x); x=w; return *this; }
+  complex& operator*=( const complex& c ){ Real w=(x*c.x)-(y*c.y); y=(x*c.y)+(y*c.x); x=w; return *this; }
 };
-inline double const abs( const complex& c ){ return hypot( c.x,c.y ); }
-inline double const norm( const double& x, const double& y ){ return x*x+y*y; }
-inline double const norm( const complex& c ){ return c.x*c.x+c.y*c.y; }
-inline double operator % ( const complex& a,const complex& b ){ return a.x*b.x+a.y*b.y; }
-inline complex operator * ( complex c,const double& r ){ c.x*=r; c.y*=r; return c; }
+inline Real const abs( const complex& c ){ return hypot( c.x,c.y ); }
+inline Real const norm( const Real& x, const Real& y ){ return x*x+y*y; }
+inline Real const norm( const complex& c ){ return c.x*c.x+c.y*c.y; }
+inline Real operator % ( const complex& a,const complex& b ){ return a.x*b.x+a.y*b.y; }
+inline complex operator * ( complex c,const Real& r ){ c.x*=r; c.y*=r; return c; }
 inline complex operator + ( complex c,const complex& e ){ c.x+=e.x; c.y+=e.y; return c; }
-inline complex polar( const double& a ){ return (complex){ cos( a ),sin( a ) }; }
+inline complex polar( const Real& a ){ return (complex){ cos( a ),sin( a ) }; }
 inline complex exp( const complex& c ){ return polar( c.y )*exp( c.x ); }
 inline Real e5( _Real R ){ return round( R*1e5 )/1e5; }
 //
 //  ... и все-таки нужна подборка стандартных цветов (без перевыбора)...
 //
-#define gl_BLACK        glColor3f( 0,0,0 )              // черный
-//efine gl_WHITE        glColor3f( 1,1,1 )              // белый
-#define gl_YELLOW       glColor3f( 1,1,0 )              // желтый
-#define gl_LIGHTRED     glColor3f( 1,0,0 )              // красный
-#define gl_LIGHTBLUE    glColor3f( .5,.5,1 )            // синий
-#define gl_LIGHTCYAN    glColor3f( 0,1,1 )              // голубой
-#define gl_LIGHTGREEN   glColor3f( 0,1,0 )              // зеленый
-#define gl_LIGHTMAGENTA glColor3f( 1,0,1 )              // фиолетовый
-//efine gl_BACKGROUND   glColor3f( 0.8,1,1 )
-#define gl_LIGHTGRAY    glColor3f( .75,.75,.75 )
-//efine gl_DARKGRAY     glColor3f( 0.3,0.3,0.3 )
-#define gl_GRAY         glColor3f( .6,.6,.6 )
-#define gl_MAGENTA      glColor3f( .6,0,.6 )
-//efine gl_BROWN        glColor3f( .4,.2,0 )
-#define gl_CYAN         glColor3f( 0,.4,.4 )
-#define gl_GREEN        glColor3f( 0,.4,0 )
-#define gl_BLUE         glColor3f( 0,0,.5 )
-#define gl_RED          glColor3f( .6,0,0 )
+#define gl_BLACK        glColor3ubv((const GLubyte[]){0,0,0})       // черный
+//efine gl_WHITE        glColor3ubv((const GLubyte[]){255,255,255}) // белый
+#define gl_YELLOW       glColor3ubv((const GLubyte[]){255,255,0  }) // желтый
+#define gl_LIGHTRED     glColor3ubv((const GLubyte[]){255,0,  0  }) // красный
+#define gl_LIGHTBLUE    glColor3ubv((const GLubyte[]){128,128,255}) // синий
+#define gl_LIGHTCYAN    glColor3ubv((const GLubyte[]){  0,255,255}) // голубой
+#define gl_LIGHTGREEN   glColor3ubv((const GLubyte[]){  0,255,0  }) // зеленый
+#define gl_LIGHTMAGENTA glColor3ubv((const GLubyte[]){255,0,  255}) // фиолетовый
+//efine gl_BACKGROUND   glColor3ubv((const GLubyte[]){204,255,255})
+#define gl_LIGHTGRAY    glColor3ubv((const GLubyte[]){191,191,191})
+//efine gl_DARKGRAY     glColor3ubv((const GLubyte[]){ 76, 76, 76})
+#define gl_GRAY         glColor3ubv((const GLubyte[]){153,153,153})
+#define gl_MAGENTA      glColor3ubv((const GLubyte[]){153,0,  153})
+//efine gl_BROWN        glColor3ubv((const GLubyte[]){102, 51,0  })
+#define gl_CYAN         glColor3ubv((const GLubyte[]){  0,102,102})
+#define gl_GREEN        glColor3ubv((const GLubyte[]){  0,102,0  })
+#define gl_BLUE         glColor3ubv((const GLubyte[]){  0,0,  128})
+#define gl_RED          glColor3ubv((const GLubyte[]){153,0,0})     // 1..18

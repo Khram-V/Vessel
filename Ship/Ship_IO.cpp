@@ -7,8 +7,8 @@ const char *sVer[]={
  "1.9",  "1.91", "1.95", "1.98", "2.0",  "2.01", "2.1",  "2.2",  "2.3",  "2.4",
  "2.5",  "2.6",  "2.7+", "2.8+", "2.94+","2.95+","2.96+","2.97+","2.98+","3.0+",
  "3.02+","3.03+","3.08+","3.09+","3.12+","3.13+","3.16+","3.27+","3.3+","3.34+",
- "3.4",  "4.2",  "4.3",  "4.6.2","5.0" };
-const int nVer=sizeof( sVer )/sizeof( char* );        // =>45 количество версий
+ "3.4",  "4.2",  "4.3",  "4.6.2","5.0",  "5.1" };
+const int nVer=sizeof( sVer )/sizeof( char* );        // =>46 количество версий
 static FileVersion FV=fv261;
 static bool isBin=false;       // признак двоичной или текстовой записи корпуса
 static FILE *F=NULL;           // локальный файл открывается временно
@@ -148,8 +148,8 @@ bool Ship::LoadProject()
    Set.Units=(UnitType)getInt();                                print( "Units = %d\n",Set.Units );
    Set.UseDefaultSplitSectionLocation=getByte();                print( "UseDefaultSplitSectionLocation=%d\n",Set.UseDefaultSplitSectionLocation );
    Set.SplitSectionLocation=getFloat();                         print( "SplitSectionLocation=%g\n",Set.SplitSectionLocation );
-   if( FV>=fv165 ){ Set.DisableModelCheck=getByte();            print( "DisableModelCheck=%d\n",Set.DisableModelCheck );
-                  }
+ /*if( FV>=fv165 )*/{ Set.DisableModelCheck=getByte();          print( "DisableModelCheck=%d\n",Set.DisableModelCheck );
+                    }
    readText( &Set.Comment );                                    print( "Comment=%s\n",Set.Comment );
    readText( &Set.CreatedBy );                                  print( "CreatedBy=%s\n",Set.CreatedBy );
    Set.SavePreview=true;
