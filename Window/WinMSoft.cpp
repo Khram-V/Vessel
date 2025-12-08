@@ -300,14 +300,12 @@ static fixed KeyStates( fixed code=0 )                  // простой опр
 //                  ! осторожно, здесь предполагается отсутствие вызовов OpenGL
 fixed Window::WaitKey()   // стандартный цикл ожидания нового символа в Windows
 {                //  HWND FWin=GetFocus(); SetActiveWindow( hWnd ); ~~ Above();
-  onKey=true;                                   // isTimer=0; SetFocus( hWnd );
+  if( onKey )return false; else onKey=true;      // isTimer=0; SetFocus( hWnd );
   while( Site && KeyPos==KeyPas )WinRequest();           // hWnd // ||isTimer>0
   WaitEvents();
 //  if( hWnd==GetFocus() ) // WaitEvents(); else
 //  { if( !WinRequest( hWnd ) )                          // ожидание символа כל
-//    { // WaitEvents();                                //    в том же окне:
-//      // if( !Site )return onKey=false;
-//  } }
+//    { WaitEvents(); if( !Site )return onKey=false; } } //   в том же окне:
   onKey=false;                                           // SetFocus( FWin );
   return KeyBuffer[++KeyPos&=lKey].Key;                  //   wctob( key )=>
 }                                                        //   Uni16=>Win1251

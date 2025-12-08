@@ -484,9 +484,10 @@ void Ship::WriteVSL()
       if( Buttocks[i].T[0].S[0].P.y<D ){ D=Buttocks[i].T[0].S[0].P.y; I=i; }
      VB=Buttocks[I].ReButtocks( Id,Iu );
      N=Buttocks[I].NPt;
-     M=Id-Iu; if( M<0 )M+=N; // M++;
+     M=Id-Iu; if( M<0 )M+=N; else M++;
      fprintf( F,"\n\n%3d",M );
-     for( i=Id; i!=Iu; i=(i+N-1)%N )fprintf( F," %7.4f %7.4f",VB[i].z,VB[i].x );
+     for( i=0; i<M; i++ )fprintf( F," %7.4f %7.4f",VB[(Id-i+N)%N].z,VB[(Id-i+N)%N].x );
+//   for( i=Id; i!=Iu; i=(i+N-1)%N )fprintf( F," %7.4f %7.4f",VB[i].z,VB[i].x );
      fprintf( F,"\n 0\n" );
   }
   //
@@ -514,11 +515,12 @@ void Ship::WriteVSL()
   //  Форштевень
   //
   if( !NoButtocks )fprintf( F,"\n\n 0\n 0\n" ); else
-  { M=Iu-Id+1; if( M<0 )M+=N; //..M++;
+  { M=Iu-Id; if( M<0 )M+=N; else M++;
     fprintf( F,"\n\n 0\n%3d",M );
-    for( i=Id; ; (++i)%=N )
-       { fprintf( F," %7.4f %7.4f",VB[i].z,VB[i].x ); if( i==Iu )break; }
-  //for( i=Id,j=0; j<M; j++,i=(i+1)%N )fprintf( F," %7.4f %7.4f",VB[i].z,VB[i].x );
+
+//  for( i=Id; ; (++i)%=N )
+//     { fprintf( F," %7.4f %7.4f",VB[i].z,VB[i].x ); if( i==Iu )break; }
+    for( i=0; i<M; i++ )fprintf( F," %7.4f %7.4f",VB[(i+Id)%N].z,VB[(i+Id)%N].x );
     fprintf( F,"\n\n" );
 //} //
     // Это чисто для сверки батоксовых связок при прояснении сбоев в алгоритмах

@@ -37,11 +37,12 @@ bool FreeShip::Draw()               // виртуальная процедура
   Clear(); color( lightgray );                 glLineWidth( .2 );
   axis(*this,Length,Beam,Draft*2,"x","y","z"); glLineWidth( .5 );
   Shell.Drawing( B );                          glLineWidth( 1 );
+  glDisable( GL_LIGHTING );
   color( cyan );  for( k=0; k<NoStations;   k++ )Stations[k].Drawing( B );
   color( green ); for( k=0; k<NoWaterlines; k++ )Waterlines[k].Drawing( B );
   color( blue );  for( k=0; k<NoButtocks;   k++ )Buttocks[k].Drawing( B );
   color( olive ); for( k=0; k<NoDiagonals;  k++ )Diagonals[k].Drawing( B );
-  color( lightgreen );                         glLineWidth( 2 );
+  color( lightcyan );                          glLineWidth( 2 );
   for( k=0; k<NoFlowLines; k++ ){ glBegin( GL_LINE_STRIP );
     for( i=0; i<FlowLines[k].len; i++ )dot( FlowLines[k][i] ); glEnd();
     if( B==mvBoth ){ glBegin( GL_LINE_STRIP );
