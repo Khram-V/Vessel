@@ -194,7 +194,7 @@ private:
   //
   void Triangle( Vector,Vector,Vector );       // обработка одного треугольника
   void divideTriangle(_Vector,_Real,_Vector,_Real,_Vector,_Real );
-  void drawTriangle( _Vector,_Vector,_Vector ); //! элементарные треугольничики
+  void drawTriangle( _Vector,_Vector,_Vector ); //! малые треугольнички
   void waterPoints( _Vector,_Vector,_Vector );  // нормали и отрезки ватерлинии
   bool Read( const char *Name,      // чтение исходной таблицы плазовых ординат
             _Real newDraught=0.0 ); //        изменение осадки на перечитывании

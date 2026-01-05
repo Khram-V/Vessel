@@ -8,16 +8,17 @@
 //
 #include "Aurora.h"       // объекты и производные операции с корпусом на волне
                           // + дополнения графической среды OpenGL-Window:Place
-static int //Board=0,       // 'о' штевни; '-' левый и '+' правый борт
-           Level=-2,        // -2-днище -1-вода 0-ватерлиния 1-смочен 2-сухой
-           wLine=1;         // -1-ниже; +1-выше цвета конструктивной ватерлинии
-//atic Flex wL;             // изменчивые отрезки фрагментов ватерлинии
-                            // по уровню воды в шпациях левого/правого борта
-static bool drawHull=false, // прорисовка корпуса | гидродинамический процесс
-            Part=false;     // false= днище и ватерлиния; true= надводный борт
+static int //Board=0,     // 'о' штевни; '-' левый и '+' правый борт
+       Level=-2,          // -2-днище -1-вода 0-ватерлиния 1-смочен 2-сухой
+       wLine=1;           // -1-ниже; +1-выше цвета конструктивной ватерлинии
+static bool Part=false,   // false= днище и ватерлиния; true= надводный борт
+        drawHull=false;   // прорисовка корпуса | гидродинамический процесс
+
 //static Real ArLen=0.1;    // относительная длина для стрелок на шпациях
 //Vertex::Vertex( _Vector a )  // конструктор и собственно
 //{ w=Storm->Value( Point::operator=(Vessel->out( Vector::operator=( a ) )) ); }
+//static Flex wL;         // изменчивые отрезки фрагментов ватерлинии
+                          // по уровню воды в шпациях левого/правого борта
 
 void Hull::drawTriangle(_Vector a,_Vector b,_Vector c ) // отработка трёх точек
 { if( !drawHull )Three( Level,a,b,c );    // единожды производится динамический
@@ -77,13 +78,13 @@ void Hull::divideTriangle
           lL=(Vector)T+(t/(t-l))*(L-T); Level=t>=0?-1:1;// треугольника и левая
   if( rR!=lL )waterPoints( (lL-T)*(T-rR),lL,rR ),       //   +++
               drawTriangle( T,rR,lL );
-  if( !l && !r )return;                 Level=t<0?-1:1;
+  if( !l && !r )return;             Level=t<0?-1:1;
   if( !l )drawTriangle( L,rR,R ); else
   if( !r )drawTriangle( R,L,lL ); else
   if( fabs( r )>fabs( l ) )drawTriangle( R,L,lL ),drawTriangle( R,lL,rR );
                       else drawTriangle( L,lL,rR ),drawTriangle( L,rR,R );
 }
-void Hull::Triangle( Vector a,Vector b,Vector c )     // обработка треугольника
+void Hull::Triangle( Vector a, Vector b, Vector c )   // обработка треугольника
 { if( a.y || b.y || c.y )            // ~~ далее точки на базисе открытого моря
 //if( a!=b && a!=c && b!=c  )
   { Vector A=out( a ),B=out( b ),C=out( c );
@@ -95,17 +96,17 @@ void Hull::Triangle( Vector a,Vector b,Vector c )     // обработка тр
 //       cZ=c.w-c.Z;                 // WL на подъем или спуск?
 //  if( aZ==0.0 && bZ==0.0 && cZ==0.0 )return;       // значит будут повторения
 //  wLine = a.z>=0.0 && b.z>=0.0 && c.z>=0.0 ? 1:-1; //  действующая ватерлиния
-    wLine = a.z+b.z+c.z>=0 ? 1:-1; // здесь пересечений ватерлинии не ожидается
-    Level = -2; //wLine*2; //-2;
+   wLine=a.z+b.z+c.z>=0 ? 1:-1;    // здесь пересечений ватерлинии не ожидается
+   Level = -2; //wLine*2;          // установка уровня треугольника стоит здесь
     if( !aZ && !bZ ){ if(cZ>0)waterPoints((b-c)*(c-a),b,a); else Level=2; }else
     if( !bZ && !cZ ){ if(aZ>0)waterPoints((c-a)*(a-b),c,b); else Level=2; }else
     if( !cZ && !aZ ){ if(bZ>0)waterPoints((a-b)*(b-c),a,c); else Level=2; }else
     if( aZ<=0&&bZ<=0&&cZ<=0 )Level=2; else   // треугольник целиком над волной
     if( aZ>=0&&bZ>=0&&cZ>=0 )Level=-2; else  // треугольник полностью под водой
     { Real ab=aZ*bZ,bc=bZ*cZ,ca=cZ*aZ;       // иначе рассечение по ватерлинии
-      if( ab<0&&ca<=0){divideTriangle(a,aZ,b,bZ,c,cZ); return;}// выбор вершины
-      if( bc<0&&ab<=0){divideTriangle(b,bZ,c,cZ,a,aZ); return;}// треугольника
-      if( ca<0&&bc<=0){divideTriangle(c,cZ,a,aZ,b,bZ); return;}// для деления
+      if( ab<0&&ca<=0){ divideTriangle(a,aZ,b,bZ,c,cZ); return; } // выбор вершины
+      if( bc<0&&ab<=0){ divideTriangle(b,bZ,c,cZ,a,aZ); return; } // треугольника
+      if( ca<0&&bc<=0){ divideTriangle(c,cZ,a,aZ,b,bZ); return; } // для деления
     } drawTriangle( a,b,c );
 } }
 //    Кинематическая постановка корпуса корабля на объединенное волновое поле
@@ -115,7 +116,7 @@ Hull& Hull::Floating( bool onlyDraw )
   // ~~   троекратная дорисовка корпуса по уровням относительно ватерлинии
   // ~~       обусловливается последовательностью наложения прозрачности
  Vector P,Q,R;
- int i,k; Part=false;             // разделение корпуса на прозрачные подуровни
+ int i; Part=false;             // разделение корпуса на прозрачные подуровни
         drawHull=onlyDraw;        // копия режима расчетов(-) или прорисовки(+)
   if( !onlyDraw )ThreeInitial();  // начальная чистка для интегрируемых величин
 //else if( !Ready() )return *this;
@@ -126,8 +127,9 @@ Part_of_hull:    // разделение корпуса по уровням на
   //  ...транцы на штевнях должны отрабатываться вогнутыми контурами... !!!
   //
   if( onlyDraw )glEnable( GL_LIGHTING );
-  for( k=0; k<=1; k++ ){ Flex &S=k?Stem:Stern;
-    for( i=0; i<S.len; i++ ){ Q=S[i];
+//#pragma omp parallel for
+  for( int k=0; k<=1; k++ ){ Flex &S=k?Stem:Stern;
+    for( int i=0; i<S.len; i++ ){ Q=S[i];
       if( k )Q.y=-Q.y;
       if( i>0 ){ if( P.y )Triangle( P,~P,~Q );
                  if( Q.y )Triangle( Q,P,~Q ); } P=Q;
@@ -135,13 +137,14 @@ Part_of_hull:    // разделение корпуса по уровням на
   //   собственно цикл покрытия оболочки бортовой обшивки
   //   по шпациям между теоретическими шпангоутами корпуса
   //
-  for( k=0; k<=Nframes; k++ )  // штевни и шпангоуты Nframes
+//#pragma omp parallel for private( P,Q,R ) ~~
+  for( int k=0; k<=Nframes; k++ ) // штевни и шпангоуты Nframes
   if( Shell[k] )              // -- есть ли сам корпус, не пропущена ли шпация?
   if( Shell[k][0]>=3 )       // в шпации присутствует хотя бы один треугольник?
   { for( int Board=-1; Board<2; Board+=2 )
     { P=Select( k,Board>0?-1:1 );            // это блок стандартных шпаций
       Q=Select( k,Board>0?-2:2 );            // сначала левый-> правый шпангоут
-      for( i=3; i<=Shell[k][0]; i++ )        // всех теоретических шпангоутов
+      for( int i=3; i<=Shell[k][0]; i++ )    // всех теоретических шпангоутов
       { R=Select( k,Board>0?-i:i );          // попутная разборка треугольников
         if( Board>0 )Triangle( P,Q,R );      // правый борт и левый к кормовому
                 else Triangle( Q,P,R );      //                  перпендикуляру
@@ -180,10 +183,10 @@ Part_of_hull:    // разделение корпуса по уровням на
       for( i=0; i<W.len-1; i++ )
         { L+=(l=abs( W[i]-W[i+1] )); wM+=l*( W[i]+W[i+1] ); }  // длина контура
       if( L>eps )wM/=2*L;                                   // центр ватерлинии
-      for( i=0; i<W.len-1; i++ )fM+=(W[i]-wM)*(W[i+1]-wM); // площадь для знака
+        for( i=0; i<W.len-1; i++ )fM+=(W[i]-wM)*(W[i+1]-wM); // площадь к знаку
       if( Zenit%( LtA( fM ) )<0.0 )                  // ориентация по вертикали
-          for( i=0; i<W.len-1; i++ )drawTriangle( W[i+1],W[i],wM ); else
-          for( i=0; i<W.len-1; i++ )drawTriangle( W[i],W[i+1],wM );
+        for( i=0; i<W.len-1; i++ )drawTriangle( W[i+1],W[i],wM ); else
+        for( i=0; i<W.len-1; i++ )drawTriangle( W[i],W[i+1],wM );
     }
 //    else
 //    { wM=0.0; L=0.0;          // без слияния контуров ватерлинии - простенько
@@ -224,8 +227,8 @@ Part_of_hull:    // разделение корпуса по уровням на
   //
   if( !onlyDraw )ThreeFixed(); drawHull=false; return *this;
 }
-/*    Здесь ведется прорисовка всего графического окружения для корпуса,
-      затем выполняется его одноразовая прорисовка без перерасчетов его текущих
+/*    Здесь ведется прорисовка всего графического окружения для корпуса, затем
+      выполняется его одноразовая прорисовка без перерасчетов текущих
       геометрических параметров и векторов/тензоров движения
            DrawMode: 0 - ватерлиния строится при любом графическом раскладе
                      1 - прорисовываются только собственно штевни и шпангоуты

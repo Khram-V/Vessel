@@ -133,21 +133,10 @@ unsigned& uList::operator[]( int k ){ return m[minmax(0,k>=0?k:k+len,len-1)]; }
 unsigned& uList::operator+=( unsigned p ) // выбор [k] обраткой и += дополнение
 { if(len>=n)m=(unsigned*)realloc(m,(n+=96)*sizeof(unsigned));return m[len++]=p;
 }
-static bool Span( int l, int r )
-#if 1
-{ //return fabs( dir(R[r+1]-R[r])%dir(R[r+1]-L[l]) )
-  //     < fabs( dir(L[l+1]-L[l])%dir(L[l+1]-R[r]) );
-  //return dir( R[r+1]-L[l] ).x > dir( R[r]-L[l+1] ).x; // горизонтальная линия
-    return norm( R[r+1]-L[l] ) < norm( R[r]-L[l+1] );  // кратчайшее обновление
-#else
-{ static Vector blr={0,0,-1};
- Vector Base=R[r]-L[l],Right=dir( Base*(R[r+1]-R[r]) ),
-                        Left=dir( Base*(L[l+1]-L[l]) );
-  if( Right%blr>Left%blr ){ if( Right%blr>0.999 ){ blr=Right; return true; } }
-                     else { if( Left%blr>0.999 ){ blr=Left; return false; } }
-  if( dir( R[r+1]-L[l] ).x >= dir( R[r]-L[l+1] ).x ){ blr=Right; return true; }
-                                               else { blr=Left; return false; }
-#endif
+static bool Span( int l, int r )                // малый: 2S/L  большой: abc/4S
+{ return norm( R[r+1]-L[l] ) < norm( R[r]-L[l+1] );  // кратчайшее обновление
+//  Vector Rr=R[r+1]-L[l],Ll=L[l+1]-R[r]; Ll.x=Rr.x=0.0;
+//  return norm( Rr ) < norm( Ll );  // кратчайшее отстояние
 }
 //   Считывание корпуса отмечается успехом, либо полным завершением программы
 //
