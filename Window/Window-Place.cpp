@@ -44,7 +44,7 @@ Place& Place::Activate( bool act )        // активизация графич
 bool Place::Draw()       // в виртуальной среде Draw доступен внутренний пролог
 { if( Site && extDraw )  // настройки OpenGL с контекстным эпилогом прорисовки
   { glContext S( Site ); // подготовка среды к внешнему исполнению с рекурсией
-//  if( S.Active )
+    if( S.Active )
     if( extDraw() )      // -- исполнение внешней независимой транзакции
       { if( this==Site )Save().Refresh(); else Show(); return false; }
   } return Site!=NULL;

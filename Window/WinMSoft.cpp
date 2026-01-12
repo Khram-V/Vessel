@@ -13,7 +13,7 @@ static bool WinRequest( HWND hWin=NULL )  // текущее состояние �
                 } return true;
               } return false;
 }
-static void WaitEvents( HWND hW=NULL )
+static void WaitEvents( HWND hW=NULL )// с нулём опрос сразу всех активных окон
                       { if( hW || First )while( WinRequest( hW ) ); }
 /* сбор
 { if( hW )while( WinRequest( hW ) ); else
@@ -36,17 +36,20 @@ bool WinReady( Window *Win )       // без указания адреса оп�
 //     - переключение и временное сохранение состояния контекстной среды OpenGL
 //               с отработкой деструктора для восстановления исходного контента
 //
-bool glAct( const Window *W )
-{ if( W ){ bool B=wglMakeCurrent( W->hDC,W->hRC );
-            if( B )if( W->hDC ){ WaitEvents(); return B; } } return false;
-}
+bool glAct( const Window *W ){ return wglMakeCurrent( W->hDC,W->hRC ); }
+//{ if( W ){ bool B=wglMakeCurrent( W->hDC,W->hRC );
+//            if( B )if( W->hDC ){ WaitEvents(); return B; } } return false;
+//}
 //             конструктор = пролог с восстановлением через эпилог = деструктор
 //
-glContext::glContext( const Window* W ) : DC( wglGetCurrentDC() )   // prologue
-  { if( W->hDC==DC )DC=0; else RC=wglGetCurrentContext(); Active=glAct( W );
-  }
+glContext::glContext( const Window* W ): Active( true ),DC( wglGetCurrentDC() )
+  { if( W->hDC==DC )DC=0; else   // установка размерений нового растрового поля
+    { RC=wglGetCurrentContext(); // glPushAttrib(GL_VIEWPORT_BIT);  // prologue
+      Active=glAct( W );
+   // if( Active )glViewport( W->pX,W->pY,W->Width,W->Height );
+  } }
 glContext::~glContext()     // деструктор = эпилог с возвратом былого контекста
-  { if( DC )wglMakeCurrent( DC,RC );                                // epilogue
+  { if( DC )wglMakeCurrent( DC,RC ); //,glPopAttrib();              // epilogue
   }
 //!    главная процедура обработки прерываний Windows
 //!
@@ -86,10 +89,9 @@ bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
     case WM_KEYDOWN   :                         // 256
     case WM_SYSKEYDOWN:                         // 260
     { fixed Key=0;
-    //WaitEvents( hWnd );                       // на входе чистый ключ
+//    WaitEvents(); // hWnd );                  // на входе чистый ключ
       switch( wParam )                          // командные перекодировки
-      {
-      //case VK_RETURN: Key=_Enter;      break; // 13≡13 => так будет повтор
+      {//ase VK_RETURN: Key=_Enter;      break; // 13≡13 => так будет повтор
         case VK_PRIOR : Key=_North_East; break; // 33⇒ 9 - 8+1
         case VK_NEXT  : Key=_South_East; break; // 34⇒12 - 8+4
         case VK_END   : Key=_South_West; break; // 35⇒ 6 - 2+4
@@ -105,28 +107,37 @@ bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
         if( !(HIWORD( lParam )&KF_REPEAT) )    // повторение F-команд исключено
           { if( wParam>=VK_F1 && wParam<=VK_F12 )Key=_F1+wParam-VK_F1; }
       }
-      if( Key )/*WaitEvents(hWnd),*/PutChar( Key ); // запись в буфер клавиатуры
+      if( Key )PutChar( Key );                     // запись в буфер клавиатуры
     }   break;
 //  case WM_TIMER: if( idEvent==wParam )         // 275 -> внутренняя процедура
 //                 { PutTimer(); return true; } break;
     case WM_CHAR:                              // 258 = WM_CHAR message handler
     { WPARAM Key;
-    //WaitEvents( hWnd );                             // на входе чистый ключ
+//    WaitEvents(); // hWnd );                          // на входе чистый ключ
       switch( Key=wParam )
-      { case VK_BACK  : Key=_BkSp;  break;            // 8 -> _BkSp(14)
-        case VK_TAB   : Key=_Tab;   break;            // 9 -> _Tab (30)
-        case VK_CANCEL: while( First )First->Close(); // 3 -> просто на выход
-                        PostQuitMessage( VK_CANCEL ); return false;
-      } WaitEvents(),PutChar( Key );    // hWnd и ещё запись в буфер UniCode-16
+      { case VK_BACK  : Key=_BkSp;  break;              // 8 -> _BkSp(14)
+        case VK_TAB   : Key=_Tab;   break;              // 9 -> _Tab (30)
+        case VK_CANCEL: while( First )First->Close();   // 3 -> просто на выход
+                     PostQuitMessage( VK_CANCEL ); return false;   // с обходом
+      } if( Key )PutChar( Key );                            // запись в буфер UniCode-16
     }   break;
-    case WM_CLOSE: Close(); // break;   //=16 - сигнал о возможности закрытия окна
-    //DestroyWindow( hWnd ); break; // внутри идёт запрос закрытия окна Windows
+#if 0
+    case WM_CLOSE: Close(); break;   //=16 - сигнал о возможности закрытия окна
+         // DestroyWindow( hWnd );  // внутри идёт запрос закрытия окна Windows
     case WM_DESTROY:     // =2 здесь должны быть закрыты все внутренние объекты
-      if( !First )PostQuitMessage(0); break; // выход с кодом 0—нормальное завершение
+      if( !First )PostQuitMessage(0); break; // с кодом 0—нормальное завершение
+    case WM_QUIT:        // безусловно (вторично) срабатывает деструктор Window
+         while( First )First->Close(); break;
+#else
+    case WM_CLOSE: Close(); // break;//=16 - сигнал о возможности закрытия окна
+      // DestroyWindow(hWnd); break;// внутри идёт запрос закрытия окна Windows
+    case WM_DESTROY:     // =2 здесь должны быть закрыты все внутренние объекты
+      if( !First )PostQuitMessage(0); break; // с кодом 0—нормальное завершение
     case WM_QUIT:        // безусловно (вторично) срабатывает деструктор Window
          while( First )First->Close();
-    default: return false;   // DefWindowProc( hWnd,message,wParam,lParam );
-  }          return true;    // освобождение очереди от нераспознанных на выход
+#endif
+    default: return false; // DefWindowProc( hWnd,message,wParam,lParam );
+  }          return true;  // освобождение очереди от нераспознанных на выход
 }
 //!   Конструктор создает окно OpenGL, и ... не образует цикла прерываний ...
 //     площадка Place в основании окна ортогонализуется и пересохраняется
@@ -300,9 +311,10 @@ static fixed KeyStates( fixed code=0 )                  // простой опр
 //                  ! осторожно, здесь предполагается отсутствие вызовов OpenGL
 fixed Window::WaitKey()   // стандартный цикл ожидания нового символа в Windows
 {                //  HWND FWin=GetFocus(); SetActiveWindow( hWnd ); ~~ Above();
-  if( onKey )return false; else onKey=true;      // isTimer=0; SetFocus( hWnd );
+  if( onKey )return false; else onKey=true;     // isTimer=0; SetFocus( hWnd );
+//glAct( this );
   while( Site && KeyPos==KeyPas )WinRequest();           // hWnd // ||isTimer>0
-  WaitEvents();
+  WaitEvents( hWnd );
 //  if( hWnd==GetFocus() ) // WaitEvents(); else
 //  { if( !WinRequest( hWnd ) )                          // ожидание символа כל
 //    { WaitEvents(); if( !Site )return onKey=false; } } //   в том же окне:
@@ -390,11 +402,16 @@ static void CALLBACK TimerProc( HWND hWind,UINT uMsg,UINT_PTR timerId,DWORD St)
     if( Win )if( timerId==Win->idEvent )
     { if( !Win->mSec )Win->isTimer=0; else    // при завершении всех транзакций
       if( !Win->isTimer )  // настройка OpenGL контекстным эпилогом перерисовки
-      { glContext S( Win ); Win->isTimer++;
-//      ::KillTimer( hWind,timerId );
-        if( Win->Timer() )Win->Save().Refresh();           // запрос транзакции
-//      ::SetTimer( hWind,timerId,Win->mSec,TimerProc );   // ...заведомо старт
-        WaitEvents( Win->hWnd );                           // и для верности...
+      { // glContext S( Win );
+        Win->isTimer++;
+        ::KillTimer( hWind,timerId );
+        { // glContext S( Win );
+          // if( S.Active )
+          if( glAct( Win ) )
+          if( Win->Timer() )Win->Save().Refresh();  // на виртуальную процедуру
+          WaitEvents( Win->hWnd );   // и для верности подождать исполнения ...
+        }
+        ::SetTimer( hWind,timerId,Win->mSec,TimerProc );   // ...заведомо старт
         Win->isTimer=0;              //  isTimer--;   с проблемами незавершёнки
     } } return;                      // фиксируется фоновая подложка всего окна
   }

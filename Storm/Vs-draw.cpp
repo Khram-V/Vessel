@@ -387,7 +387,8 @@ Hull& Hull::NavigaInform( Window *Win )
 bool Hull::Draw()                  // Виртуальная процедура простой перерисовки
 { static bool Recurse=false;
 //if( !IsWindowVisible( hWnd ) || IsIconic( hWnd ) )return false;
-  if( Recurse || !ShipName )return false; Recurse=true; Activate();
+  if( Recurse || !ShipName )return false;
+  glContext S( this ); if( !S.Active )return false; Recurse=true; Activate();
   glEnable( GL_CULL_FACE );
   glEnable( GL_DEPTH_TEST );
   glClearColor( BkColor,1 );                  // голубоватый цвет фона и полная

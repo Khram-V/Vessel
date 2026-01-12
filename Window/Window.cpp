@@ -41,21 +41,37 @@ Place& Place::Refresh(){ if( Site )Site->Refresh(); return *this; }
 //
 //   и лишь по внешнему виду две общие процедуры для клавиатуры
 //
+//static volatile bool waitKey=false;
+//#include "ConIO.h"
+//#include <windows.h>
+
 void Window::PutChar( fixed Key )
-{    WaitEvents();                    // как-то избавиться от повторов-рекурсии
-     KeyBuffer[++KeyPas&=lKey].Key=Key;  // занесение одного символа и его кода
-     KeyBuffer[KeyPas].Code=KeyStates();  // в кольцевой буфер для букв и кодов
+{
+//while( waitKey && WinReady() );       // как-то избавиться от повторов-рекурсии
+//if( waitKey )return;
+//if( waitKey )WaitTime( 100 ); //delay( 100 );
+//waitKey=true;
+//                                unsigned K=Key;
+//print( 1,38,"\n Key=%X '%s'...    ",Key,&K );
+
+      KeyBuffer[++KeyPas&=lKey].Key=Key; // занесение одного символа и его кода
+      KeyBuffer[KeyPas].Code=KeyStates(); // в кольцевой буфер для букв и кодов
+//    while( isTimer && WinRequest() ); // ожидание выхода таймерных транзакций
   if( KeyPas==KeyPos )
-    { MessageBeep( MB_OK ); ++KeyPos&=lKey; return; }          // сброс-перебор
+    { MessageBeep( MB_OK ); ++KeyPos&=lKey; } else             // сброс-перебор
   if( !onKey )                 // блок рекурсивных прерываний от активного окна
-  while( KeyPos!=KeyPas )      //  нагромождение очереди запросов от клавиатуры
+  while( KeyPos!=KeyPas )     //  нагромождение очереди запросов от клавиатуры
   { int oK=KeyPos;             // Фиксированная предустановка графической среды
-    { glContext Act( this );   // со сбоем других внешних транзакций над OpenGL
-      if( Act.Active )
+    { //glContext Act( this ); // со сбоем других внешних транзакций над OpenGL
+//      glAct( this );
+//    if( Act.Active )
       { if( !KeyBoard( KeyBuffer[++KeyPos&=lKey].Key ) ){ KeyPos=oK; break; }
         WaitEvents();        // при отказе возвращается в цикл ожидания очереди
-        glFinish();          // при/пере/пред/установка фона графической среды
-  } } }
+//      glFinish();          // при/пере/пред/установка фона графической среды
+    } }
+  }
+  WaitEvents(); // hWnd );   // освобождение от всех запросов в Windows
+  //waitKey=false;
 }
 #if 0
 bool Window::KeyBoard( fixed key )// виртуальная процедура обработки прерываний
@@ -72,9 +88,10 @@ fixed Window::ScanStatus()      // обновление в случае отсу
                         return KeyBuffer[KeyPos].Code;
   }
 #else
+
 bool Window::KeyBoard( fixed key )// виртуальная процедура обработки прерываний
 { if( Ready() )
-  if( extKey ){ glContext S( this );  // установка графического контента OpenGL
+  if( extKey ){ glContext S( this ); // установка графического контента OpenGL
               return extKey( key ); // true - символ принят, false - к возврату
   } return false; //!KeyPas!=KeyPos; либо все недочитанные символы сбрасываются
 }

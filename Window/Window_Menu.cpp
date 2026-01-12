@@ -31,8 +31,8 @@ static char *St,*StK,*Str=NULL;  // рабочая строчка и време�
 TextMenu::TextMenu( const Mlist *m,const int n, Window* Win, int x,int y ):
   Place( Win,PlaceAbove ),
   Up( false ),M( m ),Num( n ),Y( y ),X( x ),Lx( 1 ),Ly( 1 ),K( 0 ) //,Hl( NULL )
-{ Activate()//AlfaVector( 20  );    // с подстройкой на текущий шрифт
-            .AlfaBit( _8x16 );      // Простой растровый шрифт русского языка
+{ // Activate().AlfaVector( 20  );    // с подстройкой на текущий шрифт
+  AlfaBit( _8x16 );                   // Простой растровый шрифт русского языка
   if( !Str )StK=( Str=(char*)malloc( 512 ) )+256;  // заведомо избыточная длина
 }
 static int Mestr( mlist *Ls )
@@ -48,13 +48,11 @@ static int Mestr( mlist *Ls )
       if( !strcmp( sh,"°" ) )ch=':'; else ch=sh[0]|0x20;   // здесь тип формата
           lh=Uset( S,lc-2 )[0];                  //  точность числовой величины
       if( ch==':' )                              //  и блок с градусными мерами
-      { lh-='0';
-        Ls->S=':';
+      { lh-='0'; Ls->S=':';
         if( unsigned( lh )>3 )lh=0; else if( *Uset( S,k+1 )=='-' )lh=-lh;
         strcpy( Uset( St,k ),DtoA( *(Real*)dat,lh,"°" ) );
       } else                                     // and another formats
-      { lh=lh=='l';
-        Ls->S=lh ? ch|0x80:ch;                   // (long)|(double)
+      { lh=lh=='l'; Ls->S=lh ? ch|0x80:ch;       // (long)|(double)
         if( ch>'d' && ch<'h' )
         { if( lh )          sprintf( St,S,*(double*)dat );
            else             sprintf( St,S,*(float*)dat );
@@ -62,8 +60,8 @@ static int Mestr( mlist *Ls )
          else               sprintf( St,S,dat );
     } }
   } else if( l ){ if( l<k )l=k; k=0; }
-    Ls->lf=l;
-    Uset( St,l+=k )[0]=0;
+  Ls->lf=l;
+  Uset( St,l+=k )[0]=0;
   for( lc=Ulen( St ); lc<l; lc++ )Uset( St,lc," " ); return k;
 }
 //   Информационные процедуры для активного окна

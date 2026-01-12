@@ -72,6 +72,7 @@ bool Field::Timer()                //! к несчастью все расчет
          pause=false,stop=false;   // для задержки и приостановки эксперимента
   int M,D,Y;                       // подпись независима от состояния расчётов
   Event T; T.UnPack( M,D,Y );      // время для обработки прерываний от таймера
+//glContext Back( this ); if( !Back.Active )return false;
   {
 #if 0
     TextContext Save( true );                            color( aqua,0.6,0.9 );

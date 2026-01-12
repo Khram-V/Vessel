@@ -289,7 +289,7 @@ void Window::PutMouse( UINT State, int x,int y )
   }
   if( isMouse )return; isMouse++;         // предотвращение рекурсии прерываний
   if( MouseState==_MouseWheel )           // прокрутка проходит сама по себе
-  { if( y||x ){ glContext S( this ); Mouse( _MouseWheel,x,y ); } MouseState=0;
+  { if( y||x ){ glContext S( this ); Mouse( _MouseWheel,x,y*32 ); } MouseState=0;
   } else
   { Place *P=this; int px=x,py=y;         //!  поиск последней/верхней площадки
     for( Place *S=P; S; S=S->Up )         //!     по общему списку их наложений

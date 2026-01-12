@@ -45,7 +45,7 @@
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters='&quot;Ships\Samples\Галеон Великих Испанских географических открытий.ftm&quot; &quot;Save\ONR-5613_DDX-2000.fef&quot; &quot;Ships\History\Carrack «Mary Rose».fbm&quot; &quot;Save\Import\Perle2(DS).fef&quot; &quot;Ships\Fregate type 23-11.fbm&quot; Save\~באסילי.ftm' />
+				<Option parameters='Save\«Аврора».fef Save\~באסילי &quot;Save\ONR-5613_DDX-2000.fef&quot; &quot;Ships\Samples\Галеон Великих Испанских географических открытий.ftm&quot; &quot;Ships\History\Carrack «Mary Rose».fbm&quot; &quot;Save\Import\Perle2(DS).fef&quot; &quot;Ships\Fregate type 23-11.fbm&quot;' />
 				<Option projectLinkerOptionsRelation="2" />
 				<Linker>
 					<Add library="glu32" />

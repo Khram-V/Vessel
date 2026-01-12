@@ -527,9 +527,15 @@ int main()                                 // ( int ans, char **av, char **ac )
     KtE=0;                // исходная гидростатика затем будет перепроверяться
   Ship.wPrint( true );    // описатели парохода на экране-консоли и в протоколе
   logWave();              // изначальные характеристики волн для протокола
-
+#pragma omp parallel
+{
+#pragma omp single
+{
+#pragma omp task
+{
   Sea.Window::KeyBoard( AllKeyb ); // самый нижний уровень виртуальной рекурсии
   Ship.Window::KeyBoard( AllKeyb ); // доступен при прямом обращении в Window
+} } }
   Ship.Above();           // установка активности окна с прорисовками корабля
   Ship.Initial()          // установка главных осей с исходными геометрическими
       .Floating( false ); // расчётами по корпусу, без графической визуализации
@@ -569,7 +575,7 @@ int main()                                 // ( int ans, char **av, char **ac )
     ftruncate( fileno( VIL ),ftell( VIL ) ); fclose( VIL ); VIL=0;
     Break( "~ Протокол готов ~\n   ~ %s ~ [%d] ~",DtoA( Trun/3600,-3 ),KtE );
   }
-//WinReady();          //  прогон незавершённых операций из основного алгоритма
+  // WinReady();          //  прогон незавершённых операций из основного алгоритма
   return EXIT_SUCCESS;
 //_exit( EXIT_SUCCESS );              // с отменой исполнения всех деструкторов
 }

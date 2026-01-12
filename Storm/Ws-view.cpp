@@ -75,20 +75,21 @@ bool Field::Draw()
 { static bool Recurse=false;
 //if( !Ready() )return false;
 //if( !IsWindowVisible( hWnd ) || IsIconic( hWnd ) )return false;
-  if( Recurse || !KtE )return false; Recurse=true; Activate();
+  if( Recurse || !KtE )return false;
+  glContext S( this ); if( !S.Active )return false; Recurse=true; Activate();
 //glEnable( GL_LIGHTING );
 //glEnable( GL_CULL_FACE );
   glEnable( GL_DEPTH_TEST );
   glMatrixMode( GL_PROJECTION );     // размерах фрагмента экрана сброс текущих
   glLoadIdentity();                  // матричных координат, настройка обзора и
-  gluPerspective( 16.2,Real( Width )/Height,-63,63 );     // экранных пропорций
-  gluLookAt( 0,0,Distance,lookX,lookY,lookZ,0,1,0 );     // точка обзора
+  gluPerspective( 16.2,Real( Width )/Height,-63,63 );   // экранных пропорций
+  gluLookAt( 0,0,Distance,lookX,lookY,lookZ,0,1,0 );    // точка обзора
   glMatrixMode( GL_MODELVIEW ); glLoadIdentity();       // в исходное положение
-  glClearColor( BkColor,1 );                      // цвет фона окна и
+  glClearColor( BkColor,1 );                            // цвет фона окна и
   glClear( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT );   // полная расчистка
-  glRotated( eyeY-90,1,0,0 );                          // поставить на киль
-  glRotated( eyeZ,   0,1,0 );                          // дифферент
-  glRotated( eyeX,   0,0,1 );                          // рыскание
+  glRotated( eyeY-90,1,0,0 );                           // поставить на киль
+  glRotated( eyeZ,   0,1,0 );                           // дифферент
+  glRotated( eyeX,   0,0,1 );                           // рыскание
   AlfaVector( Height/WinLines );
   //
   //   рисуем оси координат и габаритный прямоугольный параллелограмм
@@ -171,7 +172,7 @@ bool Field::Draw()
   }
 //! Информационная табличка c режимами проведения вычислительного эксперимента
 //
- Hull &V=*Vessel; _Real S=V.Speed,L=V.Length;
+ Hull &V=*Vessel; _Real Sv=V.Speed,L=V.Length;
   V.NavigaInform( this );         // картушка морского волнения, курса+скорости
   color( navy );Print(2,1,Exp.peak?"Трохоидальные волны:":"В полных потоках:");
   color( blue ); Print( ModelWave[Exp.wave&3] ),Print( 2,2,Model[V.Statum] );
@@ -181,8 +182,8 @@ bool Field::Draw()
 //if( V.Pic.flow )color( yellow ),Print(2,3,VView[V.Pic.flow ] );
   Print( 2,3,
     "Курс %0.1f°, дрейф %0.1f°, скорость %0.1f узлов (Fr=%4.2f, Lw/L=%4.2f) ",
-     V.Course*360/_Pd,angle(V.Course,-V.Head[-1].z)*360/_Pd,S*3600/_Mile,
-     S/sqrt(_g*L),sqr(S)*_Pd/_g/L );
+     V.Course*360/_Pd,angle(V.Course,-V.Head[-1].z)*360/_Pd,Sv*3600/_Mile,
+     Sv/sqrt(_g*L),sqr(Sv)*_Pd/_g/L );
   Save().Refresh();                    // перерисовка с наложенными площадками
   return Recurse=false;
 }

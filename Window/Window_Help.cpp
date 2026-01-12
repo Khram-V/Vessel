@@ -9,11 +9,11 @@
   //    ++ определение каждого блока строк заканчивается нулевым адресом
   //
 void Window::Help
-( const char *Name[], const char *Cmds[], const char *Plus[], int X, int Y )
+( const char *Name[], const char *Cmds[],const char *Plus[], int X,int Y )
 { Place P( this,PlaceAbove );
   int i,k,c,n=0,t=0,p=0,h=0,l=0;        // Количество строк в Name, Text и Plus
 //while( GetKey() );                    // Отсечение всех предыдущих обращений
-  P.Activate().AlfaBit( _8x16 );        // ссылка по размерам растрового шрифта
+  P.AlfaBit( _8x16 );                   // ссылка по размерам растрового шрифта
   i=P.AlfaRect( Name[0] ).cx+1;         // Здесь определяется общая ширина окна
   if( Name )while( Name[n] )n++;        //     и собственно прорисовка таблички
   if( Cmds )while( Cmds[t] )t++; if( t )h++;       // с информацией и запросами
@@ -32,8 +32,8 @@ void Window::Help
                              glColor3f( 0,.6,.6 ),P.Print( Plus[k+1] );
     P.AlfaVector( 7,0 );
     glColor4f( 1,.9,.8,.5 ); P.Print( -1,0,"©75÷25 В.Храмушин" );
-  } P.Show(); // P.Save().Refresh();         // среда восстанавливается, а
-    WaitKey();                               // окно будет снято Р-деструктором
+  } P.Show(); // P.Save().Refresh();        // среда восстанавливается,
+    WaitKey();                             // а окно будет снято Р-деструктором
 }
 //#pragma omp master // single
 //#pragma omp taskwait
