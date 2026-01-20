@@ -135,7 +135,9 @@ Window::Window( const char *_title, int x,int y,int w,int h )
 
     Locate( x,y,w,h );  // -- без glfwWindow - просто исходные размерности окна
     if( !First )
-    { glfwSetErrorCallback( callbackError ); glfwInit(); First=this; Next=NULL; }
+    { glfwSetErrorCallback( callbackError );
+      glfwInit(); First=this; Next=NULL;
+    }
     else{ Window *W=First; while( W->Next )W=W->Next; W->Next=this; Next=NULL; }  // ++ ячейка
  // glfwInitHint( GLFW_PLATFORM,GLFW_PLATFORM_WIN32 );
     if( !_title )
@@ -182,6 +184,7 @@ Window::Window( const char *_title, int x,int y,int w,int h )
 //  glfwSetWindowFocusCallback    ( glfwWindow,glfw_focus_callback );
 //  glfwSetWindowRefreshCallback  ( glfwWindow,glfw_draw_callback );
 //            can add processing of quit message( previously was turned off )
+    Icon( "Icon" );
 /*
        GLFWmonitor *monitor=glfwGetPrimaryMonitor();     // для целого экрана
  const GLFWvidmode *mode  = glfwGetVideoMode( monitor );
@@ -362,7 +365,9 @@ void Window::PutTimer()             //? внутренняя обработка 
     } isTimer=0;                      // разрешение повторных вхождений таймера
   }// WaitEvents()                    // после завершения всех операций OpenGL
 }
+
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 void Window::WaitEvents( bool stop )
 { if( First )if( glfwWindow )//if( glAct( this ) )
   { for( Window *aW=First; aW; aW=aW->Next ) // перебор активированных окон
@@ -377,8 +382,8 @@ void Window::WaitEvents( bool stop )
   }
 }
 #include <StdArg.h>                           // блок разных текстовых надписей
-//#define GLFW_EXPOSE_NATIVE_WIN32
-//#include "glfw3native.h"
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include "glfw3native.h"
 
 Window& Window::Title( const char* A )
 { if( glfwWindow )if( Caption ){ char S[strlen(Caption)+strlen(A)+8];
@@ -387,14 +392,20 @@ Window& Window::Title( const char* A )
 //  SetWindowTextW( hWnd,U2W( strcat(strcat(strcpy(S,Caption),"  ↔  " ),A) ) );
   } return *this;
 }
+
+// Функция для конвертации HICON в формат GLFW (от Алисы из Яндекса)
+
 Window& Window::Icon( const char* A ) // по resource файлу здесь есть вопросы...
-{ //if( Caption ){
-  //HICON hIcon=LoadIcon( GetModuleHandle(NULL),A ); // ~~ hInstance
-//  glfwSetWindowIcon// ( GLFWwindow* window, int count, const GLFWimage* images);
-//  ( glfwWindow,1,(GLFWimage*)hIcon );
-//    SendMessage( glfwGetWin32Window( glfwWindow ), //GetActiveWindow(), //,
-//                 WM_SETICON,ICON_BIG,(LPARAM)hIcon );           //   ICON_SMALL
-//}
+{ if( Caption )
+  { HICON hIcon=LoadIcon( GetModuleHandle(NULL),A );      // ~~ hInstance
+    SendMessage( glfwGetWin32Window( glfwWindow ),        // GetActiveWindow(),
+                 WM_SETICON,ICON_BIG,(LPARAM)hIcon );     //? ICON_SMALL
+
+/*  glfwSetWindowIcon// ( GLFWwindow* window, int count, const GLFWimage* images);
+    ( glfwWindow,1,(GLFWimage*)hIcon+?? );
+      SendMessage( glfwGetWin32Window( glfwWindow ),      // GetActiveWindow(),
+                   WM_SETICON,ICON_BIG,(LPARAM)hIcon );         //   ICON_SMALL
+*/  }
   return *this;
 }
 Window& Window::Above()

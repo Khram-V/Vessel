@@ -18,6 +18,7 @@
 					<Add option="-fopenmp" />
 				</Compiler>
 				<Linker>
+					<Add option="--gc-sections" />
 					<Add library="gomp" />
 				</Linker>
 			</Target>
@@ -48,12 +49,12 @@
 				<Option parameters='Save\«Аврора».fef Save\~באסילי &quot;Save\ONR-5613_DDX-2000.fef&quot; &quot;Ships\Samples\Галеон Великих Испанских географических открытий.ftm&quot; &quot;Ships\History\Carrack «Mary Rose».fbm&quot; &quot;Save\Import\Perle2(DS).fef&quot; &quot;Ships\Fregate type 23-11.fbm&quot;' />
 				<Option projectLinkerOptionsRelation="2" />
 				<Linker>
+					<Add option="--gc-sections" />
 					<Add library="glu32" />
 				</Linker>
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="-fexpensive-optimizations" />
 			<Add option="-Os" />
 			<Add option="-funsigned-char" />
 			<Add option="-fexec-charset=UTF-8" />

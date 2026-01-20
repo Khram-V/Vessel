@@ -73,7 +73,13 @@ bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
     else PutMouse( message,LOWORD(lParam),HIWORD(lParam) );
   } else
   switch( message )
-  { case WM_MOVE: WindowX=LOWORD( lParam ),         // 03 перемещение по экрану
+  { //case WM_CREATE:                           // Настройка пропуска кликов мыши
+    // SetWindowLongPtr(hWnd, GWL_EXSTYLE,
+    // (LONG_PTR)(GetWindowLongPtr(hWnd, GWL_EXSTYLE)|WS_EX_LAYERED)); // | WS_EX_TRANSPARENT
+    // SetLayeredWindowAttributes( hWnd,0,200,LWA_ALPHA ); break; // Установка прозрачности
+    //case WM_NCHITTEST:                // Обработка системных операций с окном
+    //   return DefWindowProc( hWnd,message,wParam,lParam );
+    case WM_MOVE: WindowX=LOWORD( lParam ),         // 03 перемещение по экрану
                   WindowY=HIWORD( lParam ); break;
     case WM_SIZE: Width = LOWORD( lParam ),         // 05 изменение размеров
                   Height= HIWORD( lParam );         //    Refresh(); break;
@@ -106,9 +112,8 @@ bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
        default:
         if( !(HIWORD( lParam )&KF_REPEAT) )    // повторение F-команд исключено
           { if( wParam>=VK_F1 && wParam<=VK_F12 )Key=_F1+wParam-VK_F1; }
-      }
-      if( Key )PutChar( Key );                     // запись в буфер клавиатуры
-    }   break;
+      } if( Key )PutChar( Key );                   // запись в буфер клавиатуры
+    } break;
 //  case WM_TIMER: if( idEvent==wParam )         // 275 -> внутренняя процедура
 //                 { PutTimer(); return true; } break;
     case WM_CHAR:                              // 258 = WM_CHAR message handler
@@ -119,23 +124,14 @@ bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
         case VK_TAB   : Key=_Tab;   break;              // 9 -> _Tab (30)
         case VK_CANCEL: while( First )First->Close();   // 3 -> просто на выход
                      PostQuitMessage( VK_CANCEL ); return false;   // с обходом
-      } if( Key )PutChar( Key );                            // запись в буфер UniCode-16
-    }   break;
-#if 0
-    case WM_CLOSE: Close(); break;   //=16 - сигнал о возможности закрытия окна
-         // DestroyWindow( hWnd );  // внутри идёт запрос закрытия окна Windows
-    case WM_DESTROY:     // =2 здесь должны быть закрыты все внутренние объекты
-      if( !First )PostQuitMessage(0); break; // с кодом 0—нормальное завершение
-    case WM_QUIT:        // безусловно (вторично) срабатывает деструктор Window
-         while( First )First->Close(); break;
-#else
+      } if( Key )PutChar( Key );                   // запись в буфер UniCode-16
+    } break;
     case WM_CLOSE: Close(); // break;//=16 - сигнал о возможности закрытия окна
-      // DestroyWindow(hWnd); break;// внутри идёт запрос закрытия окна Windows
+     // DestroyWindow(hWnd); break; // внутри идёт запрос закрытия окна Windows
     case WM_DESTROY:     // =2 здесь должны быть закрыты все внутренние объекты
       if( !First )PostQuitMessage(0); break; // с кодом 0—нормальное завершение
     case WM_QUIT:        // безусловно (вторично) срабатывает деструктор Window
          while( First )First->Close();
-#endif
     default: return false; // DefWindowProc( hWnd,message,wParam,lParam );
   }          return true;  // освобождение очереди от нераспознанных на выход
 }
@@ -153,14 +149,14 @@ Window::Window( const char *_title, int x,int y, int w,int h )
   isTimer( 0 ),isMouse( false ),mSec( 0 ),idEvent( 12 ),    // tId + номер окна
   KeyPos( 0 ),KeyPas( 0 ),onKey( false ),extKey( NULL ),extTime( NULL )
 { //ATOM atom;
-  WNDCLASSW wc;
+  WNDCLASSW wc={ sizeof( WNDCLASSW ) };
   HINSTANCE hInstance=GetModuleHandle( NULL );
   PIXELFORMATDESCRIPTOR pfd; //={ sizeof(PIXELFORMATDESCRIPTOR) };
   RECT rectWorkArea;
    SystemParametersInfoW( SPI_GETWORKAREA,0,&rectWorkArea,0 );
    ScreenHeight=rectWorkArea.bottom-rectWorkArea.top;
    ScreenWidth=rectWorkArea.right-rectWorkArea.left;
-   ZeroMemory( &wc,sizeof( WNDCLASSW ) );
+// ZeroMemory( &wc,sizeof( WNDCLASSEXW ) );
 // memset( (void*)KeyBuffer,0,sizeof( KeyBuffer ) );
 //
 // включение нового объекта в конец простого списка - перечисления
@@ -172,20 +168,22 @@ Window::Window( const char *_title, int x,int y, int w,int h )
    }
 //  регистрация класса с особыми определениями для Microsoft Windows
 //
-   wc.style = CS_HREDRAW|CS_VREDRAW|CS_OWNDC;   // тип окна
-   wc.lpfnWndProc = WindowInterruptProcedure;  // адрес оконной функции
-// wc.cbClsExtra = 0;                         // дополнительные данные класса
-// wc.cbWndExtra = 0;                        // дополнительные данные для окна
+// wc.cbSize = sizeof(WNDCLASSEX);
+   wc.style = CS_HREDRAW|CS_VREDRAW|CS_OWNDC; // тип окна
+   wc.lpfnWndProc = WindowInterruptProcedure; // адрес оконной функции
+// wc.cbClsExtra = 0;                       // Ex: дополнительные данные класса
+// wc.cbWndExtra = 0;                       // ~ дополнительные данные для окна
    wc.hInstance = hInstance;                // дескриптор экземпляра приложения
    wc.hIcon=LoadIcon( hInstance,"Icon" );   // IDI_APPLICATION иконки для окна
    wc.hCursor=LoadCursor( NULL,IDC_ARROW ); // дескриптор курсора для окна
 // wc.hbrBackground=NULL; // GetStockObject( BLACK_BRUSH ) цвет заполнения окна
 // wc.lpszMenuName =NULL;                  // имя главного меню
    wc.lpszClassName=ws;                    // имя класса окна
- /*atom=*/ RegisterClassW( &wc );          // ==0 => "\n!\7RegisterClass\n "
+ /*atom=*/ RegisterClassW( &wc );          // Ex:==0 => "\n!\7RegisterClass\n "
    Locate( x,y,w,h );                      // -- без hWnd - только размерности
    hWnd = CreateWindowW                    // Create main window
-   ( wc.lpszClassName,                     // имя класса окна
+   ( //WS_EX_LAYERED | WS_EX_TRANSPARENT,  // Прозрачное, проницаемое для мышки
+     wc.lpszClassName,                     // имя класса окна
      _title ? U2W(_title):L"Window-Place", //   и заголовок окна
      ( _title ? WS_OVERLAPPEDWINDOW:0 )    // ? если без заголовка - нет рамки
               | WS_CLIPSIBLINGS | WS_CLIPCHILDREN
@@ -529,8 +527,10 @@ Window& Above(){ SetForegroundWindow( hWnd ); SetFocus( hWnd );
   SetActiveWindow( hWnd ); ShowWindow( hWnd,SW_SHOWNA ); return Refresh(); }
   while( isTimer>0 )if( !WinRequest() )WaitMessage(); glFinish(); WinExecute();
   while( isTimer )if( !WinRequest() )WaitMessage(); // до перезапуска таймера
+
 static void CALLBACK TimerProc(HWND hWind,UINT uMsg,UINT_PTR timerId,DWORD St);
   if( mSec )::SetTimer( hWnd,idEvent,mSec,TimerProc ); //... заведомо старт ...
+
 #define retkey return wctob( KeyBuffer[KeyPos].Key );
 #define retkey { fixed r=KeyBuffer[KeyPos].Key; return r<128?r:wctob( r ); }
 

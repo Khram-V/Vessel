@@ -187,7 +187,7 @@ explicit glContext(const Window*); // конструктор=пролог гра
 #define Xpm( X ) ( ( GetSystemMetrics( SM_CXSCREEN )*long( X ) )/100 )   // %%X
 #define Ypm( Y ) ( ( GetSystemMetrics( SM_CYSCREEN )*long( Y ) )/100 )   // %%Y
 //
-//!  Window(SDK) ++ GLFW для OpneGL
+//!  Window(SDK) ++ GLFW для OpenGL
 //!  Общие определения и процедуры управления наложенными фрагментами экрана
 //   реализуется создание, позиционирование, активизация и очистка фрагментов
 //

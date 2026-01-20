@@ -13,12 +13,38 @@
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option parameters='&quot;A-1201 Корвет-Б(а)&quot; &quot;БПК «Стерегущий»-61&quot;' />
+				<Option projectCompilerOptionsRelation="1" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-Os" />
 					<Add option="-fopenmp" />
+					<Add option="-DGLFW" />
 				</Compiler>
 				<Linker>
+					<Add option="-s" />
+					<Add option="--gc-sections" />
 					<Add library="gomp" />
+				</Linker>
+			</Target>
+			<Target title="Aurora_Storm_x">
+				<Option output="../WSpace/Dev/Aurora-GLFW_x" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../Vessel" />
+				<Option object_output="../../Work/Obj" />
+				<Option type="0" />
+				<Option compiler="gnu_gcc_stable32" />
+				<Option parameters='&quot;A-1201 Корвет-Б(а)&quot; &quot;БПК «Стерегущий»-61&quot;' />
+				<Compiler>
+					<Add option="-fopenmp" />
+					<Add option="-Wno-narrowing" />
+					<Add option="-Wno-volatile" />
+					<Add option="-DGLFW" />
+					<Add option="-D_GLFW_WIN32" />
+				</Compiler>
+				<Linker>
+					<Add option="-fopenmp" />
+					<Add library="gomp" />
+					<Add library="../../../SoftWare/Dev/Lib/libglfw3.a" />
 				</Linker>
 			</Target>
 			<Target title="Waves Profile">
@@ -26,9 +52,23 @@
 				<Option working_dir="../Vessel" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_stable" />
 				<Option use_console_runner="0" />
+				<Option projectCompilerOptionsRelation="1" />
 				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-Os" />
+					<Add option="-Wno-narrowing" />
+					<Add option="-Wno-volatile" />
+					<Add option="-DGLFW" />
+					<Add option="-D_GLFW_WIN32" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="pthread" />
+					<Add library="dl" />
+				</Linker>
 			</Target>
 			<Target title="Hull Theory">
 				<Option output="../WSpace/Dev/Hull-GLFW" prefix_auto="1" extension_auto="1" />
@@ -37,10 +77,15 @@
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option parameters="«Аврора»(а)" />
+				<Option projectCompilerOptionsRelation="2" />
+				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-fopenmp" />
+					<Add option="-DGLFW" />
+					<Add option="-D_GLFW_WIN32" />
 				</Compiler>
 				<Linker>
+					<Add option="--gc-sections" />
 					<Add library="gomp" />
 				</Linker>
 			</Target>
@@ -51,8 +96,16 @@
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Option use_console_runner="0" />
-				<Option parameters='&quot;ONR-5613_DDX-2000.fef&quot; &quot;Лидер эсминцев «Ташкент».fef&quot;' />
+				<Option parameters='Aurora.fef &quot;ONR-5613_DDX-2000.fef&quot; &quot;Лидер эсминцев «Ташкент».fef&quot;' />
+				<Option projectCompilerOptionsRelation="2" />
 				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-DGLFW" />
+					<Add option="-D_GLFW_WIN32" />
+				</Compiler>
+				<Linker>
+					<Add option="--gc-sections" />
+				</Linker>
 			</Target>
 			<Target title="Window-shapes">
 				<Option output="../WSpace/Dev/GLFW-Shapes-A" prefix_auto="1" extension_auto="1" />
@@ -60,7 +113,12 @@
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option projectCompilerOptionsRelation="1" />
 				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-DGLFW" />
+					<Add option="-D_GLFW_WIN32" />
+				</Compiler>
 			</Target>
 			<Target title="Window-trial">
 				<Option output="../WSpace/Dev/GLFW-Trial-A" prefix_auto="1" extension_auto="1" />
@@ -68,8 +126,12 @@
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
 				<Option compiler="gcc" />
+				<Option projectCompilerOptionsRelation="1" />
+				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-fopenmp" />
+					<Add option="-DGLFW" />
+					<Add option="-D_GLFW_WIN32" />
 				</Compiler>
 				<Linker>
 					<Add library="gomp" />
@@ -77,14 +139,16 @@
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="-Os" />
+			<Add option="-O3" />
 			<Add option="-funsigned-char" />
 			<Add option="-Wunused" />
+			<Add option="-ffunction-sections" />
 			<Add option="-DGLFW" />
 			<Add option="-D_GLFW_WIN32" />
 			<Add directory="../Window/GLFW" />
 		</Compiler>
 		<Linker>
+			<Add option="-O3" />
 			<Add option="-s" />
 			<Add library="opengl32" />
 			<Add library="glu32" />
@@ -157,40 +221,50 @@
 		</Unit>
 		<Unit filename="../Storm/Aurora.cpp">
 			<Option target="Aurora Storm" />
+			<Option target="Aurora_Storm_x" />
 		</Unit>
 		<Unit filename="../Storm/Aurora.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="../Storm/Aurora.inc">
 			<Option target="Aurora Storm" />
+			<Option target="Aurora_Storm_x" />
 		</Unit>
 		<Unit filename="../Storm/Flex.cpp">
 			<Option target="Aurora Storm" />
 			<Option target="Ship Viewer" />
+			<Option target="Aurora_Storm_x" />
 		</Unit>
 		<Unit filename="../Storm/Flex.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="../Storm/Vs-conf.cpp">
 			<Option target="Aurora Storm" />
+			<Option target="Aurora_Storm_x" />
 		</Unit>
 		<Unit filename="../Storm/Vs-draw.cpp">
 			<Option target="Aurora Storm" />
+			<Option target="Aurora_Storm_x" />
 		</Unit>
 		<Unit filename="../Storm/Vs-hull.cpp">
 			<Option target="Aurora Storm" />
+			<Option target="Aurora_Storm_x" />
 		</Unit>
 		<Unit filename="../Storm/Vs-math.cpp">
 			<Option target="Aurora Storm" />
+			<Option target="Aurora_Storm_x" />
 		</Unit>
 		<Unit filename="../Storm/Vs-regst.cpp">
 			<Option target="Aurora Storm" />
+			<Option target="Aurora_Storm_x" />
 		</Unit>
 		<Unit filename="../Storm/Vs-view.cpp">
 			<Option target="Aurora Storm" />
+			<Option target="Aurora_Storm_x" />
 		</Unit>
 		<Unit filename="../Storm/Vs-write.cpp">
 			<Option target="Aurora Storm" />
+			<Option target="Aurora_Storm_x" />
 		</Unit>
 		<Unit filename="../Storm/Wave/Draw.cpp">
 			<Option target="Waves Profile" />
@@ -206,9 +280,11 @@
 		</Unit>
 		<Unit filename="../Storm/Ws-field.cpp">
 			<Option target="Aurora Storm" />
+			<Option target="Aurora_Storm_x" />
 		</Unit>
 		<Unit filename="../Storm/Ws-view.cpp">
 			<Option target="Aurora Storm" />
+			<Option target="Aurora_Storm_x" />
 		</Unit>
 		<Unit filename="../Tools/Allocate.cpp">
 			<Option target="Aurora Storm" />
@@ -216,6 +292,7 @@
 			<Option target="Window-shapes" />
 			<Option target="Hull Theory" />
 			<Option target="Ship Viewer" />
+			<Option target="Aurora_Storm_x" />
 		</Unit>
 		<Unit filename="../Tools/Allocate.h">
 			<Option target="&lt;{~None~}&gt;" />
@@ -224,6 +301,7 @@
 			<Option target="Aurora Storm" />
 			<Option target="Hull Theory" />
 			<Option target="Ship Viewer" />
+			<Option target="Aurora_Storm_x" />
 		</Unit>
 		<Unit filename="../Tools/Glut/Geometry.cpp">
 			<Option target="Window-shapes" />
@@ -258,6 +336,7 @@
 			<Option target="Window-shapes" />
 			<Option target="Ship Viewer" />
 			<Option target="Window-trial" />
+			<Option target="Aurora_Storm_x" />
 		</Unit>
 		<Unit filename="../Window/ConIO.h">
 			<Option target="&lt;{~None~}&gt;" />
@@ -271,69 +350,184 @@
 		<Unit filename="../Window/Font.cpp" />
 		<Unit filename="../Window/GLFW/context.c">
 			<Option compilerVar="CC" />
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Hull Theory" />
+			<Option target="Ship Viewer" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
 		</Unit>
-		<Unit filename="../Window/GLFW/egl_context.c">
-			<Option compilerVar="CC" />
+		<Unit filename="../Window/GLFW/glfw3.h">
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Hull Theory" />
+			<Option target="Ship Viewer" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
 		</Unit>
-		<Unit filename="../Window/GLFW/glfw3.h" />
-		<Unit filename="../Window/GLFW/glfw3native.h" />
-		<Unit filename="../Window/GLFW/glfw_config.h" />
+		<Unit filename="../Window/GLFW/glfw3native.h">
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Hull Theory" />
+			<Option target="Ship Viewer" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
+		</Unit>
+		<Unit filename="../Window/GLFW/glfw_config.h">
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Hull Theory" />
+			<Option target="Ship Viewer" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
+		</Unit>
 		<Unit filename="../Window/GLFW/init.c">
 			<Option compilerVar="CC" />
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Hull Theory" />
+			<Option target="Ship Viewer" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
 		</Unit>
 		<Unit filename="../Window/GLFW/input.c">
 			<Option compilerVar="CC" />
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Hull Theory" />
+			<Option target="Ship Viewer" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
 		</Unit>
-		<Unit filename="../Window/GLFW/internal.h" />
+		<Unit filename="../Window/GLFW/internal.h">
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Hull Theory" />
+			<Option target="Ship Viewer" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
+		</Unit>
 		<Unit filename="../Window/GLFW/monitor.c">
 			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Window/GLFW/null_init.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Window/GLFW/null_monitor.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Window/GLFW/null_platform.h" />
-		<Unit filename="../Window/GLFW/null_window.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../Window/GLFW/osmesa_context.c">
-			<Option compilerVar="CC" />
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Hull Theory" />
+			<Option target="Ship Viewer" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
 		</Unit>
 		<Unit filename="../Window/GLFW/platform.c">
 			<Option compilerVar="CC" />
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Hull Theory" />
+			<Option target="Ship Viewer" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
 		</Unit>
-		<Unit filename="../Window/GLFW/platform.h" />
-		<Unit filename="../Window/GLFW/vulkan.c">
-			<Option compilerVar="CC" />
+		<Unit filename="../Window/GLFW/platform.h">
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Hull Theory" />
+			<Option target="Ship Viewer" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
 		</Unit>
 		<Unit filename="../Window/GLFW/wgl_context.c">
 			<Option compilerVar="CC" />
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Hull Theory" />
+			<Option target="Ship Viewer" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
 		</Unit>
 		<Unit filename="../Window/GLFW/win32_init.c">
 			<Option compilerVar="CC" />
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Hull Theory" />
+			<Option target="Ship Viewer" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
 		</Unit>
 		<Unit filename="../Window/GLFW/win32_module.c">
 			<Option compilerVar="CC" />
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Hull Theory" />
+			<Option target="Ship Viewer" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
 		</Unit>
 		<Unit filename="../Window/GLFW/win32_monitor.c">
 			<Option compilerVar="CC" />
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Hull Theory" />
+			<Option target="Ship Viewer" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
 		</Unit>
-		<Unit filename="../Window/GLFW/win32_platform.h" />
+		<Unit filename="../Window/GLFW/win32_platform.h">
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Hull Theory" />
+			<Option target="Ship Viewer" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
+		</Unit>
 		<Unit filename="../Window/GLFW/win32_thread.c">
 			<Option compilerVar="CC" />
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Hull Theory" />
+			<Option target="Ship Viewer" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
 		</Unit>
-		<Unit filename="../Window/GLFW/win32_thread.h" />
+		<Unit filename="../Window/GLFW/win32_thread.h">
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Hull Theory" />
+			<Option target="Ship Viewer" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
+		</Unit>
 		<Unit filename="../Window/GLFW/win32_time.c">
 			<Option compilerVar="CC" />
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Hull Theory" />
+			<Option target="Ship Viewer" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
 		</Unit>
-		<Unit filename="../Window/GLFW/win32_time.h" />
+		<Unit filename="../Window/GLFW/win32_time.h">
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Hull Theory" />
+			<Option target="Ship Viewer" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
+		</Unit>
 		<Unit filename="../Window/GLFW/win32_window.c">
 			<Option compilerVar="CC" />
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Hull Theory" />
+			<Option target="Ship Viewer" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
 		</Unit>
 		<Unit filename="../Window/GLFW/window.c">
 			<Option compilerVar="CC" />
+			<Option target="Aurora Storm" />
+			<Option target="Waves Profile" />
+			<Option target="Hull Theory" />
+			<Option target="Ship Viewer" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
 		</Unit>
 		<Unit filename="../Window/Julian.cpp">
 			<Option target="Aurora Storm" />
@@ -341,6 +535,7 @@
 			<Option target="Hull Theory" />
 			<Option target="Ship Viewer" />
 			<Option target="Window-shapes" />
+			<Option target="Aurora_Storm_x" />
 		</Unit>
 		<Unit filename="../Window/Sym_CCCP.c">
 			<Option compilerVar="CC" />
@@ -353,6 +548,7 @@
 			<Option target="Waves Profile" />
 			<Option target="Window-shapes" />
 			<Option target="Ship Viewer" />
+			<Option target="Aurora_Storm_x" />
 		</Unit>
 		<Unit filename="../Window/View.h">
 			<Option target="Waves Profile" />
@@ -394,6 +590,7 @@
 			<Option target="Hull Theory" />
 			<Option target="Ship Viewer" />
 			<Option target="Window-shapes" />
+			<Option target="Aurora_Storm_x" />
 		</Unit>
 		<Extensions>
 			<lib_finder disable_auto="1" />

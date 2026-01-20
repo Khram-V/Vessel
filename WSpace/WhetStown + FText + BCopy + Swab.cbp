@@ -6,6 +6,25 @@
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
+			<Target title="Alice">
+				<Option platforms="Windows;" />
+				<Option output="Dev/Alice" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="Data" />
+				<Option object_output="../../Work/Obj" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option projectCompilerOptionsRelation="1" />
+				<Option projectLinkerOptionsRelation="1" />
+				<Compiler>
+					<Add option="-std=gnu++98" />
+					<Add option="-funsigned-char" />
+				</Compiler>
+				<Linker>
+					<Add library="comdlg32" />
+					<Add library="comctl32" />
+					<Add library="gdi32" />
+				</Linker>
+			</Target>
 			<Target title="FText">
 				<Option output="../../../Work/FText" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Data" />
@@ -165,6 +184,10 @@
 		<Unit filename="../Window/UniCode.cpp">
 			<Option target="DC3-Interpolation-Extrapolation" />
 			<Option target="Design_Fonts" />
+		</Unit>
+		<Unit filename="../Working/Alice.c">
+			<Option compilerVar="CC" />
+			<Option target="Alice" />
 		</Unit>
 		<Unit filename="../Working/Contour.cpp">
 			<Option target="DC3-Interpolation-Extrapolation" />
