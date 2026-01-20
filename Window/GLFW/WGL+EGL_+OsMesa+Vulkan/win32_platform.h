@@ -1,6 +1,30 @@
-//
+//========================================================================
 // GLFW 3.5 Win32 - www.glfw.org
+//------------------------------------------------------------------------
+// Copyright (c) 2002-2006 Marcus Geelnard
+// Copyright (c) 2006-2019 Camilla Löwy <elmindreda@glfw.org>
 //
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would
+//    be appreciated but is not required.
+//
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+//
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//========================================================================
+
 // We don't need all the fancy stuff
 #ifndef NOMINMAX
  #define NOMINMAX
@@ -95,7 +119,8 @@
 
 #if WINVER < 0x0601
 typedef struct
-{   DWORD cbSize;
+{
+    DWORD cbSize;
     DWORD ExtStatus;
 } CHANGEFILTERSTRUCT;
 #ifndef MSGFLT_ALLOW
@@ -319,6 +344,20 @@ typedef BOOL (WINAPI * PFN_wglShareLists)(HGLRC,HGLRC);
 #define wglMakeCurrent _glfw.wgl.MakeCurrent
 #define wglShareLists _glfw.wgl.ShareLists
 
+typedef VkFlags VkWin32SurfaceCreateFlagsKHR;
+
+typedef struct VkWin32SurfaceCreateInfoKHR
+{
+    VkStructureType                 sType;
+    const void*                     pNext;
+    VkWin32SurfaceCreateFlagsKHR    flags;
+    HINSTANCE                       hinstance;
+    HWND                            hwnd;
+} VkWin32SurfaceCreateInfoKHR;
+
+typedef VkResult (APIENTRY *PFN_vkCreateWin32SurfaceKHR)(VkInstance,const VkWin32SurfaceCreateInfoKHR*,const VkAllocationCallbacks*,VkSurfaceKHR*);
+typedef VkBool32 (APIENTRY *PFN_vkGetPhysicalDeviceWin32PresentationSupportKHR)(VkPhysicalDevice,uint32_t);
+
 #define GLFW_WIN32_WINDOW_STATE         _GLFWwindowWin32  win32;
 #define GLFW_WIN32_LIBRARY_WINDOW_STATE _GLFWlibraryWin32 win32;
 #define GLFW_WIN32_MONITOR_STATE        _GLFWmonitorWin32 win32;
@@ -326,6 +365,7 @@ typedef BOOL (WINAPI * PFN_wglShareLists)(HGLRC,HGLRC);
 
 #define GLFW_WGL_CONTEXT_STATE          _GLFWcontextWGL wgl;
 #define GLFW_WGL_LIBRARY_CONTEXT_STATE  _GLFWlibraryWGL wgl;
+
 
 // WGL-specific per-context data
 //
@@ -556,6 +596,14 @@ void _glfwSetCursorWin32(_GLFWwindow* window, _GLFWcursor* cursor);
 void _glfwSetClipboardStringWin32(const char* string);
 const char* _glfwGetClipboardStringWin32(void);
 
+EGLenum _glfwGetEGLPlatformWin32(EGLint** attribs);
+EGLNativeDisplayType _glfwGetEGLNativeDisplayWin32(void);
+EGLNativeWindowType _glfwGetEGLNativeWindowWin32(_GLFWwindow* window);
+
+void _glfwGetRequiredInstanceExtensionsWin32(char** extensions);
+GLFWbool _glfwGetPhysicalDevicePresentationSupportWin32(VkInstance instance, VkPhysicalDevice device, uint32_t queuefamily);
+VkResult _glfwCreateWindowSurfaceWin32(VkInstance instance, _GLFWwindow* window, const VkAllocationCallbacks* allocator, VkSurfaceKHR* surface);
+
 void _glfwFreeMonitorWin32(_GLFWmonitor* monitor);
 void _glfwGetMonitorPosWin32(_GLFWmonitor* monitor, int* xpos, int* ypos);
 void _glfwGetMonitorContentScaleWin32(_GLFWmonitor* monitor, float* xscale, float* yscale);
@@ -564,9 +612,16 @@ GLFWvidmode* _glfwGetVideoModesWin32(_GLFWmonitor* monitor, int* count);
 GLFWbool _glfwGetVideoModeWin32(_GLFWmonitor* monitor, GLFWvidmode* mode);
 GLFWbool _glfwGetGammaRampWin32(_GLFWmonitor* monitor, GLFWgammaramp* ramp);
 void _glfwSetGammaRampWin32(_GLFWmonitor* monitor, const GLFWgammaramp* ramp);
-
+/*
+GLFWbool _glfwInitJoysticksWin32(void);
+void _glfwTerminateJoysticksWin32(void);
+GLFWbool _glfwPollJoystickWin32(_GLFWjoystick* js, int mode);
+const char* _glfwGetMappingNameWin32(void);
+void _glfwUpdateGamepadGUIDWin32(char* guid);
+*/
 GLFWbool _glfwInitWGL(void);
 void _glfwTerminateWGL(void);
 GLFWbool _glfwCreateContextWGL(_GLFWwindow* window,
                                const _GLFWctxconfig* ctxconfig,
                                const _GLFWfbconfig* fbconfig);
+

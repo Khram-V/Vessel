@@ -27,7 +27,7 @@
 
 #include "internal.h"
 
-#include <assert.h>
+//#include <assert.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -229,7 +229,7 @@ GLFWAPI int glfwVulkanSupported(void)
 
 GLFWAPI const char** glfwGetRequiredInstanceExtensions(uint32_t* count)
 {
-    assert(count != NULL);
+//  assert(count != NULL);
 
     *count = 0;
 
@@ -249,7 +249,7 @@ GLFWAPI GLFWvkproc glfwGetInstanceProcAddress(VkInstance instance,
                                               const char* procname)
 {
     GLFWvkproc proc;
-    assert(procname != NULL);
+//  assert(procname != NULL);
 
     _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
 
@@ -276,8 +276,8 @@ GLFWAPI int glfwGetPhysicalDevicePresentationSupport(VkInstance instance,
 {
     _GLFW_REQUIRE_INIT_OR_RETURN(GLFW_FALSE);
 
-    assert(instance != VK_NULL_HANDLE);
-    assert(device != VK_NULL_HANDLE);
+//  assert(instance != VK_NULL_HANDLE);
+//  assert(device != VK_NULL_HANDLE);
 
     if (!_glfwInitVulkan(_GLFW_REQUIRE_LOADER))
         return GLFW_FALSE;
@@ -299,15 +299,15 @@ GLFWAPI VkResult glfwCreateWindowSurface(VkInstance instance,
                                          const VkAllocationCallbacks* allocator,
                                          VkSurfaceKHR* surface)
 {
-    assert(surface != NULL);
+//  assert(surface != NULL);
 
     *surface = VK_NULL_HANDLE;
 
     _GLFW_REQUIRE_INIT_OR_RETURN(VK_ERROR_INITIALIZATION_FAILED);
 
     _GLFWwindow* window = (_GLFWwindow*) handle;
-    assert(window != NULL);
-    assert(instance != VK_NULL_HANDLE);
+//  assert(window != NULL);
+//  assert(instance != VK_NULL_HANDLE);
 
     if (!_glfwInitVulkan(_GLFW_REQUIRE_LOADER))
         return VK_ERROR_INITIALIZATION_FAILED;

@@ -29,7 +29,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
+//#include <assert.h>
 
 static void makeContextCurrentOSMesa(_GLFWwindow* window)
 {
@@ -189,7 +189,7 @@ void _glfwTerminateOSMesa(void)
 
 #define SET_ATTRIB(a, v) \
 { \
-    assert(((size_t) index + 1) < sizeof(attribs) / sizeof(attribs[0])); \
+ /* assert(((size_t) index + 1) < sizeof(attribs) / sizeof(attribs[0])); */ \
     attribs[index++] = a; \
     attribs[index++] = v; \
 }
@@ -300,7 +300,7 @@ GLFWAPI int glfwGetOSMesaColorBuffer(GLFWwindow* handle, int* width,
     _GLFW_REQUIRE_INIT_OR_RETURN(GLFW_FALSE);
 
     _GLFWwindow* window = (_GLFWwindow*) handle;
-    assert(window != NULL);
+//  assert(window != NULL);
 
     if (window->context.source != GLFW_OSMESA_CONTEXT_API)
     {
@@ -340,7 +340,7 @@ GLFWAPI int glfwGetOSMesaDepthBuffer(GLFWwindow* handle,
     _GLFW_REQUIRE_INIT_OR_RETURN(GLFW_FALSE);
 
     _GLFWwindow* window = (_GLFWwindow*) handle;
-    assert(window != NULL);
+//  assert(window != NULL);
 
     if (window->context.source != GLFW_OSMESA_CONTEXT_API)
     {
@@ -374,7 +374,7 @@ GLFWAPI OSMesaContext glfwGetOSMesaContext(GLFWwindow* handle)
     _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
 
     _GLFWwindow* window = (_GLFWwindow*) handle;
-    assert(window != NULL);
+//  assert(window != NULL);
 
     if (window->context.source != GLFW_OSMESA_CONTEXT_API)
     {

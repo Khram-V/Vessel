@@ -1,10 +1,34 @@
-//
+//========================================================================
 // GLFW 3.5 - www.glfw.org
+//------------------------------------------------------------------------
+// Copyright (c) 2002-2006 Marcus Geelnard
+// Copyright (c) 2006-2019 Camilla Löwy <elmindreda@glfw.org>
 //
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would
+//    be appreciated but is not required.
+//
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+//
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//========================================================================
 
 #include "internal.h"
 //#include "mappings.h"
 
+//#include <assert.h>
 #include <float.h>
 #include <math.h>
 #include <stdlib.h>
@@ -12,6 +36,18 @@
 
 // Internal key state used for sticky keys
 #define _GLFW_STICK 3
+
+// Internal constants for gamepad mapping source types
+#define _GLFW_JOYSTICK_AXIS     1
+#define _GLFW_JOYSTICK_BUTTON   2
+#define _GLFW_JOYSTICK_HATBIT   3
+
+#define GLFW_MOD_MASK (GLFW_MOD_SHIFT | \
+                       GLFW_MOD_CONTROL | \
+                       GLFW_MOD_ALT | \
+                       GLFW_MOD_SUPER | \
+                       GLFW_MOD_CAPS_LOCK | \
+                       GLFW_MOD_NUM_LOCK)
 
 //////////////////////////////////////////////////////////////////////////
 //////                         GLFW event API                       //////

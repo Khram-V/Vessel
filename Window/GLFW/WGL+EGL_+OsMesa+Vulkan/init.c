@@ -1,6 +1,29 @@
-//
+//========================================================================
 // GLFW 3.5 - www.glfw.org
+//------------------------------------------------------------------------
+// Copyright (c) 2002-2006 Marcus Geelnard
+// Copyright (c) 2006-2018 Camilla Löwy <elmindreda@glfw.org>
 //
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would
+//    be appreciated but is not required.
+//
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+//
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//========================================================================
 
 #include "internal.h"
 
@@ -8,6 +31,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
+//#include <assert.h>
+
 
 // NOTE: The global variables below comprise all mutable global data in GLFW
 //       Any other mutable global variable is a bug
@@ -27,6 +52,20 @@ static _GLFWinitconfig _glfwInitHints =
     .hatButtons = GLFW_TRUE,
     .angleType = GLFW_ANGLE_PLATFORM_TYPE_NONE,
     .platformID = GLFW_ANY_PLATFORM,
+    .vulkanLoader = NULL,
+    .ns =
+    {
+        .menubar = GLFW_TRUE,
+        .chdir = GLFW_TRUE
+    },
+    .x11 =
+    {
+        .xcbVulkanSurface = GLFW_TRUE,
+    },
+    .wl =
+    {
+        .libdecorMode = GLFW_WAYLAND_PREFER_LIBDECOR
+    },
 };
 
 // The allocation function used when no custom allocator is set
@@ -80,6 +119,8 @@ static void terminate(void)
     _glfw.mappings = NULL;
     _glfw.mappingCount = 0;
 */
+    _glfwTerminateVulkan();
+//  _glfw.platform.terminateJoysticks();
     _glfw.platform.terminate();
 
     _glfw.initialized = GLFW_FALSE;
@@ -389,7 +430,11 @@ GLFWAPI int glfwInit(void)
 }
 
 GLFWAPI void glfwTerminate(void)
-{ if (!_glfw.initialized)return; terminate();
+{
+    if (!_glfw.initialized)
+        return;
+
+    terminate();
 }
 
 GLFWAPI void glfwInitHint(int hint, int value)
@@ -404,6 +449,18 @@ GLFWAPI void glfwInitHint(int hint, int value)
             return;
         case GLFW_PLATFORM:
             _glfwInitHints.platformID = value;
+            return;
+        case GLFW_COCOA_CHDIR_RESOURCES:
+            _glfwInitHints.ns.chdir = value;
+            return;
+        case GLFW_COCOA_MENUBAR:
+            _glfwInitHints.ns.menubar = value;
+            return;
+        case GLFW_X11_XCB_VULKAN_SURFACE:
+            _glfwInitHints.x11.xcbVulkanSurface = value;
+            return;
+        case GLFW_WAYLAND_LIBDECOR:
+            _glfwInitHints.wl.libdecorMode = value;
             return;
     }
 
@@ -422,6 +479,11 @@ GLFWAPI void glfwInitAllocator(const GLFWallocator* allocator)
     }
     else
         memset(&_glfwInitAllocator, 0, sizeof(GLFWallocator));
+}
+
+GLFWAPI void glfwInitVulkanLoader(PFN_vkGetInstanceProcAddr loader)
+{
+    _glfwInitHints.vulkanLoader = loader;
 }
 
 GLFWAPI void glfwGetVersion(int* major, int* minor, int* rev)

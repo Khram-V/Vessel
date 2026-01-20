@@ -1,11 +1,36 @@
-//
+//========================================================================
 // GLFW 3.5 - www.glfw.org
+//------------------------------------------------------------------------
+// Copyright (c) 2002-2006 Marcus Geelnard
+// Copyright (c) 2006-2016 Camilla Löwy <elmindreda@glfw.org>
 //
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgment in the product documentation would
+//    be appreciated but is not required.
+//
+// 2. Altered source versions must be plainly marked as such, and must not
+//    be misrepresented as being the original software.
+//
+// 3. This notice may not be removed or altered from any source
+//    distribution.
+//
+//========================================================================
+
 #include "internal.h"
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
 #include <stdio.h>
+
 
 //////////////////////////////////////////////////////////////////////////
 //////                       GLFW internal API                      //////
@@ -19,7 +44,9 @@
 //
 GLFWbool _glfwIsValidContextConfig(const _GLFWctxconfig* ctxconfig)
 {
-    if (ctxconfig->source != GLFW_NATIVE_CONTEXT_API)
+    if (ctxconfig->source != GLFW_NATIVE_CONTEXT_API &&
+        ctxconfig->source != GLFW_EGL_CONTEXT_API &&
+        ctxconfig->source != GLFW_OSMESA_CONTEXT_API)
     {
         _glfwInputError(GLFW_INVALID_ENUM,
                         "Invalid context creation API 0x%08X",
@@ -28,7 +55,8 @@ GLFWbool _glfwIsValidContextConfig(const _GLFWctxconfig* ctxconfig)
     }
 
     if (ctxconfig->client != GLFW_NO_API &&
-        ctxconfig->client != GLFW_OPENGL_API)
+        ctxconfig->client != GLFW_OPENGL_API &&
+        ctxconfig->client != GLFW_OPENGL_ES_API)
     {
         _glfwInputError(GLFW_INVALID_ENUM,
                         "Invalid client API 0x%08X",
@@ -577,6 +605,7 @@ GLFWbool _glfwStringInExtensionString(const char* string, const char* extensions
 
     return GLFW_TRUE;
 }
+
 
 //////////////////////////////////////////////////////////////////////////
 //////                        GLFW public API                       //////
