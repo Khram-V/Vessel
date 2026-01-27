@@ -70,7 +70,7 @@ bool View::Mouse( int button, int x,int y )    // и её же указания 
   } if( ret )return( Draw() );
   return Place::Mouse( button,x,y );
 }
-bool View::KeyBoard( fixed key )   // к спуску из внешних виртуальных транзакций
+bool View::KeyBoard( fixed key )  // к спуску из внешних виртуальных транзакций
 { static Real Di=0; if( !Di )Di=Distance;  // запоминается из первого обращения
          Real Ds=6*Distance/Width;
   switch( key )
@@ -82,8 +82,16 @@ bool View::KeyBoard( fixed key )   // к спуску из внешних вир
                 if( ScanStatus()&SHIFT )lookY+=Ds; else eyeY++; break;
     case _Down: if( ScanStatus()&CTRL  )Distance/=1.1; else
                 if( ScanStatus()&SHIFT )lookY-=Ds; else eyeY--; break;
-    case _Home: Distance=Di,             // ...от точки взгляда до места обзора
+    case _Home: Distance=Di,            // ... от точки взгляда до места обзора
           eyeX=-130,eyeY=-10,eyeZ=0; lookX=-1,lookY=-1,lookZ=0; break;
+    case _Tab: if( ScanStatus()&SHIFT ){  // ... прозрачность графического окна
+#ifdef GLFW
+      HWND hWnd=GetFocus();  // в активированном фокусе под клавиатурой Windows
+#endif
+      LONG_PTR Style=GetWindowLongPtr( hWnd,GWL_EXSTYLE )^WS_EX_LAYERED;
+                     SetWindowLongPtr( hWnd,GWL_EXSTYLE,Style );
+                     SetLayeredWindowAttributes( hWnd,0,180,LWA_ALPHA ); break;
+    }                                    // | WS_EX_TRANSPARENT
    default: return Window::KeyBoard(key);// передача в цикл ожидания клавиатуры
   } Draw(); return true;                 // либо - запрос от клавиатуры погашен
 }
@@ -131,10 +139,10 @@ bool View::KeyBoard( fixed key )   // к спуску из внешних вир
 // glLightfv( GL_LIGHT1,GL_SPOT_DIRECTION,    (const float[]){ D, D, D,1});
 // glLighti ( GL_LIGHT1,GL_SPOT_CUTOFF,90 );
 //! Рендеринг
-#define Light( I )                                                  \
-   glLightfv( GL_LIGHT##I,GL_AMBIENT, (const float[]){.0,.0,.0,1}); \
-   glLightfv( GL_LIGHT##I,GL_DIFFUSE, (const float[]){.5,.5,.5,1}); \
-   glLightfv( GL_LIGHT##I,GL_SPECULAR,(const float[]){.8,.8,.8,1}); \
+#define Light( I ) \
+   glLightfv( GL_LIGHT##I,GL_AMBIENT, (const float[]){.0,.0,.0,1} ); \
+   glLightfv( GL_LIGHT##I,GL_DIFFUSE, (const float[]){.5,.5,.5,1} ); \
+   glLightfv( GL_LIGHT##I,GL_SPECULAR,(const float[]){.8,.8,.8,1} ); \
    glLighti ( GL_LIGHT##I,GL_SPOT_CUTOFF,45 );
    Light( 0 ) glLightfv( GL_LIGHT0,GL_POSITION,      (const float[]){0,0,1,0 });
               glLightfv( GL_LIGHT0,GL_SPOT_DIRECTION,(const float[]){0,0,-1  });

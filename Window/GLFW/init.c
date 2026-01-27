@@ -344,46 +344,27 @@ void _glfwInputError(int code, const char* format, ...)
 
 GLFWAPI int glfwInit(void)
 {
-    if (_glfw.initialized)
-        return GLFW_TRUE;
-
+    if (_glfw.initialized)return GLFW_TRUE;
     memset(&_glfw, 0, sizeof(_glfw));
     _glfw.hints.init = _glfwInitHints;
-
     _glfw.allocator = _glfwInitAllocator;
-    if (!_glfw.allocator.allocate)
-    {
-        _glfw.allocator.allocate   = defaultAllocate;
+    if(!_glfw.allocator.allocate)
+    {   _glfw.allocator.allocate   = defaultAllocate;
         _glfw.allocator.reallocate = defaultReallocate;
         _glfw.allocator.deallocate = defaultDeallocate;
     }
-
-    if (!_glfwSelectPlatform(_glfw.hints.init.platformID, &_glfw.platform))
-        return GLFW_FALSE;
-
-    if (!_glfw.platform.init())
-    {
-        terminate();
-        return GLFW_FALSE;
-    }
-
-    if (!_glfwPlatformCreateMutex(&_glfw.errorLock) ||
-        !_glfwPlatformCreateTls(&_glfw.errorSlot) ||
-        !_glfwPlatformCreateTls(&_glfw.contextSlot))
-    {
-        terminate();
-        return GLFW_FALSE;
-    }
-
-    _glfwPlatformSetTls(&_glfw.errorSlot, &_glfwMainThreadError);
+    if (!_glfwSelectPlatform(_glfw.hints.init.platformID,&_glfw.platform))return GLFW_FALSE;
+    if (!_glfw.platform.init()){ terminate(); return GLFW_FALSE; }
+    if (!_glfwPlatformCreateMutex(&_glfw.errorLock)
+     || !_glfwPlatformCreateTls(&_glfw.errorSlot)
+     || !_glfwPlatformCreateTls(&_glfw.contextSlot)){ terminate(); return GLFW_FALSE; }
+    _glfwPlatformSetTls( &_glfw.errorSlot,&_glfwMainThreadError );
 
 //  _glfwInitGamepadMappings();
 
     _glfwPlatformInitTimer();
     _glfw.timer.offset = _glfwPlatformGetTimerValue();
-
     _glfw.initialized = GLFW_TRUE;
-
     glfwDefaultWindowHints();
     return GLFW_TRUE;
 }

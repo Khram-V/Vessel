@@ -2,7 +2,7 @@
 // GLFW 3.5 - www.glfw.org
 //
 #pragma once
-#define _GLFW_WIN32
+//#define _GLFW_WIN32
 #define GLFW_INCLUDE_NONE
 #include "../GLFW/glfw3.h"
 

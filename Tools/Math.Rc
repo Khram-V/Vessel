@@ -1,4 +1,4 @@
 //
 // Icon resources
 //
-Math ICON "Icon/Math.ico"
+Icon ICON "Icon/Math.ico"

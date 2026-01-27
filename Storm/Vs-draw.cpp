@@ -6,7 +6,7 @@
 #include "Aurora.h"       // объекты и производные операции с корпусом на волне
 
 Hull& Hull::Contour_Lines()        // рисуем контуры габаритного прямоугольного
-{ glAct( this );                   // параллелепипеда по заданным размерениям
+{ //glAct( this );                   // параллелепипеда по заданным размерениям
   glLineWidth( 0.05 );             // сглаживание линий
   glEnable( GL_LINE_SMOOTH );
 #define V(a,b,c)glVertex3dv \

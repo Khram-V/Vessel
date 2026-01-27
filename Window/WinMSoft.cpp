@@ -122,6 +122,7 @@ bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
       switch( Key=wParam )
       { case VK_BACK  : Key=_BkSp;  break;              // 8 -> _BkSp(14)
         case VK_TAB   : Key=_Tab;   break;              // 9 -> _Tab (30)
+//      case VK_SPACE : Key=_Blank; break;
         case VK_CANCEL: while( First )First->Close();   // 3 -> просто на выход
                      PostQuitMessage( VK_CANCEL ); return false;   // с обходом
       } if( Key )PutChar( Key );                   // запись в буфер UniCode-16
@@ -205,8 +206,8 @@ Window::Window( const char *_title, int x,int y, int w,int h )
                | PFD_SUPPORT_OPENGL  // Support OpenGL calls in window
                | PFD_DOUBLEBUFFER;   // Double buffered mode ~ PFD_SWAP_COPY | PFD_SWAP_LAYER_BUFFERS | PFD_GENERIC_FORMAT
    pfd.iPixelType = PFD_TYPE_RGBA;   // RGBA Color mode
-   pfd.cColorBits = 24;   // 32
-   pfd.cDepthBits = 16;   // 32
+   pfd.cColorBits = 24; // 32
+   pfd.cDepthBits = 24; // 16;   // 32
    pfd.iLayerType = PFD_MAIN_PLANE;
    hDC = GetDC( hWnd );              // get the device context ( DC )
    SetPixelFormat( hDC,ChoosePixelFormat( hDC,&pfd ),&pfd );

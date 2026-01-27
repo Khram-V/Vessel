@@ -1,29 +1,5 @@
-//========================================================================
+
 // GLFW 3.5 - www.glfw.org
-//------------------------------------------------------------------------
-// Copyright (c) 2002-2006 Marcus Geelnard
-// Copyright (c) 2006-2019 Camilla Löwy <elmindreda@glfw.org>
-//
-// This software is provided 'as-is', without any express or implied
-// warranty. In no event will the authors be held liable for any damages
-// arising from the use of this software.
-//
-// Permission is granted to anyone to use this software for any purpose,
-// including commercial applications, and to alter it and redistribute it
-// freely, subject to the following restrictions:
-//
-// 1. The origin of this software must not be misrepresented; you must not
-//    claim that you wrote the original software. If you use this software
-//    in a product, an acknowledgment in the product documentation would
-//    be appreciated but is not required.
-//
-// 2. Altered source versions must be plainly marked as such, and must not
-//    be misrepresented as being the original software.
-//
-// 3. This notice may not be removed or altered from any source
-//    distribution.
-//
-//========================================================================
 
 #pragma once
 
@@ -278,8 +254,7 @@ typedef uint32_t VkFlags;
 typedef uint32_t VkBool32;
 
 typedef enum VkStructureType
-{
-    VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR = 1000004000,
+{   VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR = 1000004000,
     VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR = 1000005000,
     VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR = 1000006000,
     VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR = 1000009000,
@@ -290,8 +265,7 @@ typedef enum VkStructureType
 } VkStructureType;
 
 typedef enum VkResult
-{
-    VK_SUCCESS = 0,
+{   VK_SUCCESS = 0,
     VK_NOT_READY = 1,
     VK_TIMEOUT = 2,
     VK_EVENT_SET = 3,
@@ -336,23 +310,14 @@ typedef VkResult (APIENTRY * PFN_vkEnumerateInstanceExtensionProperties)(const c
 #define GLFW_NATIVE_INCLUDE_NONE
 #include "../GLFW/glfw3native.h"
 
-// Checks for whether the library has been initialized
-#define _GLFW_REQUIRE_INIT()
-#define _GLFW_REQUIRE_INIT_OR_RETURN(x)
-/*
-#define _GLFW_REQUIRE_INIT()                        \
-    if (!_glfw.initialized)                         \
-    {  _glfwInputError(GLFW_NOT_INITIALIZED, NULL); \
-        return;                                     \
-    }
-#define _GLFW_REQUIRE_INIT_OR_RETURN(x)             \
-    if (!_glfw.initialized)                         \
-    {  _glfwInputError(GLFW_NOT_INITIALIZED, NULL); \
-        return x;                                   \
-    }
-*/
 // Swaps the provided pointers
-#define _GLFW_SWAP(type,x,y){ type t; t = x; x = y; y = t; }
+#define _GLFW_SWAP(type, x, y) \
+    {                          \
+        type t;                \
+        t = x;                 \
+        x = y;                 \
+        y = t;                 \
+    }
 
 // Per-thread error structure
 //
@@ -634,6 +599,7 @@ struct _GLFWmapping
     _GLFWmapelement buttons[15];
     _GLFWmapelement axes[6];
 };
+
 // Thread local storage structure
 //
 struct _GLFWtls
@@ -658,7 +624,7 @@ struct _GLFWplatform
     // init
     GLFWbool (*init)(void);
     void (*terminate)(void);
-    // input
+ // input
     void (*getCursorPos)(_GLFWwindow*,double*,double*);
     void (*setCursorPos)(_GLFWwindow*,double,double);
     void (*setCursorMode)(_GLFWwindow*,int);
@@ -672,12 +638,7 @@ struct _GLFWplatform
     int (*getKeyScancode)(int);
     void (*setClipboardString)(const char*);
     const char* (*getClipboardString)(void);
-/*  GLFWbool (*initJoysticks)(void);
-    void (*terminateJoysticks)(void);
-    GLFWbool (*pollJoystick)(_GLFWjoystick*,int);
-    const char* (*getMappingName)(void);
-    void (*updateGamepadGUID)(char*);
-*/  // monitor
+ // monitor
     void (*freeMonitor)(_GLFWmonitor*);
     void (*getMonitorPos)(_GLFWmonitor*,int*,int*);
     void (*getMonitorContentScale)(_GLFWmonitor*,float*,float*);
@@ -686,7 +647,7 @@ struct _GLFWplatform
     GLFWbool (*getVideoMode)(_GLFWmonitor*,GLFWvidmode*);
     GLFWbool (*getGammaRamp)(_GLFWmonitor*,GLFWgammaramp*);
     void (*setGammaRamp)(_GLFWmonitor*,const GLFWgammaramp*);
-    // window
+ // window
     GLFWbool (*createWindow)(_GLFWwindow*,const _GLFWwndconfig*,const _GLFWctxconfig*,const _GLFWfbconfig*);
     void (*destroyWindow)(_GLFWwindow*);
     void (*setWindowTitle)(_GLFWwindow*,const char*);
@@ -724,11 +685,11 @@ struct _GLFWplatform
     void (*waitEvents)(void);
     void (*waitEventsTimeout)(double);
     void (*postEmptyEvent)(void);
-    // EGL
+ // EGL
     EGLenum (*getEGLPlatform)(EGLint**);
     EGLNativeDisplayType (*getEGLNativeDisplay)(void);
     EGLNativeWindowType (*getEGLNativeWindow)(_GLFWwindow*);
-    // vulkan
+ // vulkan
     void (*getRequiredInstanceExtensions)(char**);
     GLFWbool (*getPhysicalDevicePresentationSupport)(VkInstance,VkPhysicalDevice,uint32_t);
     VkResult (*createWindowSurface)(VkInstance,_GLFWwindow*,const VkAllocationCallbacks*,VkSurfaceKHR*);
@@ -757,12 +718,7 @@ struct _GLFWlibrary
 
     _GLFWmonitor**      monitors;
     int                 monitorCount;
-/*
-    GLFWbool            joysticksInitialized;
-    _GLFWjoystick       joysticks[GLFW_JOYSTICK_LAST + 1];
-    _GLFWmapping*       mappings;
-    int                 mappingCount;
-*/
+
     _GLFWtls            errorSlot;
     _GLFWtls            contextSlot;
     _GLFWmutex          errorLock;
@@ -850,7 +806,7 @@ struct _GLFWlibrary
 
     struct {
         GLFWmonitorfun  monitor;
-//      GLFWjoystickfun joystick;
+        GLFWjoystickfun joystick;
     } callbacks;
 
     // These are defined in platform.h
@@ -912,22 +868,13 @@ void _glfwInputMouseClick(_GLFWwindow* window, int button, int action, int mods)
 void _glfwInputCursorPos(_GLFWwindow* window, double xpos, double ypos);
 void _glfwInputCursorEnter(_GLFWwindow* window, GLFWbool entered);
 void _glfwInputDrop(_GLFWwindow* window, int count, const char** names);
+//void _glfwInputJoystick(_GLFWjoystick* js, int event);
+//void _glfwInputJoystickAxis(_GLFWjoystick* js, int axis, float value);
+//void _glfwInputJoystickButton(_GLFWjoystick* js, int button, char value);
+//void _glfwInputJoystickHat(_GLFWjoystick* js, int hat, char value);
 
 void _glfwInputMonitor(_GLFWmonitor* monitor, int action, int placement);
 void _glfwInputMonitorWindow(_GLFWmonitor* monitor, _GLFWwindow* window);
-
-#if 1
-#define _glfwInputError(...)
-#define _glfwInputErrorWin32(...)
-#else
-void _glfwInputErrorWin32(int error, const char* description);
-#if defined(__GNUC__)
-void _glfwInputError(int code, const char* format, ...)
-    __attribute__((format(printf, 2, 3)));
-#else
-void _glfwInputError(int code, const char* format, ...);
-#endif
-#endif
 
 //////////////////////////////////////////////////////////////////////////
 //////                       GLFW internal API                      //////
@@ -986,4 +933,35 @@ int _glfw_max(int a, int b);
 void* _glfw_calloc(size_t count, size_t size);
 void* _glfw_realloc(void* pointer, size_t size);
 void _glfw_free(void* pointer);
+
+#if 1
+#define _glfwInputError(...)
+#define _glfwInputErrorWin32(...)
+#define getEGLErrorString(...)
+#define _GLFW_REQUIRE_INIT()
+#define _GLFW_REQUIRE_INIT_OR_RETURN(x)
+#else
+// Checks for whether the library has been initialized
+#define _GLFW_REQUIRE_INIT()                        \
+    if (!_glfw.initialized)                         \
+    {  _glfwInputError(GLFW_NOT_INITIALIZED, NULL); \
+        return;                                     \
+    }
+#define _GLFW_REQUIRE_INIT_OR_RETURN(x)             \
+    if (!_glfw.initialized)                         \
+    {  _glfwInputError(GLFW_NOT_INITIALIZED, NULL); \
+        return x;                                   \
+    }
+void _glfwInputErrorWin32(int error, const char* description);
+
+#if defined(__GNUC__)
+void _glfwInputError(int code, const char* format, ...)
+    __attribute__((format(printf, 2, 3)));
+#else
+void _glfwInputError(int code, const char* format, ...);
+#endif
+#endif
+
+
+
 

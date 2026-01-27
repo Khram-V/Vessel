@@ -380,6 +380,7 @@ static const char
            " <Enter>"," метод отрисовки графиков",
            " <Tab/Space> ","  закраски/контуры",
            " <Shift+Space> ","стрелки обтекания",
+           " <Shift+Tab>   ","прозрачность окна",
            " <Ctrl/+Shift> ","задержка/остановка",
            " <стрелки·leftMouse>", " ориентация",
            " <+Shift·rightMouse>", " смещение",
@@ -413,13 +414,13 @@ bool Hull::KeyBoard( fixed Keyb )                   // С краткой под�
     case _F4: Config(); break;                // конфигурация формы отображения
     case _F5: PicMode(-2,2); break;// настройка изображения корпуса и обтекания
     case _F8: Model_Config( this ); break;
-    case _Blank: if( ScanStatus()&SHIFT )Pic.flow++; else Pic.grid^=1; break;
-    case _Enter: Pic.kart^=1; break;    // одно поле графиков и картушка справа
-    case _Tab: Pic.hull--; break;       // прорисовка корпуса или треугольников
     case _Del: if( ScanStatus()&SHIFT ) // восстановление исходного отображения
     { Pic.hull=Drawing_Hull; Initial(); //  исходный вариант цветовой раскраски
     } Distance=-2.4*sqrt(sqr(Length)+sqr(Breadth*2)+sqr(Draught*4));//дальность
       eyeX=45,eyeY=-10,eyeZ=0; lookX=1,lookY=-2,lookZ=0; break;   // ориентация
+    case _Blank: if( ScanStatus()&SHIFT )Pic.flow++; else Pic.grid^=1; break;
+    case _Enter: Pic.kart^=1; break;    // одно поле графиков и картушка справа
+    case _Tab: if( !ScanStatus()&SHIFT ){ Pic.hull--; break; } // прорисовка корпуса или треугольников
    default: return View::KeyBoard( Keyb );          // и направления взгляда
   } Draw(); return true;                            // иначе команда принята
 }
@@ -437,12 +438,12 @@ bool Field::KeyBoard( fixed Keyb )
     case _F8: Model_Config( this ); break;      // вычислительного эксперимента
     case _Blank: if( ScanStatus()&SHIFT )Vessel->Pic.flow++; // стрелки потоков
                                     else Exp.view++; break;  // сетка-раскраска
-    case _Tab: Exp.draw+=ScanStatus()&SHIFT ? -1:1; break;  // триангуляционная
     case _Del: if( ScanStatus()&SHIFT )
                { Exp.draw=Exp.view=0;  // восстановление волновых закрасок
                  Original( false );    // возврат вычислений в начальный момент
                } Distance=-0.8*Long;   // ... от точки взгляда до места обзора
                eyeX=150,eyeY=-16.4,eyeZ=0; lookX=0,lookY=-10,lookZ=0; break;
+    case _Tab: if( !ScanStatus()&SHIFT ){ Exp.draw++; break; } // =ScanStatus()&SHIFT ? -1:1; break;  // триангуляционная
    default: return View::KeyBoard( Keyb );
   } Draw(); return true;                 // список команд принятых к исполнению
 }

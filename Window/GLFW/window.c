@@ -163,18 +163,12 @@ GLFWAPI GLFWwindow* glfwCreateWindow(int width, int height,
     _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
 
     if (width <= 0 || height <= 0)
-    {
-        _glfwInputError(GLFW_INVALID_VALUE,
-                        "Invalid window size %ix%i",
-                        width, height);
-
+    { _glfwInputError(GLFW_INVALID_VALUE,"Invalid window size %ix%i",width,height);
         return NULL;
     }
-
     fbconfig  = _glfw.hints.framebuffer;
     ctxconfig = _glfw.hints.context;
     wndconfig = _glfw.hints.window;
-
     wndconfig.width   = width;
     wndconfig.height  = height;
     wndconfig.title   = title;

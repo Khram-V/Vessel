@@ -381,7 +381,7 @@ void Window::WaitEvents( bool stop )
     } else glfwPollEvents();
   }
 }
-#include <StdArg.h>                           // блок разных текстовых надписей
+//#include <StdArg.h>                           // блок разных текстовых надписей
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include "glfw3native.h"
 
@@ -393,15 +393,15 @@ Window& Window::Title( const char* A )
   } return *this;
 }
 
-// Функция для конвертации HICON в формат GLFW (от Алисы из Яндекса)
+// Функция для конвертации HICON в формат GLFW (согласовано с Алисой в Яндексе)
 
 Window& Window::Icon( const char* A ) // по resource файлу здесь есть вопросы...
 { if( Caption )
   { HICON hIcon=LoadIcon( GetModuleHandle(NULL),A );      // ~~ hInstance
     SendMessage( glfwGetWin32Window( glfwWindow ),        // GetActiveWindow(),
                  WM_SETICON,ICON_BIG,(LPARAM)hIcon );     //? ICON_SMALL
-
-/*  glfwSetWindowIcon// ( GLFWwindow* window, int count, const GLFWimage* images);
+/*
+    glfwSetWindowIcon// ( GLFWwindow* window, int count, const GLFWimage* images);
     ( glfwWindow,1,(GLFWimage*)hIcon+?? );
       SendMessage( glfwGetWin32Window( glfwWindow ),      // GetActiveWindow(),
                    WM_SETICON,ICON_BIG,(LPARAM)hIcon );         //   ICON_SMALL

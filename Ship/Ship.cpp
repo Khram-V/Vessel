@@ -90,7 +90,8 @@ Ship::Ship()
 //     Конструктор не содержит Matrix для движений корпуса в корабельном базисе
 //
 FreeShip::FreeShip():Ship(),View("Free!ship in C++ ",-12,12,640,480) //Matrix()
-{ Icon( "Ship" ).AlfaVector( 16 );
+{ //Icon( "Ship" ).
+  AlfaVector( 16 );
   Locate( Xpm( 4 ),Ypm( 4 ),min( 1280L,Xpm( 64 ) ),
                             min( 1024L,Ypm( 72 ) ) );
 //glCullFace( GL_FRONT_AND_BACK );                    // какие отбираются грани
@@ -109,6 +110,7 @@ bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой под
                " F2 "," формат «Aurora»: <имя>.vsl",0 },
      *Plus[]={ " <Space>            ","борт\\полборта",
                " <Ctrl+Space>       "," грани\\рёбра",
+               " <Shift+Tab>        "," прозрачность",
                " <стрелки·leftMouse>"," ориентация",
                " <+Shift·rightMouse>"," смещение",
                " <+Ctrl·(roll)>"," дальность, наклон",

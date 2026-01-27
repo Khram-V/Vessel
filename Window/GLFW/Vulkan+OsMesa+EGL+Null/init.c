@@ -1,29 +1,5 @@
-//========================================================================
+
 // GLFW 3.5 - www.glfw.org
-//------------------------------------------------------------------------
-// Copyright (c) 2002-2006 Marcus Geelnard
-// Copyright (c) 2006-2018 Camilla Löwy <elmindreda@glfw.org>
-//
-// This software is provided 'as-is', without any express or implied
-// warranty. In no event will the authors be held liable for any damages
-// arising from the use of this software.
-//
-// Permission is granted to anyone to use this software for any purpose,
-// including commercial applications, and to alter it and redistribute it
-// freely, subject to the following restrictions:
-//
-// 1. The origin of this software must not be misrepresented; you must not
-//    claim that you wrote the original software. If you use this software
-//    in a product, an acknowledgment in the product documentation would
-//    be appreciated but is not required.
-//
-// 2. Altered source versions must be plainly marked as such, and must not
-//    be misrepresented as being the original software.
-//
-// 3. This notice may not be removed or altered from any source
-//    distribution.
-//
-//========================================================================
 
 #include "internal.h"
 
@@ -31,7 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
-//#include <assert.h>
+#include <assert.h>
 
 
 // NOTE: The global variables below comprise all mutable global data in GLFW
@@ -114,13 +90,8 @@ static void terminate(void)
     _glfw_free(_glfw.monitors);
     _glfw.monitors = NULL;
     _glfw.monitorCount = 0;
-/*
-    _glfw_free(_glfw.mappings);
-    _glfw.mappings = NULL;
-    _glfw.mappingCount = 0;
-*/
+
     _glfwTerminateVulkan();
-//  _glfw.platform.terminateJoysticks();
     _glfw.platform.terminate();
 
     _glfw.initialized = GLFW_FALSE;
@@ -197,10 +168,8 @@ char** _glfwParseUriList(char* text, int* count)
 
         if (strncmp(line, prefix, strlen(prefix)) == 0)
         {
-            line += strlen(prefix);
-            // TODO: Validate hostname
-            while (*line != '/')
-                line++;
+            line += strlen(prefix);    // TODO: Validate hostname
+            while (*line != '/')line++;
         }
 
         (*count)++;
@@ -236,16 +205,8 @@ char* _glfw_strdup(const char* source)
     return result;
 }
 
-int _glfw_min(int a, int b)
-{
-    return a < b ? a : b;
-}
-
-int _glfw_max(int a, int b)
-{
-    return a > b ? a : b;
-}
-
+int _glfw_min(int a, int b){ return a < b ? a : b; }
+int _glfw_max(int a, int b){ return a > b ? a : b; }
 void* _glfw_calloc(size_t count, size_t size)
 {
     if (count && size)
@@ -299,13 +260,14 @@ void _glfw_free(void* block)
         _glfw.allocator.deallocate(block, _glfw.allocator.user);
 }
 
-
 //////////////////////////////////////////////////////////////////////////
 //////                         GLFW event API                       //////
 //////////////////////////////////////////////////////////////////////////
 
+#ifndef _glfwInputError
+
 // Notifies shared code of an error
-#if !defined( _glfwInputError )
+//
 void _glfwInputError(int code, const char* format, ...)
 {
     _GLFWerror* error;
