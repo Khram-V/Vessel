@@ -23,7 +23,7 @@
 				</Linker>
 			</Target>
 			<Target title="Hull-64">
-				<Option output="../../../Work/Hull-64" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/Hull-64" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../Vessel" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
@@ -46,7 +46,7 @@
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters='Save\«Аврора».fef Save\~באסילי &quot;Save\ONR-5613_DDX-2000.fef&quot; &quot;Ships\Samples\Галеон Великих Испанских географических открытий.ftm&quot; &quot;Ships\History\Carrack «Mary Rose».fbm&quot; &quot;Save\Import\Perle2(DS).fef&quot; &quot;Ships\Fregate type 23-11.fbm&quot;' />
+				<Option parameters='&quot;Ships\Samples\Галеон Великих Испанских географических открытий.fef&quot; Save\Import\2people.part Save\Import\FreeBoard-125.part Save\«Аврора».fef Save\~באסילי &quot;Save\ONR-5613_DDX-2000.fef&quot; &quot;Ships\History\Carrack «Mary Rose».fbm&quot; &quot;Save\Import\Perle2(DS).fef&quot; &quot;Ships\Fregate type 23-11.fbm&quot;' />
 				<Option projectLinkerOptionsRelation="2" />
 				<Linker>
 					<Add option="--gc-sections" />

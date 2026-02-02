@@ -2,7 +2,10 @@
 //  Лаборатория вычислительной гидромеханики и морских исследований
 //              Сахалинского государственного университета
 //
+#include <Math.h>
 #include "OS\Tv_Graph.h"
+#include "OS\Tf_topo.h"
+
 extern Real               //
      Xo,Xm,Length, Lwl,    // Длина
            Breadth,Bwl,    // Ширина
@@ -124,3 +127,5 @@ extern DrawPlane wH,    // Окно проекции корпус,
                  wM,    //  бок
                  wW;    //   и полуширота
 extern const char *Months[],*WeekDay[];
+
+// свёрнуто к одному Hull.cpp, 1998 строк 2026-01-29

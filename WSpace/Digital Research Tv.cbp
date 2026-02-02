@@ -15,42 +15,63 @@
 				<Option compiler="gcc" />
 				<Option parameters="Univer86.dc2" />
 				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-fopenmp" />
+				</Compiler>
+				<Linker>
+					<Add library="gomp" />
+				</Linker>
 			</Target>
 			<Target title="Tv-64">
-				<Option output="../../../Work/Tv64" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/Tv64" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../../Work" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
-				<Option compiler="gcc-mingw64" />
+				<Option compiler="gnu_gcc_stable" />
 				<Option parameters="Univer86.dc2" />
 				<Compiler>
 					<Add option="-fexpensive-optimizations" />
-					<Add option="-m64" />
+					<Add option="-fopenmp" />
+					<Add option="-Wno-narrowing" />
+					<Add option="-Wno-literal-suffix" />
+					<Add option="-Wno-volatile" />
 				</Compiler>
 				<Linker>
-					<Add option="-static-libgcc" />
-					<Add option="-static" />
-					<Add option="-m64" />
+					<Add library="gomp" />
+					<Add library="pthread" />
+					<Add library="dl" />
 				</Linker>
 			</Target>
 			<Target title="Flow">
-				<Option output="../../../Work/Flow" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/Flow" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../../../Work" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-ffunction-sections" />
+				</Compiler>
+				<Linker>
+					<Add option="--gc-sections" />
+				</Linker>
 			</Target>
 			<Target title="Waves">
-				<Option output="../../../Work/Waves" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/Waves" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../../../Work" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-ffunction-sections" />
+				</Compiler>
+				<Linker>
+					<Add option="--gc-sections" />
+				</Linker>
 			</Target>
 			<Target title="Hull">
-				<Option output="../../../Work/Hull_K" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/Hull_K" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../../Work" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
@@ -60,17 +81,16 @@
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="-fexpensive-optimizations" />
-			<Add option="-Os" />
+			<Add option="-O3" />
 			<Add option="-funsigned-char" />
 			<Add option="-ffast-math" />
 			<Add option="-fno-exceptions" />
 			<Add option="-Wunused" />
 		</Compiler>
 		<Linker>
+			<Add option="-O3" />
 			<Add option="-s" />
 			<Add library="gdi32" />
-			<Add library="gomp" />
 		</Linker>
 		<Unit filename="../Tools/Ship.Rc">
 			<Option compilerVar="CPP" />
@@ -88,21 +108,6 @@
 			<Option target="Hull" />
 		</Unit>
 		<Unit filename="../Tv/Hull.h">
-			<Option target="Hull" />
-		</Unit>
-		<Unit filename="../Tv/K_Frame.cpp">
-			<Option target="Hull" />
-		</Unit>
-		<Unit filename="../Tv/K_Hull.cpp">
-			<Option target="Hull" />
-		</Unit>
-		<Unit filename="../Tv/K_Math.cpp">
-			<Option target="Hull" />
-		</Unit>
-		<Unit filename="../Tv/K_Statics.cpp">
-			<Option target="Hull" />
-		</Unit>
-		<Unit filename="../Tv/K_Wave.cpp">
 			<Option target="Hull" />
 		</Unit>
 		<Unit filename="../Tv/OS/Allocate.cpp" />
@@ -123,6 +128,9 @@
 			<Option target="Hull" />
 		</Unit>
 		<Unit filename="../Tv/OS/Rstring.cpp" />
+		<Unit filename="../Tv/OS/Sym_CCCP.inc">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="../Tv/OS/Tf_Topo.cpp">
 			<Option target="Waves" />
 			<Option target="Hull" />
@@ -137,6 +145,9 @@
 		</Unit>
 		<Unit filename="../Tv/OS/Tv_Text.cpp" />
 		<Unit filename="../Tv/OS/Type.h" />
+		<Unit filename="../Tv/OS/Win_Palette.inc">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="../Tv/OS/Window.cpp">
 			<Option target="Tv-32" />
 			<Option target="Tv-64" />

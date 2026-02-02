@@ -1,4 +1,8 @@
-
+//
+//    Опытовое дополнение к free!Ship с перспективой вовлечения местных
+//      форматов и кульмана перекройки корабельных обводов в основной
+//        комплекс штормовых вычислительных экспериментов Аврора
+//
 #include "Ship.h"
 //
 //    общие данные как бы в стиле Fortran-common блоков
@@ -6,7 +10,7 @@
 Vector Min={0.0},Max={0.0};    // Экстремумы исходного графического изображения
 byte UnderWaterColorAlpha=0xFF;// для алгоритмов с точным положением ватерлинии
 Color UnderWaterColor={ 0xFFFFFF }; // ~~~ выведены в общий доступ ~~~
- Real Length=6.0,                   // длина
+Real  Length=6.0,                   // длина
       Beam=2.0,                     // ширина
       Draft=1.0;                    // осадка
 //
@@ -42,7 +46,7 @@ bool FreeShip::Draw()               // виртуальная процедура
   color( green ); for( k=0; k<NoWaterlines; k++ )Waterlines[k].Drawing( B );
   color( blue );  for( k=0; k<NoButtocks;   k++ )Buttocks[k].Drawing( B );
   color( olive ); for( k=0; k<NoDiagonals;  k++ )Diagonals[k].Drawing( B );
-  color( lightcyan );                          glLineWidth( 2 );
+  color( lightcyan ); glLineWidth( 2 );
   for( k=0; k<NoFlowLines; k++ ){ glBegin( GL_LINE_STRIP );
     for( i=0; i<FlowLines[k].len; i++ )dot( FlowLines[k][i] ); glEnd();
     if( B==mvBoth ){ glBegin( GL_LINE_STRIP );
@@ -50,39 +54,30 @@ bool FreeShip::Draw()               // виртуальная процедура
   } }                                          glLineWidth( 1 );
   Window::Show(); return true;
 }
-#include <wctype.h>
-
-inline WCHAR* Slower( WCHAR *str )
-{ int l=wcslen( str ); while( --l>=0 )str[l]=towlower( str[l] ); return str;
-}
 //!                конструктор с расчисткой и считыванием новой числовой модели
 Ship::Ship()
 { memset( this,0,sizeof( Ship ) );
-  textcolor( YELLOW );              print( "Free!Ship [*.fbm,*.ftm,*.fef]\n" );
+  textcolor( YELLOW ); print( "Free!Ship [*.fbm,*.ftm,*.fef,*.part,*.obj]\n" );
   int argc; WCHAR **argv=CommandLineToArgvW( GetCommandLineW(),&argc );
   if( argc>1 )FName=argv[1]; else
-  { printf( "Start Ship <имя файла модели корпуса.[fbm|ftm|fef]>" );
-                getch(); exit( 1 );
+  { print( "Start Ship <имя файла модели корабля.[fbm|ftm|fef|part|obj]>" );
+    getch(); exit( 1 );
   }
   Name=strdup( W2U( FName ) ); // копия имени входного файла
-  argc=wcslen( FName );
   Visio.ModelView=mvBoth;     // на оба борта, всё другое может быть вычищенным
 
-//  print( "Открыт %s файл: %s\n",isBin?"двоичный":"текстовый",W2U(FileName)); textcolor(LIGHTBLUE);
+//argc=wcslen( FName );
+//print( "Открыт %s файл: %s\n",isBin?"двоичный":"текстовый",W2U(FileName)); textcolor(LIGHTBLUE);
+//if( argc>4 && wcscmp( Slower( argv[1]+argc-4 ),L".fef" )==0 )LoadFEF(); else
+//if( argc>5 && wcscmp( Slower( argv[1]+argc-5 ),L".part" )==0 )LoadPart(); else
 
-  if( argc>4 && wcscmp( Slower( argv[1]+argc-4 ),L".fef" )==0 )
-  { if( !LoadFEF() )
-    { textcolor( LIGHTMAGENTA );
-      printf( "?File Exchange Format %s не срабатывает",Name );
-      getch(); exit( argc );
-    }
-  } else
+  textcolor( LIGHTMAGENTA );  // к расцветке сообщения об ошибке открытия файла
+  if( !LoadExtFile( true ) )
   if( !LoadProject() )
-  { textcolor( LIGHTMAGENTA );
-    printf( "?Free!Ship неверный файл/incorrect datafile: %s ",Name );
-    getch(); exit( argc );
+  { print( "?Free!Ship неверный формат числовой модели: %s ",Name ); getch(); exit( 1 );
   }
   textcolor( YELLOW );
+  print( "\n%s ",Name );
   print( "\n Длина : [ %6.2f - %-6.2f ] = %g ",Min.x,Max.x,Max.x-Min.x );
   print( "\n Ширина: [ %6.2f - %-6.2f ] = %g ",Min.y,Max.y,(Max.y>-Min.y?Max.y:-Min.y)*2 );
   print( "\n Высота: [ %6.2f - %-6.2f ] = %g ",Min.z,Max.z,Max.z-Min.z );
@@ -104,27 +99,38 @@ FreeShip::FreeShip():Ship(),View("Free!ship in C++ ",-12,12,640,480) //Matrix()
 //
 bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой подсказкой
  const static char                                   // по настройкам и методам
-     *Id[]={"Ship"," Корабельные форматы ",          // визуализации корпуса
-                   " Free!Ship: *.ftm,*fbm.*fef..",0 },
+     *Id[]={"free!Ship","  Корабельные форматы ",     // визуализации корпуса
+                   "*.ftm,*.fbm,*.fef,*.part",0 },
      *Cmds[]={ " F1 "," - справка",
-               " F2 "," формат «Aurora»: <имя>.vsl",0 },
+               " F2 ","запись   «Aurorа»: [Ship].vsl",
+               " F3 ","дополнение [Ship].part и .obj",0 },
+//             " F3 ","запрос фрагмента [Ship].part",0 },
      *Plus[]={ " <Space>            ","борт\\полборта",
                " <Ctrl+Space>       "," грани\\рёбра",
                " <Shift+Tab>        "," прозрачность",
                " <стрелки·leftMouse>"," ориентация",
                " <+Shift·rightMouse>"," смещение",
                " <+Ctrl·(roll)>"," дальность, наклон",
-               " <Home>  "," вместить корпус в экран",0 };
+               " <Home>  "," вместить корпус в экран",
+               " <End>   "," сменить нормали обшивки",
+               " <PgUp>  "," поворот вправо по курсу",
+               " <PgDn>  "," положить на правый борт",0 };
  BoardView &B=Visio.ModelView;
   switch( Keyb )
   { case _F1: Window::Help( Id,Cmds,Plus,1,1 ); break;
-    case _F2: WriteVSL(); break;
+    case _F2: WriteVSL();                       break;
+    case _F3: LoadExtFile( false );             break;
+           // LoadPart( false );                break;
+    case _End:  Shell.Revolute();  goto R1;
+    case _PgUp: Shell.R90Zright(); goto R1;
+    case _PgDn: Shell.R90Xright();      R1:
+    case _Home: Shell.Extents(); Draw(); return View::KeyBoard( Keyb );
     case _Blank:
       if( ScanStatus()&CTRL )
         { static bool xd=false;
-          if( xd^=true )glPolygonMode( GL_FRONT_AND_BACK,GL_FILL ); //,glEnable( GL_FRONT_FACE ); //,glEnable( GL_CULL_FACE )
+          if( xd^=true )glPolygonMode( GL_FRONT_AND_BACK,GL_FILL );  //,glEnable( GL_FRONT_FACE ),glEnable( GL_CULL_FACE )
                   else  glPolygonMode( GL_FRONT,GL_FILL ),
-                        glPolygonMode( GL_BACK,GL_LINE ); //,glDisable( GL_FRONT_FACE ); //,glDisable( GL_CULL_FACE )
+                        glPolygonMode( GL_BACK,GL_LINE );            //,glDisable( GL_FRONT_FACE ),glDisable( GL_CULL_FACE )
         } else
       if( B==mvPort )B=mvBoth; else B=mvPort; break;
     default: return View::KeyBoard( Keyb );

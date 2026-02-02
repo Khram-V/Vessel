@@ -50,13 +50,13 @@ FILE *FileOpen
   const WCHAR *Choice, // = "Ship Hull Form (*.vsl)\0*.vsl\0All Files\0*.*\0\0"
   const WCHAR *Title ) // = "? выбрать корпус или - Esc - для модели МИДВ"
 { FILE *F=NULL; WCHAR *C=NULL,*Fname=U2W( wName ); // буфер не менее 2К статики
-  if( *Title!=L'?' && *wName!='*' )F=_wfopen( Fname,wType );
+  if( *Title!=L'?' && *wName!='*' )F=_wfopen( Fname,wType ); ///'?' не забывать
   if( !F )
   { OPENFILENAMEW W={ sizeof( OPENFILENAMEW ),0 };
                   W.lpstrFile   = Fname; // L"Аврора.vsl";
     if( Title  )  W.lpstrTitle  = Title;
     if( Ext    )  W.lpstrDefExt = Ext;
-    if( Choice ){ W.lpstrFilter =( C=wcsdup( Choice ) );
+    if( Choice ){ W.lpstrFilter =( C=wcsdup( Choice ) ); // копия для константы
                   while( C=wcschr( C,L'\1' ) )*C++=0;
                 } W.nMaxFile = MAX_PATH*2;
     if( wType[0]==L'w' )
@@ -67,7 +67,7 @@ FILE *FileOpen
                    | OFN_EXPLORER | OFN_HIDEREADONLY; // OFN_ALLOWMULTISELECT
       if( GetOpenFileNameW( &W ) )F=_wfopen( W.lpstrFile,wType );
     } if( C )free( C );
-    strcpy( wName,W2U( wcscpy( (WCHAR*)( (char*)LS ),Fname) ) );
+    strcpy( wName,W2U( wcscpy( (WCHAR*)( (char*)LS ),W.lpstrFile) ) ); //?Fname
   } return F;
 }
 //      по случаю - чтение файловых строчек со своим (другим!) буфером в памяти

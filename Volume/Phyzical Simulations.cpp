@@ -238,6 +238,7 @@ int main( int argc, char *argv[], char *envp[] )
 { int key=0;
     View_initial();
     glPolygonMode( GL_FRONT_AND_BACK,GL_FILL );
+    glDisable( GL_LIGHTING );
     Win.Window::Icon( "Math" ).Draw( display );
     Win.Window::KeyBoard( keyboard );
     Win.SetTimer( 100,timer_drawing );          // 50 без перегрузки процессора

@@ -98,10 +98,7 @@ static void terminate(void)
     memset(&_glfw, 0, sizeof(_glfw));
 }
 
-
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW internal API                      //////
-//////////////////////////////////////////////////////////////////////////
+/// GLFW internal API
 
 // Encode a Unicode code point to a UTF-8 stream
 // Based on cutef8 by Jeff Bezanson (Public Domain)
@@ -258,10 +255,7 @@ void _glfw_free(void* block)
         _glfw.allocator.deallocate(block, _glfw.allocator.user);
 }
 
-
-//////////////////////////////////////////////////////////////////////////
-//////                         GLFW event API                       //////
-//////////////////////////////////////////////////////////////////////////
+/// GLFW event API
 
 // Notifies shared code of an error
 #if !defined( _glfwInputError )
@@ -338,9 +332,7 @@ void _glfwInputError(int code, const char* format, ...)
 }
 #endif
 
-//////////////////////////////////////////////////////////////////////////
-//////                        GLFW public API                       //////
-//////////////////////////////////////////////////////////////////////////
+/// GLFW public API
 
 GLFWAPI int glfwInit(void)
 {

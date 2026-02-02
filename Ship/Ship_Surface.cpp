@@ -1,37 +1,69 @@
 
 #include "Ship.h"
+
+void Surface::R90Zright() // поворот вправо по курсу
+{ for( int i=0; i<NoCoPoint; i++ )
+  { Vector W=P[i].V; P[i].V.x=W.y; P[i].V.y=-W.x; }
+}
+void Surface::R90Xright() // поворот вправо по курсу
+{ for( int i=0; i<NoCoPoint; i++ )
+  { Vector W=P[i].V; P[i].V.z=W.y; P[i].V.y=-W.z; }
+}
+void Surface::Revolute() // обращение последовательности обхода рёбер по граням
+{ int left,right,n,p,*P;
+  for( int i=0; i<NoFaces; i++ )
+  { P=F[i].P; n=F[i].Capacity; left=0,right=n;
+    while( left<right )p=P[left],P[left++]=P[--right],P[right]=p;
+#if 0         // от Алисы опять не получилось
+    if( n>1 ) // Защита от пустых и одноэлементных массивов
+    { int temp=P[0],left=0,right=n-1; // Сохраняем первый элемент
+      while (left<right)            // Перемещаем элементы
+      { P[left]=P[right]; left++;
+        if( left<right )            // Если еще не встретились, продолжаем цикл
+        { P[--right]=P[left];
+      } } P[left]=temp;             // Восстанавливаем первый элемент
+    }
+#endif
+  }
+}
 //
 //   прорисовка исходных многоугольников
 //
 void Surface::Drawing( BoardView Sides )
-{ static Flex V; Vector W; int I,K,N; Color C; glLineWidth( 1 );
+{ static Flex V; Vector W; int I,K,N; Color c; glLineWidth( 1 );
   for( N=0; N<NoFaces; N++ )   // синхронная по бортам прорисовка треугольников
   if( (K=F[N].Capacity)>2 )
   { Layers &Layer=L[F[N].LayerIndex];
-//  V.len=0; C.C=L[F[N].LayerIndex].Color;
-    V.len=0; C.C=Layer.LClr.C;
-    for( I=0; I<K; I++)V+=P[F[N].P[I]].V;  // C.c[3]=V[0].z>=Draught?0xFF:0x7F; glColor4ubv(C.c);
+//  V.len=0; c.C=L[F[N].LayerIndex].Color;
+    V.len=0; c.C=Layer.LClr.C;
+    for( I=0; I<K; I++)V+=P[F[N].P[I]].V;  // c.c[3]=V[0].z>=Draught?0xFF:0x7F; glColor4ubv(C.c);
     glNormal3dv( W=(V[2]-V[0])*(V[1]-V[0]) ); glBegin( GL_POLYGON );
-    for( I=0; I<K; I++ ){ C.C=Layer.LClr.C;
+    for( I=0; I<K; I++ ){ c.C=Layer.LClr.C;
       if( V[I].z<Draft+Min.z )
-      { C.c[3]-=C.c[3]/6; //C.c[3]=V[I].z>Draft+Min.z?0xFF:0xBF;
-        C.c[0] = ( C.c[0]+UnderWaterColor.c[0] )/2;
-        C.c[1] = ( C.c[0]+UnderWaterColor.c[1] )/2;
-        C.c[2] = ( C.c[0]+UnderWaterColor.c[2] )/2;
-      } glColor4ubv( C.c ); dot( V[I] );
+      { c.c[3]-=c.c[3]/6; //C.c[3]=V[I].z>Draft+Min.z?0xFF:0xBF;
+        c.c[0] = ( c.c[0]+UnderWaterColor.c[0] )/2;
+        c.c[1] = ( c.c[1]+UnderWaterColor.c[1] )/2;
+        c.c[2] = ( c.c[2]+UnderWaterColor.c[2] )/2;
+      } glColor4ubv( c.c ); dot( V[I] );
     } glEnd();
     if( Sides==mvBoth && Layer.Symmetric )
     { glNormal3dv( ~W ); glBegin( GL_POLYGON );
-      for( I=K-1; I>=0; I-- ){ C.C=Layer.LClr.C;
+      for( I=K-1; I>=0; I-- ){ c.C=Layer.LClr.C;
         if( V[I].z<Draft+Min.z )
-        { C.c[3]-=C.c[3]/6; //C.c[3]=V[I].z>Draft+Min.z?0xFF:0xBF;
-          C.c[0] = ( C.c[0]+UnderWaterColor.c[0] )/2;
-          C.c[1] = ( C.c[0]+UnderWaterColor.c[1] )/2;
-          C.c[2] = ( C.c[0]+UnderWaterColor.c[2] )/2;
-        } glColor4ubv( C.c ); dot( ~V[I] );
+        { c.c[3]-=c.c[3]/6; //c.c[3]=V[I].z>Draft+Min.z?0xFF:0xBF;
+          c.c[0] = ( c.c[0]+UnderWaterColor.c[0] )/2;
+          c.c[1] = ( c.c[1]+UnderWaterColor.c[1] )/2;
+          c.c[2] = ( c.c[2]+UnderWaterColor.c[2] )/2;
+        } glColor4ubv( c.c ); dot( ~V[I] );
       } glEnd();
     }
-  } glLineWidth( 0.2 );
+  } glLineWidth( 2 ); color( lightmagenta );
+  for( K=0; K<NoCurves; K++ )
+  { Vector V,W;
+    for( I=0; I<C[K].Capacity; I++ ){ W=P[C[K].P[I]].V;
+         if( I ){ if( Sides==mvBoth )liney( V,W ) ; else line( V,W ); } V=W; }
+  }
+  glLineWidth( 0.2 );
 }
 void Surface::Extents()                // Экстремумы по всем контрольным точкам
 { for( int i=0; i<NoCoPoint; i++ )

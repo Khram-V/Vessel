@@ -4,60 +4,69 @@
 	<Project>
 		<Option title="Vector &amp; Tensor" />
 		<Option pch_mode="2" />
-		<Option compiler="gcc" />
+		<Option compiler="gnu_gcc_stable" />
 		<Build>
 			<Target title="Dipole">
 				<Option platforms="Windows;" />
-				<Option output="Dev/Dipole" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/Dipole" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Dev/" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_stable" />
 				<Option use_console_runner="0" />
 				<Compiler>
 					<Add option="-fopenmp" />
 					<Add directory="../../../SoftWare/GLfw/include/GLFW" />
 				</Compiler>
 				<Linker>
+					<Add option="-fopenmp" />
 					<Add library="gomp" />
+					<Add library="pthread" />
+					<Add library="dl" />
 					<Add directory="../../../SoftWare/Dev/Lib/" />
 				</Linker>
 			</Target>
 			<Target title="Vector-Tensor">
 				<Option platforms="Windows;" />
-				<Option output="Dev/Vector and Tensor" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/Vector and Tensor" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Dev/" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_stable" />
 				<Option use_console_runner="0" />
-				<Option projectCompilerOptionsRelation="0" />
 			</Target>
 			<Target title="Tensor Base Space">
 				<Option platforms="Windows;" />
-				<Option output="Dev/Tensor Base Space" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/Tensor Base Space" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Dev/" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_stable" />
 				<Option use_console_runner="0" />
 			</Target>
 			<Target title="Phyzical Corpuscules">
 				<Option platforms="Windows;" />
-				<Option output="Dev/Physical Simulation" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/Physical Simulation" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Dev/" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
-				<Option compiler="gcc" />
+				<Option compiler="gnu_gcc_stable" />
 				<Option use_console_runner="0" />
+				<Compiler>
+					<Add option="-fopenmp" />
+				</Compiler>
 				<Linker>
 					<Add library="gomp" />
+					<Add library="dl" />
+					<Add library="pthread" />
 				</Linker>
 			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Os" />
 			<Add option="-funsigned-char" />
+			<Add option="-Wno-narrowing" />
+			<Add option="-Wno-literal-suffix" />
 		</Compiler>
 		<Linker>
 			<Add option="-s" />
@@ -106,6 +115,37 @@
 		</Unit>
 		<Unit filename="../Tools/StrCpy.cpp" />
 		<Unit filename="../Type.h" />
+		<Unit filename="../Volume/Dipoles.cpp">
+			<Option target="Dipole" />
+		</Unit>
+		<Unit filename="../Volume/Dipoles.h">
+			<Option target="Dipole" />
+		</Unit>
+		<Unit filename="../Volume/Dipoles_math.cpp">
+			<Option target="Dipole" />
+		</Unit>
+		<Unit filename="../Volume/Dipoles_tools.cpp">
+			<Option target="Dipole" />
+		</Unit>
+		<Unit filename="../Volume/Dipoles_video.cpp">
+			<Option target="Dipole" />
+		</Unit>
+		<Unit filename="../Volume/Mfp_2009-01-15.cpp">
+			<Option target="Phyzical Corpuscules" />
+		</Unit>
+		<Unit filename="../Volume/Phyzical Simulations.cpp">
+			<Option target="Phyzical Corpuscules" />
+		</Unit>
+		<Unit filename="../Volume/Tensor Base Space.cpp">
+			<Option target="Tensor Base Space" />
+		</Unit>
+		<Unit filename="../Volume/Tensor to ConIO.cpp">
+			<Option target="Vector-Tensor" />
+			<Option target="Tensor Base Space" />
+		</Unit>
+		<Unit filename="../Volume/Vector and Tensor.cpp">
+			<Option target="Vector-Tensor" />
+		</Unit>
 		<Unit filename="../Window/ConIO.cpp" />
 		<Unit filename="../Window/ConIO.h" />
 		<Unit filename="../Window/Font.cpp" />
@@ -131,37 +171,6 @@
 		<Unit filename="../Window/Window.h" />
 		<Unit filename="../Window/Window_Help.cpp" />
 		<Unit filename="../Window/Window_Menu.cpp" />
-		<Unit filename="../Working/Dipoles.cpp">
-			<Option target="Dipole" />
-		</Unit>
-		<Unit filename="../Working/Dipoles.h">
-			<Option target="Dipole" />
-		</Unit>
-		<Unit filename="../Working/Dipoles_math.cpp">
-			<Option target="Dipole" />
-		</Unit>
-		<Unit filename="../Working/Dipoles_tools.cpp">
-			<Option target="Dipole" />
-		</Unit>
-		<Unit filename="../Working/Dipoles_video.cpp">
-			<Option target="Dipole" />
-		</Unit>
-		<Unit filename="../Working/Mfp_2009-01-15.cpp">
-			<Option target="Phyzical Corpuscules" />
-		</Unit>
-		<Unit filename="../Working/Phyzical Simulations.cpp">
-			<Option target="Phyzical Corpuscules" />
-		</Unit>
-		<Unit filename="../Working/Tensor Base Space.cpp">
-			<Option target="Tensor Base Space" />
-		</Unit>
-		<Unit filename="../Working/Tensor to ConIO.cpp">
-			<Option target="Vector-Tensor" />
-			<Option target="Tensor Base Space" />
-		</Unit>
-		<Unit filename="../Working/Vector and Tensor.cpp">
-			<Option target="Vector-Tensor" />
-		</Unit>
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>

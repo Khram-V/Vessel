@@ -507,17 +507,12 @@ static void maximizeWindowManually(_GLFWwindow* window)
 // Window procedure for user-created windows
 //
 static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-    _GLFWwindow* window = GetPropW(hWnd, L"GLFW");
+{  _GLFWwindow* window = GetPropW(hWnd, L"GLFW");
     if (!window)
-    {
-        if (uMsg == WM_NCCREATE)
-        {
-            if (_glfwIsWindows10Version1607OrGreaterWin32())
-            {
-                const CREATESTRUCTW* cs = (const CREATESTRUCTW*) lParam;
-                const _GLFWwndconfig* wndconfig = cs->lpCreateParams;
-
+    {   if (uMsg == WM_NCCREATE)
+        {   if (_glfwIsWindows10Version1607OrGreaterWin32())
+            { const CREATESTRUCTW* cs = (const CREATESTRUCTW*) lParam;
+              const _GLFWwndconfig* wndconfig = cs->lpCreateParams;
                 // On per-monitor DPI aware V1 systems, only enable
                 // non-client scaling for windows that scale the client area
                 // We need WM_GETDPISCALEDSIZE from V2 to keep the client
@@ -526,7 +521,6 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
                     EnableNonClientDpiScaling(hWnd);
             }
         }
-
         return DefWindowProcW(hWnd, uMsg, wParam, lParam);
     }
 

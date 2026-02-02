@@ -10,9 +10,7 @@
 #define _GLFW_CONCAT_VERSION(m, n, r) #m "." #n "." #r
 #define _GLFW_MAKE_VERSION(m, n, r) _GLFW_CONCAT_VERSION(m, n, r)
 
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW internal API                      //////
-//////////////////////////////////////////////////////////////////////////
+/// GLFW internal API
 
 static const struct
 {   int ID;
@@ -55,9 +53,7 @@ GLFWbool _glfwSelectPlatform(int desiredID, _GLFWplatform* platform)
     return GLFW_FALSE;
 }
 
-//////////////////////////////////////////////////////////////////////////
-//////                        GLFW public API                       //////
-//////////////////////////////////////////////////////////////////////////
+/// GLFW public API
 
 GLFWAPI int glfwGetPlatform(void)
 {

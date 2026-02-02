@@ -8,7 +8,7 @@
 		<Build>
 			<Target title="Alice">
 				<Option platforms="Windows;" />
-				<Option output="Dev/Alice" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/Alice" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Data" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
@@ -26,7 +26,7 @@
 				</Linker>
 			</Target>
 			<Target title="FText">
-				<Option output="../../../Work/FText" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/FText" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Data" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
@@ -41,7 +41,7 @@
 				</Linker>
 			</Target>
 			<Target title="SWAB">
-				<Option output="Dev/SWAB" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/SWAB" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Data" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
@@ -56,7 +56,7 @@
 			</Target>
 			<Target title="C-WhetStones">
 				<Option platforms="Windows;" />
-				<Option output="Dev/WhetStones(-c-)" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/WhetStones(-c-)" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Data" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
@@ -64,7 +64,7 @@
 			</Target>
 			<Target title="Complex">
 				<Option platforms="Windows;" />
-				<Option output="Dev/Complex" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/Complex" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Dev" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
@@ -89,7 +89,7 @@
 			</Target>
 			<Target title="DC3-Interpolation-Extrapolation">
 				<Option platforms="Windows;" />
-				<Option output="Dev/DC3" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/DC3" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../Vessel/Digitize" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
@@ -101,7 +101,7 @@
 			</Target>
 			<Target title="Design_Fonts">
 				<Option platforms="Windows;" />
-				<Option output="Dev/DesignFonts" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/DesignFonts" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Data" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
@@ -117,7 +117,7 @@
 				</Linker>
 			</Target>
 			<Target title="Hello">
-				<Option output="Dev/Hello" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/Hello" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Data" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
@@ -142,6 +142,12 @@
 			<Add option="-s" />
 			<Add option="-static" />
 		</Linker>
+		<Unit filename="../Math/Contour.cpp">
+			<Option target="DC3-Interpolation-Extrapolation" />
+		</Unit>
+		<Unit filename="../Math/Contour.h">
+			<Option target="DC3-Interpolation-Extrapolation" />
+		</Unit>
 		<Unit filename="../Math/Gsl/Complex.c">
 			<Option compilerVar="CPP" />
 			<Option target="Complex" />
@@ -188,12 +194,6 @@
 		<Unit filename="../Working/Alice.c">
 			<Option compilerVar="CC" />
 			<Option target="Alice" />
-		</Unit>
-		<Unit filename="../Working/Contour.cpp">
-			<Option target="DC3-Interpolation-Extrapolation" />
-		</Unit>
-		<Unit filename="../Working/Contour.h">
-			<Option target="DC3-Interpolation-Extrapolation" />
 		</Unit>
 		<Unit filename="../Working/Design_Fonts.cpp">
 			<Option target="Design_Fonts" />

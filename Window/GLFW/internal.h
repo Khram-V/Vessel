@@ -2,7 +2,7 @@
 // GLFW 3.5 - www.glfw.org
 //
 #pragma once
-//#define _GLFW_WIN32
+//#define _GLFW_WIN32 -- переопределено для стандартного доступа к полной GLFW
 #define GLFW_INCLUDE_NONE
 #include "../GLFW/glfw3.h"
 
@@ -77,8 +77,7 @@ typedef const GLubyte* (APIENTRY * PFNGLGETSTRINGIPROC)(GLenum,GLuint);
 // Per-thread error structure
 //
 struct _GLFWerror
-{
-    _GLFWerror*     next;
+{  _GLFWerror*     next;
     int             code;
     char            description[_GLFW_MESSAGE_SIZE];
 };
@@ -88,8 +87,7 @@ struct _GLFWerror
 // Parameters relating to the initialization of the library
 //
 struct _GLFWinitconfig
-{
-    GLFWbool      hatButtons;
+{   GLFWbool      hatButtons;
     int           angleType;
     int           platformID;
 };
@@ -119,20 +117,20 @@ struct _GLFWwndconfig
     GLFWbool      mousePassthrough;
     GLFWbool      scaleToMonitor;
     GLFWbool      scaleFramebuffer;
-    struct {
-        char      frameName[256];
-    } ns;
-    struct {
-        char      className[256];
-        char      instanceName[256];
-    } x11;
+//    struct {
+//        char      frameName[256];
+//    } ns;
+//    struct {
+//        char      className[256];
+//        char      instanceName[256];
+//    } x11;
     struct {
         GLFWbool  keymenu;
         GLFWbool  showDefault;
     } win32;
-    struct {
-        char      appId[256];
-    } wl;
+//    struct {
+//        char      appId[256];
+//    } wl;
 };
 
 // Context configuration
@@ -336,8 +334,8 @@ struct _GLFWmutex
     GLFW_PLATFORM_MUTEX_STATE
 };
 
-// Platform API structure
-//
+/// Platform API structure
+
 struct _GLFWplatform
 {
     int platformID;
@@ -454,9 +452,7 @@ struct _GLFWlibrary
 //
 extern _GLFWlibrary _glfw;
 
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW platform API                      //////
-//////////////////////////////////////////////////////////////////////////
+/// GLFW platform API
 
 void _glfwPlatformInitTimer(void);
 uint64_t _glfwPlatformGetTimerValue(void);
@@ -476,9 +472,7 @@ void* _glfwPlatformLoadModule(const char* path);
 void _glfwPlatformFreeModule(void* module);
 GLFWproc _glfwPlatformGetModuleSymbol(void* module, const char* name);
 
-//////////////////////////////////////////////////////////////////////////
-//////                         GLFW event API                       //////
-//////////////////////////////////////////////////////////////////////////
+/// GLFW event API
 
 void _glfwInputWindowFocus(_GLFWwindow* window, GLFWbool focused);
 void _glfwInputWindowPos(_GLFWwindow* window, int xpos, int ypos);
@@ -505,9 +499,7 @@ void _glfwInputDrop(_GLFWwindow* window, int count, const char** names);
 void _glfwInputMonitor(_GLFWmonitor* monitor, int action, int placement);
 void _glfwInputMonitorWindow(_GLFWmonitor* monitor, _GLFWwindow* window);
 
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW internal API                      //////
-//////////////////////////////////////////////////////////////////////////
+/// GLFW internal API
 
 GLFWbool _glfwSelectPlatform(int platformID, _GLFWplatform* platform);
 

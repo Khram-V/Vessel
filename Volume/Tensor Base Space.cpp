@@ -145,6 +145,7 @@ int main( int argc, char** argv )
     Win.Icon( "Math" ).Place::Draw( drawing );
     Win.Draw();
   //glFrontFace( GL_CW );      // CCW видимы грани с обходом по часовой стрелке
+    glDisable( GL_LIGHTING );
   int key=0;
     do
     if( key==_F1 )

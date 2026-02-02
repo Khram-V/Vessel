@@ -3,9 +3,9 @@
  */
 #include "..\Type.h"
 #include "..\Math\Vector.h"
+#include "..\Math\Contour.h"
 #include "..\Window\ConIO.h"
 #include <StdIO.h>
-#include "Contour.h"
 
 char *getString( FILE *F );              // Чтение строки на статическом адресе
 const Real LW=1.0; // пусть это будет размер шпации

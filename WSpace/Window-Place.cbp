@@ -16,7 +16,7 @@
 		<Build>
 			<Target title="Window Shapes">
 				<Option platforms="Windows;" />
-				<Option output="Dev/Window-shapes" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/Window-shapes" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Data/" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
@@ -27,7 +27,7 @@
 			</Target>
 			<Target title="Window Trial">
 				<Option platforms="Windows;" />
-				<Option output="Dev/Window-trial" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/Window-trial" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Dev" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
@@ -42,7 +42,7 @@
 			</Target>
 			<Target title="Interpolation-Extrapolation">
 				<Option platforms="Windows;" />
-				<Option output="Dev/Interpolation-Extrapolation" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/Interpolation-Extrapolation" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Dev" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
@@ -54,7 +54,7 @@
 			</Target>
 			<Target title="Analitic Field Space">
 				<Option platforms="Windows;" />
-				<Option output="Dev/Analitic Field Space" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/Analitic Field Space" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Dev" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
@@ -81,7 +81,7 @@
 			</Target>
 			<Target title="GLFW Shapes">
 				<Option platforms="Windows;" />
-				<Option output="Dev/GLFW-shapes" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/GLFW-shapes" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Dev" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
@@ -99,7 +99,7 @@
 			</Target>
 			<Target title="GLFW Trial">
 				<Option platforms="Windows;" />
-				<Option output="Dev/GLFW-trial" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/GLFW-trial" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Dev" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
@@ -118,7 +118,7 @@
 			</Target>
 			<Target title="UTF-8-Unicode-OEM(866)alt">
 				<Option platforms="Windows;" />
-				<Option output="Dev/UtC" prefix_auto="1" extension_auto="1" />
+				<Option output="../../Work/UtC" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../Window/Fonts" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />

@@ -1,8 +1,10 @@
-
+#include <Time.h>
 #include <StdIO.h>
+#include <CType.h>
+#include <wCType.h>
 #include "..\Window\ConIO.h"
 #include "..\Storm\Flex.h"
-#include "..\Type.h"
+//#include "..\Type.h"
 
 typedef enum { fv100,fv110,fv120,fv130,fv140, fv150,fv160,fv165,fv170,fv180,
                fv190,fv191,fv195,fv198,fv200, fv201,fv210,fv220,fv230,fv240,
@@ -20,7 +22,6 @@ typedef enum { fiFree,fiStation,fiButtock,fiWaterline,fiDiagonal } IntersectionT
      // intersection lines: free,stations,buttocks,waterlines and diagonal type
 struct Plane { Real a,b,c,d; }; // Description of 3D plane: a*x+b*y+c*z-d=0.0;
 union Color{ unsigned C; byte c[4]; };
-
 extern Vector Min,Max; // Экстремумы исходного графического изображения
 extern byte  UnderWaterColorAlpha;
 extern Color UnderWaterColor;
@@ -111,12 +112,11 @@ Real CurvatureScale, // Scalefactor used to increase or decrease the size of the
 //    byte AlphaBlend;         // fv>=261
 //};
 class Surface
-{ bool isLoad;              //-- признак успешной загрузки
+{ // bool isLoad;              //-- признак успешной загрузки
   int  NoLayers,NoCoPoint,NoEdges,NoCurves,NoFaces; // размеры кривых  массивов
   struct Layers
   { char *Description;
     int ID;
-//  unsigned int Color;
     Color LClr;
     bool Visible,
          Symmetric,
@@ -137,7 +137,8 @@ class Surface
   } *P;                      //! NoCoPoint
 
   struct Edges               /// Control Edges
-  { int StartIndex,EndIndex; // --> Points индексы
+  { int StartIndex,EndIndex, // --> Points индексы
+        NoFaces;             // -- количество сопряженных граней
     bool Crease,             // -- ребро по сломанной поверхности
          Selected,           // -- выбор
          ControlEdge;        // == True на считывании ребра
@@ -155,12 +156,17 @@ class Surface
     bool Selected;
   } *F;                      //! NoFaces
 
-  void Extents();            // экстремумы по расчетным площадкам
 public:
-  Surface(){ memset( this,0,sizeof( Surface ) ); }
-  void Read();
+  void Extents();            // экстремумы по расчетным площадкам
+  Surface(){ memset( this,0,sizeof( Surface ) ); } // обнуляется NoLayers тоже!
+  void Read( bool Part=false );
   void ReadFEF();
+  void WriteFEF();            // сохранение текущего результата, наконец-то
+  void ReadObj( char *Path ); // полное имя для сопутствующего описания MtlLib
   void Drawing( BoardView=mvPort );
+  void Revolute();           // обращение нормалей по элементарных поверхностям
+  void R90Xright();          // положить на правый борт
+  void R90Zright();          // поворот вправо по курсу
 };
 struct Spline{ Vector P; bool Knuckle; };
 struct Items{ int NoSplines; Spline *S; };
@@ -184,10 +190,10 @@ struct Marker
 };
 struct Ship                      // Сборка корпуса в целом
 { WCHAR *FName; char *Name;      // Единожды представляемое имя числовой модели
-  PrecisionType PT;              // Precision of the ship-model
   Visibility Visio;              // Show настройка графической визуализации
   Project      Set;              // характеристики и размерности корабля
   Surface    Shell;              // Shell оболочка поверхности обшивки корпуса
+  PrecisionType PT;              // Precision of the ship-model
 
   int NoStations,NoButtocks,NoWaterlines,NoDiagonals,NoMarkers,NoFlowLines;
   InterSection *Stations,        // шпангоуты  LoadStation
@@ -200,12 +206,21 @@ struct Ship                      // Сборка корпуса в целом
   Ship();                        // очищающий конструктор
   bool LoadProject();            // быстрая выборка всего комплекса данных
                                  // в общие структуры в оперативной памяти
-  bool LoadFEF();                // здесь Ship.fef == File Exchange Format
-  bool LoadPart();               // или просто фрагмент цифровой модели
   void WriteVSL();               // запись теоретических контуров k Hull+Aurora
+  bool LoadFEF();                // здесь Ship.fef == File Exchange Format
+  bool LoadObj();                // WaveFront Technologies Advanced Visualizer
+  bool LoadPart( bool New=true );// или просто фрагмент цифровой модели
+  bool LoadExtFile( bool New=true );
 };
 struct FreeShip: Ship,View       // , Matrix
 { FreeShip();
   virtual bool Draw();           // виртуальная процедура с настройкой сцены
   virtual bool KeyBoard( fixed );
 };
+inline WCHAR* Slower( WCHAR *str )
+{ int l=wcslen( str ); while( --l>=0 )str[l]=towlower( str[l] ); return str;
+}
+inline char* Slower( char *str ) // пригодно лишь к латинским буквочкам
+{ int l=strlen( str ); while( --l>=0 )str[l]=tolower( str[l] ); return str;
+}
+

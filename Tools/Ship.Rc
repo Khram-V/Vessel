@@ -22,12 +22,12 @@ BEGIN
     BLOCK "041904B0"
     BEGIN
       VALUE "CompanyName",      "Russian Shipbuilders Society of Alexey Krylov"
-      VALUE "FileVersion",      "Sakhalin Branch 2024-05-11"
+      VALUE "FileVersion",      "Sakhalin Branch 2026-01-30"
       VALUE "FileDescription",  "Computational Fluid Mechanics"
       VALUE "InternalName",     "Ship Stormy Seaworthiness"
-      VALUE "LegalCopyright",   "(c)1976-2024 Vasily Khramushin"
+      VALUE "LegalCopyright",   "(c)1975-2026 Vasily Khramushin"
       VALUE "LegalTrademarks",  "Сызрань–Калининград–Севастополь–Ленинград–Владивосток–Сахалин–יְרוּשָׁלַיִם В.Храмушин"
-      VALUE "OriginalFilename", "Aurora::c++"
+      VALUE "OriginalFilename", "Aurora::C++"
       VALUE "ProductName",      "Fluidmechanics Simulation"
       VALUE "ProductVersion",   "original"
     END
