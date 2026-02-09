@@ -526,6 +526,9 @@ void Surface::ReadObj( char *Path )           // временный оригин
                 memcpy( &L[0],&ActiveLayer,sizeof( Layers ) ); ++NoLayers;
   }
   Extents();              // расчёт - переопределение графических экстремумов
+  Length=Max.x-Min.x;
+  Beam=Max.y-Min.y;
+  Draft=-Min.z;
 }
 //
 //   free!Ship.part = дельная вещь или фрагмент числовой модели корпуса

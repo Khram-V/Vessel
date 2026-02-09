@@ -117,7 +117,7 @@ Window* Place::Ready()
 }
 bool WinReady( Window *W )    // без указания адреса опрашиваются корень списка
 { if( W )return W->Ready()!=NULL; else
-  if( First )for( W=First; W->Next; W=W->Next )W->WaitEvents();
+  if( First )for( W=First; W->Next; W=W->Next )W->WaitEvents(); // всё ожидание
   return First!=NULL;
 }
 //!  Конструктор создает окно OpenGL, и ... не образует цикла прерываний ...
@@ -207,23 +207,23 @@ Window::~Window()                     // Разрушение окна в обр
     //  ScanStatus();                            // очистка запросов Windows
     //  while( GetKey() );
     //  WaitEvents();
-    Site = NULL;                                 //! сброс повторов деструктора
    Window *Cur=First;                            // обработка/очистка списка
     if( Cur==this )First=Cur=Next; else          // первое Window-вхождение
     while( Cur->Next )                           // и надо особо уважить поиски
      { if( Cur->Next==this ){ Cur->Next=Next; break; } Cur=Cur->Next; }
-
 //     if( Cur->Next!=this )Cur=Cur->Next; else  // себя самого с удалением
-//       { Cur->Next=Next; break; }    // самого первого из найденных
+//       { Cur->Next=Next; break; }              // самого первого из найденных
 //  if( glfwWindow ){
-        glfwDestroyWindow( glfwWindow );         // закрытие окна с переходом
-        glfwWindow = NULL;
+    glfwDestroyWindow( glfwWindow );             // закрытие окна с переходом
 //    }
-    if( Cur )glAct( Cur ); //else First=NULL;    // - на смежный нижний уровень
-    else{ First=NULL; glfwTerminate(); _exit( 22 );} // WinReady(),exit(3); // Cur->Activate();
+    if( Cur )glAct( Cur ),WinReady(); //,WaitEvents() - на смежный нижний уровень
+    else{ First=NULL; glfwTerminate(); } // _exit( 22 );} // WinReady(),exit(3); // Cur->Activate();
   }
+  glfwWindow = NULL;
+  Site = NULL;                                 //! сброс повторов деструктора
+//WaitEvents();
 }
-void Window::Close(){ if( glfwWindow )this->~Window(); } //delete this; }; //~Window(); }
+void Window::Close(){ /*if( glfwWindow )*/ this->~Window(); } //delete this; }; //~Window(); }
 //!
 //!   Позиционирование окон по правилам Windows
 //!
@@ -344,20 +344,20 @@ bool Window::Timer()
 }
 Window& Window::SetTimer( DWORD mSec,bool(*inTm)() )// время и адрес исполнения
 { if( glfwWindow )
-  if( !mSec )                                      // пока только таймер №12
-  { dTime=0; extTime=NULL; } else                  // идентификатор не привязан
-  { dTime=mSec;                              // glfwWaitEventsTimeout( dTime );
-    nextTime=glfwGetTime()*1e3+dTime; extTime=inTm;
+  if( !mSec )                                   // пока только таймер №12
+  { dTime=0; extTime=NULL; } else              // идентификатор не привязан
+  { dTime=mSec;                               // glfwWaitEventsTimeout( dTime )
+    nextTime=glfwGetTime()*1.0e3+dTime; extTime=inTm;
   } return *this;
 }
 Window& Window::KillTimer()                           // сброс таймера - если 0
 { if( glfwWindow )SetTimer( 0 ); return *this;
 }
 void Window::PutTimer()             //? внутренняя обработка допускает пропуски
-{ if( glfwWindow )
+{ if( glfwWindow )                  //if( dTime>0 )
   if( !isTimer )                    //! потрясающе ! вдруг обнаружились повторы
-  //if( !KeyInterrupt )             // внешних прерываний без исполнения первых
-  //if( !isMouse )                  // ! еще и с клавиатурой - проблемы
+  // if( !KeyInterrupt )            // внешних прерываний без исполнения первых
+  // if( !isMouse )                 // ! еще и с клавиатурой - проблемы
   if( Ready() )
   { ++isTimer;                        // на повторах - сбрасываются расчеты
     { glContext( this );
@@ -373,7 +373,7 @@ void Window::PutTimer()             //? внутренняя обработка 
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void Window::WaitEvents( bool stop )
-{ if( First )if( glfwWindow )//if( glAct( this ) )
+{ if( First )if( glfwWindow ) //if( glAct( this ) )
   { for( Window *aW=First; aW; aW=aW->Next ) // перебор активированных окон
     if( aW->dTime )                          // если таймер установлен и
     if( glfwGetTime()*1e3>=aW->nextTime )    // текущее время больше заданного
@@ -383,9 +383,8 @@ void Window::WaitEvents( bool stop )
       if( dTime )glfwWaitEventsTimeout( Real( dTime )/1e3 );
       else glfwWaitEvents();
     } else glfwPollEvents();
-  }
-}
-//#include <StdArg.h>                           // блок разных текстовых надписей
+} }
+//#include <StdArg.h>                         // блок разных текстовых надписей
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include "glfw3native.h"
 

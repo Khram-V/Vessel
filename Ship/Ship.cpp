@@ -124,7 +124,10 @@ bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой под
     case _End:  Shell.Revolute();  goto R1;
     case _PgUp: Shell.R90Zright(); goto R1;
     case _PgDn: Shell.R90Xright();      R1:
-    case _Home: Shell.Extents(); Draw(); return View::KeyBoard( Keyb );
+      if( Keyb!=_End ){ Shell.Extents(); Length=Max.x-Min.x,
+                                         Beam=Max.y-Min.y,
+                                         Draft=-Min.z; }
+    case _Home: Draw(); return View::KeyBoard( Keyb );
     case _Blank:
       if( ScanStatus()&CTRL )
         { static bool xd=false;
