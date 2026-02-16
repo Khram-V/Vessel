@@ -113,7 +113,6 @@ Real CurvatureScale, // Scalefactor used to increase or decrease the size of the
 //};
 class Surface
 { // bool isLoad;              //-- признак успешной загрузки
-  int  NoLayers,NoCoPoint,NoEdges,NoCurves,NoFaces; // размеры кривых  массивов
   struct Layers
   { char *Description;
     int ID;
@@ -155,14 +154,15 @@ class Surface
     int LayerIndex;          // -- слой для всего набора площадок
     bool Selected;
   } *F;                      //! NoFaces
-
 public:
-  void Extents();            // экстремумы по расчетным площадкам
+  int  NoLayers,NoCoPoint,NoEdges,NoCurves,NoFaces; // размеры кривых  массивов
+  void Extents( bool Sizes=true );         // экстремумы по расчетным площадкам
   Surface(){ memset( this,0,sizeof( Surface ) ); } // обнуляется NoLayers тоже!
+  void EditMenu( Window* );       // числовое смещение и 3D-перемасштабирование
   void Read( bool Part=false );
   void ReadFEF();
-  void WriteFEF();            // сохранение текущего результата, наконец-то
-  void ReadObj( char *Path ); // полное имя для сопутствующего описания MtlLib
+  void WriteFEF();              // сохранение текущего результата, наконец-то
+  void ReadObj( char *Path );  // полное имя для сопутствующего описания MtlLib
   void Drawing( BoardView=mvPort );
   void Revolute();           // обращение нормалей по элементарных поверхностям
   void R90Xright();          // положить на правый борт

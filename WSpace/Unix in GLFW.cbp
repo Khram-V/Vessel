@@ -322,6 +322,16 @@
 		</Unit>
 		<Unit filename="../Tools/Math.Rc">
 			<Option compilerVar="CPP" />
+			<Option target="Waves Profile" />
+			<Option target="Window-shapes" />
+			<Option target="Window-trial" />
+		</Unit>
+		<Unit filename="../Tools/Ship.Rc">
+			<Option compilerVar="CPP" />
+			<Option target="Aurora Storm" />
+			<Option target="Aurora_Storm_x" />
+			<Option target="Hull Theory" />
+			<Option target="Ship Viewer" />
 		</Unit>
 		<Unit filename="../Tools/StrCpy.cpp" />
 		<Unit filename="../Tools/Utah/Tea.cpp">

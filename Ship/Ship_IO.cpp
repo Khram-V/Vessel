@@ -419,8 +419,7 @@ bool Ship::LoadExtFile( bool New )
   FName=wcsdup( U2W( FileName ) );
   if( L>5 && strcmp( FileName+L-5,".part" )==0 )LoadPart( New ); else
   if( L>4 && strcmp( FileName+L-4,".fef" )==0 )LoadFEF(); else // с заменой заголовков
-  if( L>4 && strcmp( FileName+L-4,".obj" )==0 )LoadObj(); else
-  return false;
+  if( L>4 && strcmp( FileName+L-4,".obj" )==0 )LoadObj(); else return false;
   return true;
 }
 bool Ship::LoadObj()
@@ -430,8 +429,8 @@ bool Ship::LoadObj()
   }
  time_t lt=time(0); char *S=asctime( gmtime( &lt ) ); strcut( S );
   if( !Set.Name    )Set.Name=strdup( fname( Name ) ); // ~ без вычистки
-  if( !Set.Designer)Set.Designer="@2026-Ship.exe viewer for free!Ship";
-  if( !Set.Comment )Set.Comment="Ship for Aurora stormy seakeeping of ship";
+  if( !Set.Designer)Set.Designer="@2026-Ship.exe viewer for „free!Ship“";
+  if( !Set.Comment )Set.Comment="Application for «Аврора» stormy seakeeping of ship";
   if( !Set.CreatedBy)Set.CreatedBy=S;
 //if( !Set.CreatedBy)Set.CreatedBy=ctime( &lt );
   Shell.ReadObj( W2U( FName ) );
@@ -441,15 +440,15 @@ bool Ship::LoadObj()
 void Surface::ReadObj( char *Path )           // временный оригинал имени файла
 { char *S,*Name=strdup( Path ); Real r,g,b,a; char *s; // ссылка не текст в буфере файла
   print( "\nОткрыт WaveFront файл: %s",Name );         textcolor( LIGHTCYAN );
- int NoL=NoLayers,                            // уровни будут дополняться
-     NoC=NoCoPoint-1;
+ int NoL=NoLayers,                      // уровни будут дополняться сверху
+     NoC=NoCoPoint-1;                   // узловые точки отделяются от прошлого
   memset( &ActiveLayer,0,sizeof(Layers) );
-  ActiveLayer.Description="WaveFront"; // Technologies Advanced Visualizer";
-  ActiveLayer.Symmetric=false;
-  ActiveLayer.ID=NoL;                  // изначально здесь ноль
-  ActiveLayer.LClr.C=0xFFAAAAAA;       // предварительная раскладка
-  ActiveLayer.Visible=true;
-  ActiveLayer.ShowInLineSpan=true;
+  ActiveLayer.Description="WaveFront";  // Technologies Advanced Visualizer";
+  ActiveLayer.Symmetric=false;          // пока без правого дублирования
+  ActiveLayer.ID=NoL;                   // изначально здесь ноль
+  ActiveLayer.LClr.C=0xAAFFFFAA;        // предварительная раскладка
+  ActiveLayer.Visible=true;             // слой видимый
+  ActiveLayer.ShowInLineSpan=true;      // включается в теоретические чертежи
   while( !feof( ::F ) )
   { if( (s=strchr( S=getString( ::F ),'#' ))!=NULL )*s=0;
     if( strcut( S )<3 )continue;
@@ -458,7 +457,7 @@ void Surface::ReadObj( char *Path )           // временный оригин
     { P=(CoPoint*)Allocate( ++NoCoPoint*sizeof( CoPoint ),P );
      CoPoint &p=P[NoCoPoint-1];
 //    sscanf( S+2,"%lg%lg%lg",&p.V.y,&p.V.x,&p.V.z ); p.V.x=-p.V.x; // Новик здесь
-      sscanf( S+2,"%lg%lg%lg",&p.V.x,&p.V.z,&p.V.y ); // так готовится в Авроре
+      sscanf( S+2,"%lg%lg%lg",&p.V.x,&p.V.z,&p.V.y ); // так готовится в Авроре #+# p.V.y=-p.V.y;
 ///   sscanf( S+2,"%lg%lg%lg",&p.V.y,&p.V.z,&p.V.x ); p.V.x=-p.V.x;
     } else
     if( !strncmp( S,"f ",2) )
@@ -469,7 +468,7 @@ void Surface::ReadObj( char *Path )           // временный оригин
           if( k>3 )Rc=(int*)realloc( Rc,sizeof(int)*(k+1) );
           Rc[k]=atoi( w )+NoC; w=s+1; ++k;  // нормали получаются задом наперёд
       } while( s );
-      if( k>2 )                          // наверное прямые так не строятся ...
+      if( k>2 )                             // наверняка прямые так не строятся
       { F=(Faces*)Allocate( ++NoFaces*sizeof(Faces),F );
         Faces &f=F[NoFaces-1]; f.Capacity=k;
                                f.P=Rc;
@@ -488,47 +487,51 @@ void Surface::ReadObj( char *Path )           // временный оригин
         f.P[0]=a+NoC;
         f.P[1]=b+NoC;
         f.P[2]=c+NoC;
-      }
-*/
+      } */
     } else
     if( !strncmp( Slower( S ),"usemtl",6 ) ) // Slower дале уже готов для всех
-    {  if( NoL<NoLayers )
-       for( int i=NoL; i<NoLayers; i++ )
-       if( !strcmp( S+7,L[i].Description ) )
-         { ActiveLayer.ID=i;    // print( "\n%d %s[%d] ",i,L[i].Description,i+1 );
-           break;
-         }
-    } else
-    if( !strncmp( S,"mtllib",6 ) ) // разборка расцветки по уровням расслоений
-    { strcpy( fname( Name ),S+7 );                                                      // print( "\n собран файл %s ",Name );
-     FILE *W=_wfopen( U2W( Name ),L"rt" );   // файл.mtl может быть перепрочтён
-      while( !feof( W ) )
-      { if( (s=strchr( S=getString( W ),'#' ))!=NULL )*s=0;
-        if( strcut( S )<3 )continue;
-        if( !strncmp( Slower( S ),"newmtl",6 ) )
-        { NoLayers++; L=(Layers*)Allocate( NoLayers*sizeof( Layers ),L );
-          memcpy( &L[NoLayers-1],&ActiveLayer,sizeof( Layers ) );
-          L[NoLayers-1].Description=strdup( S+7 );
-          L[NoLayers-1].ID=NoLayers; } else
-        if( !strncmp( S,"kd ",3 ) )
-        { Color &c=L[NoLayers-1].LClr;
-          sscanf( S+3,"%lg%lg%lg",&r,&g,&b ); c.c[0]=byte( r*255 );
-                                              c.c[1]=byte( g*255 );
-                                              c.c[2]=byte( b*255 ); } else
-        if( !strncmp( S,"d ",2 ) )
-        { sscanf( S+2,"%lg",&a ); L[NoLayers-1].LClr.c[3]=byte( 22+a*200 ); //! [22-222] - пусть пока временно
+    { ActiveLayer.ID=-1;
+      if( NoL<NoLayers )
+      for( int i=NoL; i<NoLayers; i++ )
+      if( !strcmp( S+7,L[i].Description ) )
+        { ActiveLayer.ID=i;    // print( "\n%d %s[%d] ",i,L[i].Description,i+1 );
+          break;               // ... или первый из попавшихся
         }
-      } fclose( W );                                                            for( int I=NoL; I<NoLayers; I++ )print( "\nID=%d Descr=%s Color=%X",L[I].ID,L[I].Description,L[I].LClr.C );
-    }
+      if( ActiveLayer.ID==-1 )    // если слой не найден, тогда создание нового
+      { L=(Layers*)Allocate( ++NoLayers*sizeof( Layers ),L );
+        memcpy( &L[NoLayers-1],&ActiveLayer,sizeof( Layers ) );
+         L[NoLayers-1].Description=strdup( S+7 );         // новое имя по ссылке
+        L[NoLayers-1].ID=ActiveLayer.ID=NoLayers;
+      }
+    } else
+    if( !strncmp( S,"mtllib",6 ) )  // разборка расцветки по уровням расслоений
+    { strcpy( fname( Name ),S+7 );                                              // print( "\n собран файл %s ",Name );
+     FILE *W=_wfopen( U2W( Name ),L"rt" );   // файл.mtl может быть перепрочтён
+      if( !W )print( "\n? %s не открывается.\n",Name ); else
+      { while( !feof( W ) )
+        { if( (s=strchr( S=getString( W ),'#' ))!=NULL )*s=0;
+          if( strcut( S )<3 )continue;
+          if( !strncmp( Slower( S ),"newmtl",6 ) )
+          { L=(Layers*)Allocate( ++NoLayers*sizeof( Layers ),L );
+            memcpy( &L[NoLayers-1],&ActiveLayer,sizeof( Layers ) );
+            L[NoLayers-1].Description=strdup( S+7 );
+            L[NoLayers-1].ID=NoLayers; } else
+          if( !strncmp( S,"kd ",3 ) )
+          { Color &c=L[NoLayers-1].LClr;
+            sscanf( S+3,"%lg%lg%lg",&r,&g,&b ); c.c[0]=byte( r*255 );
+                                                c.c[1]=byte( g*255 );
+                                                c.c[2]=byte( b*255 ); } else
+          if( !strncmp( S,"d ",2 ) )
+          { sscanf( S+2,"%lg",&a ); L[NoLayers-1].LClr.c[3]=byte( 22+a*200 );   //! [22-222] - пусть пока временно
+          }
+        } fclose( W );              for( int I=NoL; I<NoLayers; I++ )print( "\nID=%d Descr=%s Color=%X",L[I].ID,L[I].Description,L[I].LClr.C );
+    } }
   }
   if( !NoLayers ) // на случай отсутствия послойного описания свойств, будет 1
   { L=(Layers*)Allocate( sizeof( Layers ) );
-                memcpy( &L[0],&ActiveLayer,sizeof( Layers ) ); ++NoLayers;
+    memcpy( &L[0],&ActiveLayer,sizeof( Layers ) ); NoLayers=1;
   }
-  Extents();              // расчёт - переопределение графических экстремумов
-  Length=Max.x-Min.x;
-  Beam=Max.y-Min.y;
-  Draft=-Min.z;
+  Extents( false );         // расчёт - переопределение графических экстремумов
 }
 //
 //   free!Ship.part = дельная вещь или фрагмент числовой модели корпуса
@@ -607,8 +610,8 @@ void Surface::ReadFEF()
        T.UswinHydrostatic=w,
        T.ShowInLineSpan=p;                                                      print( ", ID=%d, Color=%X, Vis=%i, Symm=%i, ... Плотность=%g, Толщина=%g \n",T.ID,T.LClr.C,T.Visible,T.Symmetric,T.MaterialDensity,T.Thickness );
    }
-   NoC=NoCoPoint;                                                               print( "< ControlPoints > %d",NoCoPoint );
-   NoCoPoint+=getInt();
+   NoC=NoCoPoint;
+   NoCoPoint+=getInt();                                                         print( "< ControlPoints > %d",NoCoPoint );
    P=(Surface::CoPoint*)Allocate( NoCoPoint*sizeof( Surface::CoPoint ),P );
    for( I=NoC; I<NoCoPoint; I++ )
    { CoPoint &T=P[I]; T.T=svRegular; K=0;        // и последних может не быть
@@ -665,7 +668,8 @@ void Surface::WriteFEF()
   }
   fprintf( ::F,"%i\n",NoFaces );
   for( int i=0; i<NoFaces; i++ )
-  { fprintf( ::F,"%i",F[i].Capacity );
+//if( L[F[i].LayerIndex].LClr.c[3]!=0 )         // исключение прозрачных граней
+  { fprintf( ::F,"%i",F[i].Capacity );          // без правки количества
     for( int j=0; j<F[i].Capacity; j++ )fprintf( ::F," %d",F[i].P[j] );
     fprintf( ::F," %i",F[i].LayerIndex );
     if( F[i].Selected )fprintf( ::F," 1" ); fprintf( ::F,"\n" );
@@ -675,16 +679,16 @@ void Ship::WriteVSL()
 { int i,j,n,M; bool vsl=NoStations>0;
   char FileName[MAX_PATH]; strcpy( FileName,sname( W2U( FName ) ) ); fext( FileName,"" );
   if( ( F=FileOpen( FileName,L"wt",vsl?L"vsl":L"fef", // простая выборка нового имени
-                     vsl? //L"Aurora-Ship [*.vsl *.fef]\1*.vsl;*.fef\1"
-                          L"[ Вычислительный эксперимент ].vsl\1*.vsl\1"
-                           "[ free!Ship Exchange Format ].fef\1*.fef\1"
-                           "Все файлы (*.*)\1*.*\1\1"
-                        : //L"free!Ship [*.fef]\1*.fef\1"
-                          L"[ free!Ship Exchange Format ].fef\1*.fef\1"
-                           "Все файлы (*.*)\1*.*\1\1",
-                          L"? Запись для вычислительного эксперимента Aurora.vsl"
-                           ", или сохранение в обменном  формате free!Ship.fef"
-                    ) )==NULL )
+        vsl? //L"Aurora-Ship [*.vsl *.fef]\1*.vsl;*.fef\1"
+            L"[ Вычислительный эксперимент ].vsl\1*.vsl\1"
+             "[ free!Ship Exchange Format ].fef\1*.fef\1"
+             "Все файлы (*.*)\1*.*\1\1"
+           : //L"free!Ship [*.fef]\1*.fef\1"
+            L"[ free!Ship Exchange Format ].fef\1*.fef\1"
+             "Все файлы (*.*)\1*.*\1\1",
+            L"? Запись для вычислительного эксперимента Aurora.vsl"
+             ", или сохранение в обменном  формате free!Ship.fef"
+    ) )==NULL )
     { print( "\n~Запись: %s\n не получается, странно...",FileName ); return; }
   M=strlen( FileName );
   if( M>4 && strcmp( FileName+M-4,".fef" )==0 )

@@ -48,6 +48,9 @@
 				<Option compiler="gcc" />
 				<Option parameters='&quot;Ships\Samples\Галеон Великих Испанских географических открытий.fef&quot; Save\Import\2people.part Save\Import\FreeBoard-125.part Save\«Аврора».fef Save\~באסילי &quot;Save\ONR-5613_DDX-2000.fef&quot; &quot;Ships\History\Carrack «Mary Rose».fbm&quot; &quot;Save\Import\Perle2(DS).fef&quot; &quot;Ships\Fregate type 23-11.fbm&quot;' />
 				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-Wno-write-strings" />
+				</Compiler>
 				<Linker>
 					<Add option="--gc-sections" />
 					<Add library="glu32" />
@@ -72,6 +75,9 @@
 		<Unit filename="../Math/Complex.h">
 			<Option target="Hull" />
 			<Option target="Hull-64" />
+		</Unit>
+		<Unit filename="../Math/Vector.h">
+			<Option target="Ship" />
 		</Unit>
 		<Unit filename="../Ship/Hull.cpp">
 			<Option target="Hull" />
@@ -171,10 +177,7 @@
 			<Option target="Hull-64" />
 		</Unit>
 		<Unit filename="../Window/Window_Help.cpp" />
-		<Unit filename="../Window/Window_Menu.cpp">
-			<Option target="Hull" />
-			<Option target="Hull-64" />
-		</Unit>
+		<Unit filename="../Window/Window_Menu.cpp" />
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>

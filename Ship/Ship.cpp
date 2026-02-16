@@ -78,6 +78,7 @@ Ship::Ship()
   }
   textcolor( YELLOW );
   print( "\n%s ",Name );
+  print( "\nLayer: %d, Knot: %d, Edge: %d, Face: %d, Curve: %d",Shell.NoLayers,Shell.NoCoPoint,Shell.NoEdges,Shell.NoFaces,Shell.NoCurves );
   print( "\n Длина : [ %6.2f - %-6.2f ] = %g ",Min.x,Max.x,Max.x-Min.x );
   print( "\n Ширина: [ %6.2f - %-6.2f ] = %g ",Min.y,Max.y,(Max.y>-Min.y?Max.y:-Min.y)*2 );
   print( "\n Высота: [ %6.2f - %-6.2f ] = %g ",Min.z,Max.z,Max.z-Min.z );
@@ -99,11 +100,12 @@ FreeShip::FreeShip():Ship(),View("Free!ship in C++ ",-12,12,640,480) //Matrix()
 //
 bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой подсказкой
  const static char                                   // по настройкам и методам
-     *Id[]={"free!Ship","  Корабельные форматы ",     // визуализации корпуса
-                   "*.ftm,*.fbm,*.fef,*.part",0 },
+     *Id[]={ "free!Ship","  Корабельные форматы ",   // визуализации корпуса
+               "*.ftm,*.fbm,*.fef,*.part",0 },
      *Cmds[]={ " F1 "," - справка",
                " F2 ","запись   «Aurorа»: [Ship].vsl",
-               " F3 ","дополнение [Ship].part и .obj",0 },
+               " F3 ","дополнение [Ship].part и .obj",
+               " F4 ","смещение и масштабирование",0 },
 //             " F3 ","запрос фрагмента [Ship].part",0 },
      *Plus[]={ " <Space>            ","борт\\полборта",
                " <Ctrl+Space>       "," грани\\рёбра",
@@ -120,14 +122,16 @@ bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой под
   { case _F1: Window::Help( Id,Cmds,Plus,1,1 ); break;
     case _F2: WriteVSL();                       break;
     case _F3: LoadExtFile( false );             break;
-           // LoadPart( false );                break;
-    case _End:  Shell.Revolute();  goto R1;
-    case _PgUp: Shell.R90Zright(); goto R1;
-    case _PgDn: Shell.R90Xright();      R1:
-      if( Keyb!=_End ){ Shell.Extents(); Length=Max.x-Min.x,
-                                         Beam=Max.y-Min.y,
-                                         Draft=-Min.z; }
-    case _Home: Draw(); return View::KeyBoard( Keyb );
+    case _F4: Shell.EditMenu(this); goto R1; // сдвиги и масштабирование
+    case _End: Shell.Revolute();    goto R1; // обращение нормалей поверхности
+    case _PgUp: Shell.R90Zright();  goto R1; // поворот 90° вправо по компасу
+    case _PgDn: Shell.R90Xright();      R1: // заложить крен 90° на правый борт
+    case _Home:
+      if( Keyb!=_End )
+      { Shell.Extents( false );   // нормали экстремумы не портят
+        Distance=-1.75*(Max.x+Max.y-Min.x-Min.y+Width*(Max.z-Min.z)*0.9/Height);
+        eyeX=135; // lookX=-60;
+      } Draw(); return View::KeyBoard( Keyb ); // перерисовка
     case _Blank:
       if( ScanStatus()&CTRL )
         { static bool xd=false;
@@ -140,9 +144,7 @@ bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой под
   } return Draw();
 }
 int main() // int argc, char **argv )
-{ texttitle( "FREE!Ship view in C++ " ); FreeShip Hull; // заголовок
+{ texttitle( "FREE!Ship view in C++ " ); FreeShip Hull; // заголовок и графика
   do{ Hull.Title( DtoA( Real(ElapsedTime())/3600000.0,-3 ) ); WaitTime( 500 );
     } while( Hull.Ready() && Hull.GetKey()!=_Esc ); return 12; //_exit( 0 );
 }
-
-
