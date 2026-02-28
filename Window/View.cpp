@@ -156,12 +156,12 @@ bool View::KeyBoard( fixed key )  // к спуску из внешних вир�
    glEnable( GL_LIGHTING );
    glEnable( GL_LIGHT0 ); glEnable( GL_LIGHT1 );
    glEnable( GL_LIGHT2 ); glEnable( GL_LIGHT3 );
-   glEnable( GL_DEPTH_TEST );        // растровая разборка отсечений по глубине
-   glDepthMask( GL_TRUE );   glClearDepth( 2e3 );  // 2000.0 );   // Enables Clearing Of The Depth Buffer
-   glDepthRange( 1,0 );  // 0,1 - Distance           взаимное накрытие объектов
-   glDepthFunc( GL_LEQUAL );//~EQUAL~GEQUAL GREATER LEQUAL NOTEQUAL LESS ALWAYS
    glEnable( GL_NORMALIZE );   glEnable( GL_AUTO_NORMAL );
-   if( !SeaColor[black+1].u ){ for( int i=0; i<256; i++ )/*   SeaColor[1+black+i].c[0]=byte(   pow(Real(i)/255,4)*180), // red   красный
+   glEnable( GL_DEPTH_TEST );        // растровая разборка отсечений по глубине
+   glClearDepth( 2e3 );     // 2000.0      Enables Clearing Of The Depth Buffer
+   glDepthRange( 1,0 );     // 0,1 - Distance        взаимное накрытие объектов
+   glDepthFunc( GL_LEQUAL );//~EQUAL~GEQUAL~GREATER~LEQUAL~NOTEQUAL~LESS~ALWAYS
+   glDepthMask( GL_TRUE );   if( !SeaColor[black+1].u ){ for( int i=0; i<256; i++ )/*   SeaColor[1+black+i].c[0]=byte(   pow(Real(i)/255,4)*180), // red   красный
      SeaColor[1+black+i].c[1]=byte(48+pow(Real(i)/255,2)*162), // green зеленый
      SeaColor[1+black+i].c[2]=byte(96+pow(Real(i)/255,3)*94 ); // blue  синий
 */   SeaColor[1+black+i].c[0]=byte(    pow(Real(i)/255,4 )*210 ), //+ 210 red   красный

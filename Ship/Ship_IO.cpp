@@ -18,6 +18,8 @@ static string Str;             // рабочая строчка изначаль
 static Real Scale=1.0;         // масштаб на случай совмещения моделей ...part.
 const Real Foot=0.3048;
 
+static Real e5r( _Real R ){ return fabs(R)<1e-5?0.0:R-remainder( R,1e-5L ); } //round(R*1e5)/1e5; } //
+
 static bool OpenFile(WCHAR *FileName) // открытие файла цифровой модели корпуса
 { char FTyp[14];
   F=_wfopen( FileName,L"rb" ); fread( FTyp,1,13,F );
@@ -444,10 +446,10 @@ void Surface::ReadObj( char *Path )           // временный оригин
      NoC=NoCoPoint-1;                   // узловые точки отделяются от прошлого
   memset( &ActiveLayer,0,sizeof(Layers) );
   ActiveLayer.Description="WaveFront";  // Technologies Advanced Visualizer";
-  ActiveLayer.Symmetric=false;          // пока без правого дублирования
   ActiveLayer.ID=NoL;                   // изначально здесь ноль
   ActiveLayer.LClr.C=0xAAFFFFAA;        // предварительная раскладка
   ActiveLayer.Visible=true;             // слой видимый
+  ActiveLayer.Symmetric=false;          // пока без правого дублирования
   ActiveLayer.ShowInLineSpan=true;      // включается в теоретические чертежи
   while( !feof( ::F ) )
   { if( (s=strchr( S=getString( ::F ),'#' ))!=NULL )*s=0;
@@ -466,6 +468,7 @@ void Surface::ReadObj( char *Path )           // временный оригин
       do{ s=strchr( w,' ' ); if( s )*s=0;
           z=strchr( w,'/' ); if( z )*z=0;
           if( k>3 )Rc=(int*)realloc( Rc,sizeof(int)*(k+1) );
+          while( *w<=' ' )w++;
           Rc[k]=atoi( w )+NoC; w=s+1; ++k;  // нормали получаются задом наперёд
       } while( s );
       if( k>2 )                             // наверняка прямые так не строятся
@@ -524,7 +527,7 @@ void Surface::ReadObj( char *Path )           // временный оригин
           if( !strncmp( S,"d ",2 ) )
           { sscanf( S+2,"%lg",&a ); L[NoLayers-1].LClr.c[3]=byte( 22+a*200 );   //! [22-222] - пусть пока временно
           }
-        } fclose( W );              for( int I=NoL; I<NoLayers; I++ )print( "\nID=%d Descr=%s Color=%X",L[I].ID,L[I].Description,L[I].LClr.C );
+        } fclose( W );                         for( int I=NoL; I<NoLayers; I++ )print( "\nID=%d Descr=%s Color=%X",L[I].ID,L[I].Description,L[I].LClr.C );
     } }
   }
   if( !NoLayers ) // на случай отсутствия послойного описания свойств, будет 1
@@ -657,7 +660,7 @@ void Surface::WriteFEF()
   }
   fprintf( ::F,"%i\n",NoCoPoint );
   for( int i=0; i<NoCoPoint; i++ )
-  { fprintf( ::F,"%g %g %g",P[i].V.x,P[i].V.y,P[i].V.z );
+  { fprintf( ::F,"%8.6f %8.6f %8.6f",P[i].V.x,P[i].V.y,P[i].V.z );
     if( P[i].Selected )fprintf( ::F," %i 1",P[i].T ); else
     if( P[i].T!=svRegular )fprintf( ::F," %i",P[i].T ); fprintf( ::F,"\n" );
   }
@@ -668,8 +671,8 @@ void Surface::WriteFEF()
   }
   fprintf( ::F,"%i\n",NoFaces );
   for( int i=0; i<NoFaces; i++ )
-//if( L[F[i].LayerIndex].LClr.c[3]!=0 )         // исключение прозрачных граней
-  { fprintf( ::F,"%i",F[i].Capacity );          // без правки количества
+  if( L[F[i].LayerIndex].LClr.c[3]!=0 )      //!.. исключение прозрачных граней
+  { fprintf( ::F,"%i",F[i].Capacity );        // без правки количества
     for( int j=0; j<F[i].Capacity; j++ )fprintf( ::F," %d",F[i].P[j] );
     fprintf( ::F," %i",F[i].LayerIndex );
     if( F[i].Selected )fprintf( ::F," 1" ); fprintf( ::F,"\n" );
@@ -693,7 +696,8 @@ void Ship::WriteVSL()
   M=strlen( FileName );
   if( M>4 && strcmp( FileName+M-4,".fef" )==0 )
   { fprintf( F,"%s\n%s\n%s\n%s\n%g %g %g %g %g %d 1 %d\n",
-           Set.Name,Set.Designer,Set.Comment,Set.CreatedBy, Length,Beam,Draft,
+           Set.Name,Set.Designer,Set.Comment,Set.CreatedBy,
+           e5r(Length),e5r(Beam),e5r(Draft),
            Set.WaterDensity,
            Set.AppendageCoefficient,
            Set.Units,PT );               // Set.MainparticularsHasBeenset=true

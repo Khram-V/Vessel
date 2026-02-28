@@ -39,6 +39,7 @@ bool FreeShip::Draw()               // виртуальная процедура
   glTranslated( (Max.x+Min.x)/-1.75,0,        // -Set.SplitSectionLocation
                 (Max.z+Min.z)/-2 );           // Set.Length/-2
   Clear(); color( lightgray );                 glLineWidth( .2 );
+  Print( 1,1,"%s < %g, %g, %g >",fname( Name ),Length,Beam,Draft );
   axis(*this,Length,Beam,Draft*2,"x","y","z"); glLineWidth( .5 );
   Shell.Drawing( B );                          glLineWidth( 1 );
   glDisable( GL_LIGHTING );
@@ -107,9 +108,9 @@ bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой под
                " F3 ","дополнение [Ship].part и .obj",
                " F4 ","смещение и масштабирование",0 },
 //             " F3 ","запрос фрагмента [Ship].part",0 },
-     *Plus[]={ " <Space>            ","борт\\полборта",
-               " <Ctrl+Space>       "," грани\\рёбра",
-               " <Shift+Tab>        "," прозрачность",
+     *Plus[]={ " <Space>  ","раскрытие борт\\полборта",
+               " <Ctrl+Space>"," борта - рёбра/грани",
+               " <Shift+Tab>  "," общая прозрачность",
                " <стрелки·leftMouse>"," ориентация",
                " <+Shift·rightMouse>"," смещение",
                " <+Ctrl·(roll)>"," дальность, наклон",
@@ -119,11 +120,19 @@ bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой под
                " <PgDn>  "," положить на правый борт",0 };
  BoardView &B=Visio.ModelView;
   switch( Keyb )
-  { case _F1: Window::Help( Id,Cmds,Plus,1,1 ); break;
+  { case _F1: Window::Help( Id,Cmds,Plus,1,2 ); break;
     case _F2: WriteVSL();                       break;
     case _F3: LoadExtFile( false );             break;
-    case _F4: Shell.EditMenu(this); goto R1; // сдвиги и масштабирование
-    case _End: Shell.Revolute();    goto R1; // обращение нормалей поверхности
+    case _F4: Shell.EditMenu(this); goto R1;        // сдвиги и масштабирование
+    case _End: Shell.Revolute();    goto R1;  // обращение нормалей поверхности
+    case _Blank:
+      if( ScanStatus()&CTRL )
+        { static bool xd=false;
+          if( xd^=true )glPolygonMode( GL_FRONT_AND_BACK,GL_FILL ); //,glEnable( GL_FRONT_FACE ),glEnable( GL_CULL_FACE );
+                  else  glPolygonMode( GL_FRONT,GL_FILL ),
+                        glPolygonMode( GL_BACK,GL_LINE ); //,glDisable( GL_FRONT_FACE ),glDisable( GL_CULL_FACE );
+        } else
+      if( B==mvPort )B=mvBoth; else B=mvPort; break;
     case _PgUp: Shell.R90Zright();  goto R1; // поворот 90° вправо по компасу
     case _PgDn: Shell.R90Xright();      R1: // заложить крен 90° на правый борт
     case _Home:
@@ -132,14 +141,6 @@ bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой под
         Distance=-1.75*(Max.x+Max.y-Min.x-Min.y+Width*(Max.z-Min.z)*0.9/Height);
         eyeX=135; // lookX=-60;
       } Draw(); return View::KeyBoard( Keyb ); // перерисовка
-    case _Blank:
-      if( ScanStatus()&CTRL )
-        { static bool xd=false;
-          if( xd^=true )glPolygonMode( GL_FRONT_AND_BACK,GL_FILL );  //,glEnable( GL_FRONT_FACE ),glEnable( GL_CULL_FACE )
-                  else  glPolygonMode( GL_FRONT,GL_FILL ),
-                        glPolygonMode( GL_BACK,GL_LINE );            //,glDisable( GL_FRONT_FACE ),glDisable( GL_CULL_FACE )
-        } else
-      if( B==mvPort )B=mvBoth; else B=mvPort; break;
     default: return View::KeyBoard( Keyb );
   } return Draw();
 }
