@@ -461,6 +461,7 @@ void Surface::ReadObj( char *Path )           // временный оригин
 //    sscanf( S+2,"%lg%lg%lg",&p.V.y,&p.V.x,&p.V.z ); p.V.x=-p.V.x; // Новик здесь
       sscanf( S+2,"%lg%lg%lg",&p.V.x,&p.V.z,&p.V.y ); // так готовится в Авроре #+# p.V.y=-p.V.y;
 ///   sscanf( S+2,"%lg%lg%lg",&p.V.y,&p.V.z,&p.V.x ); p.V.x=-p.V.x;
+      p.T=svRegular; // svCrease; // svDart; // svCorner;
     } else
     if( !strncmp( S,"f ",2) )
     { char *z,*w=S+2;
@@ -497,13 +498,13 @@ void Surface::ReadObj( char *Path )           // временный оригин
       if( NoL<NoLayers )
       for( int i=NoL; i<NoLayers; i++ )
       if( !strcmp( S+7,L[i].Description ) )
-        { ActiveLayer.ID=i;    // print( "\n%d %s[%d] ",i,L[i].Description,i+1 );
-          break;               // ... или первый из попавшихся
+        { ActiveLayer.ID=i;  // print( "\n%d %s[%d] ",i,L[i].Description,i+1 );
+          break;             //  ... или первый из попавшихся
         }
       if( ActiveLayer.ID==-1 )    // если слой не найден, тогда создание нового
       { L=(Layers*)Allocate( ++NoLayers*sizeof( Layers ),L );
         memcpy( &L[NoLayers-1],&ActiveLayer,sizeof( Layers ) );
-         L[NoLayers-1].Description=strdup( S+7 );         // новое имя по ссылке
+        L[NoLayers-1].Description=strdup( S+7 );         // новое имя по ссылке
         L[NoLayers-1].ID=ActiveLayer.ID=NoLayers;
       }
     } else
@@ -525,16 +526,15 @@ void Surface::ReadObj( char *Path )           // временный оригин
                                                 c.c[1]=byte( g*255 );
                                                 c.c[2]=byte( b*255 ); } else
           if( !strncmp( S,"d ",2 ) )
-          { sscanf( S+2,"%lg",&a ); L[NoLayers-1].LClr.c[3]=byte( 22+a*200 );   //! [22-222] - пусть пока временно
-          }
+          { sscanf( S+2,"%lg",&a ); L[NoLayers-1].LClr.c[3]=byte( 22+a*200 ); } //! [22-222] - пусть пока временно
         } fclose( W );                         for( int I=NoL; I<NoLayers; I++ )print( "\nID=%d Descr=%s Color=%X",L[I].ID,L[I].Description,L[I].LClr.C );
-    } }
+      }
+    }
   }
-  if( !NoLayers ) // на случай отсутствия послойного описания свойств, будет 1
+  if( !NoLayers )  // на случай отсутствия послойного описания свойств, будет 1
   { L=(Layers*)Allocate( sizeof( Layers ) );
     memcpy( &L[0],&ActiveLayer,sizeof( Layers ) ); NoLayers=1;
-  }
-  Extents( false );         // расчёт - переопределение графических экстремумов
+  } Extents( false );       // расчёт - переопределение графических экстремумов
 }
 //
 //   free!Ship.part = дельная вещь или фрагмент числовой модели корпуса

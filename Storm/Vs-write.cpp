@@ -9,13 +9,15 @@ static FILE *F=NULL;
 static Real T=0.0,St=0.0;    // действующее смещение для приведения к оригиналу
 static void e5R( Real &R ){ R-=remainder( R,1e-5L ); } // if( fabs( R )<=1e-5 )R=0; else
 static void e5V( Vector &V ){ e5R( V.x ); e5R( V.y ); e5R( V.z ); }
+static char Flg[]="v %lg %lg %lg\n";
 static void printF( Vector V )
-{ e5V( V ); if( V.y<0 )V.y=0; fprintf( F,"v %lg %lg %lg\n",V.x,V.z,V.y );
-                              fprintf( F,"v %lg %lg %lg\n",V.x,V.z,!V.y?0:-V.y );
+{ e5V( V ); if( V.y<0 )V.y=0; fprintf( F,Flg,V.x,V.z,V.y );
+                              fprintf( F,Flg,V.x,V.z,!V.y?0:-V.y );
 }
 static void crossPoint( _Vector A, _Vector B, _Vector C, int a, int b, int c )
-{ if( abs( (A-C)*(B-C) )<eps )return;                          // малая площадь
-  if( fabs( A.y )<eps && fabs( B.y )<eps && fabs( C.y )<eps )return;    // В ДП
+{ //if( abs( (A-C)*(B-C) )<eps )return;                        // малая площадь
+  if( a==b || b==c || c==a )return;                       // так не должно быть
+  if( fabs( A.y )<eps && fabs( B.y )<eps && fabs( C.y )<eps )return;// всё в ДП
   if( A.z*B.z<0 || B.z*C.z<0 || C.z*A.z<0 )return;                 // через КВЛ
   int l=A.z<=0 && B.z<=0 && C.z<=0; // A.Z+B.Z+C.Z<=0.0;
   if( fColor!=l )fprintf( F,"usemtl %s\n",(fColor=l)?"green":"gray" );
@@ -148,6 +150,7 @@ Hull& Hull::Write( int format )
     //
     for( k=0; k<2; k++ )
     { Flex &S=k?Stem:Stern; n=(k?oL[Nframes+2]:0)-1;        // -1 для учёта i<0
+//  { Flex &S=k?Stem:Stern; n=(k?oL[Nframes+2]:0)-1;        // -1 для учёта i<0
       fprintf( F,k?"# Stem\n":"# Stern\n" );
       for( i=0; i<S.len; i++ ){ Q=S[i];                    // if( !b )Q.y=-Q.y;
         if( i>0 )                                          // P.z|Q.z != 0 ???

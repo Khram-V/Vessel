@@ -62,7 +62,6 @@
 			<Add option="-funsigned-char" />
 			<Add option="-fexec-charset=UTF-8" />
 			<Add option="-finput-charset=UTF-8" />
-			<Add option="-ffast-math" />
 			<Add option="-fno-exceptions" />
 			<Add option="-Wunused" />
 		</Compiler>
