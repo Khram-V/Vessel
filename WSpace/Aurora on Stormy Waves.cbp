@@ -91,23 +91,6 @@
 				<Option compiler="gcc" />
 				<Option projectCompilerOptionsRelation="2" />
 			</Target>
-			<Target title="Waves Field">
-				<Option output="../../Work/Waves Field" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="Data" />
-				<Option object_output="../../Work/Obj" />
-				<Option type="0" />
-				<Option compiler="gnu_gcc_stable" />
-				<Option projectCompilerOptionsRelation="2" />
-				<Compiler>
-					<Add option="-Wno-narrowing" />
-					<Add option="-Wno-literal-suffix" />
-					<Add option="-Wno-volatile" />
-				</Compiler>
-				<Linker>
-					<Add library="pthread" />
-					<Add library="dl" />
-				</Linker>
-			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Os" />
@@ -126,7 +109,6 @@
 		</Linker>
 		<Unit filename="../Math/Tensor.cpp">
 			<Option target="Waves Profile" />
-			<Option target="Waves Field" />
 		</Unit>
 		<Unit filename="../Storm/Aurora.cpp">
 			<Option target="Aurora" />
@@ -197,19 +179,15 @@
 		</Unit>
 		<Unit filename="../Storm/Wave/Draw.cpp">
 			<Option target="Waves Profile" />
-			<Option target="Waves Field" />
 		</Unit>
 		<Unit filename="../Storm/Wave/Math.cpp">
 			<Option target="Waves Profile" />
-			<Option target="Waves Field" />
 		</Unit>
 		<Unit filename="../Storm/Wave/Wave.cpp">
 			<Option target="Waves Profile" />
-			<Option target="Waves Field" />
 		</Unit>
 		<Unit filename="../Storm/Wave/Wave.h">
 			<Option target="Waves Profile" />
-			<Option target="Waves Field" />
 		</Unit>
 		<Unit filename="../Storm/Ws-field.cpp">
 			<Option target="Aurora" />
@@ -242,7 +220,6 @@
 			<Option target="Aurora-eq" />
 			<Option target="Aurora-stable" />
 			<Option target="Waves Profile" />
-			<Option target="Waves Field" />
 		</Unit>
 		<Unit filename="../Tools/StrCpy.cpp" />
 		<Unit filename="../Type.h" />
@@ -273,13 +250,11 @@
 			<Option compile="0" />
 			<Option link="0" />
 			<Option target="Waves Profile" />
-			<Option target="Waves Field" />
 		</Unit>
 		<Unit filename="../Window/Window-Place.cpp">
 			<Option compile="0" />
 			<Option link="0" />
 			<Option target="Waves Profile" />
-			<Option target="Waves Field" />
 		</Unit>
 		<Unit filename="../Window/Window.cpp" />
 		<Unit filename="../Window/Window.h">

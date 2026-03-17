@@ -7,7 +7,7 @@
 //
 //    общие данные как бы в стиле Fortran-common блоков
 //
-Vector Min={0.0},Max={0.0};    // Экстремумы исходного графического изображения
+Vector Min={ 0.0 },Max={ 0.0 };// Экстремумы исходного графического изображения
 byte UnderWaterColorAlpha=0xFF;// для алгоритмов с точным положением ватерлинии
 Color UnderWaterColor={ 0xFFFFFF }; // ~~~ выведены в общий доступ ~~~
 Real  Length=6.0,                   // длина
@@ -61,7 +61,7 @@ Ship::Ship()
   textcolor( YELLOW ); print( "Free!Ship [*.fbm,*.ftm,*.fef,*.part,*.obj]\n" );
   int argc; WCHAR **argv=CommandLineToArgvW( GetCommandLineW(),&argc );
   if( argc>1 )FName=argv[1]; else
-  { print( "Start Ship <имя файла модели корабля.[fbm|ftm|fef|part|obj]>" );
+  { print( "Start Ship <имя файла модели корабля.[fbm|ftm|fef|part|obj]>\7" );
     getch(); exit( 1 );
   }
   Name=strdup( W2U( FName ) ); // копия имени входного файла
@@ -104,10 +104,10 @@ bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой под
      *Id[]={ "free!Ship","  Корабельные форматы ",   // визуализации корпуса
                "*.ftm,*.fbm,*.fef,*.part",0 },
      *Cmds[]={ " F1 "," - справка",
-               " F2 ","запись   «Aurorа»: [Ship].vsl",
+               " F2 ","запись «Aurorа».vsl или *.fef",
                " F3 ","дополнение [Ship].part и .obj",
-               " F4 ","смещение и масштабирование",0 },
-//             " F3 ","запрос фрагмента [Ship].part",0 },
+               " F4 ","смещение и масштабирование",
+               " F10 ","сброс повторяющихся узлов",0 },
      *Plus[]={ " <Space>  ","раскрытие борт\\полборта",
                " <Ctrl+Space>"," борта - рёбра/грани",
                " <Shift+Tab>  "," общая прозрачность",
@@ -123,29 +123,31 @@ bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой под
   { case _F1: Window::Help( Id,Cmds,Plus,1,2 ); break;
     case _F2: WriteVSL();                       break;
     case _F3: LoadExtFile( false );             break;
-    case _F4: Shell.EditMenu(this); goto R1;        // сдвиги и масштабирование
+    case _F10: Shell.ReOrder(); break; // goto R1; // расчистка повторов
+    case _F4: Shell.EditMenu(this); goto R1;      // сдвиги и масштабирование
     case _End: Shell.Revolute();    goto R1;  // обращение нормалей поверхности
     case _Blank:
       if( ScanStatus()&CTRL )
         { static bool xd=false;
           if( xd^=true )glPolygonMode( GL_FRONT_AND_BACK,GL_FILL ); //,glEnable( GL_FRONT_FACE ),glEnable( GL_CULL_FACE );
                   else  glPolygonMode( GL_FRONT,GL_FILL ),
-                        glPolygonMode( GL_BACK,GL_LINE ); //,glDisable( GL_FRONT_FACE ),glDisable( GL_CULL_FACE );
+                        glPolygonMode( GL_BACK,GL_LINE );           //,glDisable( GL_FRONT_FACE ),glDisable( GL_CULL_FACE );
         } else
       if( B==mvPort )B=mvBoth; else B=mvPort; break;
     case _PgUp: Shell.R90Zright();  goto R1; // поворот 90° вправо по компасу
     case _PgDn: Shell.R90Xright();      R1: // заложить крен 90° на правый борт
     case _Home:
-      if( Keyb!=_End )
-      { Shell.Extents( false );   // нормали экстремумы не портят
-        Distance=-1.75*(Max.x+Max.y-Min.x-Min.y+Width*(Max.z-Min.z)*0.9/Height);
-        eyeX=135; // lookX=-60;
-      } Draw(); return View::KeyBoard( Keyb ); // перерисовка
+     if( Keyb!=_End )
+     { Shell.Extents( false );   // нормали экстремумы не портят
+       Distance=-1.75*(Max.x+Max.y-Min.x-Min.y+Width*(Max.z-Min.z)*0.9/Height);
+       eyeX=135; // lookX=-60;
+     } Draw(); return View::KeyBoard( Keyb );                    // перерисовка
     default: return View::KeyBoard( Keyb );
   } return Draw();
 }
 int main() // int argc, char **argv )
-{ texttitle( "FREE!Ship view in C++ " ); FreeShip Hull; // заголовок и графика
+{ texttitle( "free!Ship view\\convert in C++" );         // заголовок и графика
+  FreeShip Hull;
   do{ Hull.Title( DtoA( Real(ElapsedTime())/3600000.0,-3 ) ); WaitTime( 500 );
-    } while( Hull.Ready() && Hull.GetKey()!=_Esc ); return 12; //_exit( 0 );
+    } while( Hull.Ready() && Hull.GetKey()!=_Esc ); return 0; //_exit( 12 );
 }

@@ -1,10 +1,12 @@
+#include <Omp.h>
 #include <Time.h>
 #include <StdIO.h>
 #include <CType.h>
 #include <wCType.h>
+//#include <ConIO.h>
+//#include "..\Type.h"
 #include "..\Window\ConIO.h"
 #include "..\Storm\Flex.h"
-//#include "..\Type.h"
 
 typedef enum { fv100,fv110,fv120,fv130,fv140, fv150,fv160,fv165,fv170,fv180,
                fv190,fv191,fv195,fv198,fv200, fv201,fv210,fv220,fv230,fv240,
@@ -97,20 +99,6 @@ bool Normals,       // Show normals of selected surface patches
 Real CurvatureScale, // Scalefactor used to increase or decrease the size of the curvature plot
      CursorIncrement;
 };
-//struct Layers
-//{ char *Description;
-//    int ID;
-//    unsigned int Color;
-//    bool Visible,
-//         Symmetric,
-//         Developable,
-//         UseforIntersection, // fc>=180
-//         UswinHydrostatic;
-//    Real MaterialDensity,    // fv>=191
-//         Thickness;
-//    bool ShoeinLineSpan;     // fv>=201
-//    byte AlphaBlend;         // fv>=261
-//};
 class Surface
 { // bool isLoad;              //-- признак успешной загрузки
   struct Layers
@@ -130,6 +118,7 @@ class Surface
 
   struct CoPoint             /// Control Point
   { Vector V;                // координаты
+//  unsigned I;              // индекс точки с учётом пропусков совпадений
     VertexType T;            // тип узла: svRegular, svCrease, svDart, svCorner
     bool Selected,           // -- выбор
          Locked;             // -- блокировка >=fv198
@@ -141,7 +130,7 @@ class Surface
     bool Crease,             // -- ребро по сломанной поверхности
          Selected,           // -- выбор
          ControlEdge;        // == True на считывании ребра
-    Vector StartPoint,EndPoint; //~~ излишнее переприсваивание -- безобидно
+//  Vector StartPoint,EndPoint; //~~ излишнее переприсваивание -- безобидно
   } *G;                      //! NoEdges
 
   struct Curves              /// Control Curves FV >= 195
@@ -160,6 +149,7 @@ public:
   Surface(){ memset( this,0,sizeof( Surface ) ); } // обнуляется NoLayers тоже!
   void EditMenu( Window* );       // числовое смещение и 3D-перемасштабирование
   void Read( bool Part=false );
+  void ReOrder();        // здесь делается попытка вычистки повторяющихся точек
   void ReadFEF();
   void WriteFEF();              // сохранение текущего результата, наконец-то
   void ReadObj( char *Path );  // полное имя для сопутствующего описания MtlLib
@@ -212,7 +202,7 @@ struct Ship                      // Сборка корпуса в целом
   bool LoadPart( bool New=true );// или просто фрагмент цифровой модели
   bool LoadExtFile( bool New=true );
 };
-struct FreeShip: Ship,View       // , Matrix
+struct FreeShip: Ship,View       // ,Matrix
 { FreeShip();
   virtual bool Draw();           // виртуальная процедура с настройкой сцены
   virtual bool KeyBoard( fixed );
@@ -223,4 +213,3 @@ inline WCHAR* Slower( WCHAR *str )
 inline char* Slower( char *str ) // пригодно лишь к латинским буквочкам
 { int l=strlen( str ); while( --l>=0 )str[l]=tolower( str[l] ); return str;
 }
-

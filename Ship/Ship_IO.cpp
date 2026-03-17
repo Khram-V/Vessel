@@ -16,9 +16,9 @@ static FILE *F=NULL;           // локальный файл открывает
 static string Str;             // рабочая строчка изначально имеет 2К
 //atic int LastLayer=-1;       // ID такой без последовательного перечисления
 static Real Scale=1.0;         // масштаб на случай совмещения моделей ...part.
-const Real Foot=0.3048;
+const Real Foot=0.3048,Eps=1.0e-5L;
 
-static Real e5r( _Real R ){ return fabs(R)<1e-5?0.0:R-remainder( R,1e-5L ); } //round(R*1e5)/1e5; } //
+static Real e5r( _Real R ){ return fabs(R)<Eps?0.0:R-remainder( R,Eps ); } //round(R*1e5)/1e5; } //
 
 static bool OpenFile(WCHAR *FileName) // открытие файла цифровой модели корпуса
 { char FTyp[14];
@@ -326,9 +326,9 @@ void Surface::Read( bool Part )
    for( I=NoI; I<NoEdges; I++ )
    { Edges &Edge=G[I];
      K=getInt(); if( K==-1 )K=0; Edge.StartIndex=K+NoC;                         if( K+NoC>=NoCoPoint )EdErr++;
-                                 Edge.StartPoint=P[K+NoC].V;
+//                               Edge.StartPoint=P[K+NoC].V;
      K=getInt(); if( K==-1 )K=0; Edge.EndIndex=K+NoC;
-                                 Edge.EndPoint=P[K+NoC].V;                      if( K+NoC>=NoCoPoint )EdErr++;
+//                               Edge.EndPoint=P[K+NoC].V;                      if( K+NoC>=NoCoPoint )EdErr++;
      Edge.Crease = getByte();
      if( !Part )
      { Edge.Selected = getByte();
@@ -584,8 +584,8 @@ bool Ship::LoadFEF()      // Ship.fef == FreeShip Exchange Format
    &Set.WaterDensity,
    &Set.AppendageCoefficient,
    &Set.Units,&I,&PT );
-   Set.MainparticularsHasBeenset=I;                                             print( "L,B,T={ %g, %g, %g },\n\t WaterDensity=%g, A?C=%g, Units=%d, Been=%d, Точность=%d\n\n",Length,Beam,Draft,Set.WaterDensity,Set.AppendageCoefficient,Set.Units,Set.MainparticularsHasBeenset,PT );
-//
+   Set.MainparticularsHasBeenset=I;                                             print( "L,B,T={ %g, %g, %g }, WaterDensity=%g, A?C=%g, Units=%d, Been=%d, Точность=%d\n\n",
+                                                                                 Length,Beam,Draft,Set.WaterDensity,Set.AppendageCoefficient,Set.Units,Set.MainparticularsHasBeenset,PT );
 // TFreeSubdivisionSurface.ImportFEFFile
 //
    Shell.ReadFEF();
@@ -600,7 +600,7 @@ void Surface::ReadFEF()
    if( !K )K=getInt();                                                          print( "NoLaeyrs(повтор) = %d\n",K );
    NoL=NoLayers;
    NoLayers+=K;                            // счетчик слоёв здесь идет в начало
-   L=(Surface::Layers*)Allocate( max(1,NoLayers)*sizeof( Surface::Layers ),L );
+   L=(Layers*)Allocate( max(1,NoLayers)*sizeof( Layers ),L );
    for( I=NoL; I<NoLayers; I++ )
    { Layers &T=L[I]; int v,d,s,u,w,p; char str[12]="";
      readText( &T.Description );                                                print( "[%d]'%-12s'",I,T.Description );
@@ -615,24 +615,37 @@ void Surface::ReadFEF()
    }
    NoC=NoCoPoint;
    NoCoPoint+=getInt();                                                         print( "< ControlPoints > %d",NoCoPoint );
-   P=(Surface::CoPoint*)Allocate( NoCoPoint*sizeof( Surface::CoPoint ),P );
+   P=(CoPoint*)Allocate( NoCoPoint*sizeof( CoPoint ),P );
    for( I=NoC; I<NoCoPoint; I++ )
    { CoPoint &T=P[I]; T.T=svRegular; K=0;        // и последних может не быть
      sscanf( getString( ::F ),"%lg%lg%lg%i%i",&T.V.x,&T.V.y,&T.V.z,&T.T,&K );
                           T.Selected=K;
-   }                                                                            if( NoCoPoint>0 )print( " = {%g,%g,%g}`0`",P[0].V.x,P[0].V.y,P[0].V.z ); print( "\n" );
+   }
+/* if( (K=NoCoPoint-NoC)>0 )
+   { int *J=(int*)Allocate( K*sizeof( int ) );
+     for( K=0,I=NoC; I<NoCoPoint; I++ )
+     { Vector &V=P[I].V;
+       J[I-NoC]=I;
+       for( int i=NoC; i<I-1; i++ )
+       { if( P[i].V==V ){ J[I-NoC]=i; K++; break; }
+       }
+     }                                                                    if( K>=0 )print( "{-%d}",K );
+   }
+*/                                                                              if( NoCoPoint>0 )print( " = {%g,%g,%g}`0`",P[0].V.x,P[0].V.y,P[0].V.z ); print( "\n" );
    NoI=NoEdges;
    NoEdges+=getInt();                                                           print( "< ControlEdges > %d",NoEdges );
-   G=(Surface::Edges*)Allocate( NoEdges*sizeof( Surface::Edges ),G );
+   G=(Edges*)Allocate( NoEdges*sizeof( Edges ),G );
    for( I=NoI; I<NoEdges; I++ )
    { int K1,K2,Ck;                                Ck=K=0;
      sscanf( getString( ::F ),"%i%i%i%i",&K1,&K2,&Ck,&K );
-       G[I].StartPoint=P[G[I].StartIndex=K1+NoC].V; G[I].Selected=K!=0;
-         G[I].EndPoint=P[G[I].EndIndex=K2+NoC].V;   G[I].Crease=Ck!=0;
+       G[I].Selected=K!=0; K=G[I].StartIndex=K1+NoC; //G[I].StartPoint=P[K].V;
+       G[I].Crease=Ck!=0; Ck=G[I].EndIndex=K2+NoC;   //G[I].EndPoint=P[Ck].V;
+//     G[I].StartPoint=P[G[I].StartIndex=K1+NoC].V; G[I].Selected=K!=0;
+//       G[I].EndPoint=P[G[I].EndIndex=K2+NoC].V;   G[I].Crease=Ck!=0;
    }                                                                            if( NoEdges>0 )print( " = {н:%d+к:%d}",G[NoI].StartIndex,G[NoI].EndIndex ); print( "\n" );
    NoI=NoFaces;
    NoFaces+=getInt();                                                           print( "< ControlFaces > %d - количество фрагментов обшивки\n",NoFaces );
-   F=(Surface::Faces*)Allocate( NoFaces*sizeof( Surface::Faces ),F );
+   F=(Faces*)Allocate( NoFaces*sizeof( Faces ),F );
    for( I=NoI; I<NoFaces; I++ ) // здесь уж чтение напрямую из текстового файла
    { fscanf( ::F,"%d",&K ); F[I].Capacity=K;
      F[I].P=(int*)Allocate( K*sizeof(int) );             /// <++ Control Points
@@ -680,7 +693,8 @@ void Surface::WriteFEF()
 }
 void Ship::WriteVSL()
 { int i,j,n,M; bool vsl=NoStations>0;
-  char FileName[MAX_PATH]; strcpy( FileName,sname( W2U( FName ) ) ); fext( FileName,"" );
+//char FileName[MAX_PATH]; strcpy( FileName,sname( W2U( FName ) ) ); fext( FileName,"" );
+  char FileName[MAX_PATH]; strcpy( FileName,Name ); fext( FileName,"" );                                      print( "\n\n%s\n\n",Name );
   if( ( F=FileOpen( FileName,L"wt",vsl?L"vsl":L"fef", // простая выборка нового имени
         vsl? //L"Aurora-Ship [*.vsl *.fef]\1*.vsl;*.fef\1"
             L"[ Вычислительный эксперимент ].vsl\1*.vsl\1"
@@ -700,7 +714,7 @@ void Ship::WriteVSL()
            e5r(Length),e5r(Beam),e5r(Draft),
            Set.WaterDensity,
            Set.AppendageCoefficient,
-           Set.Units,PT );               // Set.MainparticularsHasBeenset=true
+           Set.Units,PT=fpLow );          // Set.MainparticularsHasBeenset=true
     Shell.WriteFEF();
     fclose( F ); F=NULL;
     return;
@@ -806,4 +820,65 @@ void Ship::WriteVSL()
   }     fprintf( F,"\n\n" );
         fclose( F ); F=NULL;
 }
-
+//   Расчистка повторяющихся узлов по граням (пока без перестроения рёбер)
+//
+void Surface::ReOrder()      // Ship.fef == FreeShip Exchange Format
+{ int i,I,J,M,K=0,*L=(int*)Allocate( NoCoPoint*sizeof( int ) );                 print( "\nВсего<~%d> %d узлов",omp_get_max_threads(),NoCoPoint );
+#if 1
+#pragma omp parallel for shared( L ) // private( i,k ) reduction(+: J )
+   for( int i=0; i<NoCoPoint; i++ ){ Vector &V=P[i].V;       // так должно быть
+     for( int k=0; k<i; k++ )
+      if( abs( P[k].V-V )>Eps )L[i]=i; else
+        { P[k].T=svRegular; L[i]=k; break; }; // svCrease svCorner min( P[i].T,V.T ) без угла
+   }
+   for( I=J=0; I<NoCoPoint; I++ )
+      { if( L[I]==I  ){ if( I>J )P[L[I]=J]=P[I]; J++; } else L[I]=L[L[I]];
+      }                                                                         if( NoCoPoint!=J )print( " %d повтор",J-NoCoPoint );
+   NoCoPoint=J;
+#else
+   for( I=J=0; I<NoCoPoint; I++ ){ CoPoint &V=P[I]; // контроль с одним потоком
+     for( i=0; i<J; i++ )
+      if( abs(P[i].V-V.V)<=Eps ){ L[I]=i; K++; P[i].T=svRegular; break; }
+     if( i==J ){ P[i]=V; L[I]=i; J++; }
+   } NoCoPoint=J;                                                               print( " %d повторов",K );
+#endif
+/* for( I=J=K=0; I<NoCoPoint; I++ )
+   { if( L[I]==I ){ P[K]=P[I]; L[I]=K; K++; } else { J++; L[I]-=J; }
+   } NoCoPoint=K;                                                               print( " c перерасчетом до %d без %d ",NoCoPoint,J );
+*/
+                                                                                print( "; %d рёбер",NoEdges );
+   for( I=0; I<NoEdges; I++ )G[I].StartIndex=L[G[I].StartIndex],
+                             G[I].EndIndex=L[G[I].EndIndex];
+#if 1
+   for( I=J=0; I<NoEdges; I++ ){ Edges &E=G[I];        // пусть пока без openMP
+     if( E.StartIndex==E.EndIndex
+      || abs( P[E.StartIndex].V-P[E.EndIndex].V )<Eps )i=-1; else
+     for( i=0; i<J; i++ )
+      if( (E.StartIndex==G[i].StartIndex && E.EndIndex==G[i].EndIndex)
+       || (E.EndIndex==G[i].StartIndex && E.StartIndex==G[i].EndIndex) // { G[i].Crease=false; K++; break; }
+       ){ G[i].Crease&=E.Crease && P[E.StartIndex].V.y==0              // сброс, если не ДП
+                                && P[E.EndIndex].V.y==0; break; } // по выходу из цикла поиска повторений
+     if( i==J )G[J++]=E;
+   }                                                                            if( J!=NoEdges )print( " %d сброc",J-NoEdges );
+   NoEdges=J;
+#endif
+                                                                                print( "; %d граней",NoFaces );
+   for( I=0; I<NoFaces; I++ )
+   for( K=0; K<F[I].Capacity; K++ )F[I].P[K]=L[F[I].P[K]];
+#if 1
+#pragma omp parallel for private( i,I,J,K )
+   for( I=0; I<NoFaces; I++ ){ Faces &G=F[I];        // это не очень, исправить
+     for( K=J=0; K<G.Capacity; K++ )
+     { for( i=0; i<J; i++ )if( G.P[i]==G.P[K] )break;
+       if( i==J )G.P[J++]=G.P[K];
+     }                                                                          //if( J!=G.Capacity )print( "%d",G.Capacity-J );
+     G.Capacity=J;
+   }
+   for( I=M=0; I<NoFaces; I++ )
+    if( F[I].Capacity<3 )Allocate( 0,F[I].P ); else F[M++]=F[I];                if( M!=NoFaces )print( " %d утеря",M-NoFaces );
+   NoFaces=M;
+#endif
+   for( I=0; I<NoCurves; I++ )
+   for( K=0; K<C[I].Capacity; K++ )C[I].P[K]=L[C[I].P[K]];                      print( "; %d контуров.",NoCurves );
+   Allocate( 0,L );
+}
