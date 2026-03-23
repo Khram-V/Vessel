@@ -81,7 +81,7 @@ Ship::Ship()
   print( "\n%s ",Name );
   print( "\nLayer: %d, Knot: %d, Edge: %d, Face: %d, Curve: %d",Shell.NoLayers,Shell.NoCoPoint,Shell.NoEdges,Shell.NoFaces,Shell.NoCurves );
   print( "\n Длина : [ %6.2f - %-6.2f ] = %g ",Min.x,Max.x,Max.x-Min.x );
-  print( "\n Ширина: [ %6.2f - %-6.2f ] = %g ",Min.y,Max.y,(Max.y>-Min.y?Max.y:-Min.y)*2 );
+  print( "\n Ширина: [ %6.2f - %-6.2f ] = %g : { %g }",Min.y,Max.y,(Max.y>-Min.y?Max.y:-Min.y)*2,(Max.y+Min.y)/2.0 );
   print( "\n Высота: [ %6.2f - %-6.2f ] = %g ",Min.z,Max.z,Max.z-Min.z );
 }
 //     Конструктор не содержит Matrix для движений корпуса в корабельном базисе

@@ -100,10 +100,12 @@
 				<Option projectCompilerOptionsRelation="2" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
+					<Add option="-fopenmp" />
 					<Add option="-DGLFW" />
 				</Compiler>
 				<Linker>
 					<Add option="--gc-sections" />
+					<Add library="gomp" />
 				</Linker>
 			</Target>
 			<Target title="Window-shapes">

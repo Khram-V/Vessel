@@ -683,8 +683,8 @@ void Surface::WriteFEF()
     if( G[i].Selected )fprintf( ::F," 1" ); fprintf( ::F,"\n" );
   }
   fprintf( ::F,"%i\n",NoFaces );
-  for( int i=0; i<NoFaces; i++ )
-  if( L[F[i].LayerIndex].LClr.c[3]!=0 )      //!.. исключение прозрачных граней
+  for( int i=0; i<NoFaces; i++ )          /**
+  if( L[F[i].LayerIndex].LClr.c[3]!=0 )   */ //!.. исключение прозрачных граней
   { fprintf( ::F,"%i",F[i].Capacity );        // без правки количества
     for( int j=0; j<F[i].Capacity; j++ )fprintf( ::F," %d",F[i].P[j] );
     fprintf( ::F," %i",F[i].LayerIndex );
@@ -693,8 +693,7 @@ void Surface::WriteFEF()
 }
 void Ship::WriteVSL()
 { int i,j,n,M; bool vsl=NoStations>0;
-//char FileName[MAX_PATH]; strcpy( FileName,sname( W2U( FName ) ) ); fext( FileName,"" );
-  char FileName[MAX_PATH]; strcpy( FileName,Name ); fext( FileName,"" );                                      print( "\n\n%s\n\n",Name );
+  char FileName[MAX_PATH]; strcpy( FileName,Name ); fext( FileName,"" );        print( "\n\n%s\n\n",Name );
   if( ( F=FileOpen( FileName,L"wt",vsl?L"vsl":L"fef", // простая выборка нового имени
         vsl? //L"Aurora-Ship [*.vsl *.fef]\1*.vsl;*.fef\1"
             L"[ Вычислительный эксперимент ].vsl\1*.vsl\1"
@@ -788,7 +787,7 @@ void Ship::WriteVSL()
   //
   fprintf( F,"\n\n%s\n",fname( W2U( FName ) ) );
   fprintf( F,"\n Длина:  [ %6.2f - %-6.2f ] = %g,  мидель : %g  ",Min.x,Max.x,Max.x-Min.x,Set.SplitSectionLocation );
-  fprintf( F,"\n Ширина: [ %6.2f - %-6.2f ] = %g ",Min.y,Max.y,(Max.y>-Min.y?Max.y:-Min.y)*2 );
+  fprintf( F,"\n Ширина: [ %6.2f - %-6.2f ] = %g : { %g }",Min.y,Max.y,(Max.y>-Min.y?Max.y:-Min.y)*2,(Max.y+Min.y)/2.0 );
   fprintf( F,"\n Высота: [ %6.2f - %-6.2f ] = %g,  осадка : %g ",Min.z,Max.z,Max.z-Min.z,Draft );
 
   for( i=0; i<NoButtocks; i++ ){ InterSection &C=Buttocks[i];
@@ -822,21 +821,36 @@ void Ship::WriteVSL()
 }
 //   Расчистка повторяющихся узлов по граням (пока без перестроения рёбер)
 //
-void Surface::ReOrder()      // Ship.fef == FreeShip Exchange Format
-{ int i,I,J,M,K=0,*L=(int*)Allocate( NoCoPoint*sizeof( int ) );                 print( "\nВсего<~%d> %d узлов",omp_get_max_threads(),NoCoPoint );
+void Surface::ReOrder()                                                         // omp_get_thread_num omp_get_num_procs()
+{ int i,I,J,M,K,*L=(int*)Allocate( NoCoPoint*sizeof( int ) );                   print( "\nСчёт<~%d>: %d",omp_get_max_threads(),NoCoPoint );
+#if 1
+   for( I=0; I<NoEdges; I++ )L[G[I].EndIndex]++,
+                             L[G[I].StartIndex]++;                              //? в файлах *.fef пока нет контуров!
+   for( I=0; I<NoFaces; I++ )
+   for( K=0; K<F[I].Capacity; K++ )L[F[I].P[K]]++;
+   for( I=M=0; I<NoCoPoint; I++ )if( L[I]>0 )M++; else L[I]=-1;                 if( M!=NoCoPoint )print( "<~%d>",NoCoPoint-M );
+   if( L[0]>0 )L[0]=0;
+#endif
+                                                                                print( " узлов" );
 #if 1
 #pragma omp parallel for shared( L ) // private( i,k ) reduction(+: J )
-   for( int i=0; i<NoCoPoint; i++ ){ Vector &V=P[i].V;       // так должно быть
+   for( int i=0; i<NoCoPoint; i++ )
+   if( L[i]>=0 )
+   { Vector &V=P[i].V;  // так должно быть
      for( int k=0; k<i; k++ )
-      if( abs( P[k].V-V )>Eps )L[i]=i; else
-        { P[k].T=svRegular; L[i]=k; break; }; // svCrease svCorner min( P[i].T,V.T ) без угла
+     if( L[k]>=0 )
+     { if( abs( P[k].V-V )>Eps )L[i]=i; else                  // P[k].T=svCrease;
+       { P[k].T=(P[k].T==svCorner || V.y==0.0?svCorner:svRegular); L[i]=k; break;
+       }
+     }
    }
    for( I=J=0; I<NoCoPoint; I++ )
-      { if( L[I]==I  ){ if( I>J )P[L[I]=J]=P[I]; J++; } else L[I]=L[L[I]];
-      }                                                                         if( NoCoPoint!=J )print( " %d повтор",J-NoCoPoint );
+   { if( L[I]>=0 )                      // пропуск по отсутствию обращений -???
+     { if( L[I]==I  ){ if( I>J )P[L[I]=J]=P[I]; J++; } else L[I]=L[L[I]]; }
+   }                                                                            if( NoCoPoint!=J )print( " %d сброс",J-NoCoPoint );
    NoCoPoint=J;
 #else
-   for( I=J=0; I<NoCoPoint; I++ ){ CoPoint &V=P[I]; // контроль с одним потоком
+   for( I=J=K=0; I<NoCoPoint; I++ ){ CoPoint &V=P[I]; // контроль одним потоком
      for( i=0; i<J; i++ )
       if( abs(P[i].V-V.V)<=Eps ){ L[I]=i; K++; P[i].T=svRegular; break; }
      if( i==J ){ P[i]=V; L[I]=i; J++; }
@@ -850,16 +864,16 @@ void Surface::ReOrder()      // Ship.fef == FreeShip Exchange Format
    for( I=0; I<NoEdges; I++ )G[I].StartIndex=L[G[I].StartIndex],
                              G[I].EndIndex=L[G[I].EndIndex];
 #if 1
-   for( I=J=0; I<NoEdges; I++ ){ Edges &E=G[I];        // пусть пока без openMP
+   for( I=J=0; I<NoEdges; I++ ){ Edges &E=G[I];  // здесь пусть пока без openMP
      if( E.StartIndex==E.EndIndex
       || abs( P[E.StartIndex].V-P[E.EndIndex].V )<Eps )i=-1; else
      for( i=0; i<J; i++ )
       if( (E.StartIndex==G[i].StartIndex && E.EndIndex==G[i].EndIndex)
        || (E.EndIndex==G[i].StartIndex && E.StartIndex==G[i].EndIndex) // { G[i].Crease=false; K++; break; }
-       ){ G[i].Crease&=E.Crease && P[E.StartIndex].V.y==0              // сброс, если не ДП
+       ){ G[i].Crease&=E.Crease || P[E.StartIndex].V.y==0              // сброс, если не ДП
                                 && P[E.EndIndex].V.y==0; break; } // по выходу из цикла поиска повторений
      if( i==J )G[J++]=E;
-   }                                                                            if( J!=NoEdges )print( " %d сброc",J-NoEdges );
+   }                                                                            if( J!=NoEdges )print( " %d повтор",J-NoEdges );
    NoEdges=J;
 #endif
                                                                                 print( "; %d граней",NoFaces );
@@ -879,6 +893,6 @@ void Surface::ReOrder()      // Ship.fef == FreeShip Exchange Format
    NoFaces=M;
 #endif
    for( I=0; I<NoCurves; I++ )
-   for( K=0; K<C[I].Capacity; K++ )C[I].P[K]=L[C[I].P[K]];                      print( "; %d контуров.",NoCurves );
+   for( K=0; K<C[I].Capacity; K++ )C[I].P[K]=L[C[I].P[K]];                      if( NoCurves>0 )print( "; %d контуров",NoCurves ); print( ".┐" );
    Allocate( 0,L );
 }
