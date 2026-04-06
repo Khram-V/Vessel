@@ -7,6 +7,7 @@
 #include "..\Math\Model.h"
 #include "..\Math\Volume.h"
 #include "..\Window\ConIO.h"
+
 const Real* arrow( const Real *_a,const Real *_b,_Real l, const colors clr=empty )
 { Vector &a=*(Vector*)_a,&b=*(Vector*)_b,d=a-b; d*=l/abs( d );
   Vector e={ d.z/5,d.x/5,d.y/5 },f={ e.z,e.x,e.y },g=b+d/2; line( a,d+=b,clr );

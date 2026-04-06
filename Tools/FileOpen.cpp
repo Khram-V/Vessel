@@ -45,7 +45,7 @@ FILE *FileOpen
 #endif
 FILE *FileOpen
 ( char *wName,// = буфер полного пути имени файла в UTF-8 с длиной = MAX_PATH*2
-  const WCHAR *wType,   // = "rt"
+  const WCHAR *wType,  // = "rt"
   const WCHAR *Ext,    // = "vsl",
   const WCHAR *Choice, // = "Ship Hull Form (*.vsl)\0*.vsl\0All Files\0*.*\0\0"
   const WCHAR *Title ) // = "? выбрать корпус или - Esc - для модели МИДВ"
@@ -53,6 +53,7 @@ FILE *FileOpen
   if( *Title!=L'?' && *wName!='*' )F=_wfopen( Fname,wType ); ///'?' не забывать
   if( !F )
   { OPENFILENAMEW W={ sizeof( OPENFILENAMEW ),0 };
+                  W.lpstrInitialDir =
                   W.lpstrFile   = Fname; // L"Аврора.vsl";
     if( Title  )  W.lpstrTitle  = Title;
     if( Ext    )  W.lpstrDefExt = Ext;
@@ -60,7 +61,7 @@ FILE *FileOpen
                   while( C=wcschr( C,L'\1' ) )*C++=0;
                 } W.nMaxFile = MAX_PATH*2;
     if( wType[0]==L'w' )
-    { W.Flags = OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST;
+    { W.Flags = OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST; //| OFN_FILEMUSTEXIST;
       if( GetSaveFileNameW( &W ) )F=_wfopen( W.lpstrFile,wType );
     } else
     { W.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST
