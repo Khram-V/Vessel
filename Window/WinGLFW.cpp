@@ -128,6 +128,7 @@ Window::Window( const char *_title, int x,int y,int w,int h )
         Next( NULL ),glfwWindow( NULL ),Caption( _title ), // и сохраняется
         ScreenWidth( GetSystemMetrics( SM_CXSCREEN ) ),
         ScreenHeight( GetSystemMetrics( SM_CYSCREEN ) ),
+        onlyVirtualKeybord( false ),   // символы ставятся в очередь считывания
         WindowX( 0 ),WindowY( 0 ),KeyPos( 0 ),KeyPas( 0 ),
         isCursorInside( true ),     // Flag if cursor inside this window or not
         dTime( 0 ),nextTime( 0 ),   // шаг и ожидаемое прерывание таймера [µсек]
@@ -280,7 +281,8 @@ fixed Window::WaitKey()                         // цикл ожидания н�
 //!  Внутренние процедуры для реализации виртуальных обращений с мышкой
 //!
 void Window::PutMouse( UINT State, int x,int y )
-{ switch( State )                     // ?( и как теперь с виртуальностью )
+{ bool ret=false;
+  switch( State )                     // ?( и как теперь с виртуальностью )
   { case WM_MOUSEMOVE    : break;     // ?  контекст OpenGL не сверяется
     case WM_LBUTTONDBLCLK:            //   - мышка ставит его сама
     case WM_LBUTTONDOWN  : MouseState |=  _MouseLeft;   break;
@@ -296,7 +298,9 @@ void Window::PutMouse( UINT State, int x,int y )
   }
   if( isMouse )return; isMouse++;         // предотвращение рекурсии прерываний
   if( MouseState==_MouseWheel )           // прокрутка проходит сама по себе
-  { if( y||x ){ glContext S( this ); Mouse( _MouseWheel,x,y*32 ); } MouseState=0;
+  { if( y||x )
+    { glContext S( this ); ret=Mouse( _MouseWheel,x,y*32 ); MouseState=0;
+    }
   } else
   { Place *P=this; int px=x,py=y;         //!  поиск последней/верхней площадки
     for( Place *S=P; S; S=S->Up )         //!     по общему списку их наложений
@@ -306,30 +310,31 @@ void Window::PutMouse( UINT State, int x,int y )
     }
    static volatile int xo=0,yo=-1;        //! рекурсия мышиных прерываний c
     if( !MouseState )                     //! координатами предыдущих вхождений
-    { glContext S( this ); yo=-1; P->Mouse( px,py );
+    { glContext S( this ); yo=-1; ret=P->Mouse( px,py );
     } else                                          //! yo=-1 окно не захвачено
     { if( KeyStates()==L_ALT && MouseState==_MouseLeft )
       { if( yo<0 )xo=x,yo=y; else     // перемещение окна left<Alt> и left<Btn>
         if( x!=xo || y!=yo )Locate( WindowX+x-xo,WindowY+y-yo,Width,Height );
       } else
-      { glContext S( this ); yo=-1; P->Mouse( MouseState,px,py );
+      { glContext S( this ); yo=-1; ret=P->Mouse( MouseState,px,py );
       }
     }
-  } isMouse=0; // MouseState &= ~_MouseWheel;
+  }
+  if( ret )Save().Refresh(); isMouse=false; // MouseState &= ~_MouseWheel;
 }
 //!  Прямое и параллельное обращение к таймеру с соблюдением очередей Windows
 //!       (все расчеты в миллисекундах, опрокидывание через 49,7 суток)
 //!
 #if 1
 DWORD volatile RealTime=0,                              // тики [мс] от времени
-      StartTime=GetTickCount();                         //     запуска Windows
+      StartTime=GetTickCount();                         //      запуска Windows
 DWORD ElapsedTime(){ return GetTickCount()-StartTime; } //  от старта программы
 DWORD GetTime()
     { DWORD T=GetTickCount(); if( StartTime>T )StartTime=T; return T; }
 #else
 DWORD volatile                                          // тики [мс] от времени
-      StartTime=glfwGetTime()*1e3;                         //     запуска Windows
-DWORD ElapsedTime(){ return glfwGetTime()*1e3-StartTime; } //  от старта программы
+      StartTime=glfwGetTime()*1e3;                       //  запуска Windows от
+DWORD ElapsedTime(){ return glfwGetTime()*1e3-StartTime; } //  старта программы
 DWORD GetTime()
     { DWORD T=glfwGetTime()*1e3; if( StartTime>T )StartTime=T; return T; }
 #endif
@@ -342,9 +347,8 @@ bool Window::Timer()
     }
   } return false;
 }
-Window& Window::SetTimer( DWORD mSec,bool(*inTm)() )// время и адрес исполнения
-{ if( glfwWindow )
-  if( !mSec )                                   // пока только таймер №12
+Window& Window::SetTimer( DWORD mSec,bool(*inTm)()) // время и адрес исполнения
+{ if( glfwWindow )if( !mSec )                   // пока только таймер №12
   { dTime=0; extTime=NULL; } else              // идентификатор не привязан
   { dTime=mSec;                               // glfwWaitEventsTimeout( dTime )
     nextTime=glfwGetTime()*1.0e3+dTime; extTime=inTm;
@@ -430,23 +434,19 @@ glContext::glContext( const Window *W ) :                           // prologue
   }
 glContext::~glContext()     // деструктор = эпилог с возвратом былого контекста
   { if( was ){ glfwMakeContextCurrent( was );                       // epilogue
-//             getWindow( was )->WaitEvents();
+    //         getWindow( was )->WaitEvents();
              }
-  }                                /// доработать !!!
+  }                                /// ??? доработать !!!
 DWORD WaitTime( DWORD mWait,       // активная задержка для внешнего управления
                 bool(*inStay)(),   // собственно сам вычислительный эксперимент
                 DWORD mWork )      // время на исполнение рабочего цикла [мСек]
-{
- //Sleep( mWait );
+{ // Sleep( mWait );
    First->ScanKey();
-   glfwWaitEventsTimeout( 0.03*Real( mWait )/1e3 ); //! [ 0.03 ]
+   glfwWaitEventsTimeout( 0.00003L*Real( mWait ) ); //! [ 0.03 сек ]
    if( inStay )(*inStay)();
    return ElapsedTime();
 }
-//              { Sleep( mWait ); }
-
+//  { Sleep( mWait ); }
 //  ...  все согласованные процедуры объединяются в единый модуль интерактивной
 //  графической среды Window::Place в/исключая независимые операции с Юлианским
 //        календарем и перекодировками Unicode/UTF-8 для Windows-1251 и OEM-866
-//
-

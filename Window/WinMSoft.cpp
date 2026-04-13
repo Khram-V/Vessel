@@ -143,11 +143,12 @@ bool Window::InterruptProcedure( UINT message, WPARAM wParam, LPARAM lParam )
 
 Window::Window( const char *_title, int x,int y, int w,int h )
 : Place( this,PlaceOrtho ), // ортогонализуется [-1:1] | PlaceAbove-сохраняется
-  hDC( 0 ), hWnd( 0 ), hRC( 0 ), Caption( _title ), Next( NULL ),
+  Caption( _title ), WindowX( CW_USEDEFAULT ),WindowY( CW_USEDEFAULT ),
 //ScreenWidth( GetSystemMetrics( SM_CXSCREEN ) ),
 //ScreenHeight( GetSystemMetrics( SM_CYSCREEN ) ),
-  WindowX( CW_USEDEFAULT ),WindowY( CW_USEDEFAULT ),
-  isTimer( 0 ),isMouse( false ),mSec( 0 ),idEvent( 12 ),    // tId + номер окна
+  onlyVirtualKeybord( false ),     // все символы ставятся в очередь считывания
+  Next( NULL ), hDC( 0 ), hWnd( 0 ), hRC( 0 ), mSec( 0 ),
+  isTimer( 0 ), isMouse( false ), idEvent( 12 ), // tId + номер окна
   KeyPos( 0 ),KeyPas( 0 ),onKey( false ),extKey( NULL ),extTime( NULL )
 { //ATOM atom;
   WNDCLASSW wc={ sizeof( WNDCLASSW ) };
@@ -312,7 +313,8 @@ fixed Window::WaitKey()   // стандартный цикл ожидания н
 {                //  HWND FWin=GetFocus(); SetActiveWindow( hWnd ); ~~ Above();
   if( onKey )return false; else onKey=true;     // isTimer=0; SetFocus( hWnd );
 //glAct( this );
-  while( Site && KeyPos==KeyPas )WinRequest();           // hWnd // ||isTimer>0
+  while( Site && KeyPos==KeyPas ) //WinRequest();        // hWnd // ||isTimer>0
+     if( !WinRequest() )WaitMessage();
   WaitEvents( hWnd );
 //  if( hWnd==GetFocus() ) // WaitEvents(); else
 //  { if( !WinRequest( hWnd ) )                          // ожидание символа כל
@@ -426,14 +428,15 @@ static void CALLBACK TimerProc( HWND hWind,UINT uMsg,UINT_PTR timerId,DWORD St)
       { IdT=::SetTimer( 0,0,mWait,TimerProc );   // рабочего кванта времени и
         break;                                   // тогда к повтору безвременья
     } } while( mWait );
-  } else mWait=0;                  //if( IdT ){ ::KillTimer( 0,IdT ); IdT=0; }
+  } else mWait=0;                  // if( IdT ){ ::KillTimer( 0,IdT ); IdT=0; }
 }
 DWORD WaitTime( DWORD Wait,        // активная задержка для внешнего управления
                 bool( *inStay )(), // собственно сам вычислительный эксперимент
                 DWORD Work )       // время исполнения рабочего процесса [мСек]
 { extFree=inStay,mWork=Work,mWait=Wait;               // инициализация таймеров
   if( Wait )IdT=::SetTimer( 0,0,Wait,TimerProc );     // כל = (со всеми окнами)
-  while( First && mWait )WaitEvents();                // ожидание чистки mWait
+  while( First && mWait ) //WaitEvents();             // ожидание чистки mWait
+     if( !WinRequest() )WaitMessage();
   return RealTime;                                    // выход в особом случае
 }
                     //while( isTimer>1 )if( !WinRequest( hWnd ) )WaitMessage();

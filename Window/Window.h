@@ -112,6 +112,7 @@ class Window: public Place        // стандарт/ное окно Windows д
   int WindowX,WindowY;            // выделенное местоположение активного окна
 public:
   int ScreenWidth,ScreenHeight;   // размеры графического экрана компьютера
+  bool onlyVirtualKeybord;        // неопознанные символы будут вычищаться
   //
   //    X,Y {>0 левый/верхний}~{0,0=>2/3 остатка,1/4 высоты}~{<0 правый/нижний}
   //        Width,Height >0 -> ширина/высота {0,0 => 800,600}
@@ -138,7 +139,7 @@ public:
   //      4/8  + 12 - Left/Right.Ctrl   128 - Insert      ?? -  NumLock
   //     16/32 + 48 - Left/Right.Alt
   //                           минимальный набор клавиатурных запросов-операций
- virtual bool KeyBoard( fixed key );
+ virtual bool KeyBoard( fixed key ); // true = символ принят; false = отвергнут
   Window& KeyBoard( bool( *inKey )( fixed ) ){ extKey=inKey; return *this; }
   fixed GetKey(),ScanKey(); // выборка символа или кода без остановки программы
   fixed ScanStatus();  // сопутствующий код от клавиатуры или из буфера выборки

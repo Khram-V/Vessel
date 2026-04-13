@@ -444,7 +444,7 @@ bool Field::KeyBoard( fixed Keyb )
                  Original( false );    // возврат вычислений в начальный момент
                } Distance=-0.8*Long;   // ... от точки взгляда до места обзора
                eyeX=150,eyeY=-16.4,eyeZ=0; lookX=0,lookY=-10,lookZ=0; break;
-    case _Tab: if( !ScanStatus()&SHIFT ){ Exp.draw++; break; } // =ScanStatus()&SHIFT ? -1:1; break;  // триангуляционная
+    case _Tab: if( !ScanStatus()&SHIFT ){Exp.draw++;break;} // триангуляционная
    default: return View::KeyBoard( Keyb );
   } Draw(); return true;                 // список команд принятых к исполнению
 }
@@ -456,15 +456,15 @@ static bool Hull_and_Waves_Draw()        // вся графика исполня
     Storm->Draw();    // затем картинка штормового волнения вместе с пароходом
     Vessel->wPrint(); // ... и геометрические таблички -> на текстовую консоль
     recurse=0;        // при возникновении рекурсии новые рисунки пропускаются
-//  Act ive_Key &= Storm->Ready() && Vessel->Ready();            // ++WinReady()
+  //Active_Key &= Storm->Ready() && Vessel->Ready();           // ++WinReady()
   } return false;     // return WinReady();
 //  return Vessel->Ready() && Storm->Ready();         // - вариант для WaitTime
 }
 static bool TryTimer()
 { if( Active_Key ) // &= Storm->Ready() && Vessel->Ready() )
   { static unsigned oKt=0,i=0; WinReady();
-    print( 1,23,"%c",( "#0123456789ABCDEF=" )[++i%=18] );         // 🌀 у Wiнет
-    if( oKt==KtE )                  // принудительный перезапуск таймеров
+    print( 1,23,"%c",( "#0123456789ABCDEF=" )[++i%=18] ); // 🌀
+    if( oKt==KtE )                        // принудительный перезапуск таймеров
     { //Storm->SetTimer( 100 );
       //Vessel->SetTimer( 156,Hull_and_Waves_Draw );
       //Storm->Timer(); Storm->Draw(); Vessel->Draw();// проблема в часах/таймере
@@ -536,22 +536,37 @@ int main()                                 // ( int ans, char **av, char **ac )
       .Floating( false ); // расчётами по корпусу, без графической визуализации
                           // часы и оперативная информация в оконных заголовках
   WaitTime( 600 );        // и ожидание исполнения вычислительных конструкторов
-  Sea.SetTimer( 100 );    // вычисления по волнению с механикой корабля (½ сек)
-  Ship.SetTimer( 156,Hull_and_Waves_Draw );     // изображение корабля и моря
-// WaitTime( 1000,TryTimer ); //,100 );         // ежесекундное переподключение
-//#pragma omp parallel //sections -> section
+
 //#pragma omp master
+    { Sea.SetTimer( 100 );  // вычисления по волнам и механике корабля (½ сек)
+      // do{ WaitTime( 100 ); Sea.Timer(); } while( Sea.Ready() );
+    }
+//#pragma omp parallel
+//{
+//#pragma omp sections
+//#pragma omp barrier
+//{
+//  #pragma omp single
+    { Ship.SetTimer( 156,Hull_and_Waves_Draw );
+      //do{ WaitTime( 156 ); Hull_and_Waves_Draw(); } while( Ship.Ready() );
+    } // изображение корабля и моря
+
+//WaitTime( 1000,TryTimer ); //,100 );          // ежесекундное переподключение
+#pragma omp single
+    {
+      do                 //! после выхода обязательно должен исполняться пролог
+      { WaitTime( 1000,TryTimer ); // секунда проверки работоспособности транзакций
+      //Sleep( 1000 );      // или вариант приостановки по блокирующему таймеру
+      } while( Active_Key &= Ship.Ready() && Sea.Ready() );
+    }
+//}
+//}
 //#pragma omp single
 //#pragma omp task
-  do                     //! после выхода обязательно должен исполняться пролог
-  { WaitTime( 1000,TryTimer ); // секунда проверки работоспособности транзакций
-    // Sleep( 1000 );       // или вариант приостановки по блокирующему таймеру
-  } while( Active_Key &= Storm->Ready() && Vessel->Ready() );
-
 //Break( "~Active_Key={%s}\n~Storm{%s}\n~Vessel{%s}",
-//                                Active_Key?" true ":" false ",
-//                                Storm->Ready()?" run ":" stop ",
-//                                Vessel->Ready()?" run ":" stop " );
+//         Active_Key?" true ":" false ",
+//           Storm->Ready()?" run ":" stop ",
+//           Vessel->Ready()?" run ":" stop " );
 //if( Storm->Ready() )Vessel->Close();
 //if( Vessel->Ready() )Storm->Close();
 //#pragma omp taskwait

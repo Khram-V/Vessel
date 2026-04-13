@@ -14,25 +14,26 @@ public:
   GLFWwindow *glfwWindow;  // pointer to glfw window associated with this class
   //
   //    Локальные данные для обслуживания главного/большого окна Windows
-  int ScreenWidth,ScreenHeight;    // размеры графического экрана компьютера
   int WindowX,WindowY;             // выделенное местоположение активного окна
+  int ScreenWidth,ScreenHeight;    // размеры графического экрана компьютера
+  bool onlyVirtualKeybord;         // 1 - неопознанные символы будут вычищаться
   //
-  //    X,Y {>0 левый/верхний}~{0,0=>2/3 остатка,1/4 высоты}~{<0 правый/нижний}
+  //   X,Y {>0 левый/верхний}~{0,0=>2/3 остатка,1/4 высоты}~{<0 правый/нижний}
   //        Width,Height >0 -> ширина/высота {0,0 => 800,600}
   //             исходный шрифт в конструкторе: Courier-18
   //
  explicit Window( const char* T=NULL, int X=0,int Y=0, int W=800,int H=600 );
  virtual ~Window();   // деструктор срабатывает в эпилогах производных структур
   void Close();       // иначе: вариант завершения только для базовой структуры
-  //      -- позиционирование +левого/-правого +верхнего/-нижнего угла Window и
+          // позиционирование +левого/-правого +верхнего/-нижнего угла Window и
   Window& Locate( int X,int Y, int Width,int Height ); // с изменением размеров
   Window& Refresh();         // разборка наложенных площадок c выводом на экран
   //
   //       блок сбора данных от клавиатуры, внутренний контроль мышки и таймера
   //
-  void PutChar( fixed Key );                // один символ --> кольцевой буфер
-  void PutMouse( UINT State, int x,int y ); // внутренняя обработка прерываний
-  void PutTimer();                          //
+  void PutChar( fixed Key );                 // один символ --> кольцевой буфер
+  void PutMouse( UINT State, int x,int y );  // внутренняя обработка прерываний
+  void PutTimer();
   //
   // обращение к клавиатуре через активное и контекстно настроенное окно Window
   //        1/2  +  3 - Left/Right.Shift     64 - ScrollLock     ??  - CapsLock

@@ -389,7 +389,7 @@ void InterSection::Read()
   Pl=getPlane();
   Build=getByte();
   NIt=N=getInt(); NPt=0;
-  T=(Items*)Allocate( N*sizeof(Items) );                                   //   textcolor( YELLOW );print( "\n a=%g,b=%g,c=%g,d=%g,Build=%d,N=%d",St[I].a,St[I].b,St[I].c,St[I].d,St[I].Build,N );
+  T=(Items*)Allocate( N*sizeof(Items) );                                   //   print( "\n a=%g,b=%g,c=%g,d=%g,Build=%d,N=%d",St[I].a,St[I].b,St[I].c,St[I].d,St[I].Build,N );
   for( int n=0; n<N; n++ )
   { T[n].NoSplines=K=getInt(); NPt+=K;
     T[n].S=(Spline*)Allocate( K*sizeof( Spline ) );                        //   print( "\nN=%d, K=%d  ",N,K ); getch();
@@ -441,7 +441,7 @@ bool Ship::LoadObj()
 }
 void Surface::ReadObj( char *Path )           // временный оригинал имени файла
 { char *S,*Name=strdup( Path ); Real r,g,b,a; char *s; // ссылка не текст в буфере файла
-  print( "\nОткрыт WaveFront файл: %s",Name );         textcolor( LIGHTCYAN );
+  print( "\nОткрыт WaveFront файл: %s",Name );
  int NoL=NoLayers,                      // уровни будут дополняться сверху
      NoC=NoCoPoint-1;                   // узловые точки отделяются от прошлого
   memset( &ActiveLayer,0,sizeof(Layers) );
@@ -553,7 +553,7 @@ bool Ship::LoadPart( bool New )  // [Ship].part == дельная вещь
   }
 Cont:
  UnitType Units;
-   print( "\nОткрыт файл: %s (дельные вещи и фрагменты free!Ship)\n",W2U( FName ) ); textcolor(LIGHTCYAN);
+   print( "\nОткрыт файл: %s (дельные вещи и фрагменты free!Ship)\n",W2U( FName ) );
    FV=(FileVersion)getInt(); /*getVersion*/                                     print( "Версия фрагмента = %d = '%s'\n",FV,sVer[FV]);
    Units=(UnitType)getInt();                                                    print( "Units = %s\n",Set.Units?"Имперский":"Метрический" );
    if( Units==Set.Units )Scale=1.0; else
@@ -574,7 +574,7 @@ bool Ship::LoadFEF()      // Ship.fef == FreeShip Exchange Format
 { int I; isBin=false;     // char *str=NULL;
   if( !(F=_wfopen( FName,L"rt" ) ) )
   { print( "?не открывается free!Ship Exchange Format %s ",W2U( FName ) ); getch(); exit( 2 );
-  } print( "\nОткрыт файл: %s (free!Ship exchange format)\n",W2U( FName ) );    textcolor( LIGHTCYAN );
+  } print( "\nОткрыт файл: %s (free!Ship exchange format)\n",W2U( FName ) );
   readText( &Set.Name );                                                        print( "< Project >\nName     =%s\n",Set.Name );
   readText( &Set.Designer );                                                    print(              "Designer =%s\n",Set.Designer );
   readText( &Set.Comment );                                                     print(              "Comment  =%s\n",Set.Comment );
@@ -659,7 +659,7 @@ void Surface::WriteFEF()
 { fprintf( ::F,"%d\n",NoLayers );
   for( int i=0; i<NoLayers; i++ )
   { Color C=L[i].LClr; C.c[3]=255-C.c[3];
-    fprintf( ::F,"%s\n%d $%X %i %i %i %i %i %i %g %g\n",
+    fprintf( ::F,"%s\n%d $%X %i %i %i %i %i %i %g %g",
            L[i].Description,L[i].ID,C,
            L[i].Visible,
            L[i].Developable,
@@ -670,6 +670,8 @@ void Surface::WriteFEF()
            L[i].MaterialDensity,
            L[i].Thickness
          );
+     if( i )fprintf( ::F,"\n" ); else fprintf( ::F," ≈ Id,Cl,Vis,Dev,Sym,IS,HS,LP,ρ,δ\n" );
+        //    " ≈ Id,Color,Visible,Develop,Symmetric,InterSection,HydroStatic,inLinesPlan\n" );
   }
   fprintf( ::F,"%i\n",NoCoPoint );
   for( int i=0; i<NoCoPoint; i++ )
@@ -683,7 +685,7 @@ void Surface::WriteFEF()
     if( G[i].Selected )fprintf( ::F," 1" ); fprintf( ::F,"\n" );
   }
   fprintf( ::F,"%i\n",NoFaces );
-  for( int i=0; i<NoFaces; i++ )          /**
+  for( int i=0; i<NoFaces; i++ )            /**  ≈ грубо и неприемлемо
   if( L[F[i].LayerIndex].LClr.c[3]!=0 )   */ //!.. исключение прозрачных граней
   { fprintf( ::F,"%i",F[i].Capacity );        // без правки количества
     for( int j=0; j<F[i].Capacity; j++ )fprintf( ::F," %d",F[i].P[j] );
@@ -708,7 +710,7 @@ void Ship::WriteVSL()
     { print( "\n~Запись: %s\n не получается, странно...",FileName ); return; }
   M=strlen( FileName );
   if( M>4 && strcmp( FileName+M-4,".fef" )==0 )
-  { fprintf( F,"%s\n%s\n%s\n%s\n%g %g %g %g %g %d 1 %d\n",
+  { fprintf( F,"%s\n%s\n%s\n%s\n%g %g %g %g %g %d 1 %d ≈ L,B,T, ρ,σ, Units,Quality\n",
            Set.Name,Set.Designer,Set.Comment,Set.CreatedBy,
            e5r(Length),e5r(Beam),e5r(Draft),
            Set.WaterDensity,
@@ -839,11 +841,9 @@ void Surface::ReOrder()                                                         
    { Vector &V=P[i].V;  // так должно быть
      for( int k=0; k<i; k++ )
      if( L[k]>=0 )
-     { if( abs( P[k].V-V )>Eps )L[i]=i; else                  // P[k].T=svCrease;
+     { if( abs( P[k].V-V )>Eps ){ L[i]=i; WinReady(); } else // P[k].T=svCrease; ???
        { P[k].T=(P[k].T==svCorner || V.y==0.0?svCorner:svRegular); L[i]=k; break;
-       }
-     }
-   }
+   } } }
    for( I=J=0; I<NoCoPoint; I++ )
    { if( L[I]>=0 )                      // пропуск по отсутствию обращений -???
      { if( L[I]==I  ){ if( I>J )P[L[I]=J]=P[I]; J++; } else L[I]=L[L[I]]; }
@@ -871,7 +871,7 @@ void Surface::ReOrder()                                                         
       if( (E.StartIndex==G[i].StartIndex && E.EndIndex==G[i].EndIndex)
        || (E.EndIndex==G[i].StartIndex && E.StartIndex==G[i].EndIndex) // { G[i].Crease=false; K++; break; }
        ){ G[i].Crease&=E.Crease || P[E.StartIndex].V.y==0              // сброс, если не ДП
-                                && P[E.EndIndex].V.y==0; break; } // по выходу из цикла поиска повторений
+                                && P[E.EndIndex].V.y==0; break; }      // по выходу из цикла поиска повторений
      if( i==J )G[J++]=E;
    }                                                                            if( J!=NoEdges )print( " %d повтор",J-NoEdges );
    NoEdges=J;

@@ -57,9 +57,9 @@ bool FreeShip::Draw()               // виртуальная процедура
 }
 //!                конструктор с расчисткой и считыванием новой числовой модели
 Ship::Ship()
-{ memset( this,0,sizeof( Ship ) );
-  textcolor( YELLOW ); print( "Free!Ship [*.fbm,*.ftm,*.fef,*.part,*.obj]\n" );
-  int argc; WCHAR **argv=CommandLineToArgvW( GetCommandLineW(),&argc );
+{ int argc; WCHAR **argv=CommandLineToArgvW( GetCommandLineW(),&argc );
+  textcolor( YELLOW ); print( "free!Ship [*.fbm,*.ftm,*.fef,*.part,*.obj]\n" );
+  memset( this,0,sizeof( Ship ) );
   if( argc>1 )FName=argv[1]; else
   { print( "Start Ship <имя файла модели корабля.[fbm|ftm|fef|part|obj]>\7" );
     getch(); exit( 1 );
@@ -71,15 +71,16 @@ Ship::Ship()
 //print( "Открыт %s файл: %s\n",isBin?"двоичный":"текстовый",W2U(FileName)); textcolor(LIGHTBLUE);
 //if( argc>4 && wcscmp( Slower( argv[1]+argc-4 ),L".fef" )==0 )LoadFEF(); else
 //if( argc>5 && wcscmp( Slower( argv[1]+argc-5 ),L".part" )==0 )LoadPart(); else
-
-  textcolor( LIGHTMAGENTA );  // к расцветке сообщения об ошибке открытия файла
+  textcolor( LIGHTGRAY );
   if( !LoadExtFile( true ) )
   if( !LoadProject() )
-  { print( "?Free!Ship неверный формат числовой модели: %s ",Name ); getch(); exit( 1 );
+  { textcolor( LIGHTMAGENTA );// к расцветке сообщения об ошибке открытия файла
+    print( "?Free!Ship неопознанный формат числовой модели: %s ",Name );
+    getch(); exit( 1 );
   }
-  textcolor( YELLOW );
-  print( "\n%s ",Name );
-  print( "\nLayer: %d, Knot: %d, Edge: %d, Face: %d, Curve: %d",Shell.NoLayers,Shell.NoCoPoint,Shell.NoEdges,Shell.NoFaces,Shell.NoCurves );
+  textcolor( WHITE );
+  print( "\n%s\nLayer: %d, Knot: %d, Edge: %d, Face: %d, Curve: %d",
+    Name,Shell.NoLayers,Shell.NoCoPoint,Shell.NoEdges,Shell.NoFaces,Shell.NoCurves );
   print( "\n Длина : [ %6.2f - %-6.2f ] = %g ",Min.x,Max.x,Max.x-Min.x );
   print( "\n Ширина: [ %6.2f - %-6.2f ] = %g : { %g }",Min.y,Max.y,(Max.y>-Min.y?Max.y:-Min.y)*2,(Max.y+Min.y)/2.0 );
   print( "\n Высота: [ %6.2f - %-6.2f ] = %g ",Min.z,Max.z,Max.z-Min.z );
@@ -120,34 +121,53 @@ bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой под
                " <PgDn>  "," положить на правый борт",0 };
  BoardView &B=Visio.ModelView;
   switch( Keyb )
-  { case _F1: Window::Help( Id,Cmds,Plus,1,2 ); break;
-    case _F2: WriteVSL();                       break;
-    case _F3: LoadExtFile( false );             break;
-    case _F10: Shell.ReOrder(); break; // goto R1; // расчистка повторов
-    case _F4: Shell.EditMenu(this); goto R1;      // сдвиги и масштабирование
-    case _End: Shell.Revolute();    goto R1;  // обращение нормалей поверхности
+  { case _Esc: exit( 12 );
+    case _F1: Help( Id,Cmds,Plus,1,2 ); break;
+    case _F2: WriteVSL();               break;
+    case _F3: LoadExtFile( false );     break;
+    case _F10:Title( " Поиск и расчистка повторов..." );
+#pragma omp barrier       // Синхронизация: все потоки пусть заканчивают работу
+#pragma omp single       //! - синхронизация нужна всем редактирующим операциям
+{             Shell.ReOrder();
+}             break;    // goto R1;  // расчистка повторов
+    case _F4: Title( " Правка размерений с пространственным смещением..." );
+              Shell.EditMenu(this); goto R1;   // сдвиги и масштабирование
+    case _End:Shell.Revolute();     goto R1;  // обращение нормалей поверхности
     case _Blank:
-      if( ScanStatus()&CTRL )
-        { static bool xd=false;
-          if( xd^=true )glPolygonMode( GL_FRONT_AND_BACK,GL_FILL ); //,glEnable( GL_FRONT_FACE ),glEnable( GL_CULL_FACE );
-                  else  glPolygonMode( GL_FRONT,GL_FILL ),
-                        glPolygonMode( GL_BACK,GL_LINE );           //,glDisable( GL_FRONT_FACE ),glDisable( GL_CULL_FACE );
-        } else
-      if( B==mvPort )B=mvBoth; else B=mvPort; break;
-    case _PgUp: Shell.R90Zright();  goto R1; // поворот 90° вправо по компасу
+     if( ScanStatus()&CTRL )
+       { static bool xd=false;
+         if( xd^=true )glPolygonMode( GL_FRONT_AND_BACK,GL_FILL ); //,glEnable( GL_FRONT_FACE ),glEnable( GL_CULL_FACE );
+                 else  glPolygonMode( GL_FRONT,GL_FILL ),
+                       glPolygonMode( GL_BACK,GL_LINE );           //,glDisable( GL_FRONT_FACE ),glDisable( GL_CULL_FACE );
+       } else
+     if( B==mvPort )B=mvBoth; else B=mvPort; break;
+    case _PgUp: Shell.R90Zright(); goto R1; // поворот 90° вправо по компасу
     case _PgDn: Shell.R90Xright();      R1: // заложить крен 90° на правый борт
     case _Home:
      if( Keyb!=_End )
-     { Shell.Extents( false );   // нормали экстремумы не портят
+     { Shell.Extents( false );              // нормали экстремумы не портят
        Distance=-1.75*(Max.x+Max.y-Min.x-Min.y+Width*(Max.z-Min.z)*0.9/Height);
        eyeX=135; // lookX=-60;
-     } Draw(); return View::KeyBoard( Keyb );                    // перерисовка
+     } Draw();   // return View::KeyBoard( Keyb );               // перерисовка
     default: return View::KeyBoard( Keyb );
-  } return Draw();
+  } Draw(); return true;           // если исполнено = прорисовка и сброс ввода
 }
 int main() // int argc, char **argv )
-{ texttitle( "free!Ship view\\convert in C++" );         // заголовок и графика
-  FreeShip Hull;
-  do{ Hull.Title( DtoA( Real(ElapsedTime())/3600000.0,-3 ) ); WaitTime( 500 );
-    } while( Hull.Ready() && Hull.GetKey()!=_Esc ); return 0; //_exit( 12 );
+{ texttitle( "free!Ship view\\convert in C++" ); // заголовок текстовой консоли
+  DWORD i,j=0;
+//fixed Ans;
+  FreeShip Hull;                   // запуск сразу всей математики и графики
+  Hull.onlyVirtualKeybord=true;    // и никаких ожиданий запросов от клавиатуры
+//#pragma omp parallel ~~ смех да грех, и зачем...
+#pragma omp master
+{
+  do                                // посекундные отсчёты активности программы
+  { if( (i=ElapsedTime()/1000)!=j )Hull.Title( DtoA( Real( j=i )/3600,3 ) );
+//  Hull.Title( DtoA( Real(ElapsedTime())/3600000.0,-3 ) );
+//  if( (Ans=Hull.GetKey())==_Esc )break;
+//  if( Ans )Hull.KeyBoard( Ans );
+    WaitTime( 1000 );         // просто посекундный контроль текущей активности
+//  Sleep(25);                ~~ а так получается лишь заметное подтормаживание
+  } while( Hull.Ready() );
+} return 0; //_exit( 12 );
 }
