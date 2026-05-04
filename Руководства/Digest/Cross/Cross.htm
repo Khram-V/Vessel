@@ -1,0 +1,115 @@
+<html><head><title>Пересечения двух прямых линий и отрезков</title>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+<style>
+body{ margin: 4px; padding: 10px; background-color: #eeefff; }
+pre{ background-color: #e9e9e9; color: black; padding: 5px 10px; }
+.cpp {border: 1px dotted #a0a0a0; font-size: 115%;   font-family: 'Courier New', Courier, monospace; background-color: #f0f0f0; color: #0000bb;}
+.cpp .kw1 {color: #a1a100;}
+.cpp .kw2 {color: #000; font-weight: bold;}
+.cpp .kw3 {color: #000066;}
+.cpp .kw4 {color: #f63333;}
+.cpp .co2 {color: #808080;}
+.cpp .br0 {color: #66cc66;}
+</style>
+</head>
+<body>
+<hr><h2>Точка пересечения прямых</h2><hr>
+<p>Пусть даны две прямые, заданные своими коэффициентами <big><i>A</i><sub>1</sub>,<i>B</i><sub>1</sub>,<i>C</i><sub>1</sub> и <i>A</i><sub>2</sub>,<i>B</i><sub>2</sub>,<i>C</i><sub>2</sub></big>. Требуется найти их точку пересечения, или выяснить, что прямые параллельны.</p>
+<h3>Решение</h3>
+<p>Если две прямые не параллельны, то они пересекаются. Чтобы найти точку пересечения, достаточно составить из двух уравнений прямых систему и решить её:</p>
+<p class="formula"><img class="tex" src="E.png" alt=" \cases{ A_1 x + B_1 y + C_1 = 0, \cr A_2 x + B_2[...]"></p>
+<p>Пользуясь формулой Крамера, сразу находим решение системы, которое и будет искомой <b>точкой пересечения</b>:</p>
+<p class="formula"><img class="tex" src="X.png" alt=" x = - \frac{ \left|\matrix{C_1&amp;B_1 \cr C_2&amp;B_2}\r[...]"><br><img class="tex" src="Y.png" alt=" y = - \frac{ \left|\matrix{A_1&amp;C_1 \cr A_2&amp;C_2}\r[...]"></p>
+<p>Если знаменатель нулевой, т.е.</p>
+<p class="formula"><img class="tex" src="D.png" alt=" \left|\matrix{A_1&amp;B_1 \cr A_2&amp;B_2}\right| = A_1 B[...]"> то система решений не имеет (прямые <b>параллельны</b> и не совпадают) или имеет бесконечно много (прямые <b>совпадают</b>). Если необходимо различить эти два случая, надо проверить, что коэффициенты &quot;C&quot; прямых пропорциональны с тем же коэффициентом пропорциональности, что и коэффициенты &quot;A&quot; и &quot;B&quot;, для чего достаточно посчитать два определителя, если они оба равны нулю, то прямые совпадают:<p class="formula"><img class="tex" src="K.png" alt=" \left|\matrix{ A_1 &amp; C_1 \cr A_2 &amp; C_2 }\right|, [...]"></p>
+
+<h3>Реализация</h3>
+<pre class="notranslate cpp"><span class="kw4">const</span> <span class="kw4">double</span> EPS<span class="sy1">=</span><span class="nu19">1e-9</span><span class="sy4">;</span>
+
+<span class="kw4">struct</span> pt<span class="br0">{ </span><span class="kw4">double</span> x,y<span class="sy4">; </span><span class="br0">}</span><span class="sy4">;</span>
+<span class="kw4">struct</span> line<span class="br0">{</span> <span class="kw4">double</span> a,b,c<span class="sy4">;</span> <span class="br0">}</span><span class="sy4">;</span>
+
+<span class="kw4">double</span> det<span class="br0">( </span><span class="kw4">double</span> a,<span class="kw4">double</span> b,<span class="kw4">double</span> c,<span class="kw4">double</span> d<span class="br0"> ){ </span><span class="kw1">return</span> a<span class="sy2">*</span>d<span class="sy2">-</span>b<span class="sy2">*</span>c<span class="sy4">; </span><span class="br0">}
+</span>
+<span class="kw4">bool</span> intersect<span class="br0">( </span>line m,line n, pt <span class="sy3">&amp;</span>res <span class="br0">)
+{</span> <span class="kw4">double</span> zn <span class="sy1">=</span> det<span class="br0">(</span> m.<span class="me1">a</span>,m.<span class="me1">b</span>,n.<span class="me1">a</span>,n.<span class="me1">b</span><span class="br0"> )</span><span class="sy4">;</span>
+	<span class="kw1">if</span><span class="br0">( </span><span class="kw3">abs</span><span class="br0">( </span>zn<span class="br0"> )</span><span class="sy1">&lt;</span>EPS <span class="br0">)</span><span class="kw1">return</span> <span class="kw2">false</span><span class="sy4">;</span>
+	res.<span class="me1">x</span> <span class="sy1">=</span> <span class="sy2">-</span>det<span class="br0">( </span>m.<span class="me1">c</span>,m.<span class="me1">b</span>, n.<span class="me1">c</span>,n.<span class="me1">b</span><span class="br0"> )</span><span class="sy2">/</span>zn<span class="sy4">;</span>
+	res.<span class="me1">y</span> <span class="sy1">=</span> <span class="sy2">-</span>det<span class="br0">( </span>m.<span class="me1">a</span>,m.<span class="me1">c</span>, n.<span class="me1">a</span>,n.<span class="me1">c </span><span class="br0">)</span><span class="sy2">/</span>zn<span class="sy4">;</span>
+	<span class="kw1">return</span> <span class="kw2">true</span><span class="sy4">;</span>
+<span class="br0">}</span>
+<span class="kw4">bool</span> parallel<span class="br0">( </span>line m,line n<span class="br0"> )
+{</span>	<span class="kw1">return</span> <span class="kw3">abs</span><span class="br0">( </span>det<span class="br0">( </span>m.<span class="me1">a</span>,m.<span class="me1">b</span>,n.<span class="me1">a</span>,n.<span class="me1">b </span><span class="br0">) )</span><span class="sy1">&lt;</span>EPS<span class="sy4">;</span>
+<span class="br0">}</span>
+<span class="kw4">bool</span> equivalent<span class="br0">( </span>line m,line n<span class="br0"> )
+{</span>	<span class="kw1">return</span> <span class="kw3">abs</span><span class="br0">( </span>det<span class="br0">( </span>m.<span class="me1">a</span>,m.<span class="me1">b</span>,n.<span class="me1">a</span>,n.<span class="me1">b </span><span class="br0">) )</span><span class="sy1">&lt;</span>EPS
+	    <span class="sy3">&amp;&amp;</span> <span class="kw3">abs</span><span class="br0">( </span>det<span class="br0">( </span>m.<span class="me1">a</span>,m.<span class="me1">c</span>,n.<span class="me1">a</span>,n.<span class="me1">c </span><span class="br0">) )</span><span class="sy1">&lt;</span>EPS
+	    <span class="sy3">&amp;&amp;</span> <span class="kw3">abs</span><span class="br0">( </span>det<span class="br0">( </span>m.<span class="me1">b</span>,m.<span class="me1">c</span>,n.<span class="me1">b</span>,n.<span class="me1">c </span><span class="br0">) )</span><span class="sy1">&lt;</span>EPS<span class="sy4">;</span>
+<span class="br0">}</span></pre>
+<hr><h2>Пересечение двух отрезков</h2><hr>
+<p>Даны два отрезка <b><i>AB</i></b> и <b><i>CD</i></b> (они могут вырождаться в точки). Требуется найти их пересечение: оно может быть пустым (если отрезки не пересекаются), может быть одной точкой, и может быть целым отрезком (если отрезки накладываются друг на друга).</p>
+<h3>Алгоритм</h3>
+<p>Работать с отрезками будем как с прямыми: построим по двум отрезкам уравнения их прямых, проверим, не параллельны ли прямые. Если прямые не параллельны, то всё просто: находим их точку пересечения и проверяем, что она принадлежит обоим отрезкам (для этого достаточно проверить, что точка принадлежит каждому отрезку в проекции на ось <b><i>X</i></b> и на ось <b><i>Y</i></b> по отдельности). В итоге в этом случае ответом будет либо &quot;пусто&quot;, либо единственная найденная точка.</p>
+<p>Более сложный случай — если прямые оказались параллельными (сюда же относится случай, когда один или оба отрезка выродились в точки). В этом случае надо проверить, что оба отрезка лежат на одной прямой (или, в случае когда они оба вырождены в точку — что эта точка совпадает). Если это не так, то ответ — &quot;пусто&quot;. Если это так, то ответ — это пересечение двух отрезков, лежащих на одной прямой, что реализуется достаточно просто — надо взять максимум из левых концов и минимум из правых концов.</p>
+<p>В самом начале алгоритма напишем так называемую &quot;проверку на bounding box&quot; — во-первых, она необходима для случая, когда два отрезка лежат на одной прямой, а во-вторых, она, как легковесная проверка, позволяет алгоритму работать в среднем быстрее на случайных тестах.</p>
+<h3>Реализация</h3>
+<p>Приведём здесь полную реализацию, включая все вспомогательные функции по работе с точками и прямыми.</p>
+<p>Главной здесь является функция &quot;<b>Intersect</b>&quot;, которая пересекает два переданных ей отрезка, и если они пересекаются хотя бы по одной точке, то возвращает &quot;<b>true</b>&quot;, а в аргументах &quot;<b>left</b>&quot; и &quot;<b>right</b>&quot; возвращает начало и конец отрезка-ответа (в частности, когда ответ — это единственная точка, возвращаемые начало и конец будут совпадать).</p>
+
+<pre class="notranslate cpp"><span class="kw4">const double</span> EPS<span class="sy1">=</span><span class="nu19">1E-9</span><span class="sy4">;</span>
+
+<span class="kw4">struct</span> pt<span class="br0">{ </span><span class="kw4">double</span> x,y<span class="sy4">;</span>
+	<span class="kw4">bool</span> operator <span class="sy1">&lt;</span> <span class="br0">(</span><span class="kw4"> const</span> pt <span class="sy3">&amp;</span>p<span class="br0"> )</span> <span class="kw4">const</span>
+	<span class="br0">{ </span><span class="kw1">return</span> x<span class="sy1">&lt;</span>p.<span class="me1">x</span><span class="sy2">-</span>EPS <span class="sy3">||</span> <span class="kw3">abs</span><span class="br0">( </span>x<span class="sy2">-</span>p.<span class="me1">x </span><span class="br0">)</span><span class="sy1">&lt;</span>EPS <span class="sy3">&amp;&amp;</span> y<span class="sy1">&lt;</span>p.<span class="me1">y</span><span class="sy2">-</span>EPS<span class="sy4">;</span>
+	<span class="br0">}
+}</span><span class="sy4">;</span>
+<span class="kw4">struct</span> line<span class="br0">{ </span><span class="kw4">double</span> a,b,c<span class="sy4">;</span>
+	line<span class="br0">(){}</span>
+	line<span class="br0">( </span>pt p, pt q<span class="br0"> )
+	{</span>	a <span class="sy1">=</span> p.<span class="me1">y</span> <span class="sy2">-</span> q.<span class="me1">y</span><span class="sy4">;</span>
+		b <span class="sy1">=</span> q.<span class="me1">x</span> <span class="sy2">-</span> p.<span class="me1">x</span><span class="sy4">;</span>
+		c <span class="sy1">=</span><span class="sy2">-</span>a<span class="sy2">*</span>p.<span class="me1">x</span> <span class="sy2">-</span> b<span class="sy2">*</span>p.<span class="me1">y</span><span class="sy4">; </span>norm<span class="br0">(</span><span class="br0">)</span><span class="sy4">;</span>
+	<span class="br0">}</span> 
+	<span class="kw4">void</span> norm<span class="br0">(</span><span class="br0">)
+</span>	<span class="br0">{</span>	<span class="kw4">double</span> z <span class="sy1">=</span> <span class="kw3">sqrt</span><span class="br0">( </span>a<span class="sy2">*</span>a<span class="sy2">+</span>b<span class="sy2">*</span>b<span class="br0"> )</span><span class="sy4">;</span>
+		<span class="kw1">if</span><span class="br0">( </span><span class="kw3">abs</span><span class="br0">( </span>z<span class="br0"> )</span><span class="sy1">&gt;</span>EPS <span class="br0">)</span>a<span class="sy2">/</span><span class="sy1">=</span>z,b<span class="sy2">/</span><span class="sy1">=</span>z,c<span class="sy2">/</span><span class="sy1">=</span>z<span class="sy4">;</span>
+	<span class="br0">}</span>
+	<span class="kw4">double</span> dist<span class="br0">( </span>pt p<span class="br0"> )</span> <span class="kw4">const</span><span class="br0">{</span> <span class="kw1">return</span> a<span class="sy2">*</span>p.<span class="me1">x</span> <span class="sy2">+</span> b<span class="sy2">*</span>p.<span class="me1">y</span> <span class="sy2">+</span> c<span class="sy4">; </span><span class="br0">}</span>
+<span class="br0">}</span><span class="sy4">;</span>
+
+<span class="co2">#define det( a,b,c,d )( a*d-b*c )</span>
+
+<span class="kw2">inline</span> <span class="kw4">bool</span> betw<span class="br0">( </span><span class="kw4">double</span> l,<span class="kw4">double</span> r,<span class="kw4">double</span> x<span class="br0"> )
+{</span>	<span class="kw1">return</span> min<span class="br0">( </span>l,r<span class="br0"> )</span><span class="sy1">&lt;=</span>x<span class="sy2">+</span>EPS <span class="sy3">&amp;&amp;</span> x<span class="sy1">&lt;=</span>max<span class="br0">( </span>l,r<span class="br0"> )</span><span class="sy2">+</span>EPS<span class="sy4">;</span>
+<span class="br0">}</span>
+<span class="kw2">inline</span> <span class="kw4">bool</span> intersect_1d<span class="br0">( </span><span class="kw4">double</span> a,<span class="kw4">double</span> b,<span class="kw4">double</span> c,<span class="kw4">double</span> d<span class="br0"> )
+{</span>	<span class="kw1">if</span><span class="br0">( </span>a<span class="sy1">&gt;</span>b<span class="br0"> )</span>swap<span class="br0">( </span>a,b<span class="br0"> )</span><span class="sy4">;</span>
+	<span class="kw1">if</span><span class="br0">( </span>c<span class="sy1">&gt;</span>d<span class="br0"> )</span>swap<span class="br0">( </span>c,d<span class="br0"> )</span><span class="sy4">;</span>
+	<span class="kw1">return</span> max<span class="br0">(</span> a,c<span class="br0"> )</span><span class="sy1">&lt;=</span>min<span class="br0">(</span> b,d<span class="br0"> )</span><span class="sy2">+</span>EPS<span class="sy4">;</span>
+<span class="br0">}</span>
+<span class="kw4">bool</span> intersect<span class="br0">( </span>pt a,pt b,pt c,pt d,pt <span class="sy3">&amp;</span>left, pt <span class="sy3">&amp;</span>right <span class="br0">)
+{</span>	<span class="kw1">if</span><span class="br0">( </span><span class="sy3">!</span>intersect_1d<span class="br0">( </span>a.<span class="me1">x</span>,b.<span class="me1">x</span>,c.<span class="me1">x</span>,d.<span class="me1">x </span><span class="br0">)</span> <span class="sy3">||</span> <span class="sy3">!</span> intersect_1d<span class="br0">( </span>a.<span class="me1">y</span>,b.<span class="me1">y</span>,c.<span class="me1">y</span>,d.<span class="me1">y </span><span class="br0">) )</span>
+		<span class="kw1">return</span> <span class="kw2">false</span><span class="sy4">;</span>
+	line m<span class="br0">( </span>a,b<span class="br0"> )</span><span class="sy4">;</span>
+	line n<span class="br0">( </span>c,d<span class="br0"> )</span><span class="sy4">;</span>
+	<span class="kw4">double</span> zn<span class="sy1">=</span>det<span class="br0">( </span>m.<span class="me1">a</span>,m.<span class="me1">b</span>,n.<span class="me1">a</span>,n.<span class="me1">b </span><span class="br0">)</span><span class="sy4">;</span>
+	<span class="kw1">if</span><span class="br0">( </span><span class="kw3">abs</span><span class="br0">( </span>zn <span class="br0">)</span><span class="sy1">&lt;</span>EPS <span class="br0">)
+	{</span>	<span class="kw1">if</span><span class="br0">( </span><span class="kw3">abs</span><span class="br0">( </span>m.<span class="me1">dist</span><span class="br0">( </span>c<span class="br0"> ) )</span><span class="sy1">&gt;</span>EPS <span class="sy3">||</span> <span class="kw3">abs</span><span class="br0">( </span>n.<span class="me1">dist</span><span class="br0">( </span>a<span class="br0"> ) )</span><span class="sy1">&gt;</span>EPS<span class="br0"> )</span><span class="kw1">return</span> <span class="kw2">false</span><span class="sy4">;</span>
+		<span class="kw1">if</span><span class="br0">( </span>b<span class="sy1">&lt;</span>a<span class="br0"> )</span>swap<span class="br0">( </span>a,b<span class="br0"> )</span><span class="sy4">;</span>
+		<span class="kw1">if</span><span class="br0">( </span>d<span class="sy1">&lt;</span>c<span class="br0"> )</span>swap<span class="br0">( </span>c,d<span class="br0"> )</span><span class="sy4">;</span>
+		left <span class="sy1">= </span>max<span class="br0">(</span> a,c<span class="br0"> )</span><span class="sy4">;</span>
+		right<span class="sy1">= </span>min<span class="br0">(</span> b,d<span class="br0"> )</span><span class="sy4">; </span><span class="kw1">return</span> <span class="kw2">true</span><span class="sy4">;</span>
+	<span class="br0">}</span>
+	<span class="kw1">else</span>
+	<span class="br0">{</span>	left.<span class="me1">x</span> <span class="sy1">=</span> right.<span class="me1">x</span> <span class="sy1">=</span> <span class="sy2">-</span>det<span class="br0">( </span>m.<span class="me1">c</span>,m.<span class="me1">b</span>,n.<span class="me1">c</span>,n.<span class="me1">b</span><span class="br0"> )</span><span class="sy2">/</span>zn<span class="sy4">;</span>
+		left.<span class="me1">y</span> <span class="sy1">=</span> right.<span class="me1">y</span> <span class="sy1">=</span> <span class="sy2">-</span>det<span class="br0">( </span>m.<span class="me1">a</span>,m.<span class="me1">c</span>,n.<span class="me1">a</span>,n.<span class="me1">c </span><span class="br0">)</span><span class="sy2">/</span>zn<span class="sy4">;</span>
+		<span class="kw1">return</span> betw<span class="br0">(</span> a.<span class="me1">x</span>,b.<span class="me1">x</span>,left.<span class="me1">x</span><span class="br0"> )</span>
+		    <span class="sy3">&amp;&amp;</span> betw<span class="br0">( </span>a.<span class="me1">y</span>,b.<span class="me1">y</span>,left.<span class="me1">y</span><span class="br0"> )</span>
+		    <span class="sy3">&amp;&amp;</span> betw<span class="br0">( </span>c.<span class="me1">x</span>,d.<span class="me1">x</span>,left.<span class="me1">x</span><span class="br0"> )</span>
+		    <span class="sy3">&amp;&amp;</span> betw<span class="br0">( </span>c.<span class="me1">y</span>,d.<span class="me1">y</span>,left.<span class="me1">y</span><span class="br0"> )</span><span class="sy4">;</span>
+	<span class="br0">}</span>
+<span class="br0">}</span></pre>
+<hr>
+<p class="formula"><img src="Cross.png"></p>
+</body>
+</html>

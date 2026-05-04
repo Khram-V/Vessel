@@ -133,10 +133,35 @@ unsigned& uList::operator[]( int k ){ return m[minmax(0,k>=0?k:k+len,len-1)]; }
 unsigned& uList::operator+=( unsigned p ) // выбор [k] обраткой и += дополнение
 { if(len>=n)m=(unsigned*)realloc(m,(n+=96)*sizeof(unsigned));return m[len++]=p;
 }
+static bool s1pt=true;                          // первый четырёхугольник
+static Vector oP={0,0,-1};                      // и его нормаль условно вниз
 static bool Span( int l, int r )                // малый: 2S/L  большой: abc/4S
-{ return norm( R[r+1]-L[l] ) < norm( R[r]-L[l+1] );  // кратчайшее обновление
-//  Vector Rr=R[r+1]-L[l],Ll=L[l+1]-R[r]; Ll.x=Rr.x=0.0;
-//  return norm( Rr ) < norm( Ll );  // кратчайшее отстояние
+{
+  return norm( R[r+1]-L[l] ) < norm( R[r]-L[l+1] );    // кратчайшее обновление
+//  return sqr( dir( R[r+1]-L[l] ).x )>sqr( dir( R[r]-L[l+1] ).x );
+#if 1
+/*
+ Vector Rl=( R[r+1]-R[r] )*( L[l]-R[r] ),
+        Lr=( R[r]-L[l] )*( L[l+1]-L[l] );
+ Real rl=dir( R[r+1]-L[l] ).x,
+      lr=dir( R[r]-L[l+1] ).x;
+// bool Side=rl>lr;
+ bool Side=norm( Rl )/rl>norm( Lr )/lr ;
+  if( s1pt )s1pt=false; else      // norm( R[r+1]-L[l] )<norm( R[r]-L[l+1] ); }
+  { Real ra=dir( Rl )%oP,
+         la=dir( Lr )%oP;
+    if( ra*la<-10.5 )Side=ra>la;    // Side=Rl%oP>=Lr%oP; //s1pt=true;
+  }
+  oP=dir( Side?Rl:Lr ); return Side;
+*/
+#else
+  Vector Rl=R[r+1]-L[l],Lr=L[l+1]-R[r], // Rl.z/=2; Lr.z/=2; //Rl.x=Lr.x=0.0;
+         Ll=L[l+1]-L[l],Rr=R[r+1]-R[r]; // кратчайшее отстояние
+    Real R=dir( Rr*Rl )%dir( Rl*Ll ),   // такой слом не особо адекватен
+         L=dir( Ll*Lr )%dir( Lr*Rr );
+     if( L*R<0 )return R<L;
+          else  return norm( Rl )<norm( Lr );
+#endif
 }
 //   Считывание корпуса отмечается успехом, либо полным завершением программы
 //
@@ -277,9 +302,10 @@ Ok:
 //         { for( k=l; k>=j; k-- ){ V=S[k]; V.y=0; F.Insert( m )=V; } break; }
            { for( k=l; k>=j; k-- )F.Insert( m )=S[k]; break; }
         if( i<S.len )goto Rep;
-    } }   //  уточнение крайних контуров проекции бок в диаметральной плоскости
-    while( lfr^=true );                        // сначала форштевень lfr=false,
-                                               // затем ахтерштевень lfr=true
+      }    // уточнение крайних контуров проекции бок в диаметральной плоскости
+    }                                          // сначала форштевень lfr=false,
+    while( lfr^=true );                        // затем ахтерштевень lfr=true
+
     for( n=0; n<=Nframes+1; n++ )      // подтягивание к ДП крайних точек, если
     if( Frame[n][0].z!=Frame[n][-1].z )  // нет замыкания катамаранного контура
     { V=Frame[n][0];  if( V.y && V.x==Keel[n] ){ V.y=0; Frame[n]/=V; }
@@ -314,7 +340,7 @@ Ok:
     //                          и плазовые ординаты разбрасываются парами точек
     //                            по смежным шпангоутам внутри расчетной шпации
 // uList rf,lf;                       // индексы доступа к точкам
-    for( n=1; n<=Nframes+1; n++ )     // на шпангоутах (теперь без штевней)
+    for( n=1; n<=Nframes+1; n++ )     // на шпангоутах (без штевней) n: 1..N+1
     { L.len=R.len=lf.len=rf.len=0;    // начальные точки совпадают, и ненулевые
       //
       //   раздельная несинхронная выборка контурных точек штевней и шпангоутов
@@ -344,12 +370,13 @@ Ok:
       for( i=R.len-1; i>0; i-- )if( R[i].z<0 && R[i]==R[i-1] )
         { R.Delete( i ); for( j=i; j<R.len; j++ )rf[j]=rf[j+1]; } rf.len=R.len;
       */
-      //!            перестройка и оптимизация последовательности треугольников
+      //! с началом перестроение и оптимизация последовательности треугольников
       //                                     по всему покрытию бортовой обшивки
      int signLb=0,signRb=0,            // +1 надводный борт; -1 смоченная часть
          wl=0,wr=0,zl,zr,              // индексы поиска по контурам шпангоутов
          sl=0,sr=0;                    //                  ... от третьих точек
       Ins( n )=lf[0],Ins( n )=rf[0];   // левая точка впереди - это существенно
+      s1pt=true;                       //  отметка для первой установки нормали
 
 Sign_Fragment: signLb=signRb=0; zl=wl; zr=wr;   /// v0+((x-x0)/(x1-x0))*(v1-v0)
       //

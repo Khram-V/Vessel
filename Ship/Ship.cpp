@@ -55,6 +55,17 @@ bool FreeShip::Draw()               // виртуальная процедура
   } }                                          glLineWidth( 1 );
   Window::Show(); return true;
 }
+Surface::Surface()                                 // обнуляется NoLayers тоже!
+{ memset( this,0,sizeof( Surface ) ); // memset(&ActiveLayer,0,sizeof(Layers));
+  ActiveLayer.Description="Чистый слой"; // Technologies Advanced Visualizer";
+  ActiveLayer.ID=0;                      // изначально здесь ноль
+  ActiveLayer.LClr.C=0xAAFFFFAA;         // предварительная раскладка
+  ActiveLayer.Visible=true;              // слой видимый
+  ActiveLayer.Symmetric=false;           // пока без правого дублирования
+  ActiveLayer.ShowInLineSpan=true;       // включается в теоретические чертежи
+  ActiveLayer.MaterialDensity=1.0;       // плотность воды
+  ActiveLayer.Thickness=1.0;             // если 1 - получится площадь
+}
 //!                конструктор с расчисткой и считыванием новой числовой модели
 Ship::Ship()
 { int argc; WCHAR **argv=CommandLineToArgvW( GetCommandLineW(),&argc );

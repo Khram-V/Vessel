@@ -309,7 +309,7 @@ void Surface::Read( bool Part )
    }
    //  ... здесь начинается разборка со сплайнами и кривыми Безье-поверхностями
    //
-   if( !Part ){ ActiveLayer=L[getInt()];                                        print( "index of active layer = %d\n",ActiveLayer ); }
+   if( !Part ){ /*ActiveLayer=L[getInt()];*/ I=getInt();                        print( "index of active layer = %d[%d]\n",I,NoLayers ); }
    NoC=NoCoPoint;
    NoCoPoint+=getInt();                                                         print( "< ControlPoints > %d => %d",NoC,NoCoPoint );
    P=(Surface::CoPoint*)Allocate( NoCoPoint*sizeof( Surface::CoPoint ),P );
@@ -419,9 +419,9 @@ bool Ship::LoadExtFile( bool New )
   }
   L=strlen( FileName ); //wcscpy( FName,U2W( FileName ) );// если New остановка
   FName=wcsdup( U2W( FileName ) );
-  if( L>5 && strcmp( FileName+L-5,".part" )==0 )LoadPart( New ); else
-  if( L>4 && strcmp( FileName+L-4,".fef" )==0 )LoadFEF(); else // с заменой заголовков
-  if( L>4 && strcmp( FileName+L-4,".obj" )==0 )LoadObj(); else return false;
+  if( L>5 && strcmp( strlwr( FileName+L-5 ),".part" )==0 )LoadPart( New ); else
+  if( L>4 && strcmp( strlwr( FileName+L-4 ),".fef" )==0 )LoadFEF(); else // с заменой заголовков
+  if( L>4 && strcmp( strlwr( FileName+L-4 ),".obj" )==0 )LoadObj(); else return false;
   return true;
 }
 bool Ship::LoadObj()
@@ -444,13 +444,9 @@ void Surface::ReadObj( char *Path )           // временный оригин
   print( "\nОткрыт WaveFront файл: %s",Name );
  int NoL=NoLayers,                      // уровни будут дополняться сверху
      NoC=NoCoPoint-1;                   // узловые точки отделяются от прошлого
-  memset( &ActiveLayer,0,sizeof(Layers) );
   ActiveLayer.Description="WaveFront";  // Technologies Advanced Visualizer";
   ActiveLayer.ID=NoL;                   // изначально здесь ноль
-  ActiveLayer.LClr.C=0xAAFFFFAA;        // предварительная раскладка
-  ActiveLayer.Visible=true;             // слой видимый
   ActiveLayer.Symmetric=false;          // пока без правого дублирования
-  ActiveLayer.ShowInLineSpan=true;      // включается в теоретические чертежи
   while( !feof( ::F ) )
   { if( (s=strchr( S=getString( ::F ),'#' ))!=NULL )*s=0;
     if( strcut( S )<3 )continue;
@@ -521,19 +517,19 @@ void Surface::ReadObj( char *Path )           // временный оригин
             L[NoLayers-1].Description=strdup( S+7 );
             L[NoLayers-1].ID=NoLayers; } else
           if( !strncmp( S,"kd ",3 ) )
-          { Color &c=L[NoLayers-1].LClr;
-            sscanf( S+3,"%lg%lg%lg",&r,&g,&b ); c.c[0]=byte( r*255 );
+          { Color &c=L[NoLayers-1].LClr;        c.c[3]=0xFF;
+            sscanf( S+3,"%lg%lg%lg",&r,&g,&b ); c.c[2]=byte( b*255 );
                                                 c.c[1]=byte( g*255 );
-                                                c.c[2]=byte( b*255 ); } else
+                                                c.c[0]=byte( r*255 ); } else  //0xFF; } //byte( 255-a*255 ); } //
           if( !strncmp( S,"d ",2 ) )
-          { sscanf( S+2,"%lg",&a ); L[NoLayers-1].LClr.c[3]=byte( 22+a*200 ); } //! [22-222] - пусть пока временно
-        } fclose( W );                         for( int I=NoL; I<NoLayers; I++ )print( "\nID=%d Descr=%s Color=%X",L[I].ID,L[I].Description,L[I].LClr.C );
+          { sscanf( S+2,"%lg",&a ); L[NoLayers-1].LClr.c[3]=byte( 22+a*220 ); } //! [22-222] - пусть пока временно
+        } fclose( W );                                                          for( int I=NoL; I<NoLayers; I++ )print( "\nID=%d Descr=%s Color=%X",L[I].ID,L[I].Description,L[I].LClr.C );
       }
     }
   }
-  if( !NoLayers )  // на случай отсутствия послойного описания свойств, будет 1
-  { L=(Layers*)Allocate( sizeof( Layers ) );
-    memcpy( &L[0],&ActiveLayer,sizeof( Layers ) ); NoLayers=1;
+//if( !NoLayers )  // на случай отсутствия послойного описания свойств, будет 1
+  { L=(Layers*)Allocate( (NoLayers+1)*sizeof( Layers ),L );
+    memcpy( &L[NoLayers],&ActiveLayer,sizeof( Layers ) );
   } Extents( false );       // расчёт - переопределение графических экстремумов
 }
 //
@@ -560,7 +556,6 @@ Cont:
    { if( Units==fuMetric )Scale=1.0/Foot;
                      else Scale=Foot;
    }
-   //
    //   чтение дополнительных данных для ранее открытой модели
    //
    Shell.Read( true );
@@ -571,50 +566,59 @@ Cont:
 //   Полноценная числовая модель в варианте с базовым форматом, без излишеств
 //
 bool Ship::LoadFEF()      // Ship.fef == FreeShip Exchange Format
-{ int I; isBin=false;     // char *str=NULL;
+{ int I; isBin=false; char *str=NULL;
   if( !(F=_wfopen( FName,L"rt" ) ) )
   { print( "?не открывается free!Ship Exchange Format %s ",W2U( FName ) ); getch(); exit( 2 );
   } print( "\nОткрыт файл: %s (free!Ship exchange format)\n",W2U( FName ) );
-  readText( &Set.Name );                                                        print( "< Project >\nName     =%s\n",Set.Name );
-  readText( &Set.Designer );                                                    print(              "Designer =%s\n",Set.Designer );
-  readText( &Set.Comment );                                                     print(              "Comment  =%s\n",Set.Comment );
-  readText( &Set.CreatedBy );                                                   print(              "CreatedBy=%s\n",Set.CreatedBy );
-  sscanf( getString( F ),"%lg%lg%lg%lg%lg%d%d%d",
-   &Length,&Beam,&Draft,
-   &Set.WaterDensity,
-   &Set.AppendageCoefficient,
-   &Set.Units,&I,&PT );
-   Set.MainparticularsHasBeenset=I;                                             print( "L,B,T={ %g, %g, %g }, WaterDensity=%g, A?C=%g, Units=%d, Been=%d, Точность=%d\n\n",
-                                                                                 Length,Beam,Draft,Set.WaterDensity,Set.AppendageCoefficient,Set.Units,Set.MainparticularsHasBeenset,PT );
+  readText( &str );
+  for( I=0; I<6 && str[I]; I++ )               // в первой строке текстовое имя
+    if( !isdigit( str[I] ) ){ I=-1; break; }   // или сразу количество узлов
+  if( I<=0 ){  Set.Name=str;                                                    print( "< Project >\nName     =%s\n",Set.Name );
+    readText( &Set.Designer );                                                  print(              "Designer =%s\n",Set.Designer );
+    readText( &Set.Comment );                                                   print(              "Comment  =%s\n",Set.Comment );
+    readText( &Set.CreatedBy );                                                 print(              "CreatedBy=%s\n",Set.CreatedBy );
+    sscanf( getString( F ),"%lg%lg%lg%lg%lg%d%d%d",
+     &Length,&Beam,&Draft,
+     &Set.WaterDensity,
+     &Set.AppendageCoefficient,
+     &Set.Units,&I,&PT );
+     Set.MainparticularsHasBeenset=I; I=-1;                                     print( "L,B,T={ %g, %g, %g }, WaterDensity=%g, A?C=%g, Units=%d, Been=%d, Точность=%d\n\n",Length,Beam,Draft,Set.WaterDensity,Set.AppendageCoefficient,Set.Units,Set.MainparticularsHasBeenset,PT );
+  } else
+  { I=atoi( str ); free( str );
+  }
 // TFreeSubdivisionSurface.ImportFEFFile
 //
-   Shell.ReadFEF();
+   Shell.ReadFEF( I );
    fclose( F ); F=NULL;
    return YesShip=true;
 }
 //   чтение собственно секций всех сплайновых геометрических поверхностей
 //
-void Surface::ReadFEF()
-{ int I,K,NoL,NoC,NoI; isBin=false; // isLoad=true; First load layerdata
-   K=getInt();                                                                  print( "< Surface.LaeyrData >\nNoLaeyrs = %d -> %d\n",NoLayers,K );
-   if( !K )K=getInt();                                                          print( "NoLaeyrs(повтор) = %d\n",K );
+void Surface::ReadFEF( int K )    // количество узлов или их <= одного
+{ int I,NoC,NoL,NoI; isBin=false; // isLoad=true; First load layerdata
    NoL=NoLayers;
-   NoLayers+=K;                            // счетчик слоёв здесь идет в начало
-   L=(Layers*)Allocate( max(1,NoLayers)*sizeof( Layers ),L );
-   for( I=NoL; I<NoLayers; I++ )
-   { Layers &T=L[I]; int v,d,s,u,w,p; char str[12]="";
-     readText( &T.Description );                                                print( "[%d]'%-12s'",I,T.Description );
-     sscanf( getString( ::F ),"%d%s%i%i%i%i%i%i%lg%lg",&T.ID,
-       str,&v,&d,&s,&u,&w,&p,&T.MaterialDensity,&T.Thickness );
-       T.Visible=v; T.LClr.C=S2I( str ); T.LClr.c[3]=255-T.LClr.c[3];
-       T.Developable=d,
-       T.Symmetric=s,
-       T.UseforIntersection=u,
-       T.UswinHydrostatic=w,
-       T.ShowInLineSpan=p;                                                      print( ", ID=%d, Color=%X, Vis=%i, Symm=%i, ... Плотность=%g, Толщина=%g \n",T.ID,T.LClr.C,T.Visible,T.Symmetric,T.MaterialDensity,T.Thickness );
-   }
+   if( K<=1 )
+   { K=getInt();                                                                print( "< Surface.LaeyrData >\nNoLaeyrs = %d -> %d\n",NoLayers,K );
+     if( !K )K=getInt();                                                        print( "NoLaeyrs(повтор) = %d\n",K );
+     NoLayers+=K;                            // счетчик слоёв здесь идет в начало
+     L=(Layers*)Allocate( max(1,NoLayers+1)*sizeof( Layers ),L );
+     for( I=NoL; I<NoLayers; I++ )
+     { Layers &T=L[I]; int v,d,s,u,w,p; char str[12]="";
+       readText( &T.Description );                                              print( "[%d]'%-12s'",I,T.Description );
+       sscanf( getString( ::F ),"%d%s%i%i%i%i%i%i%lg%lg",&T.ID,
+         str,&v,&d,&s,&u,&w,&p,&T.MaterialDensity,&T.Thickness );
+         T.Visible=v; T.LClr.C=S2I( str ); T.LClr.c[3]=255-T.LClr.c[3];
+         T.Developable=d,
+         T.Symmetric=s,
+         T.UseforIntersection=u,
+         T.UswinHydrostatic=w,
+         T.ShowInLineSpan=p;                                                    print( ", ID=%d, Color=%X, Vis=%i, Symm=%i, ... Плотность=%g, Толщина=%g \n",T.ID,T.LClr.C,T.Visible,T.Symmetric,T.MaterialDensity,T.Thickness );
+     } K=getInt();
+   } else L=(Layers*)Allocate( (NoLayers+1)*sizeof( Layers ),L ); // сверх-слой
+   L[NoLayers].LClr.C=0xAAAAAA88;                  // серенькая сверх-подсветка
+   L[NoLayers].Symmetric=true;
    NoC=NoCoPoint;
-   NoCoPoint+=getInt();                                                         print( "< ControlPoints > %d",NoCoPoint );
+   NoCoPoint+=K;                                                                print( "< ControlPoints > %d->%d",NoC,NoCoPoint );
    P=(CoPoint*)Allocate( NoCoPoint*sizeof( CoPoint ),P );
    for( I=NoC; I<NoCoPoint; I++ )
    { CoPoint &T=P[I]; T.T=svRegular; K=0;        // и последних может не быть
@@ -624,12 +628,10 @@ void Surface::ReadFEF()
 /* if( (K=NoCoPoint-NoC)>0 )
    { int *J=(int*)Allocate( K*sizeof( int ) );
      for( K=0,I=NoC; I<NoCoPoint; I++ )
-     { Vector &V=P[I].V;
-       J[I-NoC]=I;
+     { Vector &V=P[I].V; J[I-NoC]=I;
        for( int i=NoC; i<I-1; i++ )
-       { if( P[i].V==V ){ J[I-NoC]=i; K++; break; }
-       }
-     }                                                                    if( K>=0 )print( "{-%d}",K );
+        if( P[i].V==V ){ J[I-NoC]=i; K++; break; }
+     }                                                                          if( K>=0 )print( "{-%d}",K );
    }
 */                                                                              if( NoCoPoint>0 )print( " = {%g,%g,%g}`0`",P[0].V.x,P[0].V.y,P[0].V.z ); print( "\n" );
    NoI=NoEdges;
@@ -638,10 +640,10 @@ void Surface::ReadFEF()
    for( I=NoI; I<NoEdges; I++ )
    { int K1,K2,Ck;                                Ck=K=0;
      sscanf( getString( ::F ),"%i%i%i%i",&K1,&K2,&Ck,&K );
-       G[I].Selected=K!=0; K=G[I].StartIndex=K1+NoC; //G[I].StartPoint=P[K].V;
-       G[I].Crease=Ck!=0; Ck=G[I].EndIndex=K2+NoC;   //G[I].EndPoint=P[Ck].V;
-//     G[I].StartPoint=P[G[I].StartIndex=K1+NoC].V; G[I].Selected=K!=0;
-//       G[I].EndPoint=P[G[I].EndIndex=K2+NoC].V;   G[I].Crease=Ck!=0;
+     G[I].Selected=K!=0; K=G[I].StartIndex=K1+NoC; //G[I].StartPoint=P[K].V;
+     G[I].Crease=Ck!=0; Ck=G[I].EndIndex=K2+NoC;   //G[I].EndPoint=P[Ck].V;
+//   G[I].StartPoint=P[G[I].StartIndex=K1+NoC].V; G[I].Selected=K!=0; // можно
+//     G[I].EndPoint=P[G[I].EndIndex=K2+NoC].V;   G[I].Crease=Ck!=0; // и позже
    }                                                                            if( NoEdges>0 )print( " = {н:%d+к:%d}",G[NoI].StartIndex,G[NoI].EndIndex ); print( "\n" );
    NoI=NoFaces;
    NoFaces+=getInt();                                                           print( "< ControlFaces > %d - количество фрагментов обшивки\n",NoFaces );
@@ -650,16 +652,30 @@ void Surface::ReadFEF()
    { fscanf( ::F,"%d",&K ); F[I].Capacity=K;
      F[I].P=(int*)Allocate( K*sizeof(int) );             /// <++ Control Points
      for( int j=0; j<K; j++ ){ int &M=F[I].P[j]; fscanf( ::F,"%d",&M ); M+=NoC; }
-     fscanf( ::F,"%d",&F[I].LayerIndex ); F[I].LayerIndex+=NoL; K=0;
-     sscanf( getString( ::F ),"%i",&K ); F[I].Selected=K!=0;
-   }                                                                            textbackground( BLACK );
+     K=0; fscanf( ::F,"%d",&K ); F[I].LayerIndex=K+NoL;   // № слоя по площадке
+     K=0; sscanf( getString(::F ),"%i",&K); F[I].Selected=K!=0; // метка выбора
+   }
+   //
+   //  теперь выборка загибулин на контрольных узлах из под оболочки "как есть"
+   //
+   NoI=NoCurves; I=getInt(); // на количество контурных кривых
+   if( !feof( ::F ) )
+   { int i; NoCurves+=I;
+     C=(Curves*)Allocate( NoCurves*sizeof( Curves ),C );
+     for( I=NoI; I<NoCurves; I++ ) // здесь чтение напрямую из текстового файла
+     { K=0; fscanf( ::F,"%d",&K ); C[I].Capacity=K;
+       i=0; fscanf( ::F,"%d",&i ); C[I].Selected=i!=0;
+       C[I].P=(int*)Allocate( K*sizeof(int) );
+       for( int j=0; j<K; j++ ){ int &M=C[I].P[j]; fscanf( ::F,"%d",&M ); M+=NoC; }
+   } }                                                                          textbackground( BLACK );
    Extents();               // расчёт - переопределение графических экстремумов
 }
 void Surface::WriteFEF()
-{ fprintf( ::F,"%d\n",NoLayers );
-  for( int i=0; i<NoLayers; i++ )
-  { Color C=L[i].LClr; C.c[3]=255-C.c[3];
-    fprintf( ::F,"%s\n%d $%X %i %i %i %i %i %i %g %g",
+{ if( NoLayers>0 )
+  { fprintf( ::F,"%d\n",NoLayers );
+    for( int i=0; i<NoLayers; i++ )
+    { Color C=L[i].LClr; C.c[3]=255-C.c[3];
+      fprintf( ::F,"%s\n%d $%X %i %i %i %i %i %i %g %g",
            L[i].Description,L[i].ID,C,
            L[i].Visible,
            L[i].Developable,
@@ -670,9 +686,9 @@ void Surface::WriteFEF()
            L[i].MaterialDensity,
            L[i].Thickness
          );
-     if( i )fprintf( ::F,"\n" ); else fprintf( ::F," ≈ Id,Cl,Vis,Dev,Sym,IS,HS,LP,ρ,δ\n" );
+       if( i )fprintf( ::F,"\n" ); else fprintf( ::F," ≈ Id,Cl,Vis,Dev,Sym,IS,HS,LP,ρ,δ\n" );
         //    " ≈ Id,Color,Visible,Develop,Symmetric,InterSection,HydroStatic,inLinesPlan\n" );
-  }
+  } }
   fprintf( ::F,"%i\n",NoCoPoint );
   for( int i=0; i<NoCoPoint; i++ )
   { fprintf( ::F,"%8.6f %8.6f %8.6f",P[i].V.x,P[i].V.y,P[i].V.z );
@@ -689,8 +705,17 @@ void Surface::WriteFEF()
   if( L[F[i].LayerIndex].LClr.c[3]!=0 )   */ //!.. исключение прозрачных граней
   { fprintf( ::F,"%i",F[i].Capacity );        // без правки количества
     for( int j=0; j<F[i].Capacity; j++ )fprintf( ::F," %d",F[i].P[j] );
-    fprintf( ::F," %i",F[i].LayerIndex );
+    fprintf( ::F," %d",F[i].LayerIndex );
     if( F[i].Selected )fprintf( ::F," 1" ); fprintf( ::F,"\n" );
+  }
+  //
+  //    если есть контурные загибулины, то лепим их в конец оболочки "как есть"
+  //
+  fprintf( ::F,"%i\n",NoCurves );
+  for( int i=0; i<NoCurves; i++ )
+  { fprintf( ::F,"%d %d ",C[i].Capacity,C[i].Selected );
+    for( int j=0; j<C[i].Capacity; j++ )fprintf( ::F," %d",C[i].P[j] );
+    fprintf( ::F,"\n" );
   }
 }
 void Ship::WriteVSL()
@@ -710,13 +735,19 @@ void Ship::WriteVSL()
     { print( "\n~Запись: %s\n не получается, странно...",FileName ); return; }
   M=strlen( FileName );
   if( M>4 && strcmp( FileName+M-4,".fef" )==0 )
-  { fprintf( F,"%s\n%s\n%s\n%s\n%g %g %g %g %g %d 1 %d ≈ L,B,T, ρ,σ, Units,Quality\n",
+  { if( Shell.NoLayers>0 )
+    fprintf( F,"%s\n%s\n%s\n%s\n%g %g %g %g %g %d 1 %d ≈ L,B,T, ρ,σ, Units,Quality\n",
            Set.Name,Set.Designer,Set.Comment,Set.CreatedBy,
            e5r(Length),e5r(Beam),e5r(Draft),
            Set.WaterDensity,
            Set.AppendageCoefficient,
            Set.Units,PT=fpLow );          // Set.MainparticularsHasBeenset=true
     Shell.WriteFEF();
+
+
+
+
+
     fclose( F ); F=NULL;
     return;
   } else

@@ -40,11 +40,11 @@ void Surface::EditMenu( Window *Win ) // обращение последоват
 //   прорисовка исходных многоугольников
 //
 void Surface::Drawing( BoardView Sides )
-{ static Flex V; Vector W; int I,K,N; Color c; glLineWidth( 1 );
+{ static Flex V; Vector W; int I,K,N,kL; Color c; glLineWidth( 1 );
   for( N=0; N<NoFaces; N++ )   // синхронная по бортам прорисовка треугольников
-  if( L[F[N].LayerIndex].LClr.c[3]!=0 )
+  if( L[kL=min(NoLayers,F[N].LayerIndex)].LClr.c[3]!=0 )
   if( (K=F[N].Capacity)>2 )    // у граней больше двух рёбер
-  { Layers &Layer=L[F[N].LayerIndex];
+  { Layers &Layer=L[kL];
 //  if( Layer.LClr.c[3]==0 )continue;
 //  V.len=0; c.C=L[F[N].LayerIndex].Color;
     V.len=0; c.C=Layer.LClr.C;
@@ -84,9 +84,9 @@ void Surface::Extents( bool Sizes )                // Экстремумы по 
     if( Min.y>V.y )Min.y=V.y; else if( Max.y<V.y )Max.y=V.y;
     if( Min.z>V.z )Min.z=V.z; else if( Max.z<V.z )Max.z=V.z;
   }
-  if( !Sizes ){ Length=Max.x-Min.x,
-                Beam=Max.y-Min.y,
-                Draft=-Min.z; }
+  if( !Sizes || !NoLayers ){ Length=Max.x-Min.x,
+                             Beam=Max.y-Min.y,
+                             Draft=-Min.z; }
 }
 static void Swab( Vector &A, Vector &B ){ Vector C=A; A=B; B=C; } // пересборка
 //atic void Swab( Items &A, Items &B ){ Items C=A; A=B; B=C; } // не по адресам

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="2835" height="2835" viewBox="0 0 2836 2836" id="svg2" xml:space="preserve" style="fill-rule:evenodd">
+<defs id="defs4">
+<linearGradient id="lG3754">
+<stop style="stop-color:#ffe165;stop-opacity:1" offset="0" />
+<stop style="stop-color:#ff6600;stop-opacity:1" offset="0.32727271" />
+<stop style="stop-color:#bf0000;stop-opacity:1" offset="1" /></linearGradient>
+<linearGradient id="lG2847">
+<stop style="stop-color:#806600;stop-opacity:1" offset="0" />
+<stop style="stop-color:#693603;stop-opacity:1" offset="0.21818182" />
+<stop style="stop-color:#530707;stop-opacity:1" offset="1" /></linearGradient>
+<linearGradient id="lG2900">
+<stop style="stop-color:#5359b1;stop-opacity:1" offset="0" />
+<stop style="stop-color:#4a85d3;stop-opacity:0.36458334" offset="0.63636363" />
+<stop style="stop-color:#63b6d1;stop-opacity:0" offset="1" /></linearGradient>
+<style type="text/css" id="style29" />
+<radialGradient cx="1410.802" cy="1410.802" r="771.03271" fx="1410.802" fy="1410.802" id="rG2906" xlink:href="#lG2900" gradientUnits="userSpaceOnUse" />
+<linearGradient x1="1460.7534" y1="1418.5093" x2="1460.7534" y2="352.69614" id="lG2268" xlink:href="#lG2847" gradientUnits="userSpaceOnUse" />
+<linearGradient x1="1417.4907" y1="1415.9645" x2="1417.4907" y2="352.99988" id="lG2277" xlink:href="#lG3754" gradientUnits="userSpaceOnUse" />
+</defs>
+<g id="g3101">
+<path d="m 2180.9847,1410.802 a 770.18274,770.18274 0 1 1 -1540.36544,0 770.18274,770.18274 0 1 1 1540.36544,0 z" transform="matrix(1.35514,0,0,1.35514,-501.0325,-501.0325)" style="fill:url(#rG2906);fill-opacity:1;fill-rule:nonzero;stroke:none" />
+<path d="m 1102,654 361,656 -45,108 -108,-45 -208,-719 z" style="fill:#ffdd55;stroke:gray" />
+<path d="m 1734,2182 -208,-719 -108,-45 -45,108 361,656 z" style="fill:#ffdd55;stroke:gray" />
+<path d="m 654,1734 656,-361 108,45 -45,108 -719,208 z" style="fill:#ffdd55;stroke:gray" />
+<path d="m 2182,1102 -719,208 -45,108 108,45 656,-361 z" style="fill:#ffdd55;stroke:gray" />
+<path d="m 1418,1418 316,764 -208,-719 -108,-45 z" style="fill:#aa8800;stroke:gray" />
+<path d="m 1418,1418 764,-316 -656,361 -108,-45 z" style="fill:#aa8800;stroke:gray" />
+<path d="m 1418,1418 120,50" style="fill:none;stroke:gray" />
+<path d="m 1418,1418 -316,-764 361,656 -45,108 z" style="fill:#aa8800;stroke:gray" />
+<path d="m 1418,1418 -764,316 719,-208 45,-108 z" style="fill:#aa8800;stroke:gray" />
+<path d="m 654,1102 719,208 45,108 -108,45 -656,-361 z" style="fill:#ffdd55;stroke:gray" />
+<path d="m 2182,1734 -656,-361 -108,45 45,108 719,208 z" style="fill:#ffdd55;stroke:gray" />
+<path d="m 1102,2182 208,-719 108,-45 45,108 -361,656 z" style="fill:#ffdd55;stroke:gray" />
+<path d="m 1734,654 -361,656 45,108 108,-45 208,-719 z" style="fill:#ffdd55;stroke:gray" />
+<path d="m 1418,1418 764,316 -656,-361 -108,45 z" style="fill:#aa8800;stroke:gray" />
+<path d="m 1418,1418 316,-764 -208,719 -108,45 z" style="fill:#aa8800;stroke:gray" />
+<path d="m 1418,1418 120,-50" style="fill:none;stroke:gray" />
+<path d="m 1418,1418 -764,-316 719,208 45,108 z" style="fill:#aa8800;stroke:gray" />
+<path d="m 1418,1418 -316,764 361,-656 -45,-108 z" style="fill:#aa8800;stroke:gray" />
+<path d="m 2086,750 -534,668 -134,0 0,-134 668,-534 z" style="fill:#ffdd55;stroke:gray" />
+<path d="m 750,2086 668,-534 0,-134 -134,0 -534,668 z" style="fill:#ffdd55;stroke:gray" />
+<path d="m 750,750 668,534 0,134 -134,0 -534,-668 z" style="fill:#ffdd55;stroke:gray" />
+<path d="m 2086,2086 -534,-668 -134,0 0,134 668,534 z" style="fill:#ffdd55;stroke:gray" />
+<path d="m 1418,1418 -668,668 668,-534 0,-134 z" style="fill:#806600;stroke:gray" />
+<path d="m 1418,1418 668,668 -668,-534 0,-134 z" style="fill:#aa8800;stroke:gray" />
+<path d="m 1418,1418 668,-668 -534,668 -134,0 z" style="fill:#806600;stroke:gray" />
+<path d="m 1418,1418 -668,-668 534,668 134,0 z" style="fill:#aa8800;stroke:gray" />
+<path d="m 1405,1421 0,148" style="fill:none;stroke:gray" />
+<path d="m 1418,355 106,957 -106,106 -106,-106 106,-957 z" style="fill:url(#lG2277);fill-opacity:1;stroke:gray" />
+<path d="m 1418,2481 106,-957 -106,-106 -106,106 106,957 z" style="fill:#fafbfb;stroke:gray" />
+<path d="m 355,1418 957,-106 106,106 -106,106 -957,-106 z" style="fill:#f5ff5d;fill-opacity:1;stroke:gray" />
+<path d="m 2481,1418 -957,-106 -106,106 106,106 957,-106 z" style="fill:#ffdd55;stroke:gray" />
+<path d="m 1418,1418 0,1063 106,-957 -106,-106 z" style="fill:#969594;stroke:gray" />
+<path d="m 1418,1418 1063,0 -957,106 -106,-106 z" style="fill:#806600;stroke:gray" />
+<path d="m 1418,1418 118,118" style="fill:none;stroke:gray" />
+<path d="m 1418,1418 0,-1063 106,957 -106,106 z" style="fill:url(#lG2268);fill-opacity:1;stroke:gray" />
+<path d="m 1418,1418 -1063,0 957,106 106,-106 z" style="fill:#806600;stroke:gray" />
+<text x="1354" y="285" style="font-size:200px;font-weight:bold;fill:navy;">N</text>
+<text x="2561" y="1490" style="font-size:200px;font-weight:bold;fill:navy;">O</text>
+<text x="1356" y="2694" style="font-size:200px;font-weight:bold;fill:navy;">S</text>
+<text x="255" y="1490" style="font-size:200px;font-weight:bold;text-align:end;line-height:125%;writing-mode:lr-tb;text-anchor:end;fill:navy;">W</text>
+<text x="2139" y="2239" style="font-size:150px;font-weight:normal;fill:navy;">SO</text>
+<text x="680" y="2239" style="font-size:150px;font-weight:normal;text-align:end;line-height:125%;writing-mode:lr-tb;text-anchor:end;fill:navy;">SW</text>
+<text x="2135" y="704" style="font-size:150px;font-weight:normal;fill:navy;">NO</text>
+<text x="684" y="704" style="font-size:150px;font-weight:normal;text-align:end;line-height:125%;writing-mode:lr-tb;text-anchor:end;fill:navy;">NW</text>
+<text x="1091" y="501" style="font-size:100px;font-weight:bold;text-align:end;text-anchor:end;fill:navy;">NNW</text>
+<text x="1734" y="501" style="font-size:100px;font-weight:bold;fill:navy;">NNO</text>
+<text x="2227" y="1064" style="font-size:100px;font-weight:bold;fill:navy;">ONO</text>
+<text x="2227" y="1844" style="font-size:100px;font-weight:bold;fill:navy;">OSO</text>
+<text x="1740" y="2406" style="font-size:100px;font-weight:bold;fill:navy;">SSO</text>
+<text x="1087" y="2406" style="font-size:100px;font-weight:bold;text-align:end;line-height:125%;writing-mode:lr-tb;text-anchor:end;fill:navy;">SSW</text>
+<text x="587" y="1844" style="font-size:100px;font-weight:bold;text-align:end;text-anchor:end;fill:navy;">WSW</text>
+<text x="591" y="1064" style="font-size:100px;font-weight:bold;text-align:end;line-height:125%;writing-mode:lr-tb;text-anchor:end;fill:navy;">WNW</text>
+<path d="m 1418,2481 -106,-957 106,-106 106,106 -106,957 z" style="fill:#786721;fill-opacity:1;stroke:gray" />
+<path d="m 1418,1418 0,1063 -106,-957 106,-106 z" style="fill:#ffdd55;fill-opacity:1;stroke:gray" /></g>
+</svg>
