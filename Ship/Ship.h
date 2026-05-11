@@ -12,29 +12,29 @@ typedef enum { fv100,fv110,fv120,fv130,fv140, fv150,fv160,fv165,fv170,fv180,
                fv190,fv191,fv195,fv198,fv200, fv201,fv210,fv220,fv230,fv240,
                fv250,fv261,fv270,fv280,fv290, fv295,fv296,fv297,fv298,fv300,
                fv302,fv303,fv305,fv309,fv310, fv313,fv314,fv317,fv327,fv332,
-               fv335,fv421,fv430,fv462,fv500, fv510 } FileVersion; // всего=46
+               fv335,fv421,fv430,fv462,fv500, fv510 } FileVersion;  // всего=46
 typedef enum { fvBodyplan, fvProfile, fvPlan, fvPerspective } ViewType;
-typedef enum { fpLow,fpMedium,fpHigh,fpVeryHigh } PrecisionType; // ship-model
-typedef enum { mvPort,mvBoth } BoardView; // Show half the hull or entire hull
-typedef enum { fuMetric,fuImperial } UnitType; // Switch metric^imperial units
-typedef enum { fcProjectSettings,fcActualData } HydrostaticCoefficient; // ??
+typedef enum { fpLow,fpMedium,fpHigh,fpVeryHigh } PrecisionType;  // ship-model
+typedef enum { mvPort,mvBoth } BoardView;  // Show half the hull or entire hull
+typedef enum { fuMetric,fuImperial } UnitType;  // Switch metric^imperial units
+typedef enum { fcProjectSettings,fcActualData } HydrostaticCoefficient;   // ??
 typedef enum { svRegular, svCrease, svDart, svCorner } VertexType;
-     // Different types of sub-division-vertices
+                                    // Different types of sub-division-vertices
 typedef enum { fiFree,fiStation,fiButtock,fiWaterline,fiDiagonal } IntersectionType;
      // intersection lines: free,stations,buttocks,waterlines and diagonal type
-struct Plane { Real a,b,c,d; }; // Description of 3D plane: a*x+b*y+c*z-d=0.0;
+struct Plane { Real a,b,c,d; };  // Description of 3D plane: a*x+b*y+c*z-d=0.0;
 union Color{ unsigned C; byte c[4]; };
-extern Vector Min,Max; // Экстремумы исходного графического изображения
+extern Vector Min,Max;         // Экстремумы исходного графического изображения
 extern byte  UnderWaterColorAlpha;
 extern Color UnderWaterColor;
-extern Real  Beam,     // ширина
-             Draft,    // осадка
-             Length;   // длина
-struct Project{        // четыре строки описание корабля
-char *Name,            // название проекта
-     *Designer,        // автор проекта
-     *Comment,         // расширенное описание
-     *CreatedBy;       // изготовитель цифровой модели
+extern Real  Beam,        // ширина
+             Draft,       // осадка
+             Length;      // длина
+struct Project{           // четыре строки описание корабля
+char *Name,               // название проекта
+     *Designer,           // автор проекта
+     *Comment,            // расширенное описание
+     *CreatedBy;          // изготовитель цифровой модели
 bool MainparticularsHasBeenset, // Flag to check if the main particulars have been set before hydrostatic calculationss are being performed
                           // Флаг, позволяющий проверить, были ли заданы основные параметры перед выполнением гидростатических расчетов.
      DisableModelCheck,   // Disable the automatic checking of the surface
@@ -99,8 +99,8 @@ bool Normals,       // Show normals of selected surface patches
 Real CurvatureScale, // Scalefactor used to increase or decrease the size of the curvature plot
      CursorIncrement;
 };
-class Surface
-{ // bool isLoad;              //-- признак успешной загрузки
+struct Surface
+{ // bool isLoad;            //-- признак успешной загрузки
   struct Layers
   { char *Description;
     int ID;
@@ -146,7 +146,7 @@ class Surface
 public:
   int  NoLayers,NoCoPoint,NoEdges,NoCurves,NoFaces; // размеры кривых  массивов
   void Extents( bool Sizes=true );         // экстремумы по расчетным площадкам
-  Surface(); //{ memset( this,0,sizeof( Surface ) ); ActiveLayer.Visible=true; } // обнуляется NoLayers тоже!
+//Surface(); //{ memset( this,0,sizeof( Surface ) ); ActiveLayer.Visible=true; } // обнуляется NoLayers тоже!
   void EditMenu( Window* );       // числовое смещение и 3D-перемасштабирование
   void Read( bool Part=false );
   void ReOrder();             // делается попытка вычистки повторяющихся точек
@@ -166,7 +166,7 @@ struct InterSection //: Plane
   bool ShowCurvature,Build;
   Plane Pl;
   int NIt,NPt; Items *T;
-  InterSection(){ memset( this,0,sizeof( InterSection ) ); }
+//InterSection(){ memset( this,0,sizeof( InterSection ) ); }
   void Read();
   void ReConnect();              // перенастройка по первому фрагменту образцу
 //void ReStation();              // упорядочение шпангоута по нижней точке в ДП

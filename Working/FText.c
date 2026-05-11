@@ -61,10 +61,10 @@ static char *OutPut( int l )            // !! необходим предвар�
 //                                               Краткая подсказка по программе
 static void Help( void )
 { printf( "\n?Use: Ftext name(s) [ -S0 ][ -T-8 ][ -R ][ -B ]\n" // [ -L72 ][ -C ]
-          "     /S±n    empty strings [+max-sub]\n"
-          "     /T±n    tabulations   [+set-del]\n"
-          "     /B±n    comma digit and blank\n"
-          "     /R      exclude <CR> symbol\n"
+          "\t/S±n\tempty strings [+max-sub]\n"
+          "\t/T±n\ttabulations   [+set-del]\n"
+          "\t/B±n\tsignificant digits [max]\n"
+          "\t/R\texclude <CR> symbol\n"
 /*	  "	/C[s|l]	Cyrillic words [small|large]\n"
 	  "	/Ln	maxima length of strings\n" */
           "\0     (c)92-24 V.Khramushin\n"

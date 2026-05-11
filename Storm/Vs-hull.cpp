@@ -133,8 +133,8 @@ unsigned& uList::operator[]( int k ){ return m[minmax(0,k>=0?k:k+len,len-1)]; }
 unsigned& uList::operator+=( unsigned p ) // выбор [k] обраткой и += дополнение
 { if(len>=n)m=(unsigned*)realloc(m,(n+=96)*sizeof(unsigned));return m[len++]=p;
 }
-static bool s1pt=true;                          // первый четырёхугольник
-static Vector oP={0,0,-1};                      // и его нормаль условно вниз
+//static bool s1pt=true;                          // первый четырёхугольник
+//static Vector oP={0,0,-1};                      // и его нормаль условно вниз
 static bool Span( int l, int r )                // малый: 2S/L  большой: abc/4S
 {
   return norm( R[r+1]-L[l] ) < norm( R[r]-L[l+1] );    // кратчайшее обновление
@@ -376,7 +376,7 @@ Ok:
          wl=0,wr=0,zl,zr,              // индексы поиска по контурам шпангоутов
          sl=0,sr=0;                    //                  ... от третьих точек
       Ins( n )=lf[0],Ins( n )=rf[0];   // левая точка впереди - это существенно
-      s1pt=true;                       //  отметка для первой установки нормали
+//    s1pt=true;                       //  отметка для первой установки нормали
 
 Sign_Fragment: signLb=signRb=0; zl=wl; zr=wr;   /// v0+((x-x0)/(x1-x0))*(v1-v0)
       //

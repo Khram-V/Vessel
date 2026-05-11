@@ -55,6 +55,7 @@ bool FreeShip::Draw()               // виртуальная процедура
   } }                                          glLineWidth( 1 );
   Window::Show(); return true;
 }
+/*
 Surface::Surface()                                 // обнуляется NoLayers тоже!
 { memset( this,0,sizeof( Surface ) ); // memset(&ActiveLayer,0,sizeof(Layers));
   ActiveLayer.Description="Чистый слой"; // Technologies Advanced Visualizer";
@@ -66,6 +67,7 @@ Surface::Surface()                                 // обнуляется NoLay
   ActiveLayer.MaterialDensity=1.0;       // плотность воды
   ActiveLayer.Thickness=1.0;             // если 1 - получится площадь
 }
+*/
 //!                конструктор с расчисткой и считыванием новой числовой модели
 Ship::Ship()
 { int argc; WCHAR **argv=CommandLineToArgvW( GetCommandLineW(),&argc );
@@ -77,6 +79,15 @@ Ship::Ship()
   }
   Name=strdup( W2U( FName ) ); // копия имени входного файла
   Visio.ModelView=mvBoth;     // на оба борта, всё другое может быть вычищенным
+                                         // обнуляется NoLayers тоже!
+  Shell.ActiveLayer.Description="Чистый слой"; // Technologies Advanced Visualizer";
+  Shell.ActiveLayer.ID=0;                 // изначально здесь ноль
+  Shell.ActiveLayer.LClr.C=0xAAFFFFAA;    // предварительная раскладка
+  Shell.ActiveLayer.Visible=true;         // слой видимый
+  Shell.ActiveLayer.Symmetric=false;      // пока без правого дублирования
+  Shell.ActiveLayer.ShowInLineSpan=true;  // включается в теоретические чертежи
+  Shell.ActiveLayer.MaterialDensity=1.0;  // плотность воды
+  Shell.ActiveLayer.Thickness=1.0;        // если 1 - получится площадь
 
 //argc=wcslen( FName );
 //print( "Открыт %s файл: %s\n",isBin?"двоичный":"текстовый",W2U(FileName)); textcolor(LIGHTBLUE);

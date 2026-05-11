@@ -456,7 +456,6 @@ void Surface::ReadObj( char *Path )           // временный оригин
      CoPoint &p=P[NoCoPoint-1];
 //    sscanf( S+2,"%lg%lg%lg",&p.V.y,&p.V.x,&p.V.z ); p.V.x=-p.V.x; // Новик здесь
       sscanf( S+2,"%lg%lg%lg",&p.V.x,&p.V.z,&p.V.y ); // так готовится в Авроре #+# p.V.y=-p.V.y;
-///   sscanf( S+2,"%lg%lg%lg",&p.V.y,&p.V.z,&p.V.x ); p.V.x=-p.V.x;
       p.T=svRegular; // svCrease; // svDart; // svCorner;
     } else
     if( !strncmp( S,"f ",2) )
@@ -473,6 +472,7 @@ void Surface::ReadObj( char *Path )           // временный оригин
         Faces &f=F[NoFaces-1]; f.Capacity=k;
                                f.P=Rc;
                                f.LayerIndex=ActiveLayer.ID;
+        L[ActiveLayer.ID].ID++;
       }
 /**  здесь не всегда только три точки
      int a,b,c;
@@ -480,7 +480,7 @@ void Surface::ReadObj( char *Path )           // временный оригин
       s=strchr(w,' '); *s=0; z=strchr(w,'/'); if(z)*z=0; b=atoi(w); w=s+1;
                              z=strchr(w,'/'); if(z)*z=0; c=atoi(w);
       if( a!=b && b!=c && c!=a )
-      { F=(Faces*)Allocate(++NoFaces*sizeof(Faces),F);
+      { F=(Faces*)Allocate( ++NoFaces*sizeof(Faces),F );
         Faces &f=F[NoFaces-1]; f.Capacity=3;
                                f.P=(int*)Allocate( 3*sizeof(int) );
                                f.LayerIndex=ActiveLayer.ID;
@@ -499,9 +499,9 @@ void Surface::ReadObj( char *Path )           // временный оригин
         }
       if( ActiveLayer.ID==-1 )    // если слой не найден, тогда создание нового
       { L=(Layers*)Allocate( ++NoLayers*sizeof( Layers ),L );
-        memcpy( &L[NoLayers-1],&ActiveLayer,sizeof( Layers ) );
+        L[NoLayers-1]=ActiveLayer; // memcpy( &L[NoLayers-1],&ActiveLayer,sizeof( Layers ) );
         L[NoLayers-1].Description=strdup( S+7 );         // новое имя по ссылке
-        L[NoLayers-1].ID=ActiveLayer.ID=NoLayers;
+        L[NoLayers-1].ID=0; ActiveLayer.ID=NoLayers-1;   // NoLayers;
       }
     } else
     if( !strncmp( S,"mtllib",6 ) )  // разборка расцветки по уровням расслоений
@@ -513,24 +513,30 @@ void Surface::ReadObj( char *Path )           // временный оригин
           if( strcut( S )<3 )continue;
           if( !strncmp( Slower( S ),"newmtl",6 ) )
           { L=(Layers*)Allocate( ++NoLayers*sizeof( Layers ),L );
-            memcpy( &L[NoLayers-1],&ActiveLayer,sizeof( Layers ) );
+            L[NoLayers-1]=ActiveLayer; // memcpy( &L[NoLayers-1],&ActiveLayer,sizeof( Layers ) );
             L[NoLayers-1].Description=strdup( S+7 );
-            L[NoLayers-1].ID=NoLayers; } else
+            L[NoLayers-1].ID=0; /*NoLayers;*/ } else
           if( !strncmp( S,"kd ",3 ) )
           { Color &c=L[NoLayers-1].LClr;        c.c[3]=0xFF;
             sscanf( S+3,"%lg%lg%lg",&r,&g,&b ); c.c[2]=byte( b*255 );
                                                 c.c[1]=byte( g*255 );
-                                                c.c[0]=byte( r*255 ); } else  //0xFF; } //byte( 255-a*255 ); } //
+                                                c.c[0]=byte( r*255 ); } else
           if( !strncmp( S,"d ",2 ) )
           { sscanf( S+2,"%lg",&a ); L[NoLayers-1].LClr.c[3]=byte( 22+a*220 ); } //! [22-222] - пусть пока временно
-        } fclose( W );                                                          for( int I=NoL; I<NoLayers; I++ )print( "\nID=%d Descr=%s Color=%X",L[I].ID,L[I].Description,L[I].LClr.C );
+        } fclose( W );
       }
     }
   }
 //if( !NoLayers )  // на случай отсутствия послойного описания свойств, будет 1
   { L=(Layers*)Allocate( (NoLayers+1)*sizeof( Layers ),L );
     memcpy( &L[NoLayers],&ActiveLayer,sizeof( Layers ) );
-  } Extents( false );       // расчёт - переопределение графических экстремумов
+  }    int j=0;
+  for( int i=0; i<NoLayers; i++ )if( L[i].ID>0 )
+  { for( int k=0; k<NoFaces; k++ )if( F[k].LayerIndex==i )F[k].LayerIndex=j;
+    if( i!=j )L[j]=L[i];
+    j++;
+  } NoLayers=j;                                                                 for( int I=NoL; I<NoLayers; I++ )print( "\nID=%d Descr=%s Color=%X",L[I].ID,L[I].Description,L[I].LClr.C );
+  Extents( false );       // расчёт - переопределение графических экстремумов
 }
 //
 //   free!Ship.part = дельная вещь или фрагмент числовой модели корпуса
@@ -660,13 +666,15 @@ void Surface::ReadFEF( int K )    // количество узлов или их
    //
    NoI=NoCurves; I=getInt(); // на количество контурных кривых
    if( !feof( ::F ) )
-   { int i; NoCurves+=I;
+   { NoCurves+=I;
      C=(Curves*)Allocate( NoCurves*sizeof( Curves ),C );
      for( I=NoI; I<NoCurves; I++ ) // здесь чтение напрямую из текстового файла
-     { K=0; fscanf( ::F,"%d",&K ); C[I].Capacity=K;
-       i=0; fscanf( ::F,"%d",&i ); C[I].Selected=i!=0;
+     { char *S=strtok( getString(::F)," " );
+       K=0; sscanf( S,"%i",&K ); C[I].Capacity=K;
        C[I].P=(int*)Allocate( K*sizeof(int) );
-       for( int j=0; j<K; j++ ){ int &M=C[I].P[j]; fscanf( ::F,"%d",&M ); M+=NoC; }
+       for( int j=0; j<K; j++ )
+          { int &M=C[I].P[j]; S=strtok( 0," " ); sscanf( S,"%i",&M ); M+=NoC; }
+       K=0; S=strtok( 0," " ); if( S )sscanf( S,"%i",&K ); C[I].Selected=K!=0;  // print( "\n K=%i -> %i",K,C[I].Selected=K );
    } }                                                                          textbackground( BLACK );
    Extents();               // расчёт - переопределение графических экстремумов
 }
@@ -691,7 +699,9 @@ void Surface::WriteFEF()
   } }
   fprintf( ::F,"%i\n",NoCoPoint );
   for( int i=0; i<NoCoPoint; i++ )
-  { fprintf( ::F,"%8.6f %8.6f %8.6f",P[i].V.x,P[i].V.y,P[i].V.z );
+//{ fprintf( ::F,"%8.6f %8.6f %8.6f",P[i].V.x,P[i].V.y,P[i].V.z );
+  { Vector &V=P[i].V;
+    fprintf( ::F,"%s %s %s",RtoA(V.x,16,6),RtoA(V.y,16,6),RtoA(V.z,16,6) );
     if( P[i].Selected )fprintf( ::F," %i 1",P[i].T ); else
     if( P[i].T!=svRegular )fprintf( ::F," %i",P[i].T ); fprintf( ::F,"\n" );
   }
@@ -708,20 +718,19 @@ void Surface::WriteFEF()
     fprintf( ::F," %d",F[i].LayerIndex );
     if( F[i].Selected )fprintf( ::F," 1" ); fprintf( ::F,"\n" );
   }
-  //
   //    если есть контурные загибулины, то лепим их в конец оболочки "как есть"
   //
   fprintf( ::F,"%i\n",NoCurves );
   for( int i=0; i<NoCurves; i++ )
-  { fprintf( ::F,"%d %d ",C[i].Capacity,C[i].Selected );
-    for( int j=0; j<C[i].Capacity; j++ )fprintf( ::F," %d",C[i].P[j] );
-    fprintf( ::F,"\n" );
+  { fprintf( ::F,"%i",C[i].Capacity );
+    for( int j=0; j<C[i].Capacity; j++ )fprintf( ::F," %i",C[i].P[j] );
+    fprintf( ::F,C[i].Selected?" 1\n":"\n" );   // метка выборки
   }
 }
 void Ship::WriteVSL()
 { int i,j,n,M; bool vsl=NoStations>0;
   char FileName[MAX_PATH]; strcpy( FileName,Name ); fext( FileName,"" );        print( "\n\n%s\n\n",Name );
-  if( ( F=FileOpen( FileName,L"wt",vsl?L"vsl":L"fef", // простая выборка нового имени
+  if( (F=FileOpen(FileName,L"wb",vsl?L"vsl":L"fef",// простой выбор имени L"wt"
         vsl? //L"Aurora-Ship [*.vsl *.fef]\1*.vsl;*.fef\1"
             L"[ Вычислительный эксперимент ].vsl\1*.vsl\1"
              "[ free!Ship Exchange Format ].fef\1*.fef\1"
@@ -743,11 +752,6 @@ void Ship::WriteVSL()
            Set.AppendageCoefficient,
            Set.Units,PT=fpLow );          // Set.MainparticularsHasBeenset=true
     Shell.WriteFEF();
-
-
-
-
-
     fclose( F ); F=NULL;
     return;
   } else
@@ -890,8 +894,7 @@ void Surface::ReOrder()                                                         
 /* for( I=J=K=0; I<NoCoPoint; I++ )
    { if( L[I]==I ){ P[K]=P[I]; L[I]=K; K++; } else { J++; L[I]-=J; }
    } NoCoPoint=K;                                                               print( " c перерасчетом до %d без %d ",NoCoPoint,J );
-*/
-                                                                                print( "; %d рёбер",NoEdges );
+*/                                                                              print( "; %d рёбер",NoEdges );
    for( I=0; I<NoEdges; I++ )G[I].StartIndex=L[G[I].StartIndex],
                              G[I].EndIndex=L[G[I].EndIndex];
 #if 1

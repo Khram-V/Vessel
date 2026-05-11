@@ -24,7 +24,7 @@
 			</Target>
 			<Target title="Hull">
 				<Option output="../../Hull" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="../Vessel" />
+				<Option working_dir="../Эскадра" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
@@ -36,7 +36,7 @@
 			</Target>
 			<Target title="Hull-64">
 				<Option output="../../Work/Hull-64" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="../Vessel" />
+				<Option working_dir="../Эскадра" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc-mingw64" />

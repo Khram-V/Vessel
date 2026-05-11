@@ -33,7 +33,6 @@
 				<Option compiler="gcc" />
 				<Option parameters="*.VSL /R /B+4" />
 				<Compiler>
-					<Add option="-fexpensive-optimizations" />
 					<Add option="-Os" />
 				</Compiler>
 				<Linker>
