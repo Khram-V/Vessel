@@ -1,0 +1,90 @@
+//
+//       Все несуразицы из free!Ship с разрисовкой теоретических контуров
+//
+#include "Ship.h"
+
+static void Swab( Vector &A, Vector &B ){ Vector C=A; A=B; B=C; } // пересборка
+//atic void Swab( Items &A, Items &B ){ Items C=A; A=B; B=C; } // не по адресам
+static void Revert( Items &T )                        // с полной перестановкой
+{ for( int i=0; i<T.NoSplines/2; i++ )Swab( T.S[i].P,T.S[T.NoSplines-i-1].P );
+}
+void InterSection::ReConnect()    // перенастройка по первому фрагменту образцу
+{ if( NIt<2 )return;
+  int I,J,Id=-1;                              // индексы с точкой присоединения
+  Vector First=T[0].S[0].P,                   // начальная точка и конец кривой
+         Last=T[0].S[T[0].NoSplines-1].P;     // фрагмента в поисковых запросах
+   for( int k=1; k<NIt; k++ )
+   { Real D=abs( Last-T[I=k].S[J=0].P ); Id=1; // последний к первому - пропуск
+     for( int i=k; i<NIt; i++ )
+     if( T[i].NoSplines>1 )
+     for( int j=0; j<T[i].NoSplines; j+=T[i].NoSplines-1 )   // бьём по хвостам
+     { Vector &V=T[i].S[j].P;                               // if( V.y<0 )V.y=0;
+       if( i!=k || j>0 )
+       if( abs( Last-V )<D ){ D=abs( Last-V ); I=i; J=j; Id=1; }
+       if( abs( First-V )<D ){ D=abs( First-V ); I=i; J=j; Id=-1; }
+     }                                            // зацепка за начальную точку
+     if( Id<0 ){ Items W=T[I]; for( int i=I; i>0; i-- )T[i]=T[i-1]; T[0]=W;
+                 if( !J )Revert( T[0] ); First=T[0].S[0].P;
+               } else
+     if( Id>0 ){ if( I>k ){ Items W=T[I]; for( int i=I; i>k; i-- )T[i]=T[i-1]; T[k]=W; }
+                 if( J )Revert( T[k] ); Last=T[k].S[T[k].NoSplines-1].P;
+               }
+   }
+}
+Vector *InterSection::ReButtocks( int &Id, int &Iu   )
+{ Real Md,Mu; int Dir=0,N=0,i,j;  Id=Iu=0;
+  static Vector *VB=NULL; VB=(Vector*)Allocate( NPt*sizeof( Vector ),VB );
+   for( i=0; i<NIt; i++ )     // распутывание фрагментов к простому вектору
+   for( j=0; j<T[i].NoSplines; j++ )VB[N++]=T[i].S[j].P;
+   //if( N!=NPt )Break( "~ проблемы с длиной батокса\n N(%d)!=NPt(%d)",N,NPt );
+   Md=Mu=VB[0].z;
+   for( i=1; i<N; i++ ){ Vector &V=VB[i];
+     if( Mu<V.z ){ Mu=V.z; Iu=i; } // ищем минимальную и максимальную аппликаты
+     if( Md>V.z ){ Md=V.z; Id=i;  // на всём замкнутом контуре нулевого батокса
+       if( V.x>VB[i-1].x         // направление вперёд по ходу батокса по днищу
+        || ( i<N-1 && V.x<VB[i+1].x ) )Dir=1; else Dir=-1;
+   } }
+   if( Dir<0 )                     // задом наперёд - нехорошо, нo исправляется
+   { for( i=0; i<N/2; i++ )Swab( VB[i],VB[N-i-1] ); Id=N-Id-1,Iu=N-Iu-1;
+   }
+// if( !Id )I=Iu; else !! здесь при сдвиге образуется наложение с порчей данных
+// for( i=(Iu+NPt-1)%NPt,j=0; j<NPt; j++,i=(i+1)%NPt )Swab( VB[j],VB[i] );
+//   for( i=Id,j=0; j<NPt; j++,(++i)%=NPt )Swab( VB[i],VB[j] );
+// (Iu-=Id)++; if( Iu<0 )Iu+=NPt;  // нос идет в начало, и корма обратным ходом
+   return VB;
+}
+
+/* !.. слишком сложно и путано
+void InterSection::ReStation()
+{  if( NIt<1 )return;
+  int I=0,J=0;         // индексы новой искомой точки
+  Vector B=Max;
+   B.x=T[0].S[0].P.x;  // исходная контрольная точка в шпангоуте на максималках
+   //
+   //       поиск нижней точки в диаметральной плоскости как условие ориентации
+   //
+   for( int i=0; i<NIt; i++ )
+   for( int j=0; j<T[i].NoSplines; j+=T[i].NoSplines-1 )     // бьём по хвостам
+   { Vector V=T[i].S[j].P;
+     if( V.y<0 )V.y=0;
+     if( V.y<B.y || ( V.y<1e-3 && B.y<1e-3 && V.z<B.z ) ){ B=V; I=i; J=j; } //!
+   }
+   if( J )Revert( T[I] );            // пересортировка для кривой задом наперёд
+   if( I )Swab( T[0],T[I] );         //{ Items W=T[0]; T[0]=T[I]; T[I]=W; }
+   if( T[0].S[0].P.z<T[0].S[T[0].NoSplines-1].P.z )Revert( T[0] );
+   //
+   //  пробуем переприсоединять перепутанные концы теоретических контуров
+   //
+   ReConnect();
+/* for( int k=1; k<NIt; k++ )             // с поиском по направлению вверх
+   { B=T[k-1].S[T[k-1].NoSplines-1].P;    // последняя точка прошлого фрагмента
+     D=abs( B-T[I=k].S[J=0].P );
+     for( int i=k; i<NIt; i++ )
+     for( int j=0; j<T[i].NoSplines; j+=T[i].NoSplines-1 )
+       if( i!=k || j>0 )
+       if( abs( B-T[i].S[j].P )<D ){ D=abs( B-T[i].S[j].P ); I=i; J=j; }
+     if( J )Revert( T[I] );
+     if( I!=k )Swab( T[I],T[k] );
+   } *-/
+}
+*/

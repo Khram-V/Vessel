@@ -38,12 +38,12 @@ static byte getByte()
 }
 static int S2I( char *s )
 { int I;
-  for( I=0; I<strlen( s ); I++ )if( s[I]>' ' )break; s+=I;
-  if( s[0]!='$' )return atoi( s );         //  return strtol( S+1,&S,16 );
-  I=0; sscanf( s+1,"%X",&I ); return I;    //  return atoi( getString( F ) );
+  for( I=0; I<strlen( s ); I++ )if( s[I]>' ' )break; s+=I; I=0;
+  if( s[0]!='$' )sscanf( s,"%i",&I );                                           // return atoi( s ); //  return strtol( S+1,&S,16 );
+            else sscanf( s+1,"%X",&I ); return I;                               // return atoi( getString( F ) );
 }
 static int getInt()
-{ int I; if( isBin ){ fread( &I,1,4,F ); return I; }
+{ if( isBin ){ int I=0; fread( &I,1,4,F ); return I; }
   return S2I( getString( F ) );
 /*
   char *S=getString( F );
@@ -295,7 +295,7 @@ void Surface::Read( bool Part )
        L[I].Developable=getByte();                                              print( "%d,",L[I].Developable );
        if( FV>=fv180 )
        { L[I].UseforIntersection=getByte();                                     textcolor( LIGHTCYAN ),print("%d,",L[I].UseforIntersection );
-         L[I].UswinHydrostatic=getByte();                                       print( "%d}",L[I].UswinHydrostatic );
+         L[I].UseinHydrostatic=getByte();                                       print( "%d}",L[I].UseinHydrostatic );
          if( FV>=fv191 )
          { L[I].MaterialDensity=getFloat();                                     textcolor( LIGHTGREEN ),print(" MD=%g",L[I].MaterialDensity );
            L[I].Thickness=getFloat();                                           print( " Tn=%-3g",L[I].Thickness );
@@ -583,6 +583,8 @@ bool Ship::LoadFEF()      // Ship.fef == FreeShip Exchange Format
     readText( &Set.Designer );                                                  print(              "Designer =%s\n",Set.Designer );
     readText( &Set.Comment );                                                   print(              "Comment  =%s\n",Set.Comment );
     readText( &Set.CreatedBy );                                                 print(              "CreatedBy=%s\n",Set.CreatedBy );
+    Set.WaterDensity=1.025,Set.AppendageCoefficient=1,     // или по отсутствию
+    Set.Units=fuMetric,Set.MainparticularsHasBeenset=I=1,PT=fpLow; // умолчанию
     sscanf( getString( F ),"%lg%lg%lg%lg%lg%d%d%d",
      &Length,&Beam,&Draft,
      &Set.WaterDensity,
@@ -617,7 +619,7 @@ void Surface::ReadFEF( int K )    // количество узлов или их
          T.Developable=d,
          T.Symmetric=s,
          T.UseforIntersection=u,
-         T.UswinHydrostatic=w,
+         T.UseinHydrostatic=w,
          T.ShowInLineSpan=p;                                                    print( ", ID=%d, Color=%X, Vis=%i, Symm=%i, ... Плотность=%g, Толщина=%g \n",T.ID,T.LClr.C,T.Visible,T.Symmetric,T.MaterialDensity,T.Thickness );
      } K=getInt();
    } else L=(Layers*)Allocate( (NoLayers+1)*sizeof( Layers ),L ); // сверх-слой
@@ -629,7 +631,7 @@ void Surface::ReadFEF( int K )    // количество узлов или их
    for( I=NoC; I<NoCoPoint; I++ )
    { CoPoint &T=P[I]; T.T=svRegular; K=0;        // и последних может не быть
      sscanf( getString( ::F ),"%lg%lg%lg%i%i",&T.V.x,&T.V.y,&T.V.z,&T.T,&K );
-                          T.Selected=K;
+                                                             T.Selected=K!=0;
    }
 /* if( (K=NoCoPoint-NoC)>0 )
    { int *J=(int*)Allocate( K*sizeof( int ) );
@@ -655,11 +657,13 @@ void Surface::ReadFEF( int K )    // количество узлов или их
    NoFaces+=getInt();                                                           print( "< ControlFaces > %d - количество фрагментов обшивки\n",NoFaces );
    F=(Faces*)Allocate( NoFaces*sizeof( Faces ),F );
    for( I=NoI; I<NoFaces; I++ ) // здесь уж чтение напрямую из текстового файла
-   { fscanf( ::F,"%d",&K ); F[I].Capacity=K;
+   { char *S=strtok( getString( ::F )," " );
+     K=0; sscanf( S,"%i",&K ); F[I].Capacity=K;
      F[I].P=(int*)Allocate( K*sizeof(int) );             /// <++ Control Points
-     for( int j=0; j<K; j++ ){ int &M=F[I].P[j]; fscanf( ::F,"%d",&M ); M+=NoC; }
-     K=0; fscanf( ::F,"%d",&K ); F[I].LayerIndex=K+NoL;   // № слоя по площадке
-     K=0; sscanf( getString(::F ),"%i",&K); F[I].Selected=K!=0; // метка выбора
+     for( int j=0; j<K; j++ )
+        { int &M=F[I].P[j]; S=strtok( 0," " ); sscanf( S,"%i",&M ); M+=NoC; }
+     K=0; S=strtok( 0," " ); if( S )sscanf( S,"%i",&K ); F[I].LayerIndex=K+NoL; // № слоя по площадке
+     K=0; S=strtok( 0," " ); if( S )sscanf( S,"%i",&K ); F[I].Selected=K!=0;    // метка выбора
    }
    //
    //  теперь выборка загибулин на контрольных узлах из под оболочки "как есть"
@@ -689,13 +693,13 @@ void Surface::WriteFEF()
            L[i].Developable,
            L[i].Symmetric,
            L[i].UseforIntersection,
-           L[i].UswinHydrostatic,
+           L[i].UseinHydrostatic,
            L[i].ShowInLineSpan,
            L[i].MaterialDensity,
            L[i].Thickness
          );
        if( i )fprintf( ::F,"\n" ); else fprintf( ::F," ≈ Id,Cl,Vis,Dev,Sym,IS,HS,LP,ρ,δ\n" );
-        //    " ≈ Id,Color,Visible,Develop,Symmetric,InterSection,HydroStatic,inLinesPlan\n" );
+        //  " ≈ Id,Color,Visible,Develop,Symmetric,InterSection,HydroStatic,inLinesPlan\n" );
   } }
   fprintf( ::F,"%i\n",NoCoPoint );
   for( int i=0; i<NoCoPoint; i++ )

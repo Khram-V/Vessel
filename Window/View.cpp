@@ -72,7 +72,7 @@ bool View::Mouse( int button, int x,int y )    // и её же указания 
 }
 bool View::KeyBoard( fixed key )  // к спуску из внешних виртуальных транзакций
 { static Real Di=0; if( !Di )Di=Distance;  // запоминается из первого обращения
-         Real Ds=6*Distance/Width;
+         Real Ds=6.0*Distance/Width;
   switch( key )
   { case _Left: if( ScanStatus()&SHIFT )lookX+=Ds; else
                 if( ScanStatus()&CTRL  )eyeZ--;    else eyeX--; break;
@@ -156,7 +156,7 @@ bool View::KeyBoard( fixed key )  // к спуску из внешних вир�
    glEnable( GL_LIGHTING );
    glEnable( GL_LIGHT0 ); glEnable( GL_LIGHT1 );
    glEnable( GL_LIGHT2 ); glEnable( GL_LIGHT3 );
-   glEnable( GL_NORMALIZE );   glEnable( GL_AUTO_NORMAL );
+   glEnable( GL_NORMALIZE );// glEnable( GL_AUTO_NORMAL );
    glEnable( GL_DEPTH_TEST );        // растровая разборка отсечений по глубине
    glClearDepth( 2e3 );     // 2000.0      Enables Clearing Of The Depth Buffer
    glDepthRange( 1,0 );     // 0,1 - Distance        взаимное накрытие объектов

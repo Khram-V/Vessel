@@ -35,7 +35,7 @@ char *Name,               // название проекта
      *Designer,           // автор проекта
      *Comment,            // расширенное описание
      *CreatedBy;          // изготовитель цифровой модели
-bool MainparticularsHasBeenset, // Flag to check if the main particulars have been set before hydrostatic calculationss are being performed
+bool MainparticularsHasBeenset, // Flag to check if the main particulars have been set before hydrostatic calculations are being performed
                           // Флаг, позволяющий проверить, были ли заданы основные параметры перед выполнением гидростатических расчетов.
      DisableModelCheck,   // Disable the automatic checking of the surface
                           // Отключить автоматическую проверку поверхности
@@ -109,7 +109,7 @@ struct Surface
          Symmetric,
          Developable,
          UseforIntersection, // fc>=180
-         UswinHydrostatic;
+         UseinHydrostatic;
     Real MaterialDensity,    // fv>=191
          Thickness;
     bool ShowInLineSpan;     // fv>=201
@@ -144,19 +144,18 @@ struct Surface
     bool Selected;
   } *F;                      //! NoFaces
 public:
-  int  NoLayers,NoCoPoint,NoEdges,NoCurves,NoFaces; // размеры кривых  массивов
-  void Extents( bool Sizes=true );         // экстремумы по расчетным площадкам
-//Surface(); //{ memset( this,0,sizeof( Surface ) ); ActiveLayer.Visible=true; } // обнуляется NoLayers тоже!
-  void EditMenu( Window* );       // числовое смещение и 3D-перемасштабирование
+  int  NoLayers,NoCoPoint,NoEdges,NoFaces,NoCurves; // размеры кривых  массивов
   void Read( bool Part=false );
-  void ReOrder();             // делается попытка вычистки повторяющихся точек
-  void ReadFEF( int );        // если >1 - чистый корпус без доп описаний
-  void WriteFEF();            // сохранение текущего результата, наконец-то
-  void ReadObj( char *Path ); // полное имя для сопутствующего описания MtlLib
   void Drawing( BoardView=mvPort );
-  void Revolute();           // обращение нормалей по элементарных поверхностям
-  void R90Xright();          // положить на правый борт
-  void R90Zright();          // поворот вправо по курсу
+  void ReOrder();              // делается попытка вычистки повторяющихся точек
+  void ReadFEF( int );         // если >1 - чистый корпус без доп описаний
+  void WriteFEF();             // сохранение текущего результата, наконец-то... ++Obj - тоже надо
+  void ReadObj( char *Path );  // полное имя для сопутствующего описания MtlLib
+  void EditMenu( Window* );    // числовое смещение и 3D-перемасштабирование
+  void Revolute();             // обращение обхода по элементарным поверхностям
+  void R90Xright();            // положить на правый борт
+  void R90Zright();            // поворот вправо по курсу
+  void Extents( bool Sizes=true );      // экстремумы по всем контрольным узлам
 };
 struct Spline{ Vector P; bool Knuckle; };
 struct Items{ int NoSplines; Spline *S; };
