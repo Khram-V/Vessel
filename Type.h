@@ -1,56 +1,57 @@
 #ifndef __Type_h__
-#define __Type_h__     /// _ подборка констант и разных операций        _¹²³ⁿªº
-#include <math.h>      //  ¯¯¯¯¯¯¯¯¯¦∈∃∪∩⊊⊆⊂⊃⊇⊋∅⊕⊗∜∛√ ×⨉ ∆∇∀˂˃˄˅∧∨⋀⋁ ⌃⌄ …∞ₒₐₓₑₔ
-#include <stdlib.h>    //     ‘’„“”«»‹›•∙±≥≤÷≈≡≠∂δ⇒⇯⇐⇔↦←↑→↓↔↕↨∏∑∩∫ƒєæϑ Θ§µ₪א©®™
-typedef double Real;   // просто число ko всем арифметическим операциям 
+#define __Type_h__           /// подборка констант и разных операций
+#include <math.h>            // ¯¯¯¯¯¯¯¯¯¦∈∃∪∩⊊⊆⊂⊃⊇⊋∅⊕⊗∜∛√ ±÷≈×⨉ ∆∇∀˂˃˄˅∧∨⋀⋁ ⌃⌄
+#include <stdlib.h>          //  ‘’„“”«»‹›•∙≥≤≡≠∂δ⇒⇯⇐⇔↦←↑→↓↔↕↨∏∑∩∫ƒєæϑ Θ§µ₪א©®™
+
+typedef double Real;         // просто число ko всем арифметическим операциям
 typedef const Real& _Real;   // числовая ссылка–константа, процедурный параметр
 typedef unsigned char byte;   // маска логических операция и выборов управления
 typedef unsigned short fixed; // маска логических операция и выборов управления
 struct Event; typedef const Event& _Event; // обобщение \ синтез даты и времени
                                            // ©75 ⇒ Сахалин ↔ 🄯 יְרוּשָׁלַיִם
-//    a 6378245 [м]  Сфероид Красовского морских карт России
-//    b 6356863.0188 SN\ϕ Эллипсоид Красовского
-//    c 6399698.9018 EW/λ  (b+c)/2=6367554.0094  ε ≈ 298.3
-//    м 1855.35626248109543 — сфероидальная миля
-//    c ≈ 299 792 458 [м·сˉ¹] ρ ≈ 1.025 [кг/дм³] ≡ 25‰
-const Real _Mile=1852.24637937659918,            // морская(равнообъёмная) миля
-                   // радиус эквивалентной сферы по отношению к единичному кубу
-   EqSphere=0.62035049089940001666800681204778, //   r = ³√(3/4/π)   ┌┬─┐╔═╦╗
-         // 1.24070098179880003333601362409556  ≈≈ — D = ³√(6/π)     ├┼░┤║▓║║
-     _Pi=3.14159265358979323846264338327950288, //   π      M_PI     ││▒│╠█╬╣
-     _Pd=6.28318530717958647692528676655900576, //   π x 2  Ø        └┴─┘╚═╩╝
-     _Ph=1.57079632679489661923132169163975144, //   π / 2  M_PI_2   ╒╤╕╓╥╖
-     _iP=0.31830988618379067153776752674503,    //   1 / π  M_1_PI   ╞╪╡╟╫╢▲▼
-     _Rd=57.295779513082320876798154814105,     // 180 / π  °\rad    ╘╧╛╙╨╜▐▌
-     _dR=0.01745329251994329576923690768489,    //   π / 180 rad\°   ¯¯¯¯▄■▀
-     _s2=1.41421356237309504880,                // M_SQRT2
-     _g=9.8106; // м/с²≈9.780318·(1+.005302·sin²ϕ-.000006·sin²2ϕ)-.000003086·h
+//  a 6378245 [м] Сфероид Красовского морских карт России
+//  b 6356863.0188 SN\ϕ Эллипсоид Красовского
+//  c 6399698.9018 EW/λ (b+c)/2=6367554.0094 ε ≈ 298.3
+//  м 1855.35626248109543 — сфероидальная миля
+//  c ≈ 299 792 458 [м·сˉ¹] ρ ≈ 1.025 [кг/дм³] ≡ 25‰
+const Real _Mile=1852.24637937659918,  // морская(равнообъёмная) миля
+         // радиус эквивалентной сферы по отношению к единичному кубу
+   EqSphere=0.62035049089940001666800681204778, //   r = ³√(3/4/π) ┌┬─┐╔═╦╗
+         // 1.24070098179880003333601362409556  ≈≈ — D = ³√(6/π)   ├┼░┤║▓║║
+     _dR=0.01745329251994329576923690768489,    //   π / 180 rad\° ││▒│╠█╬╣
+     _iP=0.31830988618379067153776752674503,    //   1 / π  M_1_PI └┴─┘╚═╩╝
+     _Ph=1.57079632679489661923132169163975144, //   π / 2  M_PI_2 ╒╤╕╓╥╖
+     _Pi=3.14159265358979323846264338327950288, //   π      M_PI   ╞╪╡╟╫╢▲▼
+     _Pd=6.28318530717958647692528676655900576, //   π x 2  Ø      ╘╧╛╙╨╜▐▌
+     _Rd=57.295779513082320876798154814105,     // 180 / π  °\rad  ¯¯¯¯▄■▀
+     _s2=1.41421356237309504880,                /* M_SQRT2
+≈36°*/ _g=9.8106; //м/с²≈9.780318·(1+.005302·sin²ϕ-.000006·sin²2ϕ)-.000003086·h
 //   _e  2.71828182845904523536028747135266249   // M_E
 //   φ ≈ 1.61803398874989484820458683436563811 = 1/φ+1 ⇒ (√5+1)/2 = В/Б=Б/мал
 enum{ RIGHT=1,LEFT,SHIFT, LCTRL,RCTRL=8,CTRL=12, L_ALT=16,R_ALT=32,ALT=48 };
-enum{_MouseMove,_MouseLeft,_MouseRight,_MouseMiddle=4,_MouseWheel=8 };
+enum{ _MouseMove,_MouseLeft,_MouseRight,_MouseMiddle=4,_MouseWheel=8 };
 enum Course
 { _North_West=3,_North=1,_North_East=9, _Home=3,   _Up =1,_PgUp =9,
         _West=2,_Zenith=0,     _East=8, _Left=2,_Center=0,_Right=8,
   _South_West=6,_South=4,_South_East=12,_End =6, _Down =4,_PgDn=12,
   _Enter=13,_BkSp,_F1,_F2,_F3,_F4,_F5,_F6,_F7,_F8,_F9,_F10,_F11,_F12,
-  _Esc=27,_Ins,_Del,_Tab,_Blank=32        // +5, +7, +10, +31 — в запасе
-};                                        // ⁰ⁱ⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₒₓₔ
+  _Esc=27,_Ins,_Del,_Tab,_Blank=32 // +5, +7, +10, +31 в запасе
+};                                 // ⁰¹²³ⁱ⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿªº∞…₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₒₓₔ
 void julday( long day,int& m,int& d,int& y ); // Julian( day ) ⇒ дата( m,d,y )
-long julday( int m, int d, int y );          // возврат: дата( m,d,y ) ⇒ Julian
-long julday(); Real onetime();              // Текущие дата и время[дни и часы]
-struct Event{ long D; Real T;              // Юлианская дата и часы от полуночи
-  Event& Now();                           // здесь текущее компьютерное время
-  Event(){ Now(); }                      //  ++ в простом/чистом конструкторе
-  Event& Check();                      // согласование внешних сложений времени
-  Event( _Event cur ): D( cur.D ),T( cur.T ){ Check(); } // заданное событие и
-  Event( long d,_Real t=0.0 ): D( d ),T( t ){ Check(); } //   в дате и времени
+long julday( int m, int d, int y );         // возврат: дата( m,d,y ) ⇒ Julian
+long julday(); Real onetime();             // Текущие дата и время[дни и часы]
+struct Event{ long D; Real T;              // Юлианская дата, часы от полуночи
+  Event& Now();                            // здесь текущее компьютерное время
+  Event(){ Now(); }                        // ++ в простом/чистом конструкторе
+  Event& Check();                          // согласование по добавкам времени
+  Event( _Event cur ): D( cur.D ),T( cur.T ){ Check(); }   // заданное событие
+  Event( long d,_Real t=0.0 ): D( d ),T( t ){ Check(); }   // в дате и времени
   Event  operator + (_Real t ){ return Event( D,T+t ); }
   Event  operator - (_Real t ){ return Event( D,T-t ); }
   Event& operator +=(_Real t ){ T+=t; return Check(); }
   Event& operator -=(_Real t ){ T-=t; return Check(); }
-  Event& UnPack( int &m,int &d,int &y ){ julday( D,m,d,y ); return *this; }
-  long     Pack( int m, int d, int y  ){ return D = julday( m,d,y ); }
+  Event& UnPack( int &m, int &d, int &y ){ julday( D, m,d,y ); return *this; }
+  long   Pack( int m, int d, int y ){ return D=julday( m,d,y ); }
   friend Event operator+(_Event B,_Real t ){ Event E( B.D,B.T+t ); return E; }
   friend Real  operator-(_Event A,_Event B ){ return (A.T-B.T)+(A.D-B.D)*24; }
   friend bool operator> (_Event A,_Event B ){ return ( A-B )> 0.0; }
@@ -80,7 +81,7 @@ template<class real>int find( const real *A, const real &Ar, int len );
 Real AxisStep( Real );                    // ϑ - Step for Axis Estimation
 char* DtoA( Real,int=0,const char* ="°"); // (±)ⁿ123°45'67"00 как круговая мера
 char* AtoD( char*,Real& );                // (°)÷(:) с возможной заменой на ':'
-char* RtoA( Real,int w,int f );           // w ширина поля, n цифры за запятой
+char* RtoA( _Real,int w,int f );          // w ширина поля, n цифры за запятой
 char* RtoA( _Real );                      // и если только число при w=16, n=6
 //
 //    Работа с обычными текстовыми строчками

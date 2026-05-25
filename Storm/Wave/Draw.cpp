@@ -142,25 +142,25 @@ Waves& Waves::Drawing()
 // Справка о ходе вычислительного эксперимента на текстовой консоли
 //
 #define Amax( n,V,S )for( W=K=0,i=0; i<n; i++ ){                  \                      if( abs( V[i] )>abs( W ) )W=V[i];           \
-                      if( fabs( V[i].x )>fabs( K.x ) )K.x=V[i].x;   \
-                      if( fabs( V[i].y )>fabs( K.y ) )K.y=V[i].y;   \
+                      if( fabs( V[i].x )>fabs( K.x ) )K.x=V[i].x; \
+                      if( fabs( V[i].y )>fabs( K.y ) )K.y=V[i].y; \
                       if( fabs( V[i].z )>fabs( K.z ) )K.z=V[i].z; } \
- printf( "\n%6.1f{ %6.1f /%g/ %-6.1f } <= [ %6.1f /%g/ %-6.1f ] -- экстремумы %s  ",abs( W ),W.x,W.y,W.z,K.x,K.y,K.z,S );
+ print( "\n%6.1f{ %6.1f /%g/ %-6.1f } <= [ %6.1f /%g/ %-6.1f ] -- экстремумы %s  ",abs( W ),W.x,W.y,W.z,K.x,K.y,K.z,S );
 
 void Waves::TextInfo()
 { static bool First=true;
   if( First ){ First=false;
 //  texttitle( "Вычислительный эксперимент с волнами на воде" );
-    printf( "Моделирование плоской прогрессивной трохоидальной волны\n\n" );
-    textcolor( YELLOW );    printf( "%6.0f \\ %.1f(%g)          -- длина[м] \\ амплитуда[м](%)\n",Length,Rw,Rw*_Pd*2.0/Length/1.134 );
-    textcolor( LIGHTGREEN); printf( "%6.2f \\ %-6.4g             -- период[с] \\ круговая частота[1/с] \n",Length/Cw,_Pd*Cw/Length );
-    textcolor( LIGHTCYAN ); printf( "%6.1f \\ %.4g/%.4g \\ %.3g -- скорость[м/с] \\ шаг времени[с]/крат \\ и сетки[м]\n",Cw,dT,tKrat,Ds );
+    print( "Моделирование плоской прогрессивной трохоидальной волны\n\n" );
+    textcolor( YELLOW );    print( "%6.0f \\ %.1f(%g)          -- длина[м] \\ амплитуда[м](%)\n",Length,Rw,Rw*_Pd*2.0/Length/1.134 );
+    textcolor( LIGHTGREEN); print( "%6.2f \\ %-6.4g             -- период[с] \\ круговая частота[1/с] \n",Length/Cw,_Pd*Cw/Length );
+    textcolor( LIGHTCYAN ); print( "%6.1f \\ %.4g/%.4g \\ %.3g -- скорость[м/с] \\ шаг времени[с]/крат \\ и сетки[м]\n",Cw,dT,tKrat,Ds );
   } else
   { Vector W,K; int i;
     textcolor( WHITE ); print( 1,7,"%12s \\ %d/%-6d -- время[сек] \\ шаг  \n",DtoA( Tlaps/3600 ),Kt,Kd ),clreol();
     if( fabs( wH )<Long/2-2 )
     textcolor( YELLOW,BLUE ),print( 8,8,"wV=%.2f \\ wH=%-.1f -- скорость[м/с] \\ граница[м] ",wV,wH );
     textcolor( LIGHTCYAN,BLACK ); clreol(); gotoxy( 1,9 );Amax( Nx+1,H,"уровня" )
-    textcolor( LIGHTGREEN ); Amax( Nx,V,"скорости" ) printf( "\n" ),clreol();
+    textcolor( LIGHTGREEN ); Amax( Nx,V,"скорости" ) print( "\n" ),clreol();
   }
 }

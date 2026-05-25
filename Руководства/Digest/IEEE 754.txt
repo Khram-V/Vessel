@@ -6,3 +6,13 @@
 -1.#QNAN Отрицательное несигнальное не-число (quiet NaN)
  1.#IND  Положительная неопределённость
 -1.#IND  Отрицательная неопределённость
+
+-fopenmp
+-funsigned-char
+-fexec-charset=UTF-8
+-finput-charset=UTF-8
+-ffast-math
+-fno-exceptions
+-Wunused
+
+-Wno-narrowing

@@ -144,10 +144,7 @@ bool Waves::KeyBoard( fixed Keyb )
              "<Ctrl>  ","задержка вычислений",
              "<Space> ","очистка\\сброс",
              "<Esc>/<ctrlC>"," стоп ",0 };
-
-
-printf( "\n WH=%g Long=%g",wH,Long );
-
+//print( "\n WH=%g Long=%g",wH,Long );
   switch( Keyb )
   { case _F1: Help( Name,Cmds,Plus,-2,-2 ); break;
     case _F4: Config(); break;               // за прос параметров эксперимента

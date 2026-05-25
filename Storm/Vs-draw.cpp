@@ -185,19 +185,23 @@ Hull& Hull::NavigaInform( Window *Win )
   //   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   //!  графики качки в окне аксонометрической проекции корпуса корабля !!
   //   ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-  color( Win==Vessel?navy:gray );
-  Win->Print( 1,0," Time%s +%.2g\"/%.2g\n"
-                  " Speed %.1f от %.1f узл\n"
-                  "    Fr %.2f ~ %.1f длин\n"
-                  " Volume %.0f << %.0f\n"
-                  " Surface %.0f << %.0f\n"
-                  " Floatable %.0f << %.0f\n"
-                  " Metacenter %.1f << %.1f\n"
-                  "            h %.1f << %.1f",
+  //
+  if( Win!=this ){ color( white,0,0.5 ); i=4; }    // color( Win==Vessel?navy:gray );
+           else  { color( navy ); i=1; }
+  while( i>0 ){ glLineWidth( i );
+    Win->Print( 1,0," Time%s +%.2g\"/%.2g\n"
+                    " Speed %.1f от %.1f узл\n"
+                    "    Fr %.2f ~ %.1f длин\n"
+                    " Volume %.0f << %.0f\n"
+                    " Surface %.0f << %.0f\n"
+                    " Floatable %.0f << %.0f\n"
+                    " Metacenter %.1f << %.1f\n"
+                    "            h %.1f << %.1f",
            DtoA( Trun/3600,Trun>3600?2:(Trun>60?3:-3) ),TimeStep,
            tKrat,Speed*3600/_Mile,cSp*3600/_Mile,Speed/sqrt(_g*Length),
            sqr(Speed)*_Pd/_g/Length,Volume,iV,Surface,iS,Floatage,iF,
-           Metacenter.x,vM.x,hX,vM.z );
+           Metacenter.x,vM.x,hX,vM.z ); color( blue,-0.5 ); i-=3;
+  }
   if( Win==this )
   if( (l=Route.len-1)>=12 )
   {                                                               //~ z=x.y-y.x

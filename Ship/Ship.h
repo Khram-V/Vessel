@@ -2,7 +2,7 @@
 #include <Time.h>
 #include <StdIO.h>
 #include <CType.h>
-#include <wCType.h>
+//#include <wCType.h>
 //#include <ConIO.h>
 //#include "..\Type.h"
 #include "..\Window\ConIO.h"
@@ -22,11 +22,13 @@ typedef enum { svRegular, svCrease, svDart, svCorner } VertexType;
                                     // Different types of sub-division-vertices
 typedef enum { fiFree,fiStation,fiButtock,fiWaterline,fiDiagonal } IntersectionType;
      // intersection lines: free,stations,buttocks,waterlines and diagonal type
-struct Plane { Real a,b,c,d; };  // Description of 3D plane: a*x+b*y+c*z-d=0.0;
+
+const Real Foot=0.3048,Eps=1.0e-5L;
 union Color{ unsigned C; byte c[4]; };
+struct Plane { Real a,b,c,d; };  // Description of 3D plane: a*x+b*y+c*z-d=0.0;
 extern Vector Min,Max;         // Экстремумы исходного графического изображения
-extern byte  UnderWaterColorAlpha;
 extern Color UnderWaterColor;
+extern byte  UnderWaterColorAlpha;
 extern Real  Beam,        // ширина
              Draft,       // осадка
              Length;      // длина

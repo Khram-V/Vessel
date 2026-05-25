@@ -34,16 +34,16 @@ void Surface::EditMenu( Window *Win ) // сдвиг и масштаб
                                    c.c[2]=( c.c[2]+UnderWaterColor.c[2] )/2; }
 
 static void Draw( Flex &Cont, int i1,int i2, _Real delta, bool right ) // i1-i2 включительно
-{ Vector norm=Zero;
-  for( int i=i1+1; i<i2; i++ )norm+=(Cont[i+1]-Cont[i1])*(Cont[i]-Cont[i1]);
-  glNormal3dv( norm );          // в гидромеханике этот расчёт долен быть здесь
+{ Vector V,W=Zero;
+  for( int i=i1+1; i<i2; i++ )W+=(Cont[i+1]-Cont[i1])*(Cont[i]-Cont[i1]);
+  glNormal3dv( W );          // в гидромеханике этот расчёт долен быть здесь
   glBegin( GL_POLYGON );
-    for( int i=i1; i<=i2; i++ ){ (norm=Cont[i]).z+=delta; dot( norm ); }
+    for( int i=i1; i<=i2; i++ ){ (V=Cont[i]).z+=delta; dot( V ); }
   glEnd();
   if( right )
-  { glBegin( GL_POLYGON );
-    for( int i=i2; i>=i1; i-- )
-    { (norm=Cont[i]).z+=delta; norm.y=-norm.y; dot( norm ); }
+  { W.y=-W.y; glNormal3dv( W );
+    glBegin( GL_POLYGON );
+    for( int i=i2; i>=i1; i-- ){ (V=Cont[i]).z+=delta; V.y=-V.y; dot( V ); }
     glEnd();
   }
 }
@@ -54,61 +54,64 @@ inline Vector newInter( _Vector V1, _Vector V2 )
 {    return V1 - V1.z*( V2-V1 )/( V2.z-V1.z );
 }
 void Surface::Drawing( BoardView Sides )
-{ static Flex W,wL; Real delta=Draft+Min.z; int i,I,J,K,N; Color c;
-  for( N=0; N<NoFaces; N++ ) // синхронная прорисовка треугольников двух бортов
+{ static Flex W,wL; const Real delta=Draft+Min.z; int K; Color c; wL.len=0;
+//#pragma omp parallel for shared( wL ) //private( K ) // reduction(+: wL.len )
+  for( int N=0; N<NoFaces; N++ ) // синхронная прорисовка треугольников двух бортов
   if( (K=F[N].Capacity)>2 )             // у граней должно быть боле двух рёбер
-  { Layers &Layer=L[min(NoLayers,F[N].LayerIndex)]; // извне указанные свойства
-    bool right=(Sides==mvBoth && Layer.Symmetric); wL.len=W.len=J=i=0;
+  { const Layers &Layer=L[min(NoLayers,F[N].LayerIndex)]; // указанные свойства
+    const bool right=(Sides==mvBoth && Layer.Symmetric);
     glLineWidth( 1 );    /// Alice AI из Яндекса стала эдесь хорошим помощником
 #if 1
-   Vector v,V1,V2; J=-1,i=0;
+   Vector v,V1,V2; int J=-1,i=0; W.len=0;
     while( i<=K+J )
     { (V2=P[F[N].P[i%K]].V).z-=delta;
       if( i++ )                        // i - показывает следующий узел = длину
-      if( inInter( V1,V2 ) ){          //     однократно, но по всем рёбрам
-/*R:*/  if( J<0 || W.len==0 ){ v=V1; if( J<0 )J=i,W.len=0; } else v=V2;
+      if( inInter( V1,V2 ) )           //     однократно, но по всем рёбрам
+      { if( J<0 || W.len==0 ){ v=V1; if( J<0 )J=i,W.len=0; } else v=V2;
         if( v.z==0.0 )W+=v; else W+=newInter( V1,V2 );
         if( W.len>1 )
-        { // if( W.len>2 ) --- невидимые двойки пусть нарисуются, аль нет {wL}?
+        { if( W.len>2 )  //--- невидимые двойки пусть нарисуются, аль нет {wL}?
           { c.C=Layer.LClr.C;
-            if( W[1].z<0 )uWater else wL+=W[0],wL+=W[-1];                       // if( W[0].x<=W[-1].x )wL+=W[0],wL+=W[-1]; else wL+=W[-1],wL+=W[0];
-            glColor4ubv( c.c );                                                 // print("%i,",W.len);color(W[1].z>0?lightcyan:magenta); // необходима доработка
+            if( W[1].z<0 )uWater else wL+=W[0],wL+=W[-1]; glColor4ubv( c.c );
             Draw( W,0,W.len-1,delta,right );
-          } W[0]=W[-1]; W.len=1;                                                // W.len=0; goto R; == первый вариант с лишним переходом
+          } W[0]=W[-1]; W.len=1;
       } }
       if( J<0 || W.len>0 )W+=V2; V1=V2; // J<0 по началу, и от пересечения нуля
     }
     if( J<0 ) // if( W.len>0 )        // c заданной расцветкой для каждой грани
-    { c.C=Layer.LClr.C; if( W[0].z<0 )uWater glColor4ubv( c.c );
-      Draw( W,0,W.len-1,delta,right );
+    { c.C=Layer.LClr.C;
+      if( W[0].z<0 )uWater glColor4ubv( c.c ); Draw( W,0,W.len-1,delta,right );
     }
 #else
-  static Flex V; int j; V.len=j=0;
-    for( I=0; I<K; I++ )(V+=P[F[N].P[I]].V).z-=delta;
-    while( i<=K+J ){ I=i%K; int I1=(i+K-1)%K; i++;
+   Flex V; int i=0,j=0,J=0; W.len=0;
+    for( int I=0; I<K; I++ )(V+=P[F[N].P[I]].V).z-=delta;
+    while( i<=K+J ){ int I=i%K,I1=(i+K-1)%K; i++;
       if( inInter(V[I1],V[I]) )
       { if( W.len )j=I; else { j=I1; if( !J )J=I+1; }
         if( V[j].z==0.0 )W+=V[j]; else W+=newInter( V[I1],V[I] );
         if( j==I )
-        { c.C=Layer.LClr.C; if( W[1].z<0 )uWater else wL+=W[0],wL+=W[-1];
-          glColor4ubv( c.c );
-          Draw( W,0,W.len-1,delta,right ); W.len=0; --i;// с одной левой точкой
+        { c.C=Layer.LClr.C;
+          if( W[1].z<0 )uWater else wL+=W[0],wL+=W[-1]; glColor4ubv( c.c );
+          Draw( W,0,W.len-1,delta,right ); W.len=0; --i; // одной левой точкой
       } } if( W.len )W+=V[I];
     }
     if( !W.len ){ c.C=Layer.LClr.C; if( V[0].z<0 )uWater; glColor4ubv( c.c );
                   Draw( V,0,V.len-1,delta,right );
                 }
 #endif
-    for( i=0; i<wL.len; i++ )wL[i].z+=delta;
-    color( white );                                    glDisable( GL_LIGHTING );
-    glLineWidth( 2 );                               // glNormal3d( 0,0,-1 );
-    for( i=0; i<wL.len; i+=2 )liney( wL[i],wL[i+1] );  glEnable( GL_LIGHTING );
-  } color( lightmagenta );
-  for( K=0; K<NoCurves; K++ )
+  }
+  for( int i=0; i<wL.len; i++ )wL[i].z+=delta; color( white ); glLineWidth(2);
+  glDisable( GL_LIGHTING );                       // glNormal3d( 0,0,-1 );
+  for( int i=0; i<wL.len; i+=2 )                  // белая ватерлиния 1|2 борта
+// if( Sides!=mvBoth )line( wL[i],wL[i+1] ); else
+                     liney( wL[i],wL[i+1] );
+  color( lightmagenta );                          // кривые контрольные контуры
+  for( int K=0; K<NoCurves; K++ )
   { Vector V,W;
-    for( I=0; I<C[K].Capacity; I++ ){ W=P[C[K].P[I]].V;
+    for( int I=0; I<C[K].Capacity; I++ ){ W=P[C[K].P[I]].V;
       if( I ){ if( Sides==mvBoth )liney( V,W ) ; else line( V,W ); } V=W;
-  } } glLineWidth( 0.2 );
+    }
+  } glEnable( GL_LIGHTING ); glLineWidth( 0.2 );
 }
 void Surface::Extents( bool Sizes )                // Экстремумы по всем контрольным точкам
 { for( int i=0; i<NoCoPoint; i++ )
@@ -120,4 +123,79 @@ void Surface::Extents( bool Sizes )                // Экстремумы по 
   if( !Sizes || !NoLayers ){ Length=Max.x-Min.x,
                              Beam=Max.y-Min.y,
                              Draft=-Min.z; }
+}
+
+//   Расчистка повторяющихся узлов по граням (пока без перестроения рёбер)
+//
+void Surface::ReOrder()                                                         // omp_get_thread_num omp_get_num_procs()
+{ int i,I,J,M,K,*L=(int*)Allocate( NoCoPoint*sizeof( int ) );                   print( "\nСчёт<~%d>: %d",omp_get_max_threads(),NoCoPoint );
+#if 1
+   for( I=0; I<NoEdges; I++ )L[G[I].EndIndex]++,
+                             L[G[I].StartIndex]++;                              //? в файлах *.fef пока нет контуров!
+   for( I=0; I<NoFaces; I++ )
+   for( K=0; K<F[I].Capacity; K++ )L[F[I].P[K]]++;
+   for( I=M=0; I<NoCoPoint; I++ )if( L[I]>0 )M++; else L[I]=-1;                 if( M!=NoCoPoint )print( "<~%d>",NoCoPoint-M );
+   if( L[0]>0 )L[0]=0;
+#endif
+                                                                                print( " узлов" );
+#if 1
+#pragma omp parallel for shared( L ) // private( i,k ) reduction(+: J )
+   for( int i=0; i<NoCoPoint; i++ )
+   if( L[i]>=0 )
+   { Vector &V=P[i].V;  // так должно быть
+     for( int k=0; k<i; k++ )
+     if( L[k]>=0 )
+     { if( abs( P[k].V-V )>Eps ){ L[i]=i; WinReady(); } else // P[k].T=svCrease; ???
+       { P[k].T=(P[k].T==svCorner || V.y==0.0?svCorner:svRegular); L[i]=k; break;
+   } } }
+   for( I=J=0; I<NoCoPoint; I++ )
+   { if( L[I]>=0 )                      // пропуск по отсутствию обращений -???
+     { if( L[I]==I  ){ if( I>J )P[L[I]=J]=P[I]; J++; } else L[I]=L[L[I]]; }
+   }                                                                            if( NoCoPoint!=J )print( " %d сброс",J-NoCoPoint );
+   NoCoPoint=J;
+#else
+   for( I=J=K=0; I<NoCoPoint; I++ ){ CoPoint &V=P[I]; // контроль одним потоком
+     for( i=0; i<J; i++ )
+      if( abs(P[i].V-V.V)<=Eps ){ L[I]=i; K++; P[i].T=svRegular; break; }
+     if( i==J ){ P[i]=V; L[I]=i; J++; }
+   } NoCoPoint=J;                                                               print( " %d повторов",K );
+#endif
+/* for( I=J=K=0; I<NoCoPoint; I++ )
+   { if( L[I]==I ){ P[K]=P[I]; L[I]=K; K++; } else { J++; L[I]-=J; }
+   } NoCoPoint=K;                                                               print( " c перерасчетом до %d без %d ",NoCoPoint,J );
+*/                                                                              print( "; %d рёбер",NoEdges );
+   for( I=0; I<NoEdges; I++ )G[I].StartIndex=L[G[I].StartIndex],
+                             G[I].EndIndex=L[G[I].EndIndex];
+#if 1
+   for( I=J=0; I<NoEdges; I++ ){ Edges &E=G[I];  // здесь пусть пока без openMP
+     if( E.StartIndex==E.EndIndex
+      || abs( P[E.StartIndex].V-P[E.EndIndex].V )<Eps )i=-1; else
+     for( i=0; i<J; i++ )
+      if( (E.StartIndex==G[i].StartIndex && E.EndIndex==G[i].EndIndex)
+       || (E.EndIndex==G[i].StartIndex && E.StartIndex==G[i].EndIndex) // { G[i].Crease=false; K++; break; }
+       ){ G[i].Crease&=E.Crease || P[E.StartIndex].V.y==0              // сброс, если не ДП
+                                && P[E.EndIndex].V.y==0; break; }      // по выходу из цикла поиска повторений
+     if( i==J )G[J++]=E;
+   }                                                                            if( J!=NoEdges )print( " %d повтор",J-NoEdges );
+   NoEdges=J;
+#endif
+                                                                                print( "; %d граней",NoFaces );
+   for( I=0; I<NoFaces; I++ )
+   for( K=0; K<F[I].Capacity; K++ )F[I].P[K]=L[F[I].P[K]];
+#if 1
+#pragma omp parallel for private( i,I,J,K )
+   for( I=0; I<NoFaces; I++ ){ Faces &G=F[I];        // это не очень, исправить
+     for( K=J=0; K<G.Capacity; K++ )
+     { for( i=0; i<J; i++ )if( G.P[i]==G.P[K] )break;
+       if( i==J )G.P[J++]=G.P[K];
+     }                                                                          //if( J!=G.Capacity )print( "%d",G.Capacity-J );
+     G.Capacity=J;
+   }
+   for( I=M=0; I<NoFaces; I++ )
+    if( F[I].Capacity<3 )Allocate( 0,F[I].P ); else F[M++]=F[I];                if( M!=NoFaces )print( " %d утеря",M-NoFaces );
+   NoFaces=M;
+#endif
+   for( I=0; I<NoCurves; I++ )
+   for( K=0; K<C[I].Capacity; K++ )C[I].P[K]=L[C[I].P[K]];                      if( NoCurves>0 )print( "; %d контуров",NoCurves ); print( ".┐" );
+   Allocate( 0,L );
 }

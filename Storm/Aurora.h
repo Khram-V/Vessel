@@ -29,8 +29,8 @@
 #define __Aurora_
 #include <StdIO.h>
 #include <Windows.h>
-#include "../Type.h"              // базисный наборт типов данных и процедур
-#include "../Window/View.h"       // собственная графическая среда Window-Place
+//#include "../Type.h"            // базисный наборт типов данных и процедур
+//#include "../Window/View.h"     // собственная графическая среда Window-Place
 #include "../Window/ConIO.h"      // консольные операции — отладочные тексты
 #include "Flex.h"
 #define BkColor 0.9,0.95,0.99     // осветлённая монотонная фоновая расцветка

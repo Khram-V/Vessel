@@ -42,9 +42,9 @@
 				<Option compiler="gcc-mingw64" />
 				<Compiler>
 					<Add option="-m64" />
-					<Add option="-Wno-narrowing" />
 				</Compiler>
 				<Linker>
+					<Add option="-static-libstdc++" />
 					<Add option="-static-libgcc" />
 					<Add option="-static" />
 					<Add option="-m64" />

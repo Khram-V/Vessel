@@ -16,7 +16,6 @@ static FILE *F=NULL;           // локальный файл открывает
 static string Str;             // рабочая строчка изначально имеет 2К
 //atic int LastLayer=-1;       // ID такой без последовательного перечисления
 static Real Scale=1.0;         // масштаб на случай совмещения моделей ...part.
-const Real Foot=0.3048,Eps=1.0e-5L;
 
 static Real e5r( _Real R ){ return fabs(R)<Eps?0.0:R-remainder( R,Eps ); } //round(R*1e5)/1e5; } //
 
@@ -859,78 +858,4 @@ void Ship::WriteVSL()
     }   fprintf( F," <%d>",j );
   }     fprintf( F,"\n\n" );
         fclose( F ); F=NULL;
-}
-//   Расчистка повторяющихся узлов по граням (пока без перестроения рёбер)
-//
-void Surface::ReOrder()                                                         // omp_get_thread_num omp_get_num_procs()
-{ int i,I,J,M,K,*L=(int*)Allocate( NoCoPoint*sizeof( int ) );                   print( "\nСчёт<~%d>: %d",omp_get_max_threads(),NoCoPoint );
-#if 1
-   for( I=0; I<NoEdges; I++ )L[G[I].EndIndex]++,
-                             L[G[I].StartIndex]++;                              //? в файлах *.fef пока нет контуров!
-   for( I=0; I<NoFaces; I++ )
-   for( K=0; K<F[I].Capacity; K++ )L[F[I].P[K]]++;
-   for( I=M=0; I<NoCoPoint; I++ )if( L[I]>0 )M++; else L[I]=-1;                 if( M!=NoCoPoint )print( "<~%d>",NoCoPoint-M );
-   if( L[0]>0 )L[0]=0;
-#endif
-                                                                                print( " узлов" );
-#if 1
-#pragma omp parallel for shared( L ) // private( i,k ) reduction(+: J )
-   for( int i=0; i<NoCoPoint; i++ )
-   if( L[i]>=0 )
-   { Vector &V=P[i].V;  // так должно быть
-     for( int k=0; k<i; k++ )
-     if( L[k]>=0 )
-     { if( abs( P[k].V-V )>Eps ){ L[i]=i; WinReady(); } else // P[k].T=svCrease; ???
-       { P[k].T=(P[k].T==svCorner || V.y==0.0?svCorner:svRegular); L[i]=k; break;
-   } } }
-   for( I=J=0; I<NoCoPoint; I++ )
-   { if( L[I]>=0 )                      // пропуск по отсутствию обращений -???
-     { if( L[I]==I  ){ if( I>J )P[L[I]=J]=P[I]; J++; } else L[I]=L[L[I]]; }
-   }                                                                            if( NoCoPoint!=J )print( " %d сброс",J-NoCoPoint );
-   NoCoPoint=J;
-#else
-   for( I=J=K=0; I<NoCoPoint; I++ ){ CoPoint &V=P[I]; // контроль одним потоком
-     for( i=0; i<J; i++ )
-      if( abs(P[i].V-V.V)<=Eps ){ L[I]=i; K++; P[i].T=svRegular; break; }
-     if( i==J ){ P[i]=V; L[I]=i; J++; }
-   } NoCoPoint=J;                                                               print( " %d повторов",K );
-#endif
-/* for( I=J=K=0; I<NoCoPoint; I++ )
-   { if( L[I]==I ){ P[K]=P[I]; L[I]=K; K++; } else { J++; L[I]-=J; }
-   } NoCoPoint=K;                                                               print( " c перерасчетом до %d без %d ",NoCoPoint,J );
-*/                                                                              print( "; %d рёбер",NoEdges );
-   for( I=0; I<NoEdges; I++ )G[I].StartIndex=L[G[I].StartIndex],
-                             G[I].EndIndex=L[G[I].EndIndex];
-#if 1
-   for( I=J=0; I<NoEdges; I++ ){ Edges &E=G[I];  // здесь пусть пока без openMP
-     if( E.StartIndex==E.EndIndex
-      || abs( P[E.StartIndex].V-P[E.EndIndex].V )<Eps )i=-1; else
-     for( i=0; i<J; i++ )
-      if( (E.StartIndex==G[i].StartIndex && E.EndIndex==G[i].EndIndex)
-       || (E.EndIndex==G[i].StartIndex && E.StartIndex==G[i].EndIndex) // { G[i].Crease=false; K++; break; }
-       ){ G[i].Crease&=E.Crease || P[E.StartIndex].V.y==0              // сброс, если не ДП
-                                && P[E.EndIndex].V.y==0; break; }      // по выходу из цикла поиска повторений
-     if( i==J )G[J++]=E;
-   }                                                                            if( J!=NoEdges )print( " %d повтор",J-NoEdges );
-   NoEdges=J;
-#endif
-                                                                                print( "; %d граней",NoFaces );
-   for( I=0; I<NoFaces; I++ )
-   for( K=0; K<F[I].Capacity; K++ )F[I].P[K]=L[F[I].P[K]];
-#if 1
-#pragma omp parallel for private( i,I,J,K )
-   for( I=0; I<NoFaces; I++ ){ Faces &G=F[I];        // это не очень, исправить
-     for( K=J=0; K<G.Capacity; K++ )
-     { for( i=0; i<J; i++ )if( G.P[i]==G.P[K] )break;
-       if( i==J )G.P[J++]=G.P[K];
-     }                                                                          //if( J!=G.Capacity )print( "%d",G.Capacity-J );
-     G.Capacity=J;
-   }
-   for( I=M=0; I<NoFaces; I++ )
-    if( F[I].Capacity<3 )Allocate( 0,F[I].P ); else F[M++]=F[I];                if( M!=NoFaces )print( " %d утеря",M-NoFaces );
-   NoFaces=M;
-#endif
-   for( I=0; I<NoCurves; I++ )
-   for( K=0; K<C[I].Capacity; K++ )C[I].P[K]=L[C[I].P[K]];                      if( NoCurves>0 )print( "; %d контуров",NoCurves ); print( ".┐" );
-   Allocate( 0,L );
 }
