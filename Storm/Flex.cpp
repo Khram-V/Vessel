@@ -22,11 +22,9 @@ Vector operator * ( Vector c,_Real w ){ c.x*=w; c.y*=w; c.z*=w; return c; }
 Vector operator / ( Vector c,_Real w ){ c.x/=w; c.y/=w; c.z/=w; return c; }
 Vector operator + ( Vector c,_Vector e){c.x+=e.x,c.y+=e.y,c.z+=e.z; return c; }
 Vector operator - ( Vector c,_Vector e){c.x-=e.x,c.y-=e.y,c.z-=e.z; return c; }
-Vector& Vector::rotZ( _Real a )
-            { Real c=cos(a),s=sin(a),w=x*c-y*s; y=y*c+x*s; x=w; return *this; }
 
-Matrix& Matrix::operator+=(_Matrix m ){ x+=m.x,y+=m.y,z+=m.z; Scale=1; return *this; }
-Matrix& Matrix::operator-=(_Matrix m ){ x-=m.x,y-=m.y,z-=m.z; Scale=1; return *this; }
+Matrix& Matrix::operator+=(_Matrix m ){ x+=m.x,y+=m.y,z+=m.z; return *this; }
+Matrix& Matrix::operator-=(_Matrix m ){ x-=m.x,y-=m.y,z-=m.z; return *this; }
 Matrix operator-( Matrix A,_Matrix B ){ return A-=B; }
 Matrix operator+( Matrix A,_Matrix B ){ return A+=B; }
 
@@ -51,9 +49,9 @@ static Matrix roll(_Real a,_Vector v ) // поворот относительн�
 { const Real c=cos( a ),s=sin( a ),c1=1-c; return (Matrix){
      { v.x*v.x*c1+c,     v.x*v.y*c1-v.z*s, v.x*v.z*c1+v.y*s },
      { v.y*v.x*c1+v.z*s, v.y*v.y*c1+c,     v.y*v.z*c1-v.x*s },
-     { v.z*v.x*c1-v.y*s, v.z*v.y*c1+v.x*s, v.z*v.z*c1+c },1.0 }; }
+     { v.z*v.x*c1-v.y*s, v.z*v.y*c1+v.x*s, v.z*v.z*c1+c } }; }
 Matrix rolZ( _Real a ){ const Real c=cos( a ),s=sin( a );
-             return (Matrix){ { c,-s,0 },{ s,c,0 },{ 0,0,1 },1.0 }; }
+             return (Matrix){ { c,-s,0 },{ s,c,0 },{ 0,0,1 } }; }
 Matrix& Matrix::Rotate( _Real a, _Vector v )     // поворот по произвольной оси
                                { return Matrix::operator *= ( roll( a,v ) ); }
 Matrix& Matrix::rotZ( _Real a ){ return Matrix::operator *= ( rolZ( a ) ); }
@@ -63,10 +61,10 @@ Matrix Krylov(_Real a,_Real b,_Real c ) // крен, дифферент, рыс�
     { sin( a )*sin( b )*cos( c )-cos( a )*sin( c ),
       sin( a )*sin( b )*sin( c )+cos( a )*cos( c ),sin( a )*cos( b ) },
     { cos( a )*sin( b )*cos( c )+sin( a )*sin( c ),
-      cos( a )*sin( b )*sin( c )-sin( a )*cos( c ),cos( a )*cos( b ) },1.0 };
+      cos( a )*sin( b )*sin( c )-sin( a )*cos( c ),cos( a )*cos( b ) } };
 }
-Vector Matrix::AtL( _Vector A ) const { return (Vector){ A%x,A%y,A%z }/Scale; }
-Vector Matrix::LtA( _Vector A ) const { return Scale*(Vector)
+Vector Matrix::AtL( _Vector A ) const { return (Vector){ A%x,A%y,A%z }; }
+Vector Matrix::LtA( _Vector A ) const { return (Vector)
                   { x.x*A.x+y.x*A.y+z.x*A.z,     // умножение вектора справа
                     x.y*A.x+y.y*A.y+z.y*A.z,     // на собственный тензор слева
                     x.z*A.x+y.z*A.y+z.z*A.z }; } // - возврат из ЛСК в АСК
@@ -77,7 +75,7 @@ Vector Matrix::LtA( _Vector A ) const { return Scale*(Vector)
 static Matrix SH( _Vector A )
      { return (Matrix){ {  A.y*A.y+A.z*A.z,-A.x*A.y,-A.x*A.z },
                         { -A.y*A.x, A.x*A.x+A.z*A.z,-A.y*A.z },
-                        { -A.z*A.x,-A.z*A.y, A.x*A.x+A.y*A.y },1.0 }; }
+                        { -A.z*A.x,-A.z*A.y, A.x*A.x+A.y*A.y } }; }
 Matrix Steiner( _Matrix M,_Vector C ){ return M-SH( C ); }   // просто к центру
 Matrix Steiner( _Matrix M,_Vector C,_Vector R )  // Сначала к базисному центру,
               { return M - SH( C ) + SH( R ); } // затем к новой точке вращения

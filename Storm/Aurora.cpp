@@ -33,7 +33,7 @@ const char
                 " эксперимент с учётом скоростей течений и дисперсией волн" };
 #include "Aurora.h"
 Real Trun=0.0,  // Отсчет времени для завершённого процесса моделирования [сек]
-     Tlaps=0.0; //      Указание отсчета времени продолжения эксперимента [час]
+    Tlaps=0.0;  //      Указание отсчета времени продолжения эксперимента [час]
 unsigned KtE=0, // Счётчик исполненных шагов всего вычислительного эксперимента
     Educt=0xFF; // = управление выводами результатов мореходного эксперимента
                 // 1 - ходкость и отклонение от заданной скорости хода
@@ -147,7 +147,7 @@ Field( _Real L,_Real W, //_Real T, // длина, ширина бассейна,
   Exp.draw=0; //  0 - 3 метода закраски и сеточной прорисовки морского волнения
   Exp.view=0; //  0 - световая раскраска или 1 - фон с разделением границ волн
   Wind.Wind=_s2/2.0;    // ветровая асимметрия гребней волн под действием ветра
-//Exp.ship=1; // 1 - гидростатика  +  2 - учет скорости и давления по Бернулли
+//Exp.ship=1; // 1 - гидростатика + 2 - учет скорости и давления по Бернулли
 //Trun=(Tlaps=Instant.T)*3600; // отсчет реального времени для моделирования[s]
 //Instant.T=0.0; //- отсчет времени от начала суток - или всегда условно разный
   KtE=0; Trun=Tlaps=0.0;     // отсчет реального времени моделирования[сек,час]
@@ -198,7 +198,7 @@ Field( _Real L,_Real W, //_Real T, // длина, ширина бассейна,
   View_initial( hypot( Long,Wide )/2.0 ); // пара люстр света на полудиагоналях
   Wind.Initial( Lw,Hw,Dw );  // ветровые волны с обрушающимися гребнями [м,%,°]
   Swell.Initial( Ls,Hs,Ds ); // свежая морская зыбь недавно прошумевших штормов
-  Surge.Initial( Lr,Hr,Dr ); // реликтовые пологие волны от удаленных ураганов
+  Surge.Initial( Lr,Hr,Dr ); //  реликтовые пологие волны от удаленных ураганов
   //
   //    по самой мелкой сетке настраивается общая акватория со Split дроблением
   //
@@ -233,8 +233,8 @@ Field( _Real L,_Real W, //_Real T, // длина, ширина бассейна,
             " акватория: { %.0f×%.0f м }[%d·%d]~δS=%.2f м, { δt=%.1g\"/%.1f }",
                                            Long,Wide,mX,mY,dS,TimeStep,tKrat );
   }
-//glMaterialfv( GL_FRONT_AND_BACK,GL_SPECULAR,(const float[]){1,1,1,0});
-//glLightModelfv( GL_LIGHT_MODEL_AMBIENT,(const float[]){.8,.8,.8,1} );  //!??
+  //glMaterialfv( GL_FRONT_AND_BACK,GL_SPECULAR,(const float[]){1,1,1,0});
+  //glLightModelfv( GL_LIGHT_MODEL_AMBIENT,(const float[]){.8,.8,.8,1} ); //!??
   eyeX=150,eyeY=-16.4,eyeZ=0; lookX=lookY=lookZ=0;        // под обзор
   Distance=-15*sqrt(Long); //*Wide расстояние от точки взгляда до центре обзора
   mx=my=0;              // указатель мыши ставится в исходное/нулевое положение
@@ -453,9 +453,9 @@ static bool Hull_and_Waves_Draw()        // вся графика исполня
   if( Active_Key )    // предварительное завершение всех ранее начатых процедур
   if( !recurse++ )    // пропуск рекурсии незавершенных графических изображений
   { Vessel->Draw();   // сначала пароход идёт сам по себе в собственном окошке,
-    Storm->Draw();    // затем картинка штормового волнения вместе с пароходом
-    Vessel->wPrint(); // ... и геометрические таблички -> на текстовую консоль
-    recurse=0;        // при возникновении рекурсии новые рисунки пропускаются
+    Storm->Draw();    //  затем картинка штормового волнения вместе с пароходом
+    Vessel->wPrint(); //  ... и геометрические таблички -> на текстовую консоль
+    recurse=0;        //  при возникновении рекурсии новые рисунки пропускаются
   //Active_Key &= Storm->Ready() && Vessel->Ready();           // ++WinReady()
   } return false;     // return WinReady();
 //  return Vessel->Ready() && Storm->Ready();         // - вариант для WaitTime
@@ -560,17 +560,17 @@ int main()                                 // ( int ans, char **av, char **ac )
       } while( Active_Key &= Ship.Ready() && Sea.Ready() );
     }
 //}
-//}
-//#pragma omp single
-//#pragma omp task
-//Break( "~Active_Key={%s}\n~Storm{%s}\n~Vessel{%s}",
-//         Active_Key?" true ":" false ",
-//           Storm->Ready()?" run ":" stop ",
-//           Vessel->Ready()?" run ":" stop " );
-//if( Storm->Ready() )Vessel->Close();
-//if( Vessel->Ready() )Storm->Close();
-//#pragma omp taskwait
-/*
+/*}
+#pragma omp single
+#pragma omp task
+  Break( "~Active_Key={%s}\n~Storm{%s}\n~Vessel{%s}",
+           Active_Key?" true ":" false ",
+             Storm->Ready()?" run ":" stop ",
+             Vessel->Ready()?" run ":" stop " );
+  if( Storm->Ready() )Vessel->Close();
+  if( Vessel->Ready() )Storm->Close();
+  #pragma omp taskwait
+==
   textcolor( MAGENTA,LIGHTCYAN );      // подсветка для начала записи протокола
   print( 1,38,"\n << успешное завершение >>  "
               " корабль[%X] · море[%X]  ",Ship.Ready(),Sea.Ready() );
