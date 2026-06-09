@@ -81,18 +81,12 @@ Matrix Krylov( _Real,_Real=0,_Real=0 );          // крен дифферент 
 Matrix Steiner( _Matrix M,_Vector C ),           // К центру (-)C
        Steiner( _Matrix M,_Vector C,_Vector R ); // К центру(-)C, затем к(+)R
 Matrix rolZ( _Real );
-//
-// автоматическая разметка координатных осей с чуть затемненными надписями xyz
-//
-const Real* arrow( const Real* a,const Real* b,_Real ab=0.06,const colors=empty );
-void axis( Place&,_Real,_Real,_Real,
-           const char *x,const char *y,const char *z, const colors=cyan );
 
 inline const Real sqr( _Real a ){ return a*a; }
 Real abs( _Vector a ),norm( _Vector a );
 Vector dir( _Vector a );
-Real& angle( Real &A );                  // -180°÷180°
-Real  angle( _Real A,_Real B );          // { A-B: -п÷п }
+Real&  angle( Real &A );                 // -180°÷180°
+Real   angle( _Real A,_Real B );         // { A-B: -п÷п }
 Vector angle( Vector A );
 Vector operator ~( _Vector );            // для другого борта
 bool intor( _Real F,_Real S,_Real G );   // с включением базовой точки G

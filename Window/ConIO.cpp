@@ -1,6 +1,9 @@
-#include <stdio.h>#include "ConIO.h"
+#include <stdio.h>
+#include "ConIO.h"
+//#include <wincon.h>
 // #define __ { if( GetActiveWindow()==NULL )exit( 25 ); }extern "C"
-{static COLORS __BACK = BLACK, __FORE = LIGHTGRAY;static HANDLE StdOut = NULL;static CONSOLE_SCREEN_BUFFER_INFO Screen;//
+{static COLORS __BACK = BLACK, __FORE = LIGHTGRAY;static HANDLE StdOut = NULL;//#define StdOut stdout
+static CONSOLE_SCREEN_BUFFER_INFO Screen;//
 //       COORD dwSize;            -- of the screen buffer//       COORD dwCursorPosition;//       WORD  wAttributes;//       SMALL_RECT srWindow      { SHORT Left,Top,Right,Bottom }//       COORD dwMaximumWindowSize{ SHORT X,Y } maximum size of console window//void gotoxy( short x,short y )         // при x или y<=0 их отсчеты сохраняются  { if( --x<0 )x=Screen.dwCursorPosition.X;
     if( --y<0 )y=Screen.dwCursorPosition.Y;
     SetConsoleCursorPosition( StdOut,(const COORD){ x,y } );
@@ -25,24 +28,25 @@ static bool CtrlHandler( DWORD fdwCtrlType )               // ExitProcess( 0 );
                        { if( StdOut )fclose( stdout ); StdOut=NULL; exit(44);
                          return true; } */
 static struct _ScreenSave_{ _ScreenSave_()
-  { // FreeConsole(),  // отсоединение
-    AllocConsole(); //   с пересозданием
-    *stderr=*stdout=*freopen( "CONOUT$","w",stdout ); // == "CON"
+  { //FreeConsole(),  // отсоединение
+    //AllocConsole(); //   с пересозданием
+    // *stderr=*stdout=*freopen( "CONOUT$","w",stdout ); // == "CON"
     // *stdin=*freopen( "CONIN$","r",stdin );
     // SetConsoleMode( GetStdHandle( STD_INPUT_HANDLE ),0 );
-    // fclose( stdin );
-    StdOut=GetStdHandle( STD_OUTPUT_HANDLE );    SetConsoleMode( StdOut,ENABLE_PROCESSED_OUTPUT );
+    StdOut=GetStdHandle( STD_OUTPUT_HANDLE );
+    // SetConsoleMode( StdOut,ENABLE_PROCESSED_OUTPUT );
     // StdOut=CreateConsoleScreenBuffer( GENERIC_WRITE,FILE_SHARE_WRITE,0,CONSOLE_TEXTMODE_BUFFER,0 );
     // SetConsoleCtrlHandler( (PHANDLER_ROUTINE)CtrlHandler,true );
-    GetConsoleScreenBufferInfo( StdOut,&Screen );    SetConsoleCP( CP_UTF8 );              //    1251
-    SetConsoleOutputCP( CP_UTF8 );        //    1251
-    // FlushConsoleInputBuffer( StdOut ); ~~ GENERIC_WRITE
+    GetConsoleScreenBufferInfo( StdOut,&Screen );    SetConsoleCP( CP_UTF8 );        // 1251
+    SetConsoleOutputCP( CP_UTF8 );  // 1251
     // EnableWindow( GetConsoleWindow(),false );
-    // clrscr();
-    // setlocale( LC_ALL,".1251" );       // LC_TYPE
+    // FlushConsoleInputBuffer( StdOut ); ~~ GENERIC_WRITE
+    // setlocale( LC_ALL,".1251" ); // LC_TYPE
     // setlocale( LC_ALL,".UTF8" );
+    // print( "X=%d, y=%d <== X=%d, y=%d \n",Screen.dwSize.X,Screen.dwSize.Y,
+    //             Screen.dwMaximumWindowSize.X,Screen.dwMaximumWindowSize.Y );
   }
-#if 1
+#if 0
  ~_ScreenSave_(){ //StdOut=NULL;
 //                SetConsoleWindowInfo( StdOut,true,&(Screen.srWindow) );//                SetConsoleScreenBufferSize( StdOut,Screen.dwSize );//                SetConsoleTextAttribute( StdOut,Screen.wAttributes );//                Screen.dwCursorPosition.Y=Screen.srWindow.Bottom-2;
 //                SetConsoleCursorPosition( StdOut,Screen.dwCursorPosition );

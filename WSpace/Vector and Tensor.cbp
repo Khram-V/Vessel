@@ -4,7 +4,7 @@
 	<Project>
 		<Option title="Vector &amp; Tensor" />
 		<Option pch_mode="2" />
-		<Option compiler="gnu_gcc_stable" />
+		<Option compiler="gcc" />
 		<Build>
 			<Target title="Dipole">
 				<Option platforms="Windows;" />
@@ -12,18 +12,19 @@
 				<Option working_dir="Dev/" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
-				<Option compiler="gnu_gcc_stable" />
+				<Option compiler="gcc" />
 				<Option use_console_runner="0" />
 				<Compiler>
+					<Add option="-Os" />
+					<Add option="-m32" />
 					<Add option="-fopenmp" />
-					<Add directory="../../../SoftWare/GLfw/include/GLFW" />
 				</Compiler>
 				<Linker>
-					<Add option="-fopenmp" />
+					<Add option="-s" />
+					<Add option="-static-libgcc" />
+					<Add option="-static" />
+					<Add option="-m32" />
 					<Add library="gomp" />
-					<Add library="pthread" />
-					<Add library="dl" />
-					<Add directory="../../../SoftWare/Dev/Lib/" />
 				</Linker>
 			</Target>
 			<Target title="Vector-Tensor">
@@ -34,6 +35,12 @@
 				<Option type="1" />
 				<Option compiler="gnu_gcc_stable" />
 				<Option use_console_runner="0" />
+				<Compiler>
+					<Add option="-Wno-volatile" />
+					<Add option="-Wno-narrowing" />
+					<Add option="-Wno-literal-suffix" />
+					<Add option="-Wno-write-strings" />
+				</Compiler>
 			</Target>
 			<Target title="Tensor Base Space">
 				<Option platforms="Windows;" />
@@ -41,7 +48,7 @@
 				<Option working_dir="Dev/" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
-				<Option compiler="gnu_gcc_stable" />
+				<Option compiler="gcc" />
 				<Option use_console_runner="0" />
 			</Target>
 			<Target title="Phyzical Corpuscules">
@@ -50,23 +57,20 @@
 				<Option working_dir="Dev/" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
-				<Option compiler="gnu_gcc_stable" />
+				<Option compiler="gcc" />
 				<Option use_console_runner="0" />
 				<Compiler>
 					<Add option="-fopenmp" />
 				</Compiler>
 				<Linker>
+					<Add option="-fopenmp" />
 					<Add library="gomp" />
-					<Add library="dl" />
-					<Add library="pthread" />
 				</Linker>
 			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Os" />
 			<Add option="-funsigned-char" />
-			<Add option="-Wno-narrowing" />
-			<Add option="-Wno-literal-suffix" />
 		</Compiler>
 		<Linker>
 			<Add option="-s" />
@@ -146,6 +150,7 @@
 		<Unit filename="../Volume/Vector and Tensor.cpp">
 			<Option target="Vector-Tensor" />
 		</Unit>
+		<Unit filename="../Window/Arrow.cpp" />
 		<Unit filename="../Window/ConIO.cpp" />
 		<Unit filename="../Window/ConIO.h" />
 		<Unit filename="../Window/Font.cpp" />
@@ -156,11 +161,7 @@
 			<Option link="0" />
 		</Unit>
 		<Unit filename="../Window/UniCode.cpp" />
-		<Unit filename="../Window/View.cpp">
-			<Option target="Tensor Base Space" />
-			<Option target="Phyzical Corpuscules" />
-			<Option target="Dipole" />
-		</Unit>
+		<Unit filename="../Window/View.cpp" />
 		<Unit filename="../Window/View.h" />
 		<Unit filename="../Window/WinMSoft.cpp">
 			<Option compile="0" />

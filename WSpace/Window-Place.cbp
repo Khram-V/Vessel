@@ -104,6 +104,7 @@
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
 				<Option compiler="gnu_gcc_stable32" />
+				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-fopenmp" />
 					<Add option="-DGLFW" />
@@ -111,9 +112,12 @@
 					<Add directory="../../../SoftWare/GLfw/include/GLFW" />
 				</Compiler>
 				<Linker>
-					<Add library="../../../SoftWare/Dev/Lib/libglfw3_static.a" />
+					<Add library="libglfw3_static.a" />
 					<Add library="comdlg32" />
 					<Add library="gomp" />
+					<Add library="dl" />
+					<Add library="pthread" />
+					<Add directory="../../../SoftWare/Dev/Lib" />
 				</Linker>
 			</Target>
 			<Target title="UTF-8-Unicode-OEM(866)alt">

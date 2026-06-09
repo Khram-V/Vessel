@@ -50,7 +50,7 @@
 				<Option working_dir="../Эскадра" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
-				<Option compiler="gnu_gcc_stable" />
+				<Option compiler="gnu_gcc_stable32" />
 				<Option parameters='&quot;БПК «Стерегущий»-61&quot;' />
 				<Option projectCompilerOptionsRelation="1" />
 				<Option projectLinkerOptionsRelation="0" />
@@ -220,6 +220,7 @@
 		</Unit>
 		<Unit filename="../Tools/StrCpy.cpp" />
 		<Unit filename="../Type.h" />
+		<Unit filename="../Window/Arrow.cpp" />
 		<Unit filename="../Window/ConIO.cpp" />
 		<Unit filename="../Window/ConIO.h">
 			<Option target="&lt;{~None~}&gt;" />

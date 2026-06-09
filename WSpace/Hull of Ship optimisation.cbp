@@ -142,6 +142,9 @@
 		</Unit>
 		<Unit filename="../Tools/StrCpy.cpp" />
 		<Unit filename="../Type.h" />
+		<Unit filename="../Window/Arrow.cpp">
+			<Option target="Ship" />
+		</Unit>
 		<Unit filename="../Window/ConIO.cpp">
 			<Option target="Ship" />
 		</Unit>

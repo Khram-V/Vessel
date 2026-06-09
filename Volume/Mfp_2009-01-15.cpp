@@ -14,7 +14,7 @@ extern                // признаки режимов движения
 bool Gravity_mode,    // =false свободное или гравитационное перемещение частиц
      linear_Model;    // =false линейно-упругая или ядерная модель корпускул
 extern                //
-Real ks,              // 0.4  коэффициент сопротивления для шара [0.2-0.4]
+Real Particle_viscosity, // 0.4  коэффициент сопротивления для шара [0.2-0.4]
      wall,            // 1.32 стенки аквариума (высокого, пока)
      init_Scale;      // 1.0  начальный масштаб для каждой частицы
                       //
@@ -77,7 +77,8 @@ Real Init_Flight_Points( Array& Fly )
       Ro(2).X=Ro(5).X=Ro(8).X=Ro(11).X=Ro(14).X=Ro(17).X=Ro(20).X=Ro(23).X=Ro(26).X=-0.71;
       /* Ro(27).X=Ro(27).Y=Ro(27).Z=12.0; */ return 0.71/2;
 #else
-      for( int i=0; i<27; i++ )Ro(i)=(Point){ (i%3)-1.0,i/9-1.0,(i%9)/3-1.0 }*0.71; return 0.71/2;
+      for( int i=0; i<27; i++ )Ro(i)=(Point){ (i%3)-1.0,i/9-1.0,(i%9)/3-1.0 }*0.71;
+         Ro(13)=(Point){ -1e-6,-1e-6,-1e-6 }; return 0.71/2; // разбалансировка
 #endif
     case 125:
       for( int i=0; i<125; i++ )Ro(i)=(Point){ (i%5)-2.0,i/25-2.0,(i%25)/5-2.0 }*0.528; return 0.528/2;
@@ -94,15 +95,13 @@ void One_Inter_Step_of_Point( Array& Fly, bool MFiz )
      //
 //#pragma omp parallel reduction( +: Vo(j) )
 #pragma omp parallel for
-  for(   int j=0; j<Fly.nc; j++ )
-  {
-    for( int k=0; k<Fly.nc; k++ )if( k!=j )
+  for( int j=0; j<Fly.nc; j++ )
+  { for( int k=0; k<Fly.nc; k++ )if( k!=j )
     { Vector r = Ro(k)-Ro(j); Real ss=norm( r ),s=sqrt( ss ); r*=Fly.dT/M_PI/s;
         if( MFiz )Vo(j) -= r*( 1.0/ss - 1.0 )/ss; else
         if( s>1.4655712319 )Vo(j) += r/ss;
                       else  Vo(j) -= r*( 1.0-s );
-    }
-  }
+  } }
 }
 //      Блок расчета кинематики частицы под действием внешних сил и трения
 //
@@ -141,7 +140,7 @@ void One_Flight_Step_of_Point( Array& Fly, int iPart ) // 1 шаг для iPart
       //
      Real v=abs( V );     // величина скорости для учета сопротивления воздуха
       if( v>0.0 )V -= V/v        // величина скорости здесь только уменьшается
-                   * ks                         // коэффициент сопротивления
+                   * Particle_viscosity         // коэффициент сопротивления
                    * ro                         // плотность воздуха
                    * ( v*v / 2.0 )              // и квадрат скорости
                    * M_PI * Rm*Rm               // площадь поперечного сечения

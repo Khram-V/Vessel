@@ -7,40 +7,89 @@
  **     2 - скорость движения и масса исходно ортонормированны на единицу
  **     3 - инерционное ускорение приводит к дефектам массы и формы частицы
  **
- **                                            (c)2021 ‏יְרוּשָׁלַיִם
+ **                                              (c)2021 ‏יְרוּשָׁלַיִם
  **/
 #include "Dipoles.h"                              // Win64: -Wno-narrowing
-#include "../Window/Window.h"                     //        -Wno-literal-suffix
+#include "../Window/ConIO.h"                      //        -Wno-literal-suffix
+#include "../Window/Window.h"
 
 Dipoles *Dipoles_array=0;  // множество или рой из групп диполей в пространстве
 unsigned nDip=0,           // количество корпускул в активном эксперименте
-         Time_count=0;     // отсчёты временных шагов от запуска эксперимента
+         Time_count=0,     // отсчёты временных шагов от запуска эксперимента
+         Video_count=0;    // счётчик кадров видео прорисовок
 
 void ReInstall_TimeSpace( int N )  // продолжительность во времени Dipole_route
 {                                  // в переустановке используется исходный рой
   for( int i=0; i<Dipole_route; i++ )Dipoles_array[i].Install( N ); nDip=N;
-                                     Dipoles_array->Initial();
+  Dipoles_array->Initial();
   //
   //  начальная установка с обнулением счётчика исполненных тактов эксперимента
   //
   glDisable( GL_LIGHTING );
-  Time_count=0;
-//clrscr();
+  glPolygonMode( GL_FRONT_AND_BACK,GL_FILL );
+  Time_count=Video_count=0;
+  clrscr();
 }
+// Предустановка и начальная инициализация вычислительного эксперимента в целом
 //
+Dipoles& Dipoles::Install( int N )     // количество условных нуклонов в группе
+{                                              // динамическое добавление точек
+  if( nDip<N )D=(Dipole*)Allocate( N*sizeof( Dipole ),D );  // по необходимости
+  for( int k=0; k<N; k++ )    // без повторений но с предварительной расчисткой
+  { D[k].M=(Vector){ 1,0,0 }, // дипольные моменты
+    D[k].V=(Vector){ 0,0,0 }, // изначальная скорость набегающего потока
+    D[k].W=(Vector){ 0,0,0 }, // скорость частицы в инерциальной(глобальной) СК
+    D[k].R=(Vector){ 0,0,0 }; // координаты корпускулы в абсолютных отсчётах
+    if( ex.Flow )D[k].V.x=-1; // внешний набегающий поток
+  } return *this;
+}
+Dipoles& Dipoles::Initial()
+{ int k=nDip;
+  switch( nDip )              // в предустановке только начальный рой корпускул
+  { case 1: break;                                               //  H водород
+    case 2: D[1].R.y=-(D[0].R.y=0.5); break;                     // ²H дейтерий
+    case 3: D[0].R=(Vector){0,0.5,.28866},                       // ³H тритий
+            D[1].R=(Vector){0,-.5,.28866},D[2].R=(Vector){0,0,-0.57733}; break;
+    case 4: D[0].R=(Vector){0.5,0,.35355},D[2].R=(Vector){0,0.5,-.35355}, // Не гелий 2+2 ~~ Be бериллий 4+5
+            D[1].R=(Vector){-.5,0,.35355},D[3].R=(Vector){0,-.5,-.35355}; break;
+    case 5: D[0].R=(Vector){0,0.5,.28866},D[2].R=(Vector){0,0,-.57733}, // B бор 5+6
+            D[1].R=(Vector){0,-.5,.28866},D[4].R.x=-( D[3].R.x=.7071 ); break;
+    case 6: D[0].R.x=-(D[1].R.x=.7071),D[2].R.y=-(D[3].R.y=.7071), // C углерод 6+6
+            D[4].R.z=-(D[5].R.z=.7071); break;    // √2 по касательной
+    case 7: D[6].R.x=-(D[0].R.x=.55)-.12; k--;    // Li Литий 3+4 ~~ N Азот 7+7
+          while(--k>0)D[k].R=(Vector){0,sin(k*_Pd/5),cos(k*_Pd/5)}*.759; break;
+    case 8: while(k--)D[k].R=(Vector){(k%2)-.5,k/4-.5,(k%4)/2-.5}*0.866; break; // ~~ О кислород 8+8
+    case 9: k--; while(k--)D[k].R=(Vector){(k%2)-.5,k/4-.5,(k%4)/2-.5};  break; // Ве Берилий 4+5 ~~ F фтор 9+10
+    case 10: D[8].R.x=-(D[9].R.x=1.32); k-=2;               // ~~ Ne неон 10+10
+             while(k--)D[k].R=(Vector){(k%2)-.5,k/4-.5,(k%4)/2-.5}*1.24; break;
+    case 27: while(k--)D[k].R=(Vector){(k%3)-1,k/9-1,(k%9)/3-1}*0.7071;  break; // Al алюминий 13+14 ~~ Co кобальт 27+32
+    case 64: while(k--)D[k].R=(Vector){(k%4)-1.5,k/16-1.5,(k%16)/4-1.5}; break; //*0.71
+    case 125:while(k--)D[k].R=(Vector){(k%5)-2,  k/25-2,  (k%25)/5-2  }; break; //*0.528;
+    case 216:while(k--)D[k].R=(Vector){(k%6)-2.5,k/36-2.5,(k%36)/6-2.5}; break;
+    case 343:while(k--)D[k].R=(Vector){(k%7)-3,  k/49-3,  (k%49)/7-3  }; break;
+    case 512:while(k--)D[k].R=(Vector){(k%8)-3.5,k/64-3.5,(k%64)/8-3.5}; break;
+    case 729:while(k--)D[k].R=(Vector){(k%9)-4,  k/81-4,  (k%81)/9-4  }; break; //*0.35;
+   default: Break( "Неверное количество[%d]"
+                   " ≠ 1,2,3,4,5,6,7,8,9,10,27,64,125,216,343,512,729",nDip );
+  } return Average( 0.0 );
+}
 //  Главная программа
 //
-int main( int argc, char** argv )
-{                                 // однократное распределение всех маршрутов
-  Dipoles_array =                 // для хранения динамики движения во времени
-      (Dipoles*)Allocate( Dipole_route*sizeof( Dipoles ) );
-  ReInstall_TimeSpace( 7 );            // поначалу будет только одна корпускула
-                                       //  что не сильно перегрузит вычислители
-  while( VideoStage() )                // проверка, жива ли еще сама программа
-  {                                    // запускается интервальный таймер и
+int main( int argc, char** argv )   // однократное распределение всех маршрутов
+{ Dipoles_array =                  // для хранения динамики движения во времени
+    (Dipoles*)Allocate( Dipole_route*sizeof( Dipoles ) );
+  ReInstall_TimeSpace( 6 );            // поначалу будет только одна корпускула
+  texttitle( "Пространственные частицы и поляризованные корпускулы" );                                     //  что не сильно перегрузит вычислители
+  while( VideoStage() )
+  { DWORD T=GetTime();        // отсчет начала приоритетных расчётов
+    One_Time_Step();          // проверка, жива ли еще сама программа
+    RealTime+=GetTime()-T;    // использованный интервал времени #0
+  }
+/*{                                    // запускается интервальный таймер и
     WaitTime( Quantum_wait,            // время задержки для внешних операций
               One_Time_Step,           // собственно процедура расчётного цикла
               nDip<2?0:Quantum_exp );  // счёт по exp и приостановка на wait мс
-  }                   // одна частичка не сильно грузит вычислительные процессы
+  }*/                   // одна частичка не сильно грузит вычислительные процессы
+  Break( "~ на выход ~" );
   return 18;
 }

@@ -1,5 +1,6 @@
                      //
-#include "View.h"    // Очередная отработка элементарных графических примитивов                     //                                  ©2018-08-22 ‏יְרוּשָׁלַיִםconst char*_Mnt[]={"январь","февраль","март","апрель","май","июнь","июль","август","сентябрь","октябрь","ноябрь","декабрь"},*_Day[]={"понедельник","вторник","среда","четверг","пятница","суббота","воскресенье"};static union{ unsigned u; byte c[4]; } // чистый цвет '33=51,'66=102,'99=153,'CC=204
+#include "View.h"    // Очередная отработка элементарных графических примитивов//#include "..\Math\Vector.h"                              // ©2018-08-22 ‏יְרוּשָׁלַיִם
+const char*_Mnt[]={"январь","февраль","март","апрель","май","июнь","июль","август","сентябрь","октябрь","ноябрь","декабрь"},*_Day[]={"понедельник","вторник","среда","четверг","пятница","суббота","воскресенье"};static union{ unsigned u; byte c[4]; } // чистый цвет '33=51,'66=102,'99=153,'CC=204
 SeaColor[black+257] =    /* переопределение расцветки подобно как в палитре-256
  {255,255,255},{192,192,192},{160,160,160},{128,128,128},{96,96,96},{64,64,64},
  {204,221,238},{255,255,0},{0,128,0},{0,255,0},{160,255,64},{64,255,96},
@@ -24,7 +25,8 @@ void color( const colors clr,_Real b,_Real a ) // bright:-1 на черный; +
 }
 const Real* line( const Real* a, const Real* b )
 { glBegin( GL_LINES ),glVertex3dv( a ),glVertex3dv( b ),glEnd(); return b; }
-const Real* line( const Real* a, const Real* b, const colors clr ){ if( clr!=empty )color( clr ); line( a,b ); return b; }void liney( const Real* a,const Real* b, const colors clr )     // две линии{ if( clr!=empty )color( clr );                                 // по ординатам  glBegin( GL_LINES ); glVertex3dv( a ); glVertex3dv( b );         glVertex3d( a[0],-a[1],a[2] ); glVertex3d( b[0],-b[1],b[2] ); glEnd();}                                                         // 32 секторных румбаconst Real * circle( const Real *a, _Real r, bool fill )  //    в плоскости X-Y
+const Real* line( const Real* a, const Real* b, const colors clr ){ if( clr!=empty )color( clr ); line( a,b ); return b; }void liney( const Real* a,const Real* b, const colors clr )     // две линии{ if( clr!=empty )color( clr );                                 // по ординатам  glBegin( GL_LINES ); glVertex3dv( a ); glVertex3dv( b );         glVertex3d( a[0],-a[1],a[2] ); glVertex3d( b[0],-b[1],b[2] ); glEnd();}
+const Real * circle( const Real *a, _Real r, bool fill )  //    в плоскости X-Y
 { glBegin( fill?GL_POLYGON:GL_LINE_LOOP ); for( Real q=0; q<_Pd; q+=_Ph/8 )
   glVertex3d( a[0]+r*sin( q ),a[1]+r*cos( q ),a[2] ); glEnd(); return a;
 }
@@ -33,6 +35,29 @@ void rectangle( const Real *LD,const Real *RU,bool fill )  // прямоугол
   glVertex3dv( LD ),glVertex3d( RU[0],LD[1],LD[2] ),
   glVertex3dv( RU ),glVertex3d( LD[0],RU[1],RU[2] ),glEnd();
 }
+/*
+const Real* arrow( const Real *_a,const Real *_b, _Real l, const colors clr )
+{ Vector &a=*(Vector*)_a,
+         &b=*(Vector*)_b,d=l*(b-a),e={d.z/8,d.x/8,d.y/8},f={e.z,e.x,e.y};
+  line( a,d=b-d,clr );
+  glBegin( GL_LINE_STRIP ),dot( d+e ),dot( b ),dot( d-e ),glEnd();
+  glBegin( GL_LINE_STRIP ),dot( d+f ),dot( b ),dot( d-f ),glEnd();
+//glBegin( GL_TRIANGLE_FAN ),dot( b ),dot( d+e ),dot( d+f ),
+//                                    dot( d-e ),dot( d-f ),dot( d+e ),glEnd();
+  return b;
+}
+void axis( Place &P,_Real L,_Real Y,_Real Z,
+  const char *x,const char *y,const char *z, const colors clr )
+{  glPushAttrib( GL_LINE_BIT ); glLineWidth( 0.1 );
+   arrow( (Vector){ 0,0,-Z },(Vector){ 0,0,Z },0.025,clr ),
+   arrow( (Vector){ 0,-Y,0 },(Vector){ 0,Y,0 },0.025 ),
+   arrow( (Vector){ -L,0,0 },(Vector){ L,0,0 },0.025 );
+   color( clr,-0.5 ); glLineWidth( 0.2 );
+  P.Text( _North,0,0,Z,z )
+   .Text( _North,0,Y*1.01,0,y )
+   .Text( _North_East,L*1.01,0,0,x ); glPopAttrib();
+}
+*/
 View::View( const char* Tt, int X,int Y, int W,int H, _Real Size )
     : Window( Tt,X,Y,W,H ),eyeX(-130),eyeY( -10 ),eyeZ( 0 ),
                            lookX( 0 ),lookY( 0 ),lookZ( 0 ),

@@ -84,8 +84,8 @@ Real Place::AlfaWidth(){ LFont; return L.Tw; } // ширина одной бук
 SIZE Place::AlfaRect( const char *S )         // на выход подаются строки UTF-8
 { LFont; SIZE F;
   if( !(L.Bit) )Design.Rect( F,S ); else      // размер со шрифтом без масштаба
-  { int w,l; char* V=(char*)S; unsigned u; F.cy=L.Th,F.cx=w=0;
-    for( l=0;; l++ )
+  { int w; char* V=(char*)S; unsigned u; F.cy=L.Th,F.cx=w=0;
+    while( true )
     { V=UtC( u,V ); if( !u )break;
       if( u=='\n' ){ F.cx=max( w,(int)F.cx ); w=0; F.cy+=L.Th; } else w+=L.Tw;
     } F.cx=max( w,(int)F.cx );

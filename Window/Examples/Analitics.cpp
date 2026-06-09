@@ -124,7 +124,7 @@ static void grid()
   glLineWidth( 1 );
 }
 static bool drawing()
-{ char *S; Vector(*F)(Vector)=NULL; grid();
+{ char *S=NULL; Vector(*F)(Vector)=NULL; grid();
   switch( KeyFunction )
   { case '0': F=DiPole;    S="Диполь Z + 1/Z";               break;
     case '1': F=Angles;    S="Угловой слом Z^1.5 ";          break;
