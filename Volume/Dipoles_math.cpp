@@ -18,7 +18,7 @@ bool One_Time_Step()
 {
  Dipoles &Prev=Dipoles_array[Time_count%Dipole_route],
          &Next=Dipoles_array[(Time_count+1)%Dipole_route];
- unsigned &Q=nDip;
+ const unsigned &Q=nDip;
   for( int i=0; i<Q; i++ )           // здесь копируется весь предыдущий массив
                 Next[i]=Prev[i];     // ... возможно за зря
 //
@@ -32,7 +32,7 @@ bool One_Time_Step()
 //      и опять же при условии, что взаимное действие мгновенно-быстрое).
 //
   if( Q<2 )Next[0].V=-1.0; else
-  {
+  {                                  //! пространственное распределение потоков
 #pragma omp parallel for
     for( int i=0; i<Q; i++ )           // расслоение к параллельным вычислениям
     { Dipole &B=Next[i]; B.V=0.0;      // вычисляются все наведённые скорости в
@@ -40,7 +40,7 @@ bool One_Time_Step()
       { const Dipole &D=Prev[k];       // вызванные скорости связаны с объемом
         B.V += dipole_v( D.M,B.R-D.R );// частицы - кубика, *EqSphere - изнутри
       } const Real U=norm( B.V );      // ≈≈≈≈≈≈≈≈≈ терять длину здесь не стоит
-      if( U<eps ){ if( !U )B.V=eps; else B.V*=eps/sqrt( U ); }
+      if( U<eps ){ if( !U )B.V=eps; else B.V*=eps/sqrt( U ); } // ноль по оси х
     }
   }
 //  1.1) - корректировка вызванных скоростей для придания совместного
@@ -54,20 +54,20 @@ bool One_Time_Step()
 //      чтобы расталкивание шариков не проявлялось взрывным разлётом
 //
   if( ex.Edge )                      // goto A3; пусть пока закрыто - совсем...
-  {
-#pragma omp parallel for // reduction(+: V)
-    for( int i=0; i<Q; i++ )
+  {                                  // reduction(+: V)
+#pragma omp parallel for
+    for( int i=0; i<Q; i++ )       //! суммарное притяжение от всего роя частиц
     { Vector V=Zero;
       const Dipole &B=Prev[i]; // здесь есть наведенные скорости от всех частиц
       for( int k=0; k<Q; k++ )if( i!=k )
-      { const Dipole &D=Prev[k];
-        Vector r=( B.R-D.R )*EqSphere;      // радиус-вектор между корпускулами
-        Real ss=norm( r ),s=sqrt( ss );     // радиус соприкосновения частиц
-        r *= 1/s;                           // нормированный вектор поверхности
-        if( ex.Edge&1 )V += r*(1/ss-1)/ss;  //! функция притяжения/отталкивания
-        if( ex.Edge&2 )                     //! вариант соприкосновения шариков
-        { if( s>1.4655712319 )V -= r/ss;    // при квадратичном притяжении
-                        else  V += r*(1-s); // и линейно-упругое столкновение
+      { const Dipole &D=Prev[k];           // неизменный во времени старый слой
+        Vector r=( D.R-B.R )*EqSphere;     // радиус-вектор между корпускулами
+        Real ss=norm( r ),s=sqrt( ss );    // радиус соприкосновения частиц
+                      r /= s;              // нормированный вектор поверхности
+        if( ex.Edge&1 )V -= r*(1/ss-1)/ss; //! функция притяжения/отталкивания
+        if( ex.Edge&2 )                    //! вариант соприкосновения шариков
+        { if( s>1.4655712319 )V += r/ss;    // при квадратичном притяжении
+                        else  V -= r*(1-s); // и линейно-упругое столкновение
       } }
       if( ex.Edge==3 )V/=2.0;               // сумма средне-гладкошариковых сил
       Next[i].V += V*TimeStep/(_Pd*60);     // Приращение скорости под
@@ -86,15 +86,18 @@ bool One_Time_Step()
     for( int i=0; i<Q; i++ )
     { Dipole &D=Next[i],            // дипольный момент на новый отсчет времени
              &B=Prev[i];            //    опорная поляризованная диполь-частица
-      Vector VM; VM=D.M+(D.V+B.V)/2;// средний ветер на старый парус или
+#if 0
+      Vector VM=D.M+(D.V+B.V)/2;    // средний ветер на старый парус или
 //     D.W += VM * TimeStep;        // ускорение от рассогласования силы и тяги
        D.R += VM * TimeStep;        // траектория движения центра тяжести
        D.M = -dir( D.V+B.V );       // подворот диполя встреч новому потоку
-//    Vector A=-(D.V-B.V)/TimeStep; // приращение внешней скорости - ускорение
-//     D.M = -dir( D.V );           // подворот диполя встреч потоку *EqSphere
-//     A += (D.M+D.V)/TimeStep;     // ускорение от рассогласования силы и тяги
-//     D.W = A*TimeStep;            // ускорение с учетом присоединённой массы
-//     D.R += D.W * TimeStep;
+#else
+      Vector A=-(D.V-B.V)/TimeStep; // приращение внешней скорости - ускорение
+       D.M = -dir( D.V );           // подворот диполя встреч потоку *EqSphere
+       A += (D.M+D.V)/TimeStep;     // ускорение от рассогласования силы и тяги
+       D.W = A*TimeStep;            // ускорение с учетом присоединённой массы
+       D.R += D.W * TimeStep;
+#endif
     }
   } else
   {
@@ -105,8 +108,10 @@ bool One_Time_Step()
 #pragma omp parallel for
     for( int i=0; i<Q; i++ )
     { Dipole &D=Next[i];
-      D.M = dir( -D.V );             // подворот диполя встреч потоку *EqSphere
+//      D.M += (D.V-D.M)*TimeStep;     // x EqSphere - масса на ускорение
+      D.M = dir( -D.V );           // подворот диполя встреч потоку
       D.R += (D.M+D.V)*TimeStep;
+//      D.R += D.V*TimeStep;
   } }
   // + (Vector){ sin(k*.02),sin(k*.02),sin(k*.01) }         идём-едем, загуляли
   //           * sin(k*.04)*.005;                         гармонические шатания

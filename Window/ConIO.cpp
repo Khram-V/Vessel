@@ -28,9 +28,9 @@ static bool CtrlHandler( DWORD fdwCtrlType )               // ExitProcess( 0 );
                        { if( StdOut )fclose( stdout ); StdOut=NULL; exit(44);
                          return true; } */
 static struct _ScreenSave_{ _ScreenSave_()
-  { //FreeConsole(),  // отсоединение
-    //AllocConsole(); //   с пересозданием
-    // *stderr=*stdout=*freopen( "CONOUT$","w",stdout ); // == "CON"
+  { FreeConsole(),  // отсоединение
+    AllocConsole(); //  с пересозданием
+    *stderr=*stdout=*freopen( "CONOUT$","w",stdout ); // == "CON"
     // *stdin=*freopen( "CONIN$","r",stdin );
     // SetConsoleMode( GetStdHandle( STD_INPUT_HANDLE ),0 );
     StdOut=GetStdHandle( STD_OUTPUT_HANDLE );
@@ -46,15 +46,13 @@ static struct _ScreenSave_{ _ScreenSave_()
     // print( "X=%d, y=%d <== X=%d, y=%d \n",Screen.dwSize.X,Screen.dwSize.Y,
     //             Screen.dwMaximumWindowSize.X,Screen.dwMaximumWindowSize.Y );
   }
-#if 0
- ~_ScreenSave_(){ //StdOut=NULL;
-//                SetConsoleWindowInfo( StdOut,true,&(Screen.srWindow) );//                SetConsoleScreenBufferSize( StdOut,Screen.dwSize );//                SetConsoleTextAttribute( StdOut,Screen.wAttributes );//                Screen.dwCursorPosition.Y=Screen.srWindow.Bottom-2;
-//                SetConsoleCursorPosition( StdOut,Screen.dwCursorPosition );
-                  FreeConsole(); // printf( "\n Conio_Destructor \n" );
-                  // _exit( 25 );
+#if 1
+ ~_ScreenSave_(){/*SetConsoleWindowInfo( StdOut,true,&(Screen.srWindow) );                  SetConsoleScreenBufferSize( StdOut,Screen.dwSize );                  SetConsoleTextAttribute( StdOut,Screen.wAttributes );                  Screen.dwCursorPosition.Y=Screen.srWindow.Bottom-2;
+                  SetConsoleCursorPosition( StdOut,Screen.dwCursorPosition );*/
+                  FreeConsole(); // printf("\n ConIO_Destructor\n"); _exit(25);
                 }
 #endif} // __attribute__( (init_priority(100)) )
   // __attribute__( (constructor) )
   // __attribute__( (destructor) )
- _Save_;  /* статическая инициализация с сохранением исходного состояния экрана
-idx xRRGGBB:  0 x000000 BLACK  1 x0000AA BLUE          1 BLUE  2 x00AA00 GREEN         2 GREEN  3 x00AAAA CYAN          3 GREEN + BLUE  4 xAA0000 RED           4 RED  5 xAA00AA MAGENTA       5 RED + BLUE  6 xAA5500 BROWN         6 RED + GREEN // EGA/VGA (brown)  6 xAAAA00                             // Windows (dark yellow)  7 xAAAAAA LIGHTGRAY     7 RED + GREEN + BLUE  8 x555555 DARKGRAY      8 INTENSITY  9 x5555FF LIGHTBLUE     9 INTENSITY + BLUE 10 x55FF55 LIGHTGREEN   10 INTENSITY + GREEN 11 x55FFFF LIGHTCYAN    11 INTENSITY + GREEN + BLUE 12 xFF5555 LIGHTRED     12 INTENSITY + RED 13 xFF55FF LIGHTMAGENTA 13 INTENSITY + RED + BLUE 14 xFFFF55 YELLOW       14 INTENSITY + RED + GREEN 15 xFFFFFF WHITE        15 INTENSITY + RED + GREEN + BLUE*/
+ _newConsole_;   /* статическая инициализация с сохранением исходного состояния
+idx RRGGBB:  0 000000 BLACK  1 0000AA BLUE          1 BLUE  2 00AA00 GREEN         2 GREEN  3 00AAAA CYAN          3 GREEN + BLUE  4 AA0000 RED           4 RED  5 AA00AA MAGENTA       5 RED + BLUE  6 AA5500 BROWN         6 RED + GREEN // EGA/VGA (brown)  6 AAAA00                             // Windows (dark yellow)  7 AAAAAA LIGHTGRAY     7 RED + GREEN + BLUE  8 555555 DARKGRAY      8 INTENSITY  9 5555FF LIGHTBLUE     9 INTENSITY + BLUE 10 55FF55 LIGHTGREEN   10 INTENSITY + GREEN 11 55FFFF LIGHTCYAN    11 INTENSITY + GREEN + BLUE 12 FF5555 LIGHTRED     12 INTENSITY + RED 13 FF55FF LIGHTMAGENTA 13 INTENSITY + RED + BLUE 14 FFFF55 YELLOW       14 INTENSITY + RED + GREEN 15 FFFFFF WHITE        15 INTENSITY + RED + GREEN + BLUE*/

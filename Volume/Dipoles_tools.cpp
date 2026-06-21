@@ -9,7 +9,8 @@
 //
 //! прорисовка диполя в радужно-доплеровских расцветках (синий нос,красный зад)
 //
-Model& Model::dipole( _Real s, bool paint ){  // s: внутри {-1 <s< +∞ } снаружи
+Model& Model::dipole( _Real s, bool paint, _Real Alfa )
+{                                             // s: внутри {-1 <s< +∞ } снаружи
  const colors C[]={purple,blue,lightblue,cyan,lightcyan,lightgreen, // радужная
                    olive,yellow,orange,lightred,red,silver };       // покраска
  const int ns=15,rs=12,cp=sizeof( C )/sizeof( colors ); // числа многоугольника
@@ -27,7 +28,7 @@ Model& Model::dipole( _Real s, bool paint ){  // s: внутри {-1 <s< +∞ } 
       for( int k=0; k<=1;  k++ ){ W=Meridian[abs(i+k)];            // закраска
         if( i+k<0 )W.x=-W.x;                       // дополнение абсциссы
         if( i==1-ns && !k || i==ns-2 && k )W.y/=6; // замыкание оконцовок/торца
-        color( C[(i+k+ns)*cp/ns/2],0.125,0.5 );    // осветление и прозрачность
+        color( C[(i+k+ns)*cp/ns/2],0.125,Alfa );   // осветление и прозрачность
         dot( out( (Vector){ W.x,W.y*cos(t),W.y*sin(t) } ) ); // = glVertex3dv
     } } glEnd();
   } if( !paint )glPopAttrib(); return *this;

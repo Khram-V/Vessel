@@ -13,9 +13,9 @@ static int Mc=0,Nc=0,Kc=0;      // Количество отрезков и контрольная точка
 
 void Curve_Analytic( int=-1 );  // Несколько (шесть) аналитических фигур
 //
-//      Процедуры разбиения контрура на отрезки пригодные
-//              для применения алгоритмов интегрирования
-
+//     Процедуры разбиения контрура на отрезки, пригодные для применения
+//     алгоритмов интегрирования
+//
 static Real  Dl=1;      // Требуемый шаг дробления многоугольника
 static int   Kl=0,kl=0, // Номер грани и индекс дробящего отрезка
                   nc=0; // Количество дроблений текущей грани
@@ -74,15 +74,15 @@ int Curve_Access( Point A )
     Point P,Q=C[Nc-1]-A;
     for( int k=0; k<Nc; k++ )
     { P=C[k]-A; S+=atan2( P.y*Q.x-P.x*Q.y,P.y*Q.y+P.x*Q.x ); Q=P;
-    } return abs( S )>M_PI_2;
+    } return abs( S )>M_PI_2*3.8;
 } }
 //      Основная программа рисования плоских фигур
 //
 static void Field_Check( Field& F )
 { F.Jy=min(-F.Ly,F.Jy ),F.Ly=max(-F.Jy,F.Ly );      // контроль и настройка
   F.Jx=min(-F.Lx,F.Jx ),F.Lx=max(-F.Jx,F.Lx );      // ортогональных пропорций
-  F.Jy*=1.25; F.Ly*=1.25; F.Ly-=F.Jy;               // графического изображения
-  F.Jx*=1.5;  F.Lx*=1.5;  F.Lx-=F.Jx;
+  F.Jy*=1.5; F.Ly*=1.5; F.Ly-=F.Jy;               // графического изображения
+  F.Jx*=2.0; F.Lx*=2.0; F.Lx-=F.Jx;
  Real LS=Real( Tv_port.bottom-Tv_port.top )/(Tv_port.right-Tv_port.left);
   if( LS>F.Ly/F.Lx ){ Real W=F.Ly; F.Ly=LS*F.Lx; F.Jy-=(F.Ly-W)/2; }
              else   { Real W=F.Lx; F.Lx=F.Ly/LS; F.Jx-=(F.Lx-W)/2; }

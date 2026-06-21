@@ -7,15 +7,15 @@
 #include "OS/Tv_graph.h"
 
 const Real D2R=M_PI/180.0;
-const int Blen=64000;       // Длина списков координат внутренних точек
+const int Blen=128000;      // Длина списков координат внутренних точек
 
-Real  DCy=12,DCx=12,        // Размер простой фигуры
-       dY=0.5,dX=0.5;       // Вертикальный и горизонтальный
-Field F={ -15,-10,30,20 };  // размер и шаг прорисовки поля
+Real  DCy=12,DCx=12;        // Размер простой фигуры
+Real  dY=1.5,dX=1.5;        // Вертикальный и горизонтальный
+Field F={ -26,-18,52,36 };  // размер и шаг прорисовки поля
 
-static Real  dCy=0.2,       // Вертикальный и
-             dCx=0.2,       //     горизонтальный шаг сканирования объекта
-             dL =0.2,       // Шаг обхода вдоль контура
+static Real  dCy=0.1,       // Вертикальный и
+             dCx=0.1,       //     горизонтальный шаг сканирования объекта
+             dL =0.1,       // Шаг обхода вдоль контура
              FD =32.0,      // Угол набегающего потока в градусах
              Vm,Vd;         // Вычисляемые экстремумы для поля скорости
 static Point P,             // Просто рабочий вектор или точка
@@ -64,10 +64,10 @@ Point Fletcher( Point );     // Выборка вызванной скорости в произвольной точке
 static void Draw( Real Scale, short SM=0x8002 )
 { { Field _f=F; Tv_place( 0,&_f ); }
   Ghelp(); clear(); Tv.Height( 8 );                         color( LIGHTBLUE );
-  Tgo( 98,-3 ); Tprintf( W2D( "(c)1993-99, В.Храмушин" ) ); color( CYAN );
-  Tgo( 99,-2 ); Tprintf( W2D( "Лаб.вычислительной гидромеханики" ) );
-  Tgo( 99,-1 ); Tprintf( W2D( "Сахалинский государственный университет" ) );
-  color( LIGHTGRAY ); Tv_axis( true ); Tv.Height( 0 );
+  Tgo( 48,-4 ); Tprintf( W2D( "(c)1993-99, В.Храмушин" ) ); color( CYAN );
+  Tgo( 49,-3 ); Tprintf( W2D( "Лаб.вычислительной гидромеханики" ) );
+  Tgo( 49,-2 ); Tprintf( W2D( "Сахалинский государственный университет" ) );
+  color( LIGHTGRAY ); Tv.Height( 0 ); Tv_axis( true );
   color( LIGHTCYAN ); Tv_rect();              // разметка прямоугольной сетки
   if( FMod&1 || SM&2 || !FMod )               // изображение замкнутого контура
   { Curve_Normal( dL );  Curve_View();        // с очень маленькими нормальками
@@ -151,8 +151,10 @@ static Point Surface( Point& P )
   { W=P-Body[k];
     E=FMod&1 ? Flow[k] : M;
     if( abs( W.y )>=dCy || abs( W.x )>=dCx )
-//      V+=E*sqr( W )*Ds/pow( norm( W ),1.5 );
-        V+=E*sqr( W )*Ds/sqr( norm( W ) );
+//      V+=E*sqr( W )*Ds/norm( W );                    // V~=R^-0
+//      V+=E*sqr( W )*Ds/pow( norm( W ),1.5 );         // V~=R^-1
+        V+=E*sqr( W )*Ds/sqr( norm( W ) );             // V~=R^-2
+//      V+=E*sqr( W )*Ds/pow( norm( W ),2.5 );         // V~=R^-3
     else { if( FVid&1 )BF[y][x]=1; V+=E*sqr( W )*16/Ds; }
   } dCx*=2; dCy*=2;
   return V;
@@ -189,6 +191,7 @@ static void Flow_Field()
           if( !BF[y][x] ){ if( Vm<abs( V ))Vm=abs( V );
                            if( Vd<(V*D).x )Vd=( V*D ).x; }
         }
+//BF[y][x]=0;
         EF[y][x]=V;     // if( Interrupt() )return;
         needle( P-dir( V )*diagonal/2,P+dir( V )*diagonal/2 );
       }
@@ -204,17 +207,17 @@ static void Flow_Field()
 int main()
 { Mlist Menu[] =
   { { 1,0,"\tРазмеры расчетной области" }
-  , { 1,4," Y: %4.2lf",&F.Jy},{0,4,"\t \xB6 %4.2lf",&F.Ly},{0,4,", dY %4.2lf",&dY }
   , { 1,4," X: %4.2lf",&F.Jx},{0,4,"\t \xB6 %4.2lf",&F.Lx},{0,4,", dX %4.2lf",&dX }
+  , { 1,4," Y: %4.2lf",&F.Jy},{0,4,"\t \xB6 %4.2lf",&F.Ly},{0,4,", dY %4.2lf",&dY }
   , { 2,4,"\tНаправление потока %4.2lf",&FD  },{ 0,0,"\t°" }
   , { 2,4,"\tШаг вдоль контура: %4.2lf",&dL  }
-  , { 1,4,"\tДробление тела dY: %4.2lf",&dCy }
-  , { 1,4,  "               dX: %4.2lf",&dCx }
+  , { 1,4,"\tДробление тела dX: %4.2lf",&dCx }
+  , { 1,4,  "               dY: %4.2lf",&dCy }
   , { 2,0,"\t  Интеграл по" },{ 0,10 }
   };
- static field Tr={ -32,-60,0,0,0 };
+ static field Tr={ -32,-68,0,0,0 };
  int ans=0;
-  Tv_Graphics_Start();                    // Установка драйвера на 256 цветов
+  Tv_Graphics_Start(); // Установка драйвера на 256 цветов
   setwindowtitle( "Flow - fluidmechanics" );
   Tv_place( &Tr );
   M=conj( (D=(Point){ cos( FD*D2R ),sin( FD*D2R ) })/M_PI );
@@ -223,10 +226,8 @@ int main()
 //
 //      Инициализация параметров расчетной области
 //
-Start: // pattern( BLUE,LIGHTCYAN );
+Start:
   {
-//   static Real ymn=-6,ymx=6, // Вертикальный и
-//               xmn=-6,xmx=6; //  горизонтальный размер построенной фигуры
    Display T( Mlist( Menu ),1,-1 ); Draw( 1.0 );
     do
     { Thelp( "F4 Figure  F5 Start  %sF10 Exit",EF?"F6 Show  ":"" );
@@ -281,8 +282,9 @@ Request:
   for( ;; )
   { Thelp
     ( "F1 Вызванные F2 Результат  F3 Настройка  F4 К нормировке  <Enter>В начало  <Esc>Выход" );
+    setwritemode( XOR_PUT );
     do
-    { setwritemode( XOR_PUT ); VQ=VP;
+    { VQ=VP;
       if( FMod&2 )
       { Vv=Surface( VP );     color( LIGHTGRAY );
         VV=dir(Vv/Vd-D)*VSt*64; line( VQ,VQ+VV );
@@ -299,8 +301,9 @@ Request:
       if( FMod&1 || !FMod )
       { color( FMod&1?LIGHTMAGENTA:WHITE); line( VQ,VQ+VS ),line( VQ,VQ+Vs ); }
       if( FMod&2 ){ color(LIGHTGRAY);      line( VQ,VQ+VV ),line( VQ,VQ+Vv ); }
-      setwritemode( COPY_PUT );
     } while( ans<_Enter );
+    setwritemode( COPY_PUT );
+
 //
 //  Настройка картинки с обтекаемым телом
 //

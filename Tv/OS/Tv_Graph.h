@@ -218,7 +218,7 @@ long long Tfile( char* PathName, const char* Com );
    void Tis( int &x,int &y );           // Считывание текущей позиции
    void Tln();                          // Переход на новую строку
    void Tputc( char ch );               // Один символ в текущую позицию
-   int  Tprintf( const char*, ... );    // текст в графическом режиме
+   int  Tprintf( const char*,... );     // текст в графическом режиме
 //
 //      Tgetc,s : запрос команды от терминала
 //        S     - Изменяемая строка
@@ -242,7 +242,8 @@ Course Wgets( char* S,int len,int pos=0 ); // c перекодировкой
   int  bkcolor( int );     // Установка цвета фона
   void pattern( int,int ); // Установка типа и цвета раскраски
   void pattern( int );     // Установка только цвета фона
-                           //
+  void clear();
+
 inline void moveto( _point p ){ moveto( p.x,p.y ); }
 inline void lineto( _point q ){ lineto( q.x,q.y ); }
 inline void line  ( _point p,_point q ){ line  ( p.x,p.y,q.x,q.y ); }
@@ -254,8 +255,7 @@ inline void needle( _point p,_point q ){ needle( p.x,p.y,q.x,q.y ); }
   void Ghelp( const char*,... );  // Временное сообщение
   void Thelp( const char*,... );  // -- в русском
 Course Help( const char *Name[], const char** Text, const char** Plus=NULL );
-              //
-void clear(); // { clearviewport(); }
+
 //
 //  256-colors Palette
 //

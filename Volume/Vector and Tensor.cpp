@@ -74,7 +74,7 @@ static void axis( _Real L )
     arrow((Point){0,-L,0},(Point){0,L,0},.1,green),Win.Text(_North,Tv.in((Point){0,L*1.04,0}),"Y");
     arrow((Point){0,0,-L},(Point){0,0,L},.1,blue ),Win.Text(_South,Tv.in((Point){0,0,L*1.04}),"Z");
   }
-static Base Model;                 // собственный базис геометрического объекта
+//static Base Model;                 // собственный базис геометрического объекта
 static bool rotate_OpenGL=false,   // вращение всего пространства OpenGL
              moving_Model=false,   // собственное перемещение объекта
            painting_Model=false;   // признак закраски граней подвижной модели

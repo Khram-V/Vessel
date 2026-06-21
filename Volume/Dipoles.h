@@ -67,7 +67,7 @@ struct Model: Base
   Model& operator =( _Real Scale ){ Base::operator=(Scale); return *this; }
   Model& operator =( _Point Rc   ){ Point::operator=(Rc);   return *this; }
   Model& operator+=( _Vector dR  ){ Point::operator+=(dR);  return *this; }
-  Model& dipole( _Real acl=0.0, bool=false );                 // {-1<s<+oo}
+  Model& dipole( _Real acl=0.0, bool=false, _Real Alfa=0.75 ); // {-1<s<+oo}
 };
 void Text_to_ConIO( Dipoles &D ); // "отладочная" печать
 //

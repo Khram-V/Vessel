@@ -55,6 +55,8 @@
 			<Add option="-Os" />
 			<Add option="-funsigned-char" />
 			<Add option="-fopenmp" />
+			<Add option="-fno-exceptions" />
+			<Add option="-fno-rtti" />
 			<Add option="-fexec-charset=UTF-8" />
 			<Add option="-finput-charset=UTF-8" />
 			<Add option="-fno-exceptions" />

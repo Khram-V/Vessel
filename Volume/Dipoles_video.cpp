@@ -129,29 +129,10 @@ bool Video::Draw()
   Title( _Format( "Ч:%d [рис:%u/счет:%u]: T=%s = %1.2f%%    ==  %ld тики",nDip,
      Video_count,Time_count,DtoA(rt/3600000),rt*100/ElapsedTime(),RealTime ) );
   //
-  // прорисовка всех диполей в центрированном расчётном пространстве
-  //
-  for( int i=0; i<nDip; i++ )
-  { Dipole &D=Dp[i]; Vector P=D.R-Center;
-    if( ex.Model ){  spot( P,12,red );
-      if( ex.Model>1 )                  // 0-только трек 1-точка 2-ребра 3-цвет
-      { (Mxl=*(Point*)&P).set( D.M );   // местоположение и вектор массы
-        if( ex.Size )dM=1.0-abs(D.V)/abs(D.M); else dM=0.0;
-        Mxl.dipole( dM,ex.Model==3 );  // изображение диполя в движении
-      }
-      arrow( P,P+D.V*EqSphere,0.1,green ); //  и встречной локальной скорости
-      arrow( P,P+D.M*EqSphere,0.1,navy );  // стрелка дипольного момента
-    }
-    if( Time_count<1 )break;             // и если маршрут еще не сформировался
-    glBegin( GL_LINE_STRIP ); color( lightmagenta );
-    for( int k=max( 0u,Time_count-Dipole_route+1 ); k<Time_count; k++ )
-    { dot( Dipoles_array[k%Dipole_route][i].R-Center );
-    } glEnd();
-  }
   //  прорисовка векторного пространства скоростей вызванных, суммарных
   //                                             и суммарно-осреднённых
   if( ex.Field )
-  { const Real Sc=0.1;                            // масштаб отрисовки векторов
+  { const Real Sc=0.12;                            // масштаб отрисовки векторов
           Real x,y,z,dx=max(.01,wX),dy=max(.01,wY),dz=max(.01,wZ);
     if( wX )if((Cmax.x-Cmin.x)/wX>320)dx=(Cmax.x-Cmin.x)/320; // ускорение
     if( wY )if((Cmax.y-Cmin.y)/wY>320)dy=(Cmax.y-Cmin.y)/320; // прорисовки
@@ -167,12 +148,35 @@ bool Video::Draw()
       for( int i=0; i<nDip; i++ )                        // действующий рой частиц
       { V+=dipole_v(Dp[i].M*EqSphere,P+Center-Dp[i].R); ///? вызванные скорости
       }                                     // усреднённое  поле полного потока
-      if( ex.Field&1 )arrow( P-V*Sc,P+V*Sc,abs(V)*Sc/2,lightblue ); // фоновый
-      if( ex.Flow )V-=(Vector){ EqSphere,0,0 }; else                // поток
-                   V+=Dp.Mean.V*EqSphere;                           // средний
-      if( ex.Field&2 )arrow( P-V*Sc,P+V*Sc,abs(V)*Sc/2,green );     // контроль
-  } }
-  Draw_space();                               // самоцентрированное пространство
+      if( ex.Field&1 )arrow( P-V*Sc,P+V*Sc,0.25,blue );       // фоновый
+      if( ex.Flow )V-=(Vector){ EqSphere,0,0 }; else          // поток
+                   V+=Dp.Mean.V*EqSphere;                     // средний
+      if( ex.Field&2 )arrow( P-V*Sc,P+V*Sc,0.25,lightgreen ); // контроль
+    }
+  }
+  //
+  // прорисовка всех диполей в центрированном расчётном пространстве
+  //
+  for( int i=0; i<nDip; i++ )
+  { Dipole &D=Dp[i]; Vector P=D.R-Center;
+    if( ex.Model ){ spot( P,12,red );
+      glLineWidth( 2 );
+      arrow( P,P+D.M*EqSphere,0.25,navy  ); // стрелка дипольного момента
+      arrow( P,P+D.V*EqSphere,0.25,green ); // и встречной локальной скорости
+      glLineWidth( 1 );
+      if( ex.Model>1 )                  // 0-только трек 1-точка 2-ребра 3-цвет
+      { (Mxl=*(Point*)&P).set( D.M );   // местоположение и вектор массы
+        if( ex.Size )dM=1.0-abs(D.V)/abs(D.M); else dM=0.0;
+        Mxl.dipole( dM,ex.Model==3,0.75 ); // изображение диполя в движении
+      }
+    }
+    if( Time_count<1 )break;             // и если маршрут еще не сформировался
+    glBegin( GL_LINE_STRIP ); color( lightmagenta );
+    for( int k=max( 0u,Time_count-Dipole_route+1 ); k<Time_count; k++ )
+    { dot( Dipoles_array[k%Dipole_route][i].R-Center );
+    } glEnd();
+  }
+  Draw_space();                              // самоцентрированное пространство
   //
   //                   Информация на графическом поле
   color( ex.Body?red:navy );

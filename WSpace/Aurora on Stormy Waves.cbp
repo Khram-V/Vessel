@@ -97,6 +97,7 @@
 			<Add option="-fexec-charset=UTF-8" />
 			<Add option="-finput-charset=UTF-8" />
 			<Add option="-fno-exceptions" />
+			<Add option="-fno-rtti" />
 		</Compiler>
 		<Linker>
 			<Add option="-s" />

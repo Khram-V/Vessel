@@ -48,6 +48,7 @@
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
+				<Option parameters="-bgi=4" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-ffunction-sections" />
@@ -81,14 +82,14 @@
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="-O3" />
+			<Add option="-Os" />
 			<Add option="-funsigned-char" />
 			<Add option="-ffast-math" />
 			<Add option="-fno-exceptions" />
+			<Add option="-fno-rtti" />
 			<Add option="-Wunused" />
 		</Compiler>
 		<Linker>
-			<Add option="-O3" />
 			<Add option="-s" />
 			<Add library="gdi32" />
 		</Linker>
@@ -127,6 +128,7 @@
 		<Unit filename="../Tv/OS/Julian.cpp">
 			<Option target="Hull" />
 		</Unit>
+		<Unit filename="../Tv/OS/Point.h" />
 		<Unit filename="../Tv/OS/Rstring.cpp" />
 		<Unit filename="../Tv/OS/Sym_CCCP.inc">
 			<Option target="&lt;{~None~}&gt;" />

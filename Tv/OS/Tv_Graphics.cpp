@@ -47,7 +47,7 @@ int Tv_Graphics_Start( int Mode, int width, int height )
     Tv.mX=getmaxx();
     Tv_place( &Ap );                    //
     Tv.Font( 0,0 );                     // Стандартный растровый шрифт
-    Tv.Height( 0 );                     // Подключение его к векторным функциям
+    Tv.Height( 0 );                    // Подключение его к векторным функциям
     Tt.Ly=( Tv.mY-JY+1 )/Tv.Th;         //
     Tt.Lx=( Tv.mX-JX+1 )/Tv.Tw;
     Set_Palette( 0,256,(RGB_palette)Default_Palettes );
