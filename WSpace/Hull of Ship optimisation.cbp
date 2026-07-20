@@ -59,7 +59,6 @@
 			<Add option="-fno-rtti" />
 			<Add option="-fexec-charset=UTF-8" />
 			<Add option="-finput-charset=UTF-8" />
-			<Add option="-fno-exceptions" />
 			<Add option="-Wunused" />
 		</Compiler>
 		<Linker>
@@ -120,6 +119,9 @@
 			<Option target="Ship" />
 		</Unit>
 		<Unit filename="../Ship/Ship.h">
+			<Option target="Ship" />
+		</Unit>
+		<Unit filename="../Ship/Ship_Ex.cpp">
 			<Option target="Ship" />
 		</Unit>
 		<Unit filename="../Ship/Ship_IO.cpp">

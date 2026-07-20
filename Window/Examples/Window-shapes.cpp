@@ -145,7 +145,7 @@ bool Pro::KeyBoard( fixed key )
         case _Down : orad /= 2;        break;
         case _Right: irad *= 2;        break;
         case _Left : irad /= 2;        break;
-        case _Esc: delete this;
+        case _Esc: delete this; return false;
        default: key=0;
   } } }
   if( function_index<0 )function_index = NUMBEROF( table )-1;

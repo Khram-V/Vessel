@@ -81,7 +81,7 @@ bool VideoStage()
     }
   }
   if( WinReady() )                   // Ready -> c исполнением Windows запросов
-  { static DWORD T=0,T1; T1=ElapsedTime(); //GetTime();
+  { static unsigned T=0,T1; T1=ElapsedTime(); //GetTime();
     if( T1-T>Quantum_video ){ Win.Draw(); T=T1; } return true;
   } else return false;
 }
@@ -124,10 +124,12 @@ bool Video::Draw()
   // контрольные надписи о прохождении вычислительных процессов
   //
  Real rt=RealTime,dM;                               // время и размер корпускул
-  color( navy ),Print( 1,-1,"Ч:%d [рис:%u/счет:%u]: T=%s = %1.2f%%",nDip,
-          ++Video_count,Time_count,DtoA(rt/3600000.0),rt*100.0/ElapsedTime() );
-  Title( _Format( "Ч:%d [рис:%u/счет:%u]: T=%s = %1.2f%%    ==  %ld тики",nDip,
-     Video_count,Time_count,DtoA(rt/3600000),rt*100/ElapsedTime(),RealTime ) );
+  color( navy ),Print( 1,-1,"Ч:%d [рис:%u/счет:%u]: T=%s = %1.2f%% <== %g ",
+     nDip,++Video_count,Time_count,DtoA(rt/3600000.0),rt*100.0/ElapsedTime(),
+     Dipoles_array[Time_count%Dipole_route].T );
+  Title( _Format( "Ч:%d [рис:%u/счет:%u]: T=%s = %1.2f%%    ==  %ld тики <== %g",
+     nDip,Video_count,Time_count,DtoA(rt/3600000),rt*100/ElapsedTime(),RealTime,
+     Dipoles_array[Time_count%Dipole_route].T ) );
   //
   //  прорисовка векторного пространства скоростей вызванных, суммарных
   //                                             и суммарно-осреднённых
@@ -154,20 +156,19 @@ bool Video::Draw()
       if( ex.Field&2 )arrow( P-V*Sc,P+V*Sc,0.25,lightgreen ); // контроль
     }
   }
-  //
   // прорисовка всех диполей в центрированном расчётном пространстве
   //
   for( int i=0; i<nDip; i++ )
   { Dipole &D=Dp[i]; Vector P=D.R-Center;
     if( ex.Model ){ spot( P,12,red );
       glLineWidth( 2 );
-      arrow( P,P+D.M*EqSphere,0.25,navy  ); // стрелка дипольного момента
-      arrow( P,P+D.V*EqSphere,0.25,green ); // и встречной локальной скорости
+      arrow( P-D.M*EqSphere/2,P+D.M*EqSphere/2,0.25,navy  ); // стрелка дипольного момента
+      arrow( P-D.V*EqSphere/2,P+D.V*EqSphere/2,0.25,green ); // и встречной локальной скорости
       glLineWidth( 1 );
       if( ex.Model>1 )                  // 0-только трек 1-точка 2-ребра 3-цвет
       { (Mxl=*(Point*)&P).set( D.M );   // местоположение и вектор массы
         if( ex.Size )dM=1.0-abs(D.V)/abs(D.M); else dM=0.0;
-        Mxl.dipole( dM,ex.Model==3,0.75 ); // изображение диполя в движении
+        Mxl.dipole( dM,ex.Model==3 ); // изображение диполя в движении
       }
     }
     if( Time_count<1 )break;             // и если маршрут еще не сформировался
@@ -179,6 +180,7 @@ bool Video::Draw()
   Draw_space();                              // самоцентрированное пространство
   //
   //                   Информация на графическом поле
+  //
   color( ex.Body?red:navy );
   Print( 2,-6,ex.Body?"Динамика корпускул с учётом массы и инерции" :
                       "Чисто кинематическое безынерционное взаимодействие" );
@@ -194,13 +196,14 @@ bool Video::Draw()
   Print( 2,-2,"R[%d]={%.1f,%.1f,%.1f}",nDip,Center.x,Center.y,Center.z );
   if( Time_count>0 )
   { Dipoles &Dq=Dipoles_array[(Time_count-1)%Dipole_route];// прошлый рой частиц
-    Vector V=(Center-Dq.Mean.R)/(Dp.T-Dq.T);
+    Vector V=(Center-Dp.Mean.R)/(Dp.T-Dq.T);
     color( green ); Print( ", V={%.1f,%.1f,%.1f} delta={%.2f,%.2f,%.2f} ",
            V.x,V.y,V.z, V.x-Dp.Mean.V.x,V.y-Dp.Mean.V.y,V.z-Dp.Mean.V.z );
   }
   Show();
   Save(); Refresh();
-  Text_to_ConIO( Dp ); return Recurse=false;
+  Text_to_ConIO( Dp ); //   WaitKey();
+  return Recurse=false;
 }
 void Video::Draw_space()                   // сетка Эйлерова этапа эксперимента
 { if( ex.Grid&1 )                          //      локально центрируется к нулю
@@ -226,29 +229,35 @@ Course Video::Configuration()        // таблица запросов наст
 { const char *Grid[]={ "нет","оси","сетка","всё" };
   const char *GVid[]={ "только маршрут","красная точка","контуры","диполь" };
   const char *Flow[]={ "нет","вызван","полный","вместе" };
-  const char *Edge[]={ "нет","гладкая связь","упругий шарик","шарик+функция" };
+  const char *Edge[]={ "нет","гладкий нуклон","упругая сфера","шарик + функция" };
   const char *Body[]={ "кинематика поляризованных частиц",
                        "динамика независимых корпускул" };
   const char *exFlow[]={ "свободно изменяется","поддерживается" };
-  for( int K=-1; K; )                  // текущая позиция в меню
+  int K=-1,N=nDip;
+  do                                   // текущая позиция в меню
   { Mlist Menu_C[]=                    // собственно список запросов и настроек
     { { 0,0,"   <<<- видео-конфигурация ->>>" }
-    , { 2,0,"Способ изображения корпускулы: " },{ 0,14,GVid[ex.Model] }
-    , { 1,0,"Эксперимент: "},{ 0,32,Body[ex.Body] }
-    , { 1,0,"Направление потока:  "},{ 0,6,Flow[ex.Field] }
-    , { 0,4," =  %4.2lf",&wX },{ 0,4,",%4.2lf",&wY },{ 0,4,",%4.2lf",&wZ }
-    , { 1,0,"Рёбра и оси единичной разметки: "},{ 0,5,Grid[ex.Grid] }
-    , { 0,2,"%2d",&nX },{ 0,2,",%2d",&nY },{ 0,2,",%2d",&nZ }
-    , { 1,0,"Притяжение/отталкивание частиц: " },{ 0,13,Edge[ex.Edge] }
-    , { 1,0,"Внешний набегающий поток: " },{ 0,20,exFlow[ex.Flow] } };
+    , { 2,0,"Тип корпускулы: "},{0,15,GVid[ex.Model]},{0,3," количество %d",&N} // 1-3
+    , { 1,0,"Эксперимент: "},{ 0,32,Body[ex.Body] }                             // 4-5
+    , { 1,0,"Отображение потока:  "},{ 0,6,Flow[ex.Field] }                     // 6-7
+    , { 0,4," =  %4.2lf",&wX },{ 0,4,",%4.2lf",&wY },{ 0,4,",%4.2lf",&wZ }      // 8-10
+    , { 1,0,"Рёбра и оси единичной разметки: "},{ 0,5,Grid[ex.Grid] }           // 11-12
+    , { 0,2,"%2d",&nX },{ 0,2,",%2d",&nY },{ 0,2,",%2d",&nZ }                   // 13-15
+    , { 1,0,"Ориентация по поляризации: " },{ 0,15,Edge[ex.Edge] }              // 16-17
+    , { 1,0,"Гравитационное притяжение: " },{ 0,15,Edge[ex.Grav] }              // 18-19
+    , { 1,0,"Внешний набегающий поток: " },{ 0,20,exFlow[ex.Flow] } };          // 20-21
     TextMenu T( Mlist( Menu_C ),&Win,-1,2 );
     switch( K=T.Answer( K ) )
-    { case  2: ex.Model--; break;
-      case  4: ex.Body^=true; break;
-      case  6: ex.Field++;    break;
-      case 11: ex.Grid++;     break;
-      case 16: ex.Edge++;     break;
-      case 18: ex.Flow^=true; /*ReInstall_TimeSpace( nDip ); */ break;
+    { case  2: ex.Model--;    break; // картинка для корпускулы
+      case  5: ex.Body^=true; break; // инерционная динамика/чистая кинематика
+      case  7: ex.Field++;    break; // варианты отображения наведённых полей
+      case 12: ex.Grid++;     break; // запросы для прорисовки осевой разметки
+      case 17: ex.Edge++;     break; // ориентация поляризованных корпускул
+      case 19: ex.Grav++;     break; // действие гравитационного притяжения
+      case 21: ex.Flow^=true; /*ReInstall_TimeSpace( nDip ); */ break;
       case _Esc: return _Esc;
-  } } return _F4;
+    } Draw();
+  } while( N==nDip );             // Break( "~N=%d,nDip=%d",N,nDip );
+  ReInstall_TimeSpace( N );       // VideoStage();
+  return _Center;
 }

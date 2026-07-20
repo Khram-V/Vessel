@@ -25,13 +25,19 @@ typedef enum { fiFree,fiStation,fiButtock,fiWaterline,fiDiagonal } IntersectionT
 
 const Real Foot=0.3048,Eps=1.0e-5L;
 union Color{ unsigned C; byte c[4]; };
-struct Plane { Real a,b,c,d; };  // Description of 3D plane: a*x+b*y+c*z-d=0.0;
+struct Plane { Real a,b,c,d; }; // Description of 3D plane: a*x+b*y+c*z-d=0.0;
+extern FILE *FM;               // единый или общий файл открывается временно
+extern WCHAR *FName;           // имя файла открытого из командной строки
+extern bool isBin;             // признак двоичной или текстовой записи корпуса
+extern Real  Beam,             // ширина
+             Draft,            // осадка
+             Length;           // длина
 extern Vector Min,Max;         // Экстремумы исходного графического изображения
 extern Color UnderWaterColor;
 extern byte  UnderWaterColorAlpha;
-extern Real  Beam,        // ширина
-             Draft,       // осадка
-             Length;      // длина
+int getInt();
+Vector getPoint();
+
 struct Project{           // четыре строки описание корабля
 char *Name,               // название проекта
      *Designer,           // автор проекта
@@ -152,7 +158,9 @@ public:
   void ReOrder();              // делается попытка вычистки повторяющихся точек
   void ReadFEF( int );         // если >1 - чистый корпус без доп описаний
   void WriteFEF();             // сохранение текущего результата, наконец-то... ++Obj - тоже надо
+  void WriteSTL( char* Name ); // запись стандартных треугольников с нормалями
   void ReadObj( char *Path );  // полное имя для сопутствующего описания MtlLib
+  void ReadStl( char *Path );  // поверхность из треугольников с нормалями
   void EditMenu( Window* );    // числовое смещение и 3D-перемасштабирование
   void Revolute();             // обращение обхода по элементарным поверхностям
   void R90Xright();            // положить на правый борт
@@ -179,28 +187,29 @@ struct Marker
   Real CurvatureScale;
   int NoSplines; Spline *S;
 };
-struct Ship                      // Сборка корпуса в целом
-{ WCHAR *FName; char *Name;      // Единожды представляемое имя числовой модели
-  Visibility Visio;              // Show настройка графической визуализации
-  Project      Set;              // характеристики и размерности корабля
-  Surface    Shell;              // Shell оболочка поверхности обшивки корпуса
-  PrecisionType PT;              // Precision of the ship-model
+struct Ship                    // Сборка корпуса в целом
+{ char *Name;                  // Единожды представляемое имя числовой модели
+  Visibility Visio;            // Show настройка графической визуализации
+  Project      Set;            // характеристики и размерности корабля
+  Surface    Shell;            // Shell оболочка поверхности обшивки корпуса
+  PrecisionType PT;            // Precision of the ship-model
 
   int NoStations,NoButtocks,NoWaterlines,NoDiagonals,NoMarkers,NoFlowLines;
-  InterSection *Stations,        // шпангоуты  LoadStation
-               *Buttocks,        // батоксы    LoadButtocks
-               *Waterlines,      // ватерлинии LoadWaterlines
-               *Diagonals;       // рыбины     LoadDiagonals
+  InterSection *Stations,      // шпангоуты  LoadStation
+               *Buttocks,      // батоксы    LoadButtocks
+               *Waterlines,    // ватерлинии LoadWaterlines
+               *Diagonals;     // рыбины     LoadDiagonals
   Marker *Marks;
   Flex* FlowLines;
-  bool YesShip;                  // ... и это здесь не особо-то необходимо ?
-  Ship();                        // очищающий конструктор
-  bool LoadProject();            // быстрая выборка всего комплекса данных
-                                 // в общие структуры в оперативной памяти
-  void WriteVSL();               // запись теоретических контуров k Hull+Aurora
-  bool LoadFEF();                // здесь Ship.fef == File Exchange Format
-  bool LoadObj();                // WaveFront Technologies Advanced Visualizer
-  bool LoadPart( bool New=true );// или просто фрагмент цифровой модели
+  bool YesShip;                // ... и это здесь не особо-то необходимо ?
+  Ship();                      // очищающий конструктор
+  bool LoadProject();          // быстрая выборка всего комплекса данных
+                               // в общие структуры в оперативной памяти
+  void WriteVSL();             // запись теоретических контуров k Hull+Aurora
+  bool LoadFEF();              // здесь Ship.fef == File Exchange Format
+  bool Import( fixed );        // 1: WaveFront Technologies Advanced Visualizer
+                               // 2:
+  bool LoadPart(bool New=true);// или простой фрагмент цифровой модели freeShip
   bool LoadExtFile( bool New=true );
 };
 struct FreeShip: Ship,View       // ,Matrix

@@ -12,7 +12,7 @@
 #if !defined( _Window_h_ )
 #define _Window_h_           // аппаратное окружение и стандартная среда
 #include <Windows.h>         // программирования MinGW_Microsoft-Windows
-#include "..\Type.h"         // собственно настройка локальных иных операций
+#include "../Type.h"         // собственно настройка локальных иных операций
 struct Window;               // производный класс постройки нового окна Windows
 enum Place_Signs{ PlaceOrtho=0x40,     // трёхмерное ортогональное пространство
                   PlaceAbove=0x80 };   // сохранение-восстановление изображения
@@ -121,7 +121,7 @@ public:
        HDC   hDC;     //   ++  PIXELFORMATDESCRIPTOR pfd;
        HWND  hWnd;    //   ++  WNDCLASS wc;
        HGLRC hRC;     //   ++  ATOM atom;
-       DWORD mSec;    // интервал прерываний активированного таймера [мил.сек]
+    unsigned mSec;    // интервал прерываний активированного таймера [мил.сек]
   bool InterruptProcedure( UINT message,WPARAM wParam,LPARAM lParam );
  explicit Window( const char* T=NULL, int X=0,int Y=0, int W=800,int H=600 );
 //virtual
@@ -148,7 +148,7 @@ public:
   //   процедуры таймера, работающего от достигнутого времени ?? с надбавкой
   //      выполняется привязка к основному/большому графическому экрану
   //
-  Window& SetTimer( DWORD mSec, bool( *inTime )()=NULL ); // время и транзакция
+  Window& SetTimer( unsigned mSec,bool(*inTime)()=NULL ); // время и транзакция
   Window& KillTimer();                                // если 0 – сброс таймера
  virtual bool Timer();                               // ++ виртуальных процедур
   int volatile isTimer;       // таймер отслеживает уровень рекурсии транзакций
@@ -164,7 +164,7 @@ public:
   void PutChar( fixed Key );          // один символ(uni16) --> кольцевой буфер
   UINT_PTR idEvent;     // идентификатор встроенного таймера прерываний =0x12++
 private:      //! подборка скрытых параметров и свободных/отвязанных транзакций
-  void PutTimer();      // DWORD iTime )   ==  со временем на момент прерывания
+  void PutTimer();     // unsigned iTime ) ==  со временем на момент прерывания
  struct{ fixed Code,Key; }KeyBuffer[lKey+1];  // накопительный буфер клавиатуры
   int KeyPos,KeyPas;    // кольцевые счетчики для последовательности символов
   bool volatile         // отметки рекурсивности сдерживают повтор изображений
@@ -192,11 +192,11 @@ explicit glContext(const Window*); // конструктор=пролог гра
 //!  Общие определения и процедуры управления наложенными фрагментами экрана
 //   реализуется создание, позиционирование, активизация и очистка фрагментов
 //
-extern DWORD volatile
+extern unsigned volatile
              StartTime, // время начала исполнения программы от запуска Windows
              RealTime;  // время исполнения параллельной процедуры из WaitTime
-       DWORD GetTime(); // в миллисекундах = timeGetTime = GetTickCount
-   DWORD ElapsedTime(); // продолжительность - опрокидывание через ~49,7 суток
+    unsigned GetTime(); // в миллисекундах = timeGetTime = GetTickCount
+unsigned ElapsedTime(); // продолжительность - опрокидывание через ~49,7 суток
 //
 //  Процедура регулярно вызывает inStay() в течение заданного интервала времени
 //  <= mWork с регулярными задержками цикла расчётов на интервалы mWait,
@@ -206,9 +206,9 @@ extern DWORD volatile
 //  inStay() возвращает false, при этом на выходе - суммарное время
 //  исполнения собственно inStay() в миллисекундах
 //
-DWORD WaitTime( DWORD mWait,       // активная задержка для внешнего управления
+unsigned WaitTime( unsigned mWait, // активная задержка для внешнего управления
                 bool(*inStay)()=0, // собственно сам вычислительный эксперимент
-                DWORD mWork=0 );   // время на исполнение рабочего цикла [мСек]
+               unsigned mWork=0 ); // время на исполнение рабочего цикла [мСек]
 bool WinReady( Window *W=NULL );   // исполнение запросов и проверка активности
                                    // без указания адреса опрашиваются все окна
 //

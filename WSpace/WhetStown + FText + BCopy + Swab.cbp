@@ -89,7 +89,7 @@
 			<Target title="DC3-Interpolation-Extrapolation">
 				<Option platforms="Windows;" />
 				<Option output="../../Work/DC3" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="../Vessel/Digitize" />
+				<Option working_dir="../Эскадра/Digitize" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -101,7 +101,7 @@
 			<Target title="Design_Fonts">
 				<Option platforms="Windows;" />
 				<Option output="../../Work/DesignFonts" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="Data" />
+				<Option working_dir="../Window/Fonts" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />

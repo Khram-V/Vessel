@@ -7,6 +7,7 @@ typedef double Real;         // просто число ko всем арифме
 typedef const Real& _Real;   // числовая ссылка–константа, процедурный параметр
 typedef unsigned char byte;   // маска логических операция и выборов управления
 typedef unsigned short fixed; // маска логических операция и выборов управления
+//typedef unsigned long ulong;  // маска логических операция и выборов управления
 struct Event; typedef const Event& _Event; // обобщение \ синтез даты и времени
                                            // ©75 ⇒ Сахалин ↔ 🄯 יְרוּשָׁלַיִם
 //  a 6378245 [м] Сфероид Красовского морских карт России
@@ -110,7 +111,7 @@ char* UtOEM( const char *U );            // строчка в буфер Russian
 char* UtWin( const char *U );            // строчка в буфер Russian-Windows1251
 char* OEMtU( const char *U );            // для считывание DOS-OEM(866) текстов
 char* WintU( const char *U );            // и старые тексты Russian-Windows1251
-const char* CtU( unsigned u );           // UniCode -» UTF-8 (int->string)
+const char* CtU( unsigned u );//, int *l=0 ); // UniCode -» UTF-8 (int->string)
 char* UtC( unsigned &u, const char *U ); // UTF-8 -» UniCode  продвижение буквы
 unsigned UtC( const char *U );           // + на всякий случай
 

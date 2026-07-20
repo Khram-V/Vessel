@@ -127,10 +127,10 @@ bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой под
      *Id[]={ "free!Ship","  Корабельные форматы ",   // визуализации корпуса
                "*.ftm,*.fbm,*.fef,*.part",0 },
      *Cmds[]={ " F1 "," - справка",
-               " F2 ","запись «Aurorа».vsl или *.fef",
-               " F3 ","дополнение [Ship].part и .obj",
-               " F4 ","смещение и масштабирование",
-               " F10 ","сброс повторяющихся узлов",0 },
+               " F2 ","запись «Aurorа».vsl,.fef,.stl",
+               " F3 ","добавка [Ship].part,.obj,.stl",
+               " F4 ","смещение с масштабированием",
+               " F10 "," сброс повторяющихся узлов",0 },
      *Plus[]={ " <Space>  ","раскрытие борт\\полборта",
                " <Ctrl+Space>"," борта - рёбра/грани",
                " <Shift+Tab>  "," общая прозрачность",
@@ -151,10 +151,10 @@ bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой под
 #pragma omp barrier       // Синхронизация: все потоки пусть заканчивают работу
 #pragma omp single       //! - синхронизация нужна всем редактирующим операциям
 {             Shell.ReOrder();
-}             break;    // goto R1;  // расчистка повторов
+}             break;                         // goto R1;  // расчистка повторов
     case _F4: Title( " Правка размерений с пространственным смещением..." );
-              Shell.EditMenu(this); goto R1;   // сдвиги и масштабирование
-    case _End:Shell.Revolute();     goto R1;  // обращение нормалей поверхности
+              Shell.EditMenu(this); goto R1; // сдвиги и масштабирование
+    case _End:Shell.Revolute();     goto R1; // обращение нормалей поверхности
     case _Blank:
      if( ScanStatus()&CTRL )
        { static bool xd=false;
@@ -176,7 +176,7 @@ bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой под
 }
 int main() // int argc, char **argv )
 { texttitle( "free!Ship view\\convert in C++" ); // заголовок текстовой консоли
-  DWORD i,j=0;
+  unsigned i,j=0;
 //fixed Ans;
   FreeShip Hull;                   // запуск сразу всей математики и графики
   Hull.onlyVirtualKeybord=true;    // и никаких ожиданий запросов от клавиатуры

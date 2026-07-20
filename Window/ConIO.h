@@ -1,8 +1,12 @@
-#ifndef _CONIO_H_#define _CONIO_H_//#include <_mingw.h>                    /// ConIO implementation for Mingw/C++#include <windows.h>//#include <wincon.h>
+#ifndef _CONIO_H_#define _CONIO_H_#ifdef _WIN32
+//#include <_mingw.h>                    /// ConIO implementation for Mingw/C++#include <windows.h>//#include <wincon.h>
 extern "C"{#ifndef RC_INVOKED__ _CRTIMP char* __cdecl __MINGW_NOTHROW _cgets( char* ); _CRTIMP int __cdecl __MINGW_NOTHROW _cprintf( const char*,... ),                                       _cputs( const char* ),                                      _cscanf( char*,... ),                                       _kbhit(),kbhit(),                                       _getch(),getch(),                                      _getche(),getche(),                                    _putch(int),putch(int),                                  _ungetch(int),ungetch(int);#endiftypedef enum{ BLACK,BLUE,GREEN,CYAN,RED,MAGENTA,BROWN,LIGHTGRAY,DARKGRAY,              LIGHTBLUE,LIGHTGREEN,LIGHTCYAN,LIGHTRED,LIGHTMAGENTA,YELLOW,WHITE            } COLORS; void clrscr(),clreol(); void gotoxy( short x, short y );      // при x или y<=0 их отсчеты сохраняются
  void textsize( short w,short h,short bh=0 ); // размеры экрана, укрытая длина буфера void textbackground( COLORS cbk );
  short wherex(),wherey();                      // -- COORD wherexy();
  void texttitle( const char* title );          // Титульная надпись консоли}                                              // { SetConsoleTitle( title ); }void textcolor( COLORS clr ),                  // расцветка буквочек консоли
      textcolor( COLORS clr,COLORS cbk );       //   и сопутствующего фона
  int print( short x,short y,const char*,... ); // вариант надписей в позицию int print( const char*,... );                 // сверху-слева, и в продолжение
-#endif
+#else
+#include "Unix/conio.h"
+#endif // _WIN32
+#endif // _CONIO_H_

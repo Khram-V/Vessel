@@ -100,7 +100,7 @@ const char
 //     Первое окно ориентировано на виртуальные функции
 //
 struct _One: public Window
-{ DWORD cw,dw,cnt;
+{ unsigned cw,dw,cnt;
   _One():Window( "One::First OpenGL window",100,100,800,600 ),dw(0),cnt(0)
         { Icon( "Flag" ); };
   virtual ~_One(){ print( 1,15,"One::Destructor \n" ); gotoxy( 1,21 ); }
@@ -125,7 +125,7 @@ static bool FreeHelp( fixed Keyb )
 { if( Win2 && Keyb==_F1 ){ Win2->Help( Nam2,Cmds,Plus ); return true; }
                                                          return false; }
 static bool SecondTimer()
-{ static DWORD cw,dw=0,cnt=0;
+{ static unsigned cw,dw=0,cnt=0;
   Win2->Activate( true ); Rotation( Real(cw=ElapsedTime())/-333.0 );
   glColor3f( 0,0.5,0 ); Win2->Print(1,0,"Ext::Счетчик кадров: № %d ",cnt );
   textcolor( LIGHTGREEN ); print(1,16,"Ext::SecondTimer[%d] = %d = %d \n",cnt,cw,cw-dw );

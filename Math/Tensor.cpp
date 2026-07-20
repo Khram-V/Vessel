@@ -16,8 +16,8 @@ Vector operator / ( Vector c,_Real w ){ c.x/=w; c.y/=w; c.z/=w; return c; }     
 Vector operator + ( Vector c,_Vector e){c.x+=e.x,c.y+=e.y,c.z+=e.z; return c; } // (Vector){c.x+e.x,c.y+e.y,c.z+e.z}; }
 Vector operator - ( Vector c,_Vector e){c.x-=e.x,c.y-=e.y,c.z-=e.z; return c; } // (Vector){c.x-e.x,c.y-e.y,c.z-e.z}; }
 
-bool operator + ( _Vector a ){ return a.x!=0 || a.y!=0.0 || a.z!=0.0; }
-bool operator ! ( _Vector a ){ return a.x==0 && a.y==0.0 && a.z==0.0; }
+bool operator + ( _Vector a ){ return a.x!=0 || a.y!=0.0 || a.z!=0.0; } // есть
+bool operator ! ( _Vector a ){ return a.x==0 && a.y==0.0 && a.z==0.0; } // нет
 bool operator ==( _Vector a,_Vector b ){ return a.x==b.x&&a.y==b.y&&a.z==b.z; }
 bool operator !=( _Vector a,_Vector b ){ return a.x!=b.x||a.y!=b.y||a.z!=b.z; }
 //

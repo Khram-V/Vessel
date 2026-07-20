@@ -125,8 +125,8 @@ bool View::KeyBoard( fixed key )  // к спуску из внешних вир�
 //+glFrontFace( GL_CCW );              // CW грани с обходом по часовой стрелке
 //+glCullFace ( GL_BACK );             // FRONT_AND_BACK какие отбираются грани
 //+glEnable   ( GL_CULL_FACE );        // включение режима отбора треугольников   glHint     ( GL_POINT_SMOOTH_HINT,GL_NICEST );   glEnable   ( GL_POINT_SMOOTH );   glPointSize( 1.0 );   glHint     ( GL_LINE_SMOOTH_HINT,GL_NICEST );   glEnable   ( GL_LINE_SMOOTH );       // сглаживание линий   glLineWidth( 1.0 );
-   glPolygonMode( GL_FRONT,GL_FILL );
-   glPolygonMode( GL_BACK,GL_LINE );    // POINT );
+   glPolygonMode( GL_FRONT,GL_FILL );   // GL_FRONT_AND_BACK
+   glPolygonMode( GL_BACK,GL_LINE );    //  _POINT
    glEnable   ( GL_POLYGON_SMOOTH);     // Really Nice Perspective Calculations   glHint     ( GL_POLYGON_SMOOTH_HINT,GL_NICEST );   glHint     ( GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST );   glBlendFunc( GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA );
    glShadeModel( GL_SMOOTH );       // FLAT закраска с использованием полутонов
    glAlphaFunc( GL_ALWAYS,0 );
@@ -185,7 +185,7 @@ bool View::KeyBoard( fixed key )  // к спуску из внешних вир�
    glEnable( GL_DEPTH_TEST );        // растровая разборка отсечений по глубине
    glClearDepth( 2e3 );     // 2000.0      Enables Clearing Of The Depth Buffer
    glDepthRange( 1,0 );     // 0,1 - Distance        взаимное накрытие объектов
-   glDepthFunc( GL_LEQUAL );//~EQUAL~GEQUAL~GREATER~LEQUAL~NOTEQUAL~LESS~ALWAYS
+   glDepthFunc( GL_LEQUAL );//NEVER~EQUAL~GEQUAL~GREATER~LEQUAL~NOTEQUAL~LESS~ALWAYS
    glDepthMask( GL_TRUE );   if( !SeaColor[black+1].u ){ for( int i=0; i<256; i++ )/*   SeaColor[1+black+i].c[0]=byte(   pow(Real(i)/255,4)*180), // red   красный
      SeaColor[1+black+i].c[1]=byte(48+pow(Real(i)/255,2)*162), // green зеленый
      SeaColor[1+black+i].c[2]=byte(96+pow(Real(i)/255,3)*94 ); // blue  синий

@@ -10,7 +10,7 @@ char* UtC( unsigned &c,const char *V )// синтез Unicode-4 из полно�
   } else nS=1; c=u; return U+1;
 }
 unsigned UtC( const char *U ){ unsigned c; UtC( c,U ); return c; }
-const char* CtU( unsigned u ){ static char w[5];         // раскодирование UniCode-4 в текстовую строчку UTF  if(u<0x80){ w[0]=u; nS=1; } else  if(u<0x0800){ w[0]=(u>>6)&0x1F|0xC0; w[1]=u&0x3F|0x80; nS=2; } else  if(u<0x10000){ w[0]=(u>>12)&0xF|0xE0; w[1]=(u>>6)&0x3F|0x80; w[2]=u&0x3F|0x80; nS=3; } else  if(u<0x110000){ w[0]=(u>>18)&0x7|0xF0; w[1]=(u>>12)&0x3F|0x80; w[2]=(u>>6)&0x3F|0x80; w[3]=u&0x3F|0x80; nS=4; }  else{ w[0]=0xEF; w[1]=0xBF; w[2]=0xBD; nS=3; } w[nS]=0; return w;}
+const char* CtU( unsigned u )//, int *l ) // вовне может востребоваться длина буквы{ static char w[5];         // раскодирование UniCode-4 в текстовую строчку UTF  if(u<0x80){ w[0]=u; nS=1; } else  if(u<0x0800){ w[0]=(u>>6)&0x1F|0xC0; w[1]=u&0x3F|0x80; nS=2; } else  if(u<0x10000){ w[0]=(u>>12)&0xF|0xE0; w[1]=(u>>6)&0x3F|0x80; w[2]=u&0x3F|0x80; nS=3; } else  if(u<0x110000){ w[0]=(u>>18)&0x7|0xF0; w[1]=(u>>12)&0x3F|0x80; w[2]=(u>>6)&0x3F|0x80; w[3]=u&0x3F|0x80; nS=4; }  else{ w[0]=0xEF; w[1]=0xBF; w[2]=0xBD; nS=3; } w[nS]=0; /*if( l )*l=nS;*/ return w;}
 char* Uget( const char *U )               // однократная выборка UTF-8 символа{ static char S[5],*u; u=(char*)U; nS=0;  // - на пустой строке - выход с нулём  if( *U ){ if( (S[nS++]=*u++)&0x80 )     // иначе выборка хотя бы одного байта  { if((*U&0xE0)==0xC0){ X(1)S[nS++]=*u++; } else    if((*U&0xF0)==0xE0){ X(1)X(2){ S[nS++]=*u++; S[nS++]=*u++; } } else    if((*U&0xF8)==0xF0){ X(1)X(2)X(3){ S[nS++]=*u++; S[nS++]=*u++; S[nS++]=*u++; } }  } } S[nS]=0; return S;}
 char* Uset( const char *UTF, int k ){ return Uset( k,UTF ); }
 char* Uset( int &k, const char *UTF )          // установка в k-позицию символа{ nS=0; if( !k )return (char*)UTF; else        //  -1 в конец, последовательный
@@ -111,7 +111,6 @@ wchar_t* U2W( const char* str )
   return (wchar_t*)((char*)LS);
 }
 #endif
-
 /// немного устаревшие тексты
 /*
 const char* RtU( const char R );         // получение UTF-8 кода из символа OEM

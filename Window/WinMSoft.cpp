@@ -382,10 +382,10 @@ bool Window::Timer()// контроль транзакций, вызов про�
 //!  Прямое и параллельное обращение к таймеру с соблюдением очередей Windows
 //!      (все расчеты в миллисекундах, опрокидывание через 49,7 суток)
 //!
-DWORD volatile RealTime=0,           // время исполнения параллельной процедуры
+unsigned volatile RealTime=0,        // время исполнения параллельной процедуры
                StartTime=GetTickCount(); // тики[мс] от времени запуска Windows
-DWORD GetTime(){ DWORD T=GetTickCount(); if(StartTime>T)StartTime=T; return T; }
-DWORD ElapsedTime(){ return GetTickCount()-StartTime; } //  от старта программы
+unsigned GetTime(){ unsigned T=GetTickCount(); if(StartTime>T)StartTime=T; return T; }
+unsigned ElapsedTime(){ return GetTickCount()-StartTime; } //  от старта программы
 //
 //!   Общий таймер не привязан к Window::Place, задействуется лишь единожды
 //    и служит квотированию чистого времени вычислений mCon/mWork
@@ -393,7 +393,7 @@ DWORD ElapsedTime(){ return GetTickCount()-StartTime; } //  от старта п
 //    статика определений не полагает возможности рекурсии-реентерабельности
 //
 static bool (*extFree)()=NULL;      // процедура главного вычислительного цикла
-static DWORD mWait=0,mWork=0;       // время задержки и циклов по исполнению
+static unsigned mWait=0,mWork=0;    // время задержки и циклов по исполнению
 #if 1
 static UINT_PTR IdT=0;               // базовый идентификатор общего прерывания
 
@@ -419,7 +419,7 @@ static void CALLBACK TimerProc( HWND hWind,UINT uMsg,UINT_PTR timerId,DWORD St)
   if( IdT!=timerId )return;              // всякие Sleep и т.п. пусть идут мимо
     ::KillTimer( 0,timerId );            // отключаем таймер, пока не изменился
   if( extFree )                          // запуск вычислений на заданное время
-  { DWORD Rt,T;    //, St=GetTickCount() -- отсчет начала приоритетных расчётов
+  { unsigned Rt,T; //, St=GetTickCount() -- отсчет начала приоритетных расчётов
     do
     { T=GetTickCount();                  //= отметка реального времени расчётов
       if( !extFree() )mWait=0;           //! исполнение или полный выход =false
@@ -430,9 +430,9 @@ static void CALLBACK TimerProc( HWND hWind,UINT uMsg,UINT_PTR timerId,DWORD St)
     } } while( mWait );
   } else mWait=0;                  // if( IdT ){ ::KillTimer( 0,IdT ); IdT=0; }
 }
-DWORD WaitTime( DWORD Wait,        // активная задержка для внешнего управления
+unsigned WaitTime( unsigned Wait,        // активная задержка для внешнего управления
                 bool( *inStay )(), // собственно сам вычислительный эксперимент
-                DWORD Work )       // время исполнения рабочего процесса [мСек]
+                unsigned Work )       // время исполнения рабочего процесса [мСек]
 { extFree=inStay,mWork=Work,mWait=Wait;               // инициализация таймеров
   if( Wait )IdT=::SetTimer( 0,0,Wait,TimerProc );     // כל = (со всеми окнами)
   while( First && mWait ) //WaitEvents();             // ожидание чистки mWait
@@ -474,7 +474,7 @@ static void CALLBACK TimerProc( HWND hWind,UINT uMsg,UINT_PTR timerId,DWORD St)
   if( tId!=timerId )return;              // всякие Sleep и т.п. пусть идут мимо
   ::KillTimer( 0,tId );              // отключаем таймер, пока не изменился
   if( extFree )                          // запуск вычислений на заданное время
-  { DWORD Rt,T;    //, St=GetTickCount() -- отсчет начала приоритетных расчётов
+  { unsigned Rt,T; //, St=GetTickCount() -- отсчет начала приоритетных расчётов
     do
     { T=GetTickCount();                  //= отметка реального времени расчётов
       if( !extFree() )mWait=0;           //! исполнение или полный выход =false
@@ -487,9 +487,9 @@ static void CALLBACK TimerProc( HWND hWind,UINT uMsg,UINT_PTR timerId,DWORD St)
   } else mWait=0;
 }
 
-DWORD WaitTime( DWORD Wait,        // активная задержка для внешнего управления
+unsigned WaitTime( unsigned Wait,  // активная задержка для внешнего управления
                 bool( *inStay )(), // собственно сам вычислительный эксперимент
-                DWORD Work )       // время исполнения рабочего процесса [мСек]
+                unsigned Work )    // время исполнения рабочего процесса [мСек]
 { extFree=inStay,mWork=Work,mWait=Wait;               // инициализация таймеров
   if( Wait )::SetTimer( 0,tId,Wait,TimerProc );       // כל = tId всеми окнами
   while( mWait )if( !WinRequest() )WaitMessage();     // ожидание чистки mWait
@@ -498,7 +498,7 @@ DWORD WaitTime( DWORD Wait,        // активная задержка для �
                     //while( isTimer>1 )if( !WinRequest( hWnd ) )WaitMessage();
 #endif
 
-Window& Window::SetTimer( DWORD mS,bool(*inTm)() )    // время+адрес исполнения
+Window& Window::SetTimer( unsigned mS,bool(*inTm)() ) // время+адрес исполнения
 { if( this )
   { WaitEvents( hWnd );                             // исполнение проходящего
     if( !mS )KillTimer(); else                        // включается таймер №12+

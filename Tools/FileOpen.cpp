@@ -87,6 +87,33 @@ char *getString( FILE *F, int t ) // Чтение строчки произво�
      if( c!='\r' ){ if( c!='\t' )LS[k++]=c; else do LS[k++]=' '; while( k%t );
                   } LS[k]=0; return LS;
 }
+/*#if 1
+#include <WChar.h>
+char* W2U( const wchar_t *str ) /// входная str не может быть унаследованной LS
+{ int i,l,iL=wcslen( str ),n; LS[0]=0; // в пределах инициированной длины на 2К
+   for( i=l=0; i<iL; i++ ){ strcpy( &LS[l],CtU(str[i],&n) ); l+=n; } return LS;
+}
+wchar_t* U2W( const char* str )   // и здесь только в пределах имеющейся LS.len
+{ if( str )if( *str ){ LS[0]=0;   // LS[Usize( str )*2]=0;
+    char *s=(char*)str; unsigned u=0; wchar_t *w=(wchar_t*)( (char*)LS );
+    while( *s ){ s=UtC( u,s ); *w++=wchar_t( u ); } *w=0;
+  } return (wchar_t*)( (char*)LS );
+}
+#else
+#include <windows.h>
+//
+//    всё будет на UTF-8, и только открытие файлов в Unicode-Windows (UTF-16le)
+//
+char* W2U( const wchar_t *str )
+{ int iL=::WideCharToMultiByte( CP_UTF8,0,str,-1,NULL,0,NULL,NULL ); LS[iL]=0;
+         ::WideCharToMultiByte( CP_UTF8,0,str,-1,LS,iL,NULL,NULL ); return LS;
+}
+wchar_t* U2W( const char* str )
+{ int uL=::MultiByteToWideChar( CP_UTF8,0,str,-1,NULL,0 ); LS[uL*2]=0;
+         ::MultiByteToWideChar( CP_UTF8,0,str,-1,(LPWSTR)((char*)LS),uL );
+  return (wchar_t*)((char*)LS);
+}
+#endif */
 /*
 void Break( const char Msg[],... )    // Случай аварийного завершения программы
 { va_list V; va_start( V,Msg );       // или приостановка с первым символом "~"

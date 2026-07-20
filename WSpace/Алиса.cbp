@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Алиса" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Alice">
+				<Option platforms="Windows;" />
+				<Option output="../../Work/Alice" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="Data" />
+				<Option object_output="../../Work/Obj" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option projectCompilerOptionsRelation="1" />
+				<Option projectLinkerOptionsRelation="1" />
+				<Compiler>
+					<Add option="-funsigned-char" />
+				</Compiler>
+				<Linker>
+					<Add library="comdlg32" />
+					<Add library="comctl32" />
+					<Add library="gdi32" />
+				</Linker>
+			</Target>
+			<Target title="alfaGenerator">
+				<Option output="../../Work/alfaGenerator" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../Алиса" />
+				<Option object_output="../../Work/Obj" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-fverbose-asm" />
+				</Compiler>
+			</Target>
+			<Target title="alfaGrid">
+				<Option output="../../Work/alfaGenerator" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../Алиса" />
+				<Option object_output="../../Work/Obj" />
+				<Option type="1" />
+				<Option compiler="gnu_gcc_stable32" />
+				<Compiler>
+					<Add option="-fverbose-asm" />
+				</Compiler>
+			</Target>
+			<Target title="Копилот">
+				<Option platforms="Windows;" />
+				<Option output="../../Work/Копилот" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../Working" />
+				<Option object_output="../../Work/Obj" />
+				<Option type="0" />
+				<Option compiler="gnu_gcc_stable" />
+				<Option projectCompilerOptionsRelation="1" />
+				<Option projectLinkerOptionsRelation="1" />
+				<Compiler>
+					<Add option="-funsigned-char" />
+				</Compiler>
+				<Linker>
+					<Add library="opengl32" />
+					<Add library="glu32" />
+				</Linker>
+			</Target>
+			<Target title="gigaGenerator">
+				<Option output="../../Work/alfaGenerator" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../Алиса" />
+				<Option object_output="../../Work/Obj" />
+				<Option type="1" />
+				<Option compiler="gnu_gcc_stable" />
+				<Compiler>
+					<Add option="-Os" />
+					<Add option="-fverbose-asm" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Os" />
+			<Add option="-funsigned-char" />
+			<Add option="-ffast-math" />
+			<Add option="-fno-exceptions" />
+			<Add option="-fno-trapping-math" />
+			<Add option="-mthreads" />
+			<Add option="-Wunused" />
+		</Compiler>
+		<Linker>
+			<Add option="-s" />
+		</Linker>
+		<Unit filename="../Type.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="../Window/ConIO.cpp">
+			<Option target="Alice" />
+			<Option target="alfaGenerator" />
+			<Option target="Копилот" />
+			<Option target="gigaGenerator" />
+		</Unit>
+		<Unit filename="../Working/Alice.c">
+			<Option compilerVar="CC" />
+			<Option target="Alice" />
+		</Unit>
+		<Unit filename="../Working/Копилот.c">
+			<Option compilerVar="CC" />
+			<Option target="Копилот" />
+		</Unit>
+		<Unit filename="../Алиса/AlfaGenerator.cpp">
+			<Option target="alfaGenerator" />
+		</Unit>
+		<Unit filename="../Алиса/AlfaGrid.cpp">
+			<Option target="alfaGrid" />
+		</Unit>
+		<Unit filename="../Алиса/GigaGenerator.cpp">
+			<Option target="gigaGenerator" />
+		</Unit>
+		<Extensions>
+			<DoxyBlocks>
+				<comment_style block="0" line="0" />
+				<doxyfile_project />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot />
+				<general />
+			</DoxyBlocks>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

@@ -9,5 +9,6 @@
 		<Project filename="Vector and Tensor.cbp" />
 		<Project filename="Fortran origin sources.cbp" />
 		<Project filename="WhetStown + FText + BCopy + Swab.cbp" />
+		<Project filename="Алиса.cbp" />
 	</Workspace>
 </CodeBlocks_workspace_file>

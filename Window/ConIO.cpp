@@ -23,7 +23,7 @@ void texttitle( const char* title )         //GetConsoleTitleA( S,sizeof(S ) );
                     va_end( aV ); return n;
 int print( short x,short y, const char *fmt,... ){ gotoxy( x,y ); ArgStr( x ) }int print( const char *fmt,... ){ int n; ArgStr( n ) } // CharToOem( str,str )void textcolor( COLORS clr,COLORS cbk ){ textattr( clr|cbk<<4 ); }
 void textcolor( COLORS clr ){ textattr( clr|(__BACK<<4) ); }
-////   Неявная и не особо управляемая инициализация нового окна текстовой консоли/*                              Rus-Windows/Cyr(1251) DOS/OEM(866) UTF-8(65001)#include <locale.h>
+/*     Неявная и не особо управляемая инициализация нового окна текстовой консоли                                Rus-Windows/Cyr(1251) DOS/OEM(866) UTF-8(65001)#include <locale.h>
 static bool CtrlHandler( DWORD fdwCtrlType )               // ExitProcess( 0 );
                        { if( StdOut )fclose( stdout ); StdOut=NULL; exit(44);
                          return true; } */
@@ -46,7 +46,7 @@ static struct _ScreenSave_{ _ScreenSave_()
     // print( "X=%d, y=%d <== X=%d, y=%d \n",Screen.dwSize.X,Screen.dwSize.Y,
     //             Screen.dwMaximumWindowSize.X,Screen.dwMaximumWindowSize.Y );
   }
-#if 1
+#if 0
  ~_ScreenSave_(){/*SetConsoleWindowInfo( StdOut,true,&(Screen.srWindow) );                  SetConsoleScreenBufferSize( StdOut,Screen.dwSize );                  SetConsoleTextAttribute( StdOut,Screen.wAttributes );                  Screen.dwCursorPosition.Y=Screen.srWindow.Bottom-2;
                   SetConsoleCursorPosition( StdOut,Screen.dwCursorPosition );*/
                   FreeConsole(); // printf("\n ConIO_Destructor\n"); _exit(25);

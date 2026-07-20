@@ -51,24 +51,20 @@
 			</Target>
 			<Target title="Waves Profile">
 				<Option output="../../Work/Wave-GLFW" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="../Vessel" />
+				<Option working_dir="../Эскадра" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
-				<Option compiler="gnu_gcc_stable" />
+				<Option compiler="gcc" />
 				<Option use_console_runner="0" />
 				<Option projectCompilerOptionsRelation="2" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-fexpensive-optimizations" />
 					<Add option="-Os" />
-					<Add option="-Wno-narrowing" />
-					<Add option="-Wno-volatile" />
 					<Add option="-DGLFW" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add library="pthread" />
-					<Add library="dl" />
 				</Linker>
 			</Target>
 			<Target title="Hull Theory">
@@ -110,7 +106,7 @@
 			</Target>
 			<Target title="Window-shapes">
 				<Option output="../../Work/GLFW-Shapes-A" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="../Vessel" />
+				<Option working_dir="../Эскадра" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -125,7 +121,7 @@
 			</Target>
 			<Target title="Window-trial">
 				<Option output="../../Work/GLFW-Trial-A" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="../Vessel" />
+				<Option working_dir="../Эскадра" />
 				<Option object_output="../../Work/Obj" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -138,6 +134,40 @@
 				<Linker>
 					<Add option="--gc-sections" />
 					<Add library="gomp" />
+				</Linker>
+			</Target>
+			<Target title="Window-shapes_x">
+				<Option output="../../Work/GLFW-Shapes-Ax" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../Эскадра" />
+				<Option object_output="../../Work/Obj" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option projectCompilerOptionsRelation="2" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-DGLFW" />
+				</Compiler>
+				<Linker>
+					<Add option="--gc-sections" />
+					<Add library="../../../SoftWare/Dev/Lib/libglfw3.a" />
+				</Linker>
+			</Target>
+			<Target title="Window-trial_x">
+				<Option output="../../Work/GLFW-Trial-Ax" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../Эскадра" />
+				<Option object_output="../../Work/Obj" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option projectCompilerOptionsRelation="2" />
+				<Option projectLinkerOptionsRelation="2" />
+				<Compiler>
+					<Add option="-fopenmp" />
+					<Add option="-DGLFW" />
+				</Compiler>
+				<Linker>
+					<Add option="--gc-sections" />
+					<Add library="gomp" />
+					<Add library="../../../SoftWare/Dev/Lib/libglfw3.a" />
 				</Linker>
 			</Target>
 		</Build>
@@ -172,6 +202,7 @@
 		<Unit filename="../Math/Tensor.cpp">
 			<Option target="Waves Profile" />
 			<Option target="Window-shapes" />
+			<Option target="Window-shapes_x" />
 		</Unit>
 		<Unit filename="../Math/Tensor.h">
 			<Option target="&lt;{~None~}&gt;" />
@@ -304,6 +335,7 @@
 			<Option target="Hull Theory" />
 			<Option target="Ship Viewer" />
 			<Option target="Aurora_Storm_x" />
+			<Option target="Window-shapes_x" />
 		</Unit>
 		<Unit filename="../Tools/Allocate.h">
 			<Option target="&lt;{~None~}&gt;" />
@@ -317,19 +349,26 @@
 		<Unit filename="../Tools/Glut/Geometry.cpp">
 			<Option target="Window-shapes" />
 			<Option target="Window-trial" />
+			<Option target="Window-shapes_x" />
+			<Option target="Window-trial_x" />
 		</Unit>
 		<Unit filename="../Tools/Glut/Geometry.h">
 			<Option target="Window-shapes" />
+			<Option target="Window-shapes_x" />
 		</Unit>
 		<Unit filename="../Tools/Glut/Teapot.cpp">
 			<Option target="Window-shapes" />
 			<Option target="Window-trial" />
+			<Option target="Window-shapes_x" />
+			<Option target="Window-trial_x" />
 		</Unit>
 		<Unit filename="../Tools/Math.Rc">
 			<Option compilerVar="CPP" />
 			<Option target="Waves Profile" />
 			<Option target="Window-shapes" />
 			<Option target="Window-trial" />
+			<Option target="Window-shapes_x" />
+			<Option target="Window-trial_x" />
 		</Unit>
 		<Unit filename="../Tools/Ship.Rc">
 			<Option compilerVar="CPP" />
@@ -341,15 +380,23 @@
 		<Unit filename="../Tools/StrCpy.cpp" />
 		<Unit filename="../Tools/Utah/Tea.cpp">
 			<Option target="Window-trial" />
+			<Option target="Window-trial_x" />
 		</Unit>
 		<Unit filename="../Tools/Utah/Tea.inc">
 			<Option target="Window-trial" />
+			<Option target="Window-trial_x" />
 		</Unit>
 		<Unit filename="../Type.h">
 			<Option target="Waves Profile" />
 			<Option target="Hull Theory" />
 			<Option target="Ship Viewer" />
 			<Option target="Window-shapes" />
+			<Option target="Window-shapes_x" />
+		</Unit>
+		<Unit filename="../Window/Arrow.cpp">
+			<Option target="Aurora Storm" />
+			<Option target="Aurora_Storm_x" />
+			<Option target="Ship Viewer" />
 		</Unit>
 		<Unit filename="../Window/ConIO.cpp">
 			<Option target="Aurora Storm" />
@@ -358,15 +405,19 @@
 			<Option target="Ship Viewer" />
 			<Option target="Window-trial" />
 			<Option target="Aurora_Storm_x" />
+			<Option target="Window-shapes_x" />
+			<Option target="Window-trial_x" />
 		</Unit>
 		<Unit filename="../Window/ConIO.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="../Window/Examples/Window-shapes.cpp">
 			<Option target="Window-shapes" />
+			<Option target="Window-shapes_x" />
 		</Unit>
 		<Unit filename="../Window/Examples/Window-trial.cpp">
 			<Option target="Window-trial" />
+			<Option target="Window-trial_x" />
 		</Unit>
 		<Unit filename="../Window/Font.cpp" />
 		<Unit filename="../Window/GLFW/context.c">
@@ -549,6 +600,7 @@
 			<Option target="Ship Viewer" />
 			<Option target="Window-shapes" />
 			<Option target="Aurora_Storm_x" />
+			<Option target="Window-shapes_x" />
 		</Unit>
 		<Unit filename="../Window/Sym_CCCP.c">
 			<Option compilerVar="CC" />
@@ -562,23 +614,28 @@
 			<Option target="Window-shapes" />
 			<Option target="Ship Viewer" />
 			<Option target="Aurora_Storm_x" />
+			<Option target="Window-shapes_x" />
 		</Unit>
 		<Unit filename="../Window/View.h">
 			<Option target="Waves Profile" />
 			<Option target="Window-shapes" />
+			<Option target="Window-shapes_x" />
 		</Unit>
 		<Unit filename="../Window/WinGLFW.cpp">
 			<Option compile="0" />
 			<Option link="0" />
 			<Option target="Window-shapes" />
+			<Option target="Window-shapes_x" />
 		</Unit>
 		<Unit filename="../Window/WinGLFW.h">
 			<Option target="Window-shapes" />
+			<Option target="Window-shapes_x" />
 		</Unit>
 		<Unit filename="../Window/WinMSoft.cpp">
 			<Option compile="0" />
 			<Option link="0" />
 			<Option target="Window-shapes" />
+			<Option target="Window-shapes_x" />
 		</Unit>
 		<Unit filename="../Window/Window-Free.cpp">
 			<Option compile="0" />
@@ -586,6 +643,8 @@
 			<Option target="Waves Profile" />
 			<Option target="Window-shapes" />
 			<Option target="Window-trial" />
+			<Option target="Window-shapes_x" />
+			<Option target="Window-trial_x" />
 		</Unit>
 		<Unit filename="../Window/Window-Place.cpp">
 			<Option compile="0" />
@@ -593,6 +652,8 @@
 			<Option target="Waves Profile" />
 			<Option target="Window-shapes" />
 			<Option target="Window-trial" />
+			<Option target="Window-shapes_x" />
+			<Option target="Window-trial_x" />
 		</Unit>
 		<Unit filename="../Window/Window.cpp" />
 		<Unit filename="../Window/Window.h" />
@@ -604,6 +665,7 @@
 			<Option target="Ship Viewer" />
 			<Option target="Window-shapes" />
 			<Option target="Aurora_Storm_x" />
+			<Option target="Window-shapes_x" />
 		</Unit>
 		<Extensions>
 			<lib_finder disable_auto="1" />

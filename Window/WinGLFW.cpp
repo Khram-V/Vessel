@@ -27,16 +27,18 @@ static void glfw_window_size_callback( GLFWwindow* window,int width,int height )
    Win->Rest().Show();
 }
 /// мышка
+enum { Move,Wheel,Ld,Md,Rd, Lu,Mu,Ru };
+
 static void glfw_cursor_enter_callback( GLFWwindow* window, int entered )
 { getWindow( window )->isCursorInside=entered;
 }
 static void glfw_mouse_button_callback
 ( GLFWwindow* window, int button, int action, int mods )
-{ int scan=0; Real x,y;
+{ fixed scan=0; Real x,y;
   switch( button )
-  { case GLFW_MOUSE_BUTTON_LEFT : scan=action==GLFW_PRESS?WM_LBUTTONDOWN:WM_LBUTTONUP; break;
-    case GLFW_MOUSE_BUTTON_RIGHT: scan=action==GLFW_PRESS?WM_RBUTTONDOWN:WM_RBUTTONUP; break;
-    case GLFW_MOUSE_BUTTON_3    : scan=action==GLFW_PRESS?WM_MBUTTONDOWN:WM_MBUTTONUP; break;
+  { case GLFW_MOUSE_BUTTON_LEFT : scan=action==GLFW_PRESS?Ld:Lu; break;
+    case GLFW_MOUSE_BUTTON_RIGHT: scan=action==GLFW_PRESS?Rd:Ru; break;
+    case GLFW_MOUSE_BUTTON_3    : scan=action==GLFW_PRESS?Md:Mu; break;
    default: return;
   }
  Window *Win=getWindow( window ); // glContext Set( Win );
@@ -46,11 +48,11 @@ static void glfw_mouse_button_callback
 }
 static void glfw_cursor_position_callback( GLFWwindow* window, Real x,Real y )
 { Window *Win=getWindow( window ); // glContext Set( Win );
-  if( Win->isCursorInside )Win->PutMouse( WM_MOUSEMOVE,x,y );
+  if( Win->isCursorInside )Win->PutMouse( Move,x,y );
 }
 static void glfw_scroll_callback( GLFWwindow* window, Real xoff,Real yoff )
 { Window *Win=getWindow( window ); // glContext Set( Win );
-  if( Win->isCursorInside )Win->PutMouse( WM_MOUSEWHEEL,xoff,yoff );
+  if( Win->isCursorInside )Win->PutMouse( Wheel,xoff,yoff );
 }
 static void callbackError( int error, const char* description )
   { Break( "~Ошибка GLFW( %d ):\n %s ",error,description );
@@ -200,7 +202,7 @@ Window::Window( const char *_title, int x,int y,int w,int h )
 }
 Window::~Window()                     // Разрушение окна в обработке прерываний
 { if( glfwWindow )                               // не без предосторожностей
-//if( Site )
+  if( Site )
   { KillTimer();                                 // отключение таймера
     while( Up )Up->~Place();                     // сброс наложенных фрагментов
     //       Site->~Place();                     // обрушение графического поля
@@ -214,15 +216,12 @@ Window::~Window()                     // Разрушение окна в обр
      { if( Cur->Next==this ){ Cur->Next=Next; break; } Cur=Cur->Next; }
 //     if( Cur->Next!=this )Cur=Cur->Next; else  // себя самого с удалением
 //       { Cur->Next=Next; break; }              // самого первого из найденных
-//  if( glfwWindow ){
     glfwDestroyWindow( glfwWindow );             // закрытие окна с переходом
-//    }
-    if( Cur )glAct( Cur ),WinReady(); //,WaitEvents() - на смежный нижний уровень
-    else{ First=NULL; glfwTerminate(); } // _exit( 22 );} // WinReady(),exit(3); // Cur->Activate();
+    if( Cur )glAct( Cur ),WinReady();            // - на смежный нижний уровень
+    else{ First=NULL; glfwTerminate(); _exit( 22 ); } // Cur->Activate();
   }
   glfwWindow = NULL;
-  Site = NULL;                                 //! сброс повторов деструктора
-//WaitEvents();
+  Site = NULL;                                   //! сброс повторов деструктора
 }
 void Window::Close(){ /*if( glfwWindow )*/ this->~Window(); } //delete this; }; //~Window(); }
 //!
@@ -280,20 +279,17 @@ fixed Window::WaitKey()                         // цикл ожидания н�
 //!
 //!  Внутренние процедуры для реализации виртуальных обращений с мышкой
 //!
-void Window::PutMouse( UINT State, int x,int y )
+void Window::PutMouse( fixed State, int x,int y )
 { bool ret=false;
-  switch( State )                     // ?( и как теперь с виртуальностью )
-  { case WM_MOUSEMOVE    : break;     // ?  контекст OpenGL не сверяется
-    case WM_LBUTTONDBLCLK:            //   - мышка ставит его сама
-    case WM_LBUTTONDOWN  : MouseState |=  _MouseLeft;   break;
-    case WM_LBUTTONUP    : MouseState &= ~_MouseLeft;   break;
-    case WM_RBUTTONDBLCLK:
-    case WM_RBUTTONDOWN  : MouseState |=  _MouseRight;  break;
-    case WM_RBUTTONUP    : MouseState &= ~_MouseRight;  break;
-    case WM_MBUTTONDBLCLK:
-    case WM_MBUTTONDOWN  : MouseState |=  _MouseMiddle; break;
-    case WM_MBUTTONUP    : MouseState &= ~_MouseMiddle; break;
-    case WM_MOUSEWHEEL   : MouseState =   _MouseWheel;  break; // сдвиг
+  switch( State )                         // ?( и как теперь с виртуальностью )
+  { case Move:  break;                    // ?  контекст OpenGL не сверяется
+    case Ld:    MouseState |=  _MouseLeft;   break;  // - мышка ставит его сама
+    case Lu:    MouseState &= ~_MouseLeft;   break;
+    case Rd:    MouseState |=  _MouseRight;  break;
+    case Ru:    MouseState &= ~_MouseRight;  break;
+    case Md:    MouseState |=  _MouseMiddle; break;
+    case Mu:    MouseState &= ~_MouseMiddle; break;
+    case Wheel: MouseState =   _MouseWheel;  break; // сдвиг
     default: MouseState=0; return; // isMouse=0; return;
   }
   if( isMouse )return; isMouse++;         // предотвращение рекурсии прерываний
@@ -325,18 +321,16 @@ void Window::PutMouse( UINT State, int x,int y )
 //!  Прямое и параллельное обращение к таймеру с соблюдением очередей Windows
 //!       (все расчеты в миллисекундах, опрокидывание через 49,7 суток)
 //!
-#if 1
-DWORD volatile RealTime=0,                              // тики [мс] от времени
-      StartTime=GetTickCount();                         //      запуска Windows
-DWORD ElapsedTime(){ return GetTickCount()-StartTime; } //  от старта программы
-DWORD GetTime()
-    { DWORD T=GetTickCount(); if( StartTime>T )StartTime=T; return T; }
+unsigned volatile RealTime=0,        // время исполнения параллельной процедуры
+          StartTime=0; //GetTickCount(); // тики[мс] от времени запуска Windows
+#if 0
+unsigned ElapsedTime(){ return GetTickCount()-StartTime; }// к старту программы
+unsigned GetTime()
+    { unsigned T=GetTickCount(); if( StartTime>T )StartTime=T; return T; }
 #else
-DWORD volatile                                          // тики [мс] от времени
-      StartTime=glfwGetTime()*1e3;                       //  запуска Windows от
-DWORD ElapsedTime(){ return glfwGetTime()*1e3-StartTime; } //  старта программы
-DWORD GetTime()
-    { DWORD T=glfwGetTime()*1e3; if( StartTime>T )StartTime=T; return T; }
+unsigned GetTime()                         // [мс] или тики от старта программы
+    { Real T=glfwGetTime()*1e3; if( StartTime>T )StartTime=T; return T; }
+unsigned ElapsedTime(){ return GetTime()-StartTime; }
 #endif
 bool Window::Timer()
 { if( glfwWindow )
@@ -347,7 +341,7 @@ bool Window::Timer()
     }
   } return false;
 }
-Window& Window::SetTimer( DWORD mSec,bool(*inTm)()) // время и адрес исполнения
+Window& Window::SetTimer(unsigned mSec,bool(*inTm)()) // время,адрес исполнения
 { if( glfwWindow )if( !mSec )                   // пока только таймер №12
   { dTime=0; extTime=NULL; } else              // идентификатор не привязан
   { dTime=mSec;                               // glfwWaitEventsTimeout( dTime )
@@ -437,14 +431,14 @@ glContext::~glContext()     // деструктор = эпилог с возвр
     //         getWindow( was )->WaitEvents();
              }
   }                                /// ??? доработать !!!
-DWORD WaitTime( DWORD mWait,       // активная задержка для внешнего управления
+unsigned WaitTime( unsigned mWait, // активная задержка для внешнего управления
                 bool(*inStay)(),   // собственно сам вычислительный эксперимент
-                DWORD mWork )      // время на исполнение рабочего цикла [мСек]
+                unsigned mWork )   // время на исполнение рабочего цикла [мСек]
 { // Sleep( mWait );
-   First->ScanKey();
-   glfwWaitEventsTimeout( 0.00003L*Real( mWait ) ); //! [ 0.03 сек ]
-   if( inStay )(*inStay)();
-   return ElapsedTime();
+  // First->ScanKey();
+  glfwWaitEventsTimeout( 0.00003*Real( mWait ) ); //! [ 0.03 сек ]
+  if( inStay )(*inStay)();
+  return ElapsedTime();
 }
 //  { Sleep( mWait ); }
 //  ...  все согласованные процедуры объединяются в единый модуль интерактивной
