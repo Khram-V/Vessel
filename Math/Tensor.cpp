@@ -53,7 +53,7 @@ const Real norm( _Real a,_Real b ){ return a*a + b*b; }
 const Real norm( _Real a,_Real b,_Real c ){ return a*a + b*b + c*c; }
 const Real norm(_Vector a ){ return a.x*a.x + a.y*a.y + a.z*a.z; }
 const Real  abs(_Vector a ){ Real n=norm(a); if(n>0)return sqrt(n); return 0; }
-Vector dir( _Vector a ){ Real n=norm(a); if(n>0)return a/sqrt(n); return Zero; }
+Vector dir( _Vector a ){ Real n=norm(a); if(n>0)return a/sqrt(n); return (Vector){1}; } // Zero; }
 Vector In3( _Vector A, _Vector B, _Vector C, _Real x ) // Кривая в трёх точках
  { return (A*(x-1)*x + C*x*(x+1))/2 - B*(x+1)*(x-1); } // в точках A:-1,B:0,C:1
 Vector In2( _Vector A, _Vector B, _Real x )      // Прямая линия по двух точкам

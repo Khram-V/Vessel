@@ -138,7 +138,7 @@ static Point Contour( Point& P )
   Point V={ 0,0 },R,N;
          Curve_Normal( dL );
   while( Curve_Normal( R,N ) )
-  { if( (A=norm( R-=P ))<(B=norm( N )/2) )A=B; V-=M*N*R/A/2;
+  { if( (A=norm( R-=P ))<(B=norm( N )/2) )A=B; V-=M*N*R/A/A/2; //!! /sqrt(A) ??
   } return V;
 }
 //      -------------------------------------------------------¬
@@ -153,8 +153,9 @@ static Point Surface( Point& P )
     if( abs( W.y )>=dCy || abs( W.x )>=dCx )
 //      V+=E*sqr( W )*Ds/norm( W );                    // V~=R^-0
 //      V+=E*sqr( W )*Ds/pow( norm( W ),1.5 );         // V~=R^-1
-        V+=E*sqr( W )*Ds/sqr( norm( W ) );             // V~=R^-2
+        V+=E*sqr( W )*Ds/sqr( norm( W ) );             // V~=R^-2 !! ++
 //      V+=E*sqr( W )*Ds/pow( norm( W ),2.5 );         // V~=R^-3
+//      V+=E*sqr( W )*Ds/pow( norm( W ),3.0 );         // V~=R^-4
     else { if( FVid&1 )BF[y][x]=1; V+=E*sqr( W )*16/Ds; }
   } dCx*=2; dCy*=2;
   return V;
@@ -174,9 +175,9 @@ static void Flow_Field()
  Real diagonal=hypot( dY,dX );
   if( FMod&2 )FVid|=1; Contour(); color( CYAN );
   if( FMod==3 )                                  // просчёт по "тензорам"
-  { for( int k=0; k<Nb; k++ )
-    { Flow[k]=conj( D-(Q=Contour( P=Body[k] )) )/M_PI; line( P,P+Q ); }
-  }
+  { for( int k=0; k<Nb; k++ )                    //        ?? << нормировка >>
+    { Flow[k]=conj(D-(Q=Contour(P=Body[k])))/M_PI; line(P,P+Q/(4*sqrt(abs(Q))));
+  } }
   for( P=0;; )
   { if( fixed( y=Ny/2+mY )>=Ny ){ if( nY>=Ny )break; }else
     { ++nY;

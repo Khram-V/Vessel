@@ -88,7 +88,7 @@ char* RtoA( _Real );                      // и если только число
 //    Работа с обычными текстовыми строчками
 //
  int strcut( char* Str );                // Убираются концевые пробелы, символы
-void  Break( const char* Msg, ... );     // с подсчетом оставшейся длины строки
+                                         // с подсчетом оставшейся длины строки
 char* fname( const char* FileName );     // Поиск собственно самого имени файла
 char* sname( char* ShortFileName  );     // то же имя, с отсечённым расширением
 char* fext ( char*, const char* Ext=0 ); // c принудительной заменой расширения
@@ -132,4 +132,7 @@ void  *Allocate( size_t Sz, void *A=NULL );         // Линейный масс
 void **Allocate( size_t Ny,size_t Sz,void* =NULL ); // Количество и длина строк
 size_t isAlloc( void* A ); // ?оперативный объём или количество строк в матрице
 #endif
+// Случай аварийного завершения программы или приостановка первым символом ="~"
+fixed Break( const char *Msg,... ); // _Esc - отмена или _Enter - подтверждение
+fixed Message( const char *Title, const char *Msg, ... );
 #endif

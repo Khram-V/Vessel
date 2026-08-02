@@ -1,5 +1,6 @@
 //
 //      Изображение замкнутого контура в текущем графическом поле
+//                     ... требуется перепроверка всей математики
 //
 //                               Версия 1.2 от 13 марта 1993 года
 //                                      Василий Храмушин, Сахалин
@@ -74,7 +75,7 @@ int Curve_Access( Point A )
     Point P,Q=C[Nc-1]-A;
     for( int k=0; k<Nc; k++ )
     { P=C[k]-A; S+=atan2( P.y*Q.x-P.x*Q.y,P.y*Q.y+P.x*Q.x ); Q=P;
-    } return abs( S )>M_PI_2*3.8;
+    } return abs( S )>M_PI*1.9; //_2*3.8;
 } }
 //      Основная программа рисования плоских фигур
 //
@@ -135,11 +136,12 @@ void Curve_Show()
     { case _Esc: Corner(); goto Leave;
       case 0xF1: Corner();
       { Ghelp();                          color( CYAN );
-        Twindow( 0,1,17,8 ); Tln();       color( LIGHTCYAN );
-        Tprintf( "<Insert>New Point\n" );
-        Tprintf( "<Delete>Point Off\n" );
-        Tprintf( "<Tab>Point Select\n" ); color( WHITE );
-        Tprintf( " Arrows +\n" );         color( LIGHTGRAY );
+        Twindow( 0,1,23,9 ); Tln();       color( LIGHTCYAN );
+        Tprintf( W2D("<Insert> Новая точка\n") );
+        Tprintf( W2D("<Delete> Удалить точку\n") );
+        Tprintf( W2D("<Tab>    Выбрать точку\n") ); color( WHITE );
+        Tprintf( W2D("<+|->    Перебор точек\n") );
+        Tprintf( W2D("Arrows Движение курсора\n") ); color( LIGHTGRAY );
         Tprintf( " <SHIFT> Moving\n" );
         Tprintf( "  <CTRL> Slowly\n" );
         Tprintf( "   <ALT> Fastly\n" ); Tv_getc(); Tback();
@@ -209,9 +211,9 @@ void Curve_Analytic( int inType )
     if( ans<sizeof(Menu)/sizeof(Mlist) )
     { if( Typ==5 )                              //  Домик с вогнутыми полостями
       { const Point Home[]=
-         { {-.8,-.5},{-1,.3},{-.3,1},{0,.8},{.3,1},{1,.3},
-           {.8,-.5},{.6,-.6},{.5,-.6},{.4,-.5},{.4,-.1},{.3,0},
-           {0,.1},{-.3,0},{-.4,-.1},{-.4,-.5},{-.5,-.6},{-.6,-.6}
+         { {-.8,-.5},{-1,.3},{-.3,1},{0,.8},{.3,1},{1,.3},{.8,-.5},
+           {.6,-.6},{.5,-.6},{.4,-.5},{.4,-.2},{.3,-.1},  {0,0},
+           {-.3,-.1},{-.4,-.2},{-.4,-.5},{-.5,-.6},{-.6,-.6}
          }; Nc=18;
         for( k=0; k<Nc; k++ )C[k].y=Home[k].y*DCy,C[k].x=Home[k].x*DCx;
       }

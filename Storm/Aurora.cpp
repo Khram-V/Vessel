@@ -349,13 +349,19 @@ static bool AllKeyb( fixed Keyb )
     case '6': case '^': if( Keyb )Ship.dCs=_Pd/60.0;
                         angle(Ship.Course+=_Ph*0.125); break; // курс ±1 румб
     case '5': case '%': angle(Ship.Course=-Ship.Head[-1].z);  // так держать
-                                                       break;
-    case _Esc:{ int Ans=MessageBoxW             // установка активности окна 🌀
-      ( 0,             //GetFocus() //GetForegroundWindow() //GetTopWindow( 0 )
-        L"«Аврора» — штормовая мореходность корабля",L"Завершение эксперимента"
+                        break;
+#if 0
+    case _Esc:      // GetFocus() // GetForegroundWindow() // GetTopWindow( 0 )
+    { int Ans=MessageBoxW                       // установка активности окна 🌀
+      ( 0,L"«Аврора» — штормовая мореходность корабля",L"Завершение эксперимента"
         , MB_OKCANCEL | MB_ICONQUESTION );
       Active_Key=Ans!=IDOK;                          // ==IDCANCEL; OK; YES; NO
-  } } return true;            // команда с клавиши снята и обработана
+    }
+#else
+    case _Esc: Active_Key=Message( "<Enter> - завершение программы",
+               "«Аврора» штормовая мореходность корабля" )!=_Enter;
+#endif
+  } return true;            // команда с клавиши снята и обработана
 }                             // все иные запросы клавиатуры здесь сбрасываются
 static int Write_choice( Window* Win )
 { fixed ans=1;
@@ -582,9 +588,8 @@ int main()                                 // ( int ans, char **av, char **ac )
   if( VIL )          // ...и сразу контроль записи протоколов испытаний
   { logStop();       // завершение протокола с записью интегральных результатов
     ftruncate( fileno( VIL ),ftell( VIL ) ); fclose( VIL ); VIL=0;
-    Break( "~ Протокол готов ~\n   ~ %s ~ [%d] ~",DtoA( Trun/3600,-3 ),KtE );
+    Break( "~ Протокол готов ~\n~ %s ~ [%d] ~",DtoA( Trun/3600,-3 ),KtE );
   }
-  // WinReady();       //  прогон незавершённых операций из основного алгоритма
-  return EXIT_SUCCESS;
-//_exit( EXIT_SUCCESS );              // с отменой исполнения всех деструкторов
+  // WinReady();        // прогон незавершённых операций из основного алгоритма
+  return EXIT_SUCCESS;  //               с отменой исполнения всех деструкторов
 }

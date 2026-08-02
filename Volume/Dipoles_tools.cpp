@@ -33,18 +33,22 @@ Model& Model::dipole( _Real s, bool paint, _Real Alfa )
     } } glEnd();
   } if( !paint )glPopAttrib(); return *this;
 }
-//!  промежуточная печать на текстовой консоли
+//!  "промежуточная печать" по текстовой консоли
 //
 #include <time.h>
 #include "../Window/ConIO.h"
 void Text_to_ConIO( Dipoles &D )
 { static int ct=0; time_t lt=time(0); // к текстовому окну с подключением мышки
-  if( !ct )textsize( 80,25,25 );      //   при неявной внешней инициализации
-  textcolor( LIGHTGREEN );
+//if( !ct )textsize( 80,25,25 );      //      при неявной внешней инициализации
+  textcolor( WHITE );
   print( 2,2,"<%d/%d>=<%d/%d> %s ",
         ++ct,Time_count,nDip,RealTime,asctime( (tm*)localtime( &lt ) ) );
-  for( int i=0; i<nDip && i<32; i++ )
-  { Dipole &B=D[i]; print( 2,i+3,"R={%5.2f,%5.2f,%5.2f}=%-5.2f V=%+.2f ",
-                                  B.R.x,B.R.y,B.R.z,abs(B.R),abs(B.V)-1 );
+  for( int i=0; i<nDip; i++ )
+  { Dipole &B=D[i]; textcolor( LIGHTCYAN );
+    print( 2,i+3,"[%2i] R={%4.1f,%4.1f,%4.1f}=%3.1f",
+                      i,B.R.x,B.R.y,B.R.z,abs(B.R) );
+    textcolor( LIGHTGREEN );
+    print( "  M={%4.1f,%4.1f,%4.1f}=%3.1f  W=%+.1f  V=%+.1f ",
+              B.M.x,B.M.y,B.M.z,abs(B.M), abs(B.W), abs(B.V) );
   }
 }

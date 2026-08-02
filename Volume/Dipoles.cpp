@@ -19,36 +19,35 @@ unsigned nDip=0,           // количество корпускул в акт�
          Video_count=0;    // счётчик кадров видео прорисовок
 
 void ReInstall_TimeSpace( int N )  // продолжительность во времени Dipole_route
-{                                  // в переустановке используется исходный рой
-  for( int i=0; i<Dipole_route; i++ )Dipoles_array[i].Install( N ); nDip=N;
-  Dipoles_array->Initial();
+{ clrscr();                        // в переустановке используется исходный рой
+  glDisable( GL_LIGHTING );
+  glPolygonMode( GL_FRONT_AND_BACK,GL_FILL );
   //
   //  начальная установка с обнулением счётчика исполненных тактов эксперимента
   //
-  glDisable( GL_LIGHTING );
-  glPolygonMode( GL_FRONT_AND_BACK,GL_FILL );
   Time_count=Video_count=0;
-  clrscr();
+  for( int i=0; i<Dipole_route; i++ )Dipoles_array[i].Install( N ); nDip=N;
+                                     Dipoles_array[0].Initial();
 }
 // Предустановка и начальная инициализация вычислительного эксперимента в целом
 //
 Dipoles& Dipoles::Install( int N )     // количество условных нуклонов в группе
 { T=0.0;                                       // динамическое добавление точек
   if( nDip<N )D=(Dipole*)Allocate( N*sizeof( Dipole ),D );  // по необходимости
-  for( int k=0; k<N; k++ )    // без повторений но с предварительной расчисткой
-  { D[k].M=(Vector){ 1,0,0 }, // дипольные моменты
-    D[k].V=(Vector){ 0,0,0 }, // изначальная скорость набегающего потока
-//  D[k].W=(Vector){ 0,0,0 }, // скорость частицы в инерциальной(глобальной) СК
-    D[k].R=(Vector){ 0,0,0 }; // координаты корпускулы в абсолютных отсчётах
-    if( ex.Flow )D[k].V.x=-1; // внешний набегающий поток
+  for( int k=0; k<N; k++ )      // без повторений и предварительной расчисткой
+  { D[k].M=(Vector){ 1,0,0 },   // дипольные моменты
+    D[k].V=(Vector){ 0,0,0 },   // изначальная скорость набегающего потока
+    D[k].W=(Vector){ 0,0,0 },   // наведённый диполями поток в локальном базисе
+    D[k].R=(Vector){ 0,0,0 };   // координаты корпускулы в абсолютных отсчётах
+    ExtFlow=0.0;                // внешний набегающий поток
   } return *this;
 }
 Dipoles& Dipoles::Initial()
 { int k=nDip;
   switch( nDip )              // в предустановке только начальный рой корпускул
-  { case 1: break;                                                //  H водород
-    case 2: D[1].R.x=-(D[0].R.x=0.5); D[0].M.x=-(D[1].R.x=1); break; // ²H дейтерий
-    case 3: D[0].R=(Vector){0,0.5,.28866},                        // ³H тритий
+  { case 1: D[0].M=1.0; break;                                   //  H водород
+    case 2: D[1].R.x=-(D[0].R.x=.5); break;                      // ²H дейтерий
+    case 3: D[0].R=(Vector){0,0.5,.28866},                       // ³H тритий
             D[1].R=(Vector){0,-.5,.28866},D[2].R=(Vector){0,0,-0.57733}; break;
     case 4: D[0].R=(Vector){0.5,0,.35355},D[2].R=(Vector){0,0.5,-.35355}, // Не гелий 2+2 ~~ Be бериллий 4+5
             D[1].R=(Vector){-.5,0,.35355},D[3].R=(Vector){0,-.5,-.35355}; break;
@@ -74,11 +73,13 @@ Dipoles& Dipoles::Initial()
       Break( "~nDip=%d => x:%d, y:%d, z:%d ",nDip,_x,_y,_z ); //exit(11);
       for( k=0,z=0; z<_z; z++ )
       for( y=0; y<_y; y++ )
-      for( x=0; x<_x && k<nDip; x++ )D[k++].R=(Vector){ x-_x/2.0,y-_y/2.0,z-_z/2.0 };
-    }
-    // Break( "Неверное количество[%d]"
-    //        " ≠ 1,2,3,4,5,6,7,8,9,10,27,64,125,216,343,512,729",nDip );
-  } return Average();
+      for( x=0; x<_x && k<nDip; x++ )
+        D[k++].R=(Vector){ x-_x/2.0,y-_y/2.0,z-_z/2.0 };
+    }   // Break( "Неверное количество[%d]"
+  }     //        " ≠ 1,2,3,4,5,6,7,8,9,10,27,64,125,216,343,512,729",nDip );
+  if( nDip>1 )
+  for( k=0; k<nDip; k++ )
+    D[k].M=norm( D[k].R )<=eps ? (Vector){-1}:dir( -D[k].R ); return Average();
 }
 //  Главная программа
 //
@@ -89,15 +90,13 @@ int main( int argc, char** argv )   // однократное распредел
   texttitle( "Пространственные частицы и поляризованные корпускулы" );                                     //  что не сильно перегрузит вычислители
   glDepthFunc( GL_LEQUAL ); //NEVER~EQUAL~GEQUAL~GREATER~LEQUAL~NOTEQUAL~LESS~ALWAYS
   while( VideoStage() )
-  { unsigned T=GetTime();              // отсчет начала приоритетных расчётов
+  { unsigned T=GetTime(); //WaitTime(60);// отсчет начала приоритетных расчётов
     One_Time_Step();                   // проверка, жива ли еще сама программа
     RealTime+=GetTime()-T;             // использованный интервал времени #0
-  }
-/*{                                    // запускается интервальный таймер и
-    WaitTime( Quantum_wait,            // время задержки для внешних операций
+  }                                    // запускается интервальный таймер и
+/*{ WaitTime( Quantum_wait,            // время задержки для внешних операций
               One_Time_Step,           // собственно процедура расчётного цикла
               nDip<2?0:Quantum_exp );  // счёт по exp и приостановка на wait мс
   }*/                 // одна частичка не сильно грузит вычислительные процессы
-  Break( "~ на выход ~" );
-  return 18;
+  Break( "~ на выход ~" ); return 0;
 }

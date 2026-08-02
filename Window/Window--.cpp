@@ -80,15 +80,14 @@ bool Window::KeyBoard( fixed key )// виртуальная процедура �
   } return false; //!KeyPas!=KeyPos; либо все недочитанные символы сбрасываются
 }
 fixed Window::GetKey()         // запрос появления нового символа на клавиатуре
-  { WaitEvents(); if( KeyPas==KeyPos )return 0; return KeyBuffer[ ++KeyPos&=lKey ].Key; } // WaitKey(); }
+{ WaitEvents(); if( KeyPas==KeyPos )return 0; return KeyBuffer[ ++KeyPos&=lKey ].Key; } // WaitKey(); }
 fixed Window::ScanKey()        // просто проверка текущей активности клавиатуры
-  { WaitEvents(); return KeyPas==KeyPos ? 0 : KeyBuffer[KeyPos].Key; }
+{ WaitEvents(); return KeyPas==KeyPos ? 0 : KeyBuffer[KeyPos].Key; }
 fixed Window::ScanStatus()      // обновление в случае отсутствия новых запросов
-  { WaitEvents(); if( KeyPas==KeyPos )return KeyStates();
-                        return KeyBuffer[KeyPos].Code;
-  }
+{ WaitEvents(); if( KeyPas==KeyPos )return KeyStates();
+                                    return KeyBuffer[KeyPos].Code;
+}
 #else
-
 bool Window::KeyBoard( fixed key )// виртуальная процедура обработки прерываний
 { if( Ready() )
   if( extKey ){ glContext S( this ); // установка графического контента OpenGL
@@ -119,38 +118,24 @@ fixed Window::ScanStatus()      // обновление в случае отсу
 // #include "Julian.cpp"
 // #include "Sym_CCCP.c"
 //
-//
 // Случай аварийного завершения программы или приостановка первым символом ="~"
 //
 fixed Break( const char *Msg, ... ) // _Esc - отмена или _Enter - подтверждение
 { char str[256]; bool msg=*Msg=='~'; fixed ans; va_list V;
   va_start( V,Msg ); vsnprintf( str,255,Msg,V ); va_end( V );
+//#pragma omp barrier
   Window B( msg?"...к сведению":"Завершение",0,0,max(24,Ulen(str))*9+64,60 );
   glColor3b( msg?63:127,127,63 ); B.AlfaBit(_8x16).Print( 4,-2,str );
   ans=B.WaitKey(); if( !msg )exit( MB_OK+4 ); // ! со всеми деструкторами ...
   return ans;
 }
 fixed Message( const char *Title,const char *Msg,... ) //?! остановка программы
-{ va_list V; va_start(V,Msg); //char *str=(char*)malloc( vsprintf( 0,Msg,V )*2+4 );
-  char str[4096];             vsprintf( str,Msg,V ); va_end( V );
-#pragma omp barrier
+{ va_list V; va_start(V,Msg); char *str=(char*)malloc( vsprintf( 0,Msg,V )*2+4 );
+                          vsprintf( str,Msg,V ); va_end( V );
   Window B( Title,0,0,max(24,Ulen(str))*9+64,60 );
-  glColor3b( 63,127,63 ); B.AlfaBit(_8x16).Print( 4,-2,str ); //free( str );
-#pragma omp barrier
+  glColor3b( 63,127,63 ); B.AlfaBit(_8x16).Print( 4,-2,str ); free( str );
+//#pragma omp barrier
   return B.WaitKey();
 }
-/*
-fixed Break( const char *Msg, ... )    // Случай аварийного завершения программы
-//{ static int Len=0; static char *str=NULL;
-{ char str[256];
-  va_list V; va_start( V,Msg );       // или приостановка с первым символом "~"
-//int L=vsprintf( 0,Msg,V )*2+1600; if( L>Len )str=(char*)realloc( str,Len=L ); _vscprintf
-       vsnprintf( str,255,Msg,V ); va_end( V );   //! с длиной что-то не то ??
-  MessageBoxW( NULL,U2W(str),*Msg=='~'?L"...к сведению":L"Завершение",
-               MB_ICONASTERISK|MB_OK );
-  if( *Msg!='~' )exit( MB_OK+4 );     // ! со всеми деструкторами ...
-//free( str ); str=NULL; Len=0;       // очистка к безуспешному продолжению
-return 0;
-}
-// char str[vsprintf( 0,Msg,V )*2+16]; // автоматическая память из стека
-*/
+
+
