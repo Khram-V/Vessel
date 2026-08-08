@@ -91,7 +91,7 @@ static void Control( Flex &F, _Vector Ofs, bool Stm )     // def - шпанго�
 //
 static void Alliance( Flex &S, Flex &Y, _Real X )          // St ? Stern : Stem
 { if( !Y.len )return;               // штевни остаются как есть, без дополнений
-  if( !S.len ){ Y[0].x=X; S+=Y[0]; }    // одна новая точка ставится на штевень
+  if( !S.len ){ Y[0].x=X; S+=Y[0]; }// или одна новая точка ставится на штевень
  int i,j; Vector V; Flex F;
   for( i=j=0; i<S.len || j<Y.len; F+=V )// всегда с пристройкой найденной точки
   { if( !i && !j  )
@@ -110,12 +110,13 @@ static void Alliance( Flex &S, Flex &Y, _Real X )          // St ? Stern : Stem
       { V=Y[j]; V.x=Inter( V.z,S[i-1].z,S[i].z,S[i-1].x,S[i].x ); j++; }
     }
   }
-  if( F.len ){ // V=F[0];  if( V.y ){ V.y=0.0; F/=V; } // так, на всякий случай
-               // V=F[-1]; if( V.y ){ V.y=0.0; F+=V; } //   обнуление оконцовок
+  if( F.len ){ //V=F[0];  if( V.y ){ V.y=0.0; F/=V; } // так, на всякий случай
+               //V=F[-1]; if( V.y ){ V.y=0.0; F+=V; } //   обнуление оконцовок
     S.len=0; S+=F[0];                         // сброс исходных абсцисс  штевня
-    for( i=1; i<F.len; i++ )                  // с переброской иного результата
-    { if( F[i].z>0 || S[-1]!=F[i] )S+=F[i]; } // без повторов в подводной части
-  }
+    for( i=1; i<F.len; i++ )S+=F[i];          // с переброской иного результата
+//   if( S[-1]!=F[i] )S+=F[i];                // без повторов
+//   if( F[i].z>=0 || S[-1]!=F[i] )S+=F[i];   // без повторов в подводной части
+  } Y.len=0;                                  // исключение повторений (старое)
 }
 #if 0
 #define inx( x,s )( (St && (s<=x)) || (!St && (x<=s)) ) // за штевнем [s<=x<=s]
@@ -123,7 +124,7 @@ static void Alliance( Flex &S, Flex &Y, _Real X )          // St ? Stern : Stem
 #endif
 //     сопровождение векторного списка с помощью индексов для оболочки Shell
 //
-static Flex L,R;               // левый и правый шпангоуты для поисковой шпации
+static Flex L,R;       // смежные левый и правый шпангоуты для поисковой шпации
 static struct uList // *m-вектор индексных масок, n-истинная, len-текущая длина
 { unsigned *m; int n,len;
 //uList(): m( NULL ),n(0),len(0){} ~uList(){ if( m )free( m ); m=0; n=len=0; }
@@ -133,35 +134,15 @@ unsigned& uList::operator[]( int k ){ return m[minmax(0,k>=0?k:k+len,len-1)]; }
 unsigned& uList::operator+=( unsigned p ) // выбор [k] обраткой и += дополнение
 { if(len>=n)m=(unsigned*)realloc(m,(n+=96)*sizeof(unsigned));return m[len++]=p;
 }
-//static bool s1pt=true;                          // первый четырёхугольник
-//static Vector oP={0,0,-1};                      // и его нормаль условно вниз
-static bool Span( int l, int r )                // малый: 2S/L  большой: abc/4S
-{
-  return norm( R[r+1]-L[l] ) < norm( R[r]-L[l+1] );    // кратчайшее обновление
-//  return sqr( dir( R[r+1]-L[l] ).x )>sqr( dir( R[r]-L[l+1] ).x );
-#if 1
-/*
- Vector Rl=( R[r+1]-R[r] )*( L[l]-R[r] ),
-        Lr=( R[r]-L[l] )*( L[l+1]-L[l] );
- Real rl=dir( R[r+1]-L[l] ).x,
-      lr=dir( R[r]-L[l+1] ).x;
-// bool Side=rl>lr;
- bool Side=norm( Rl )/rl>norm( Lr )/lr ;
-  if( s1pt )s1pt=false; else      // norm( R[r+1]-L[l] )<norm( R[r]-L[l+1] ); }
-  { Real ra=dir( Rl )%oP,
-         la=dir( Lr )%oP;
-    if( ra*la<-10.5 )Side=ra>la;    // Side=Rl%oP>=Lr%oP; //s1pt=true;
-  }
-  oP=dir( Side?Rl:Lr ); return Side;
-*/
-#else
-  Vector Rl=R[r+1]-L[l],Lr=L[l+1]-R[r], // Rl.z/=2; Lr.z/=2; //Rl.x=Lr.x=0.0;
-         Ll=L[l+1]-L[l],Rr=R[r+1]-R[r]; // кратчайшее отстояние
-    Real R=dir( Rr*Rl )%dir( Rl*Ll ),   // такой слом не особо адекватен
-         L=dir( Ll*Lr )%dir( Lr*Rr );
-     if( L*R<0 )return R<L;
-          else  return norm( Rl )<norm( Lr );
-#endif
+//static bool s1pt=true;                       // первый четырёхугольник
+//static Vector oP={0,0,-1};                   // и его нормаль условно вниз
+static bool Span( int l, int r )               // малый: 2S/L  большой: abc/4S
+{ Vector b=R[r+1]-R[r]+L[l+1]-L[l],            // общий или срединный вектор
+        rl=R[r+1]-L[l],                 // обнормаливаемые векторы к
+        lr=L[l+1]-R[r];                 // корректному сравнению с единичным .х
+  return norm( b*dir(rl) )>=norm( dir(lr)*b );
+//return norm( R[r+1]-L[l] ) < norm( R[r]-L[l+1] );    // кратчайшее обновление
+//return sqr( dir( R[r+1]-L[l] ).x )>sqr( dir( R[r]-L[l+1] ).x );
 }
 //   Считывание корпуса отмечается успехом, либо полным завершением программы
 //
@@ -187,7 +168,7 @@ Ok:
   Str=stringData( Fh );              // Длинная строка в буфере входного файла
   if( *Str++==30 ){                  //  '\30=▲\x1E'
    Vector V;                         // векторы шпангоутных контуров по шпациям
-   Real x,y,z; int i,j,k,l,m,n;      // ... точки по циклам двойной вложенности
+   Real x,y,z; int i,k,n;            // ... точки по циклам двойной вложенности
     Ofs=Zero;                        // приведение к миделю и основной линии OЛ
     if( Str=strchr( Str,'<' ) )      // подзаголовок проекта в угловых скобках
     if( s=strchr( ++Str,'>' ) )      // ?если нет названия проекта <- имя файла
@@ -200,19 +181,19 @@ Ok:
     Keel=(Real*)Allocate( (Nframes+2)*sizeof(Real),Keel );  // килевая разметка
     Frame=(Flex*)Allocate( (Nframes+2)*sizeof(Flex),Frame );// точки шпангоутов
     for( i=0; i<=Nframes+1; i++ )Frame[i].len=0;    // вычистка всех шпангоутов
-    Stem.len=Stern.len=L.len=R.len=0;  // расчистка и обнуление адресных ссылок
-    if( newDraught>eps )Draught=newDraught; //else // новое пересчитывание с
+    Stem.len=Stern.len=L.len=R.len=0;            // расчистка и обнуление узлов
+    if( newDraught>eps )Draught=newDraught;    //else // новое пересчитывание с
 //      else KtE=0,Trun=Tlaps=0.0;      // переустановкой конструктивной осадки
 //    if( KtE>0 )Storm->Original( true );
 /*    if( KtE>0 )
     {
       Trun=Tlaps=0.0;
       KtE=0;     // реальное время для моделирования [сек, час]
-//      Storm->Instant.Now();      // текущее время к фазе волн на данный момент
+//    Storm->Instant.Now();      // текущее время к фазе волн на данный момент
       Storm->Wind.Clear();       // ветер
       Storm->Swell.Clear();      // зыбь
       Storm->Surge.Clear();      // вал
-//      Initial().Floating();
+//    Initial().Floating();
     }
 */
     //
@@ -221,7 +202,7 @@ Ok:
     n=strtol( stringData( Fh ),&s,0 );          // штевни выбираются как есть
     for( V.y=0,i=0; i<n; i++ )V.z=strtod( s,&s ),V.x=strtod( s,&s ),Stern+=V;
     k=strtol( stringData( Fh ),&s,0 );          // если концевые точки обнулены
-    for( V.x=0,i=0; i<k; i++ )V.z=strtod( s,&s ),V.y=strtod( s,&s ),L+=V;
+    for( V.x=0,i=0; i<k; i++ )V.z=strtod( s,&s ),V.y=strtod( s,&s ),R+=V;
     //
     //   Собственно корпус ( - в том же последовательном потоке )
     //
@@ -239,12 +220,13 @@ Ok:
     //  отсчет абсцисс шпангоутов и штевней ведется от кормового перпендикуляра
     //
     k=strtol( stringData( Fh ),&s,0 );
-    for( V.x=0,i=0; i<k; i++ )V.z=strtod( s,&s ),V.y=strtod( s,&s ),R+=V;
+    for( V.x=0,i=0; i<k; i++ )V.z=strtod( s,&s ),V.y=strtod( s,&s ),L+=V;
     n=strtol( stringData( Fh ),&s,0 );
     for( V.y=0,i=0; i<n; i++ )V.z=strtod( s,&s ),V.x=strtod( s,&s ),Stem+=V;
-    fclose( Fh );                           // работа с файлом данных завершена
-    Alliance( Stern,L,Keel[1] );            // первая перестройка штевней после
-    Alliance( Stem,R,Keel[Nframes] );       // считывания всех данных о корпусе
+    fclose( Fh );                         // выборка исходных данных завершена
+                                          // Связывание координат по аппликатам
+    Alliance( Stern,R,Keel[1] );          // первая перенастройка штевней после
+    Alliance( Stem,L,Keel[Nframes] );     // считывания всех данных о корпусе
     //
     //   Экстремумы по килевой линии и дополнение крайних шпангоутов
     //       ~~ крайние точки на килевой или палубной аппликате
@@ -258,6 +240,7 @@ Ok:
     if( !Frame[0].len ){ for( z=i=0; i<Frame[1].len; i++ )z+=Frame[1][i].z;
                           if( i )Frame[0]+=(Vector){ Keel[0],0,z/i };
                        } n=Nframes; // носовая оконечность на конечных отсчётах
+
     for( Keel[n+1]=Keel[n],i=0; i<Stem.len; i++ )
     { _Vector S=Stem[i];
       if( S.x>Keel[n+1] )Keel[n+1]=S.x;    // экстремум абсциссы по форштевню с
@@ -278,29 +261,33 @@ Ok:
        { Keel[n]-=Ofs.x;                                    // пересечения
          Control( Frame[n],Ofs,n==0||n==Nframes+1 );        // ватерлинии
        } Control( Stem,Ofs,true );
+                  //       крайне сомнительное переложение штевней на шпангоуты
    bool lfr=false;// выбор левой стороны штевня со смежными правыми шпангоутами
+#if 1
+   int j,l;
     do
     for( n=1; n<Nframes; n++ ) // оконечные шпации считаются предустановленными
     {    i=j=l=0;            // будет интервал [j..l], i возможно с превышением
      Flex &S=lfr?Stern:Stem; // изначально полагается нижняя точка на шпангоуте
     Rep:                     // выборка цельного фрагмента штевня внутри шпации
-      for( j=-1; i<S.len; i++ )                   // подборка точек на штевнях
+      for( j=-1; i<S.len; i++ )                   // i-cборка точек на штевнях
       if( Keel[n]<=S[i].x && S[i].x<=Keel[n+1] )  // в пределах одной шпации
-      { l=i; if( j<0 )j=l;                        // индекс i будет зашкаливать
+      { l=i; if( j<0 )j=i;                        // индекс i будет зашкаливать
       } else if( j>=0 )break;                     // получен интервал от j до l
-             if( j<0 )continue;                   // фрагмент контура не найден
-//    if( j==l )goto Rep; else                    // ? j==l интервал на 1 точку
+      if( j<0 )continue;                          // фрагмент контура не найден
+      if( j==l )goto Rep; else                    // ? j==l интервал на 1 точку
       { //
         // самая простая привязка контуров штевней к наклонам ветвей шпангоутов
         //
        Flex &F=lfr?Frame[n]:Frame[n+1];          // фиксация ссылки на шпангоут
         if( S[l].z>=F[-1].z ){ for( k=j; k<=l; k++ )if( F[-1]!=S[k] )F+=S[k]; } else
         if( S[j].z<F[0].z ){ for( k=l; k>=j; k-- )if( F[0]!=S[k] )F/=S[k]; } else
-        for( m=1; m<F.len; m++ )
-        if( F[m-1].y==0.0 && F[m].y==0.0 )
-         if( intoi( F[m-1].z,0.5*(S[j].z+S[l].z),F[m].z ) )
-//         { for( k=l; k>=j; k-- ){ V=S[k]; V.y=0; F.Insert( m )=V; } break; }
-           { for( k=l; k>=j; k-- )F.Insert( m )=S[k]; break; }
+        for( int m=1; m<F.len; m++ )
+         if( F[m-1].y==0.0 && F[m].y==0.0 )
+         if( intoi( F[m-1].z,0.5*(S[j].z+S[l].z),F[m].z ) ) // нужный интервал?
+          { for( k=l; k>=j; k-- ) // и вставка задом наперёд, но без совпадений
+             if( F[m]!=S[k] && F[m-1]!=S[k] )F.Insert( m )=S[k]; break;
+          }
         if( i<S.len )goto Rep;
       }    // уточнение крайних контуров проекции бок в диаметральной плоскости
     }                                          // сначала форштевень lfr=false,
@@ -317,9 +304,8 @@ Ok:
       if( Frame[n][i].x==Keel[n] )      // выход на собственно контур шпангоута
       { if( Frame[n][i].y<Frame[n][i-1].y*2 ) // предполагается возможность у=0
             Frame[n][i].y=Frame[n][i-1].y; break;
-      }
-    }
-    // Каждый шпангоут должен иметь точки на ватерлинии по абсциссам шпангоутов
+    } }
+    // Каждый шпангоут должен иметь точки на ватерлинии
     //
     for( n=0; n<=Nframes+1; n++ )
     for( k=Frame[n].len-2; k>=0; k-- )    // длина всегда больше трёх, если у>0
@@ -329,6 +315,11 @@ Ok:
         if( abs( W-C )<eps )W=C; else
         if( abs( V-C )<eps )V=C; else Frame[n].Insert( k+1 )=C;
     } }
+#else
+    //
+    // перепостроение диаметральной плоскости с контрурами концевых щпангоутов
+    //
+#endif
     //! Собираем треугольники в оболочку Shell - "как есть" с веером у днища на
     //! основной линии для последующей оптимизации от киля по максимуму площади
     //! треугольников относительно половины квадрата минимального ребра

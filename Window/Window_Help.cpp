@@ -33,6 +33,8 @@ void Window::Help
     P.AlfaVector( 7,0 );
     glColor4f( 1,.9,.8,.5 ); P.Print( -1,0,"©75÷26 В.Храмушин" );
   } P.Show(); // P.Save().Refresh();        // среда восстанавливается,
+#pragma omp barrier
+#pragma omp single
     WaitKey();                             // а окно будет снято Р-деструктором
 }
 //#pragma omp master // single

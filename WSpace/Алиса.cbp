@@ -75,6 +75,20 @@
 					<Add option="-s" />
 				</Linker>
 			</Target>
+			<Target title="Вода_invent-1">
+				<Option output="../../Work/Вода_invent-1" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../Алиса" />
+				<Option object_output="../../Work/Obj" />
+				<Option type="1" />
+				<Option compiler="gnu_gcc_stable" />
+				<Compiler>
+					<Add option="-Os" />
+					<Add option="-fverbose-asm" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Os" />
@@ -113,6 +127,10 @@
 		</Unit>
 		<Unit filename="../Алиса/GigaGenerator.cpp">
 			<Option target="gigaGenerator" />
+		</Unit>
+		<Unit filename="../Алиса/Вода_invent-1.c">
+			<Option compilerVar="CC" />
+			<Option target="Вода_invent-1" />
 		</Unit>
 		<Extensions>
 			<DoxyBlocks>

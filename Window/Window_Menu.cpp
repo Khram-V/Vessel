@@ -135,6 +135,7 @@ Rep: ins=GetKeyState( VK_INSERT );            // признак 1-вставки
      }
      if( ked!=-1 && ked!=K ){ K=ked; Get( Ls,ked ); }     // будет новое число?
      Draw();
+#pragma omp barrier
      if( !(ans=A->WaitKey() ) )break;                  // случай закрытия окна
      if( ans>=_F1 && ans<=_F12 )return ans;
    }                                   // по выходу из процедуры ???

@@ -55,7 +55,7 @@ static void glfw_scroll_callback( GLFWwindow* window, Real xoff,Real yoff )
   if( Win->isCursorInside )Win->PutMouse( Wheel,xoff,yoff );
 }
 static void callbackError( int error, const char* description )
-  { Break( "~Ошибка GLFW( %d ):\n %s ",error,description );
+  { Message( "Ошибка GLFW","err( %d ):\n %s ",error,description );
   }
 /*
 static void glfw_draw_callback( GLFWwindow* window )
@@ -159,7 +159,7 @@ Window::Window( const char *_title, int x,int y,int w,int h )
  // glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR,3 );
  //?glfwWindowHint( GLFW_HOVERED,true ); // контроль присутствия курсора в окне
  //?glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT,GLFW_TRUE );
-
+#pragma omp barrier
     glfwWindow=glfwCreateWindow                   // Создание независимого окна
       ( Width,Height,_title?_title:"Window-Place",   // glfwGetPrimaryMonitor()
                                       NULL,NULL );

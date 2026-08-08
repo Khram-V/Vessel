@@ -350,18 +350,9 @@ static bool AllKeyb( fixed Keyb )
                         angle(Ship.Course+=_Ph*0.125); break; // курс ±1 румб
     case '5': case '%': angle(Ship.Course=-Ship.Head[-1].z);  // так держать
                         break;
-#if 0
-    case _Esc:      // GetFocus() // GetForegroundWindow() // GetTopWindow( 0 )
-    { int Ans=MessageBoxW                       // установка активности окна 🌀
-      ( 0,L"«Аврора» — штормовая мореходность корабля",L"Завершение эксперимента"
-        , MB_OKCANCEL | MB_ICONQUESTION );
-      Active_Key=Ans!=IDOK;                          // ==IDCANCEL; OK; YES; NO
-    }
-#else
-    case _Esc: Active_Key=Message( "<Enter> - завершение программы",
-               "«Аврора» штормовая мореходность корабля" )!=_Enter;
-#endif
-  } return true;            // команда с клавиши снята и обработана
+    case _Esc:Active_Key=Message( " «Аврора» ≈ штормовая мореходность корабля",
+                                "<Esc> - продолжить опытовые испытания")==_Esc;
+  } return true;              // команда с клавиши снята и обработана
 }                             // все иные запросы клавиатуры здесь сбрасываются
 static int Write_choice( Window* Win )
 { fixed ans=1;
@@ -409,15 +400,12 @@ bool Hull::KeyBoard( fixed Keyb )                   // С краткой под�
   switch( Keyb )
   { case _F1: Help( Id,Cmds,Plus,1,1 ); break;            // справка с корпусом
     case _F2: Write( Write_choice( this ) ); break;       // запись 3D-модели
-    case _F3:
-          if( Read( "*.vsl" ) )
-          { logStop();
-            KtE=0;
+    case _F3: if( Read( "*.vsl" ) )
+          { logStop(); KtE=0;
             wPrint(true); // описатели парохода на экране-консоли и в протоколе
             Storm->Original( true );
             logWave();         // изначальные характеристики волн для протокола
-          } else Break( "Ошибка повторного чтения корпуса %s",FileName );
-          break;                                    // очистка волнового поля
+          } else Break("Ошибка повторного чтения корпуса %s",FileName ); break;
     case _F4: Config(); break;                // конфигурация формы отображения
     case _F5: PicMode(-2,2); break;// настройка изображения корпуса и обтекания
     case _F8: Model_Config( this ); break;
@@ -468,18 +456,17 @@ static bool Hull_and_Waves_Draw()        // вся графика исполня
 }
 static bool TryTimer()
 { if( Active_Key ) // &= Storm->Ready() && Vessel->Ready() )
-  { static unsigned oKt=0,i=0; WinReady();
+  { static unsigned /*oKt=0,*/ i=0; WinReady();
     print( 1,23,"%c",( "#0123456789ABCDEF=" )[++i%=18] ); // 🌀
-    if( oKt==KtE )                        // принудительный перезапуск таймеров
-    { //Storm->SetTimer( 100 );
-      //Vessel->SetTimer( 156,Hull_and_Waves_Draw );
-      //Storm->Timer(); Storm->Draw(); Vessel->Draw();// проблема в часах/таймере
+/*  if( oKt==KtE )                        // принудительный перезапуск таймеров
+    { Storm->SetTimer( 100 );
+      Vessel->SetTimer( 156,Hull_and_Waves_Draw );
+      Storm->Timer(); Storm->Draw(); Vessel->Draw();// проблема в часах/таймере
     } oKt=KtE;
-  } return false;
+*/} return false;
 }
 //!                      Главная процедура запускает процессы реального времени
 ///                                       и зацикливается на опросах клавиатуры
-#include <OMP.h>
 #include <Fenv.h>
 #include <unistd.h>
 //#include <Float.h>
@@ -588,7 +575,7 @@ int main()                                 // ( int ans, char **av, char **ac )
   if( VIL )          // ...и сразу контроль записи протоколов испытаний
   { logStop();       // завершение протокола с записью интегральных результатов
     ftruncate( fileno( VIL ),ftell( VIL ) ); fclose( VIL ); VIL=0;
-    Break( "~ Протокол готов ~\n~ %s ~ [%d] ~",DtoA( Trun/3600,-3 ),KtE );
+    Message( "Протокол готов","Время: %s ═ [%d] такт",DtoA( Trun/3600,-3 ),KtE );
   }
   // WinReady();        // прогон незавершённых операций из основного алгоритма
   return EXIT_SUCCESS;  //               с отменой исполнения всех деструкторов

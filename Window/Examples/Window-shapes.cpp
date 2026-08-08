@@ -360,6 +360,6 @@ int main( int argc,char *argv[] )
     } textcolor( LIGHTRED,YELLOW ); print( 48,20,"  При(у)ехали  " );
 
   //Tvm.KillTimer();
-  Break( "~Как бы всё благополучно" );
+  Break( "Как бы всё благополучно" );
   return EXIT_SUCCESS;
 }

@@ -27,6 +27,7 @@
 //
 #ifndef __Aurora_
 #define __Aurora_
+#include <OMP.h>
 #include <StdIO.h>
 #include <Windows.h>
 //#include "../Type.h"            // базисный наборт типов данных и процедур

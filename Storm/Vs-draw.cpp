@@ -185,7 +185,7 @@ Hull& Hull::NavigaInform( Window *Win )
   //!  графики качки в окне аксонометрической проекции корпуса корабля !!
   //   ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
   //
-  if( Win!=this ){ color( white,0,0.5 ); i=4; }    // color( Win==Vessel?navy:gray );
+  if( Win!=this ){ color( white,0,0.5 ); i=4; } // color(Win==Vessel?navy:gray);
            else  { color( navy ); i=1; }
   while( i>0 ){ glLineWidth( i );
     Win->Print( 1,0," Time%s +%.2g\"/%.2g\n"
@@ -195,11 +195,12 @@ Hull& Hull::NavigaInform( Window *Win )
                     " Surface %.0f << %.0f\n"
                     " Floatable %.0f << %.0f\n"
                     " Metacenter %.1f << %.1f\n"
-                    "            h %.1f << %.1f",
+                    " τ %-4.1f с  h %.1f << %.1f м",
            DtoA( Trun/3600,Trun>3600?2:(Trun>60?3:-3) ),TimeStep,
            tKrat,Speed*3600/_Mile,cSp*3600/_Mile,Speed/sqrt(_g*Length),
            sqr(Speed)*_Pd/_g/Length,Volume,iV,Surface,iS,Floatage,iF,
-           Metacenter.x,vM.x,hX,vM.z ); color( blue,-0.5 ); i-=3;
+           Metacenter.x,vM.x,_Pd*sqrt( inMass.x.x/hX/_g/Volume ),hX,vM.z );
+           color( blue,-0.5 ); i-=3;
   }
   if( Win==this )
   if( (l=Route.len-1)>=12 )
@@ -408,7 +409,9 @@ bool Hull::Draw()                  // Виртуальная процедура 
   color( blue );
   Print( 2,1,"%s\n { %s }\n %s",sname( FileName ),ShipName,Model[Statum] );
   if( Statum>3 && Storm->Exp.wave )           // подводные волновые воздействия
-    { color( green ); Print( lFlow?", увлечение волной":", над волной" ); }
+    { if( lFlow )color( (long)Trun&1 ? lightred:cyan ); else color( green );
+      Print( lFlow?", увлечение волной":", ход над волной" );
+    }
   color( gray );  Print( ", сток/исток(%g) ",Kv );
   if( Pic.flow )
   { color( green ); Print(2,4,VView[Pic.flow] );

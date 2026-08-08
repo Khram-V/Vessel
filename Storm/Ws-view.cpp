@@ -177,8 +177,8 @@ bool Field::Draw()
   color( navy );Print(2,1,Exp.peak?"Трохоидальные волны:":"В полных потоках:");
   color( blue ); Print( ModelWave[Exp.wave&3] ),Print( 2,2,Model[V.Statum] );
   if( V.Statum>3 && Exp.wave )                // подводные волновые воздействия
-  { color( green ); Print(V.lFlow?", увлечение волной":", над волной"); }
-    color( gray );  Print( ", сток/ист(%g) ",V.Kv );
+  { color( cyan ); Print( V.lFlow?", увлечение волной":", ход над волной" );
+  } color( gray ); Print( ", сток/ист(%g) ",V.Kv );
 //if( V.Pic.flow )color( yellow ),Print(2,3,VView[V.Pic.flow ] );
   Print( 2,3,
     "Курс %0.1f°, дрейф %0.1f°, скорость %0.1f узлов (Fr=%4.2f, Lw/L=%4.2f) ",
