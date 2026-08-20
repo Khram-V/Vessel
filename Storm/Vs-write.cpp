@@ -33,7 +33,7 @@ static void crossPoint( _Vector A, _Vector B, _Vector C, int a, int b, int c )
   if( fColor!=l )fprintf( F,"usemtl %s\n",(fColor=l)?"green":"gray" );
                  fprintf( F,"f %d %d %d\n",a,b,c );
 }
-Hull& Hull::Write( int format )
+HullVsl& HullVsl::Write( int format )
 {
  int i,j,k,n,*oL=(int*)Allocate( (Nframes+3)*sizeof( int ) );
  string FName; FName<<FileName;                // Free!Ship exchange format

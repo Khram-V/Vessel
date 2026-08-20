@@ -8,11 +8,12 @@
 //
 #include "Aurora.h"       // объекты и производные операции с корпусом на волне
                           // + дополнения графической среды OpenGL-Window:Place
-static int //Board=0,     // 'о' штевни; '-' левый и '+' правый борт
+       int //Board=0,     // 'о' штевни; '-' левый и '+' правый борт
        Level=-2,          // -2-днище -1-вода 0-ватерлиния 1-смочен 2-сухой
        wLine=1;           // -1-ниже; +1-выше цвета конструктивной ватерлинии
-static bool Part=false,   // false= днище и ватерлиния; true= надводный борт
+       bool Part=false,   // false= днище и ватерлиния; true= надводный борт
         drawHull=false;   // прорисовка корпуса | гидродинамический процесс
+       Color Cx={0x00000000};
 
 //static Real ArLen=0.1;    // относительная длина для стрелок на шпациях
 //Vertex::Vertex( _Vector a )  // конструктор и собственно
@@ -26,6 +27,7 @@ void Hull::drawTriangle(_Vector a,_Vector b,_Vector c ) // отработка т
   { const byte Mode=Pic.hull;             //  для полупрозрачной картинки нужна
     if( !Part && Level>0 || Part && Level<=0 || !Level && Mode>2 )return;
 //  int wLine = a.z>0 && b.z>0 && c.z>0 ? 1:-1;   // двухэтапная перепрорисовка
+    if( Cx.C )glColor3ubv( Cx.c ); else
     color( !Level?lightblue               // поверхность действующей ватерлинии
          : (wLine<0?green:freeboard),     // подводные обводы и надводный борт
          ( abs( Level )<2?0.75:1.0 )*( Level>0&&wLine<0?0.25:      // затенение
@@ -111,12 +113,12 @@ void Hull::Triangle( Vector a, Vector b, Vector c )   // обработка тр
 } }
 //    Кинематическая постановка корпуса корабля на объединенное волновое поле
 //
-Hull& Hull::Floating( bool onlyDraw )
+HullVsl& HullVsl::Floating( bool onlyDraw )
 { // работа с треугольниками обшивки корпуса и фрагментами ватерлинии в шпациях
   // ~~   троекратная дорисовка корпуса по уровням относительно ватерлинии
   // ~~       обусловливается последовательностью наложения прозрачности
  Vector P,Q,R;
- int i; Part=false;             // разделение корпуса на прозрачные подуровни
+ int i; Part=false; Cx.C=0;       // разделение корпуса на прозрачные подуровни
         drawHull=onlyDraw;        // копия режима расчетов(-) или прорисовки(+)
   if( !onlyDraw )ThreeInitial();  // начальная чистка для интегрируемых величин
 //else if( !Ready() )return *this;
@@ -226,112 +228,6 @@ Part_of_hull:    // разделение корпуса по уровням на
   // выборка и расчёт обновленных параметров корпуса, увеличение счетчика цикла
   //
   if( !onlyDraw )ThreeFixed(); drawHull=false; return *this;
-}
-/*    Здесь ведется прорисовка всего графического окружения для корпуса, затем
-      выполняется его одноразовая прорисовка без перерасчетов текущих
-      геометрических параметров и векторов/тензоров движения
-           DrawMode: 0 - ватерлиния строится при любом графическом раскладе
-                     1 - прорисовываются только собственно штевни и шпангоуты
-                     2 - оставляется подводная часть со шпангоутами над водой
-                     3 - весь корпус прорисовывается целиком отчасти прозрачным
-                   х04 - тоже, без обшивки и только с триангуляционными ребрами
-                   х08 - исходный вариант: одно поле графиков и картушка справа
-*/
-Hull& Hull::Drawing( byte type )  // 0 - DrawMode; 1 - корпус; 2 + профили волн
-{ //const Real ArLen=Length/132;  // относительная длина для стрелок на шпациях
-  //if( !Shell )return *this;   // glTranslated( -Frame[Mid][0].X,0,-Draught )
-  if( type!=1 )Contour_Lines(); // габариты и вертикальные профили пакетов волн
-  //
-  //  исходные и действующие центры и плечи гидростатических сил и моментов
-  //
- Vector P,Q,S,W,C=out( vB ),F=out( vF ),M=C,K=F; M.z=vM.x;  // метацентр
- colors c = vM.z>=hX ? green : ( vM.z<0 ? red:yellow );     // K=out( vC ),
-  //
-  //  оси корабельных координат - векторы локального базиса от центра величины
-  //
-// Vector R=Buoyancy; R.z=vB.z;
-// Point O=out( R );
-  if( iV<Volume/36 )K=out( Gravity ); else    // на вылете - центр тяжести
-  if( iF<Floatage/36  )K=out( Buoyancy );     // на погружение - центр величины
-                                              // либо центр площади ватерлинии
-  Text( _Up,arrow( K-2*Draught*z,K+3*Draught*z,0.01,blue ),"z" );
-  Text( _Up,arrow( K+Breadth*y,  K-Breadth*y,  0.01 ),     "y" );
-  Text( _Up,arrow( K-0.6*Length*x,K+0.6*Length*x,0.01 ),   "x" );
-                  // белый центр гидродинамических пар сил и реакций - моментов
-//arrow( spot( K,12,blue ),spot( out( vD ),36,maroon ),ArLen ); /// 12,white
-//arrow( spot( K,24,white ),spot( out( vD ),24,lightmagenta ),ArLen/3 );
-//line( line( C,spot( out( dV ),24,yellow ),green ),F ); // срединная точка
-  //
-  //  четырёхугольник исходных центров площади ватерлинии и величины,
-  //                                 с центром тяжести и метацентром
- GLboolean CF;
-  glGetBooleanv( GL_CULL_FACE,&CF );
-  if( CF )glDisable( GL_CULL_FACE );   // режима отбора треугольников выключен
-  glBegin( GL_POLYGON );
-    dot( P=out( Buoyancy),lightblue ); // исходный центр величины тихой воды
-    dot( Q=out( Gravity ),gray );      // центр тяжести после загрузки в порту
-    S=Q; S.z+=hX; dot( S,c );          // начальный метацентр по тихой воде
-    dot( W=out( Floatable ),cyan );    // исходный центр площади ватерлинии
-//  dot( K,white );                    // центр динамической реакции корабля
-  glEnd();
-  if( CF )glEnable( GL_CULL_FACE );    // включение режима отбора треугольников
-  //
-  //  разметка подвижных гидростатических центров
-  //
-  glLineWidth( 2 );
-  Text( _Right,spot( Q,18,gray ),"G " );   // центр гравитационной тяжести
-  Text( _Left, spot( F,12,cyan ),"F " );   // текущий центр площади ватерлинии
-  if( W!=F )arrow( spot( W,18 ),F,0.1 );   //   динамика ватерлинии
-
-  Text( _Down,spot( C,12,blue ),"C" );     // действующий центр величины
-  if( C!=P )arrow( spot( P,18 ),C,0.1 );   //   динамика центра величины
-  Text( _Up,spot( out( vC ),18,black ),"R" );          // динамический центр
-  Text( _Down,spot( out( vP ),36,lightmagenta ),"P" ); // центр давлений (ЦБС)
-//            spot( out( vP ),24,lightmagenta );
-
-  Text( _Up,spot( M,12,c ),"m " );         // действующий метацентр
-  if( S!=M )arrow( spot( S,18 ),M,0.1 );   //  кинематика метацентра тихой воды
-  glLineWidth( 1 ); line( C,M );           // метацентрический радиус-вертикаль
-  //
-  //  маршрут корабля по поверхности взволнованного моря
-  //
- int i,j,k; color( blue,0,0.5 );
-  for( i=Route.len-1; i>0; i-- )line( Route[i]-Locate,Route[i-1]-Locate ),
-                                spot( Route[i]-Locate,5 );
-  //
-  //   рисуем и подписываем шпангоуты, как есть ...
-  //                         -.1
-#define L1( A,B,C ){ color(C,-.25),line(out(A),out(B)),line(out(~A),out(~B)); }
-#define L2(_A,_B,C){ Vector &A=_A,&B=_B; if( A.z!=B.z||A.y&&B.y )L1( A,B,C ) }
-
- byte Mode=Pic.hull;                       // собственно 4 режима прорисовки
-//if( Mode>1 )glDisable( GL_LINE_SMOOTH ); // без сглаживание линий, и зачем?
-  if( Mode && Mode!=3 )                    // режимы рисования только для 1 и 2
-  for( j=k=0; k<=Nframes+1; k++ )
-  { for( i=0; i<Frame[k].len-1; i++ )
-      L2( Frame[k][i],Frame[k][i+1],Frame[k][i].z<0 ? green:freeboard )
-    if( k>0 )
-    { if( Stem.len==0 || Stern.len==0 )        // без форштевня или ахтерштевня
-        L2( Frame[k][0],Frame[k-1][0],green ) else // рисуем раскрытие днища
-      if( Frame[k][0].x<=Stem[0].x && Frame[k-1][0].x>=Stern[0].x )
-        L2( Frame[k][0],Frame[k-1][0],green )    // иначе днище между штевнями
-      L2( Frame[k][i],Frame[k-1][j],lightblue ) //  и раскрытие ширстрека
-    } j=i;                                     // вершина предыдущего шпангоута
-  }
-  if( Mode ) // теперь прорисовка штевней с оконтуриванием транцевых расширений
-  { glLineWidth( 2 );
-    for( k=0; k<Stern.len-1; k++ )
-     L1( Stern[k],Stern[k+1],Stern[k].z<0 ? green:freeboard )
-    for( k=0; k<Stem.len-1; k++ )
-     L1( Stem[k+1],Stem[k],Stem[k].z<0 ? green:freeboard )
-    glLineWidth( 1 );
-  }
-//if( Mode>1 )glEnable( GL_LINE_SMOOTH );   // восстановление сглаживания линий
-                    // включение одноразовой прорисовки корпуса вместо расчетов
-  if( type )Pic.hull|=3; Floating( true );  // изображение корпуса только здесь
-  if( type )Pic.hull=Mode;                  //    -- с 3D-обшивкой
-  if( !type )NavigaInform( this );          // навигационная информация
-  return *this;                             //     о текущем состоянии корабля
 }
 
 // static Real Vm=1,Vi=0; // Масштаб скорости и отсчет среднеквадратичной суммы

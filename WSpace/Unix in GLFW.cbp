@@ -12,7 +12,7 @@
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters='&quot;A-1201 Корвет-Б(а)&quot; &quot;БПК «Стерегущий»-61&quot;' />
+				<Option parameters='&quot;Eskuadra\FREE!ship demo 1_weght.fbm&quot; &quot;A-1201 Корвет-Б(а)&quot; &quot;БПК «Стерегущий»-61&quot;' />
 				<Option projectCompilerOptionsRelation="2" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
@@ -285,6 +285,10 @@
 			<Option target="Aurora_Storm_x" />
 		</Unit>
 		<Unit filename="../Storm/Vs-draw.cpp">
+			<Option target="Aurora Storm" />
+			<Option target="Aurora_Storm_x" />
+		</Unit>
+		<Unit filename="../Storm/Vs-free.cpp">
 			<Option target="Aurora Storm" />
 			<Option target="Aurora_Storm_x" />
 		</Unit>

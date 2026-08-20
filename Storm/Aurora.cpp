@@ -43,6 +43,7 @@ unsigned KtE=0, // Счётчик исполненных шагов всего �
                 // 512 - 0х200 - признак необходимости записи только превышений
 Field *Storm=0; /// адресная ссылка для доступа к акватории с морским волнением
 Hull *Vessel=0; /// теоретический корпус корабля в собственном тензорном базисе
+
 FILE *VIL=0;    // исходный файл с настройками и протоколами опытовых испытаний
 static char *Lst=(char*)calloc( MAX_PATH,4 ); // временная строчка 1k вне стэка
 const                    //!  константы исходных управляющих кодов и параметров
@@ -61,10 +62,14 @@ static bool Active_Key=true; // ключик позволяет выйти из 
 //!
 ///   Аксонометрический вид корпуса корабля и профилей морских волн
 //!
+HullVsl::HullVsl():Hull(),Keel( 0 ),Frame( 0 ),Shell( 0 )
+{ Vessel=this;
+  Nframes=Mid=0;
+}
 Hull::Hull():Matrix(),View// прицеп View окошко графической визуализации OpenGL
 ( Title_Hull, -12,12, 412,136 ), // Xpm( 4 ),Ypm( 4 ), Xpm( 64 ),Ypm( 72 )
   FileName( 0 ),ShipName( 0 ),   // Исходный Файл и название исходного проекта
-  Keel( 0 ),Frame( 0 ),Shell( 0 ), // шпангоуты + штевни и обечайка по шпациям
+//  Keel( 0 ),Frame( 0 ),Shell( 0 ), // шпангоуты + штевни и обечайка по шпациям
   lFlow( false ),                 // ключ вовлечения корабля в волновой поток
   Statum( Mekhanik_Status ),     // индекс режимов вычислительного эксперимента
 //Educt( 255 ),                  // все восемь признаков экстремальных событий
@@ -75,21 +80,22 @@ Hull::Hull():Matrix(),View// прицеп View окошко графическо
   Kv( 0.5 ),                     // 1-без давления; 0-учёт парадокса Даламбера
   Course( _Ph/3 ),dCs( _Ph/60 ), // курс, руль на борт(1мин), полборта(2) [рад]
   Speed( 0.0 ),cSp( 0.0 ),       // скорость погашена, машины остановлены [м/с]
-  Locate( Zero ),                // прямая ссылка на текущее местоположение [м]
+  Locate(Zero),                  // прямая ссылка на текущее местоположение [м]
   Route(),Rate(),Head(),Whirl(),Mix() // конструкторы для кинематики во времени
-{ Vessel=this;                  // ссылка на корпус, пусть будет внешний доступ
-  Nframes=Mid=0; Length=Breadth=Draught=1.0; vC=vR=vS=vP=Zero; Identity();
+{ // Vessel=this;               // ссылка на корпус, пусть будет внешний доступ
+  Length=Breadth=Draught=1.0; vC=vR=vS=vP=Zero; Identity();
   Pic.hull=Drawing_Hull;        // изображение закрашенной корабельной обшивки
   Pic.grid=Pic.flow=Pic.kart=0; // закраска или контуры, поток и место картушки
+  Max=(Vector){ 500,8,4 }, Min=-Max;
   nF=muF=(Vector){ 0.1,0.8,0.6 }; // демпфер по абсциссе, ординате и аппликате
   nM=muM=(Vector){ 0.2,0.6,0.8 }; // ... по бортовой, килевой качке и рысканию
   Ofs=Zero; mx=my=0;              // и мышку тоже в исходное
-  AlfaVector( Height/WinLines ).Activate();         // привязка к Window::Place
-  glPolygonMode( GL_FRONT_AND_BACK,GL_FILL );       //   и первый рисунок
-  FileName=(char*)calloc( MAX_PATH,4 );
-  color(navy); AlfaVector( 16,2 ).Print( 2,1,"Aurora ~ " );
-  color(blue); AlfaVector( 16,1 ).Print( "штормовая гидромеханика");
-  color(cyan); AlfaVector( 15,2 ).Print( 6,1.9,
+  AlfaVector( Height/WinLines ).Activate();        // привязка к Window::Place
+  glPolygonMode( GL_FRONT_AND_BACK,GL_FILL );      //   и первый рисунок
+  FileName=(char*)calloc( MAX_PATH,4 );            // 260х4 возможно достаточно
+  color( navy ); AlfaVector( 16,2 ).Print( 2,1,"Aurora ~ " );
+  color( blue ); AlfaVector( 16,1 ).Print( "штормовая гидромеханика");
+  color( cyan ); AlfaVector( 15,2 ).Print( 6,1.9,
                           "\nМореходные качества корабля -"
                           "\n  вычислительный эксперимент" );
   color(lightgreen); AlfaVector( 13,0 ).Print( 8,5,
@@ -101,15 +107,16 @@ Hull::Hull():Matrix(),View// прицеп View окошко графическо
                           "©75 Василий Храмушин" ).Save().Show();
   glFinish();
   WaitTime( 500 );
+  Window::Locate( Xpm( 4 ),Ypm( 4 ),min( 1280L,Xpm( 64 ) ),
+                                    min( 1024L,Ypm( 72 ) ) ).Clear();
+/*
  int Ac; WCHAR **Av=CommandLineToArgvW( GetCommandLineW(),&Ac );
   if( !Read(  W2U( Ac>1 ? Av[1] : L"Aurora.vsl" ) ) )
        Break( "Ошибка считывания корпуса %s -> %s",W2U( Av[1] ),FileName );
-  Window::Locate( Xpm( 4 ),Ypm( 4 ),min( 1280L,Xpm( 64 ) ),
-                                    min( 1024L,Ypm( 72 ) ) ).Clear();
-//  Distance*=1.08;
-//  lookX=1;
-//  lookY=-2; //eye.y=-10;
-//  lookZ=0;
+  Distance*=1.08;
+  lookX=1;
+  lookY=-2; //eye.y=-10;
+  lookZ=0; */
 }
 //                      Shell  n = 0 - ахтерштевень;      n = 1 - корма;
 //void Hull::FullFree()    //  n = Frames+2 - форштевень; n = Frames+1 - нос;
@@ -500,9 +507,27 @@ int main()                                 // ( int ans, char **av, char **ac )
    // из файла и формирование представления корпуса Aurora в оперативной памяти
    // с построением независимой прорисовки 3D корпуса под мышкой и таймером
    //
- Hull Ship;        //! Исходная модель корабля считывается в оперативную память
+// HullVsl Ship;     //! Исходная модель корабля считывается в оперативную память
   //                  графическая среда для построения и визуализации групповых
   //                  трохоидальных структур штормового волнения всей акватории
+
+ int Ac; WCHAR **Av=CommandLineToArgvW( GetCommandLineW(),&Ac );
+ char *Fe=0,*Fn=strdup( Ac>1 ? W2U( Av[1] ):"Aurora" ); Ac=strlen( Fn ); // "~באסילי.vsl"
+
+  if( Ac>4 ){ Fe=Fn+Ac-4; if( *Fe!='.' )Fe=0; else strlwr( ++Fe ); }
+  if( !Fe || strcmp( Fe,"vsl" )==0 || strcmp( Fe,"vil" )==0 )
+  { Vessel=new HullVsl();
+  } else
+  if( !strcmp( Fe,"fef" ) || !strcmp( Fe,"fbm" ) || !strcmp( Fe,"ftm" )
+   || !strcmp( Fe,"obj" ) || !strcmp( Fe,"stl" ) )
+  { Vessel = new freeShip();
+  } else
+  Break( "%s\n необходимы: Ship.[vsl,fef,ftm,fbm,obj или stl]",Fn );
+
+ Hull &Ship = *Vessel;
+  if( !Ship.Read( Fn ) )
+      Break( "Ошибка считывания корпуса %s",Fn );
+
  Field Sea( 800,720,    //! Long, Wide - длина и ширина штормовой акватории [м]
   //            0.5,     //.25 TimeStep заданный шаг времени волновых полей [c]
           64,0.9,-165,   //+10 ветровые волны с обрушающимися гребнями  [м,%,°]
@@ -516,7 +541,7 @@ int main()                                 // ( int ans, char **av, char **ac )
   //
   //! для контроля начальной инициализации желателен полный расчёт гидростатики
   //
-  Ship.Floating();        // после конфигурации сброс избыточной остойчивости
+    Ship.Floating();        // после конфигурации сброс избыточной остойчивости
 //if( Ship.Gravity.z>Ship.Draught*2 )                               // и др ...
 //  Ship.hX=Ship.Metacenter.z=Ship.Metacenter.x-(Ship.Gravity.z=Ship.Draught*2);
     KtE=0;                // исходная гидростатика затем будет перепроверяться
@@ -525,12 +550,13 @@ int main()                                 // ( int ans, char **av, char **ac )
   Sea.Window::KeyBoard( AllKeyb ); // самый нижний уровень виртуальной рекурсии
   Ship.Window::KeyBoard( AllKeyb ); // доступен при прямом обращении в Window
   Ship.Above();           // установка активности окна с прорисовками корабля
-  Ship.Initial()          // установка главных осей с исходными геометрическими
-      .Floating( false ); // расчётами по корпусу, без графической визуализации
+  Ship.Initial();         // установка главных осей с исходными геометрическими
+  Ship.Floating( false ); // расчётами по корпусу, без графической визуализации
                           // часы и оперативная информация в оконных заголовках
-  WaitTime( 600 );        // и ожидание исполнения вычислительных конструкторов
 
-//#pragma omp master
+  WaitTime( 600 ); //,Hull_and_Waves_Draw,20 ); // и ожидание исполнения вычислительных конструкторов
+
+#pragma omp master
     { Sea.SetTimer( 100 );  // вычисления по волнам и механике корабля (½ сек)
       // do{ WaitTime( 100 ); Sea.Timer(); } while( Sea.Ready() );
     }
@@ -548,8 +574,8 @@ int main()                                 // ( int ans, char **av, char **ac )
 #pragma omp single
     {
       do                 //! после выхода обязательно должен исполняться пролог
-      { WaitTime( 1000,TryTimer ); // секунда проверки работоспособности транзакций
-      //Sleep( 1000 );      // или вариант приостановки по блокирующему таймеру
+      { WaitTime( 600,TryTimer);//секунда проверки работоспособности транзакций
+        //Sleep( 1000 );    // или вариант приостановки по блокирующему таймеру
       } while( Active_Key &= Ship.Ready() && Sea.Ready() );
     }
 //}

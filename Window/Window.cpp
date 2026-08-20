@@ -131,7 +131,7 @@ fixed Break( const char *Msg, ... ) // _Esc - отмена или _Enter - по�
 fixed Message( const char *Title,const char *Msg,... ) //?! остановка программы
 { va_list V; va_start( V,Msg );
   char str[512]=""; vsnprintf( str,511,Msg,V ); va_end( V );
-  Window B( 0,0,0,max( max( 12,Ulen( str )+6 ),Ulen( Title )+4 )*9,60 );
+  Window B( 0,0,0,max( max( 12,Ulen( str )+6 ),Ulen( Title )+4 )*9,64 );
   glColor3b( 63,96,127 ); B.AlfaBit( _8x16 ).Print( 2,1.25,Title );
   glColor3b( 63,127,96 );                  B.Print( 4,2.5,str );
 #pragma omp barrier

@@ -206,14 +206,14 @@ int Field_Window::DCReadItem()
   { Entity_Type     =get2( DC ); // Номер объекта
     Number_of_Points=get2( DC ); // Длина заголовка в байтах
   }else
-  { DCRead( "%d%d%lf%lf%d%d", //
+  { DCRead( "%d%d%lf%lf%d%d",
          &Entity_Type,      // Собственно тип объекта
          &Number_of_Points, // Количество точек
          &Pattern_Scale,    // Масштаб для закраски
          &Line_Width,       // Толщина линии
          &Line_Type,        // Тип линии                (0-8)
-         &The_Color         // Цвет объекта             (1-16)
-    );   DColor();
+         &The_Color );      // Цвет объекта             (1-16)
+    DColor();
   }
   if( feof( DC ) )return EOF;
   { switch( Entity_Type )
@@ -264,9 +264,6 @@ int Field_Window::DCReadItem()
     }
   } return feof( DC );
 }
-
-//#include "simplex_font.c++"
-
 void Field_Window::Draw( Field& wF ) // Typ = 5,6 типа входного файла
 { //
   // Открытие или установка файла в начало считывания
@@ -408,33 +405,30 @@ static int Info( int x,int y, bool st )
   color( (Active&4?GREEN^WHITE:_MAGENTA^_WHITE) );
   return ActIn;
 }
-static Course Console()         //
-{                               // Главная процедура организации
- int x,y,Ans;                   //  диалога с консолью ЭВМ
- Field F={ 0,0,0,0 };           //
+static Course Console()          // Главная процедура организации
+{ int x,y,Ans;                   //  диалога с консолью ЭВМ
+  Field F={ 0,0,0,0 };
   for( ;; )
   { if( (Ans=Map.Console( Info ))==_Esc )return Center;
         Tv_GetCursor( x,y );
     if( Ans==_MousePressed )
     { if( All.Is( x,y ) ){ F.Jx=F.Lx=F.Jy=F.Ly=0; Map.Draw( F ); All.Draw(); }
-    } else
-    if( Ans==-1 )
+    }
+    else if( Ans==-1 )
     { F.Jy=Tv_Y( Map._y ); F.Ly=Tv_Y( Map.y )-F.Jy;
       F.Jx=Tv_X( Map._x ); F.Lx=Tv_X( Map.x )-F.Jx;
       Map.Draw( F );
       All.Draw();
-    } else
-    if( (Ans|=0x20)=='w' )
+    }
+    else if( (Ans|=0x20)=='w' )
     { if( (DT=fopen( fext( strcpy( Msg,Map.Name ),"txt" ),"wt" ))!=NULL )
       { Map.Draw( F );
         All.Draw();
         fclose( DT ); DT=NULL;
-      }
-    } else
-    if( Ans==_Space )
+    } }
+    else if( Ans==_Space )
     { ANSI^=true;
       Map.Draw( F );
       All.Draw();
-    }
-  }
+  } }
 }

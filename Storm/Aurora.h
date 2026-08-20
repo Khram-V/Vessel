@@ -30,7 +30,7 @@
 #include <OMP.h>
 #include <StdIO.h>
 #include <Windows.h>
-//#include "../Type.h"            // базисный наборт типов данных и процедур
+#include "../Type.h"              // базисный наборт типов данных и процедур
 //#include "../Window/View.h"     // собственная графическая среда Window-Place
 #include "../Window/ConIO.h"      // консольные операции — отладочные тексты
 #include "Flex.h"
@@ -72,35 +72,26 @@ extern const char *Rmbs[];        /* N¦Nord, NtO,NNO,NOtN,NO,NOtO,ONO,OtN,
 */
 //!  Исходная таблица плазовых ординат и все параметры штормового хода корабля
 //
-class Hull:
+struct Hull:
 public View, public Matrix        // Связный корабельный базис и окно графики
-{ int Nframes,Mid;                // общее количество и номер мидельшпангоута
-  Real *Keel;                     // абсциссы шпангоутов под таблицей ординат
-  Flex Stern,Stem,                // штевни оконтуривают транцевые расширения
-           *Frame,                //   и собственно список шпангоутных контуров
-        WaterLine,wL;             // конструктивная ватерлиния - рабочая осадка
+{
+  Flex WaterLine,wL;             // конструктивная ватерлиния - рабочая осадка
   Matrix inWater,mW,     // моменты инерции площади действующей ватерлинии I м⁴
          inMass; //,mM;  ~~ моменты инерции исходного и смещенного корпуса G м⁴
-  unsigned **Shell;               // обшивка строится по вершинам треугольников
-  unsigned& Ins( int n,int=0 );   // вставка в список, 0 в конец, -l от конца
-  Vector InShell( int n, unsigned m ); // номер шпации и отсчет индексной маски
-  Vector Select( int n,int k );        // оболочка Shell[0..N+1][1..len]
-  Vector InSpan( int&,int&,bool=true );// индексы точки: 0 и Nframes+1 - штевни
   virtual bool KeyBoard( fixed ); // краткая справка и методы работы с корпусом
   Vector out( Vector a ) const;   // возвращение к внешним морским координатам
   Vector in( Vector A ) const;    // вход внутрь корабельного Декартова базиса
 public:                           // конструктор, авторская метка и обнуление
   Hull();                         // чтение теоретического корпуса и 1-й чертеж
-//virtual ~Hull(){}
-//~Hull(){ FullFree(); }          // здесь освобождается вся оперативная память
-//    void FullFree();            // destructor: очистка данных старого корпуса
+// virtual ~Hull(){}
 //
 //   Геометрия корпуса, состояние движения и маршрутные записи курса и скорости
 //
   Real Length,Breadth,Draught,    // конструктивные длина, ширина и осадка  [м]
        Course,dCs, // курс корабля и обратное время для полуциркуляции  п·dT/30
         Speed,cSp; // настоящая и устанавливаемая скорость хода корабля   [м/с]
-  Vector Locate;   // местоположение корабля для отсчётов волновых полей    [м]
+  Vector Min,Max,  // экстремумы для габаритных размерений корпуса          [м]
+         Locate;   // местоположение корабля для отсчётов волновых полей    [м]
   Flex Route,      // маршрут - траектория контролируемого хода корабля   МБ[м]
        Rate,       // скорости смещения корпуса в корабельном базисе    КБ[м/с]
        Head,Whirl, // и вращательные движения корпуса в углах Крылова   [р,р/с]
@@ -136,22 +127,25 @@ public:                           // конструктор, авторская 
 //              // 32-64-128 -вертикальные ускорения на корме, миделе и по носу
 //              // 512 - 0х200 - признак необходимости записи только превышений
   Hull& Movement();               // движение корпуса под действием внешних сил
-  Hull& Floating( bool=false );   // кинематика корабля на морском волнении
- virtual bool Draw();             // виртуальная процедура с настройкой сцены
   Hull& Drawing( byte type=0 );   // 0 ->DrawMode; 1<- корпус; 2<+ профили волн
                                   // прорисовка без настройки графической сцены
   Hull& Get( char* ); // изменение посадки, выбор курса и скорости хода корабля
   Hull& GetDam( char* );// факторы демпфирования поступательной и угловой качки
   Hull& GetExp( char* ); // управление экспериментом и ключи вывода результатов
-  Hull& Protocol();      // одна строчка протокола, с сохранением предыстории
-                         // true графика или включение перерасчетов
-  Hull& Write( int );    // запись + Wavefront Technologies Advanced Visualizer
-  char *FileName,*ShipName; // Имя корабля или название исходного проекта UTF-8
+  Hull& Protocol();        // одна строчка протокола, с сохранением предыстории
+                           // true графика или включение перерасчетов
+ char *FileName,*ShipName; // Имя корабля или название исходного проекта UTF-8
+
+ virtual bool Draw();               // виртуальная процедура с настройкой сцены
+ virtual Hull& LineDraw( byte Mode )=0;  // теоретические или ключевые контуры
+ virtual Hull& Floating( bool=false )=0; // кинематика хода на морском волнении
+ virtual Hull& Write( int )=0;  // + Wavefront Technologies Advanced Visualizer
+ virtual bool Read( const char *Name,    // считывание таблицы плазовых ординат
+            _Real newDraught=0.0 )=0;    // и изменение осадки на перечитывании
   Vector nF,nM, // относительные коэффициенты угловых и поступательных движений
        muF,muM; // обобщённые параметры демпфирования - задаваемые извне [0÷∞[
       // под большими углами крена и до опрокидывания сопротивление утраивается
   Hull& DampInit(); // инициализация коэффициентов демпфирования на шаг времени
-//private:
   //
   //  размерения и динамические параметры корпуса корабля (Volume=0-обновление)
   //  локальная корабельная система координат определяется в составе структуры
@@ -178,14 +172,12 @@ public:                           // конструктор, авторская 
                  vS, // накопительный вектор сил от перепада уровня моря  [H/ρ]
                  vR; // поворотный момент от криво-наклонной ватерлинии   [Н·м]
                      // с оценкой мгновенной метацентрической высоты в МБ! h(z)
-//public:
-  Hull& NavigaInform     // общая навигационная информация о волнах с маневрами
-         ( Window* );    // картушка морского волнения, курса, скорости корабля
-  Hull& wPrint( bool=false ); // информация по кораблю на консоли и в протоколе
-private:
+  void NavigaInform      // общая навигационная информация о волнах с маневрами
+       ( Window* );      // картушка морского волнения, курса, скорости корабля
+  void wPrint( bool=false );  // информация по кораблю на консоли и в протоколе
   void Config();       // установка параметров корпуса и методов его прорисовки
   void PicMode(int,int);//выбор вариантов изображения корпуса и стрелок течений
-  Hull& Contour_Lines();   // отрисовка габаритов и профилей волн на белом фоне
+  void Contour_Lines();    // отрисовка габаритов и профилей волн на белом фоне
   void ThreeInitial();// начальная очистка всех величин динамических параметров
   void ThreeFixed();  //  обработка всех треугольников, фиксация первой статики
   void Three          //       все элементы одного треугольника обшивки корпуса
@@ -197,10 +189,26 @@ private:
   void divideTriangle(_Vector,_Real,_Vector,_Real,_Vector,_Real );
   void drawTriangle( _Vector,_Vector,_Vector ); //! малые треугольнички
   void waterPoints( _Vector,_Vector,_Vector );  // нормали и отрезки ватерлинии
-  bool Read( const char *Name,      // чтение исходной таблицы плазовых ординат
-            _Real newDraught=0.0 ); //        изменение осадки на перечитывании
+};
+struct HullVsl: Hull                // таблица плазовых ординат со штевнями
+{ HullVsl(); //~HullVsl(){};
+  int Nframes,Mid;                // общее количество и номер мидельшпангоута
+  Real *Keel;                     // абсциссы шпангоутов под таблицей ординат
+  Flex Stern,Stem,                // штевни оконтуривают транцевые расширения
+           *Frame;                //   и собственно список шпангоутных контуров
+  unsigned **Shell;               // обшивка строится по вершинам треугольников
+  unsigned& Ins( int n,int=0 );   // вставка в список, 0 в конец, -l от конца
+  Vector InShell( int n, unsigned m ); // номер шпации и отсчет индексной маски
+  Vector Select( int n,int k );        // оболочка Shell[0..N+1][1..len]
+  Vector InSpan( int&,int&,bool=true );// индексы точки: 0 и Nframes+1 - штевни
   bool LNext( int,unsigned &m,Vector &L,byte*); // левый/кормовой - шпангоут
   bool RNext( int,unsigned &m,Vector &R,byte*); // правый/носовой контур шпации
+
+  bool Read( const char *Name,        // считывание таблицы плазовых ординат
+            _Real newDraught=0.0 );   //     изменение осадки на перечитывании
+  HullVsl& Write( int );              // запись + Wavefront.obj и др.
+  HullVsl& Floating( bool=false );    // кинематика корабля на морском волнении
+  HullVsl& LineDraw( byte Mode );     // теоретические или ключевые контуры
 };
 //
 //!  § варианты построения групповых структур трохоидального морского волнения
@@ -309,6 +317,7 @@ public:
  { Wind.Slick( A,B,N ),Swell.Slick( A,B,N ),Surge.Slick( A,B,N ); } // скорости
 */
 };
+
 void Model_Config( Window* Win );            // запрос по моделям гидромеханики
 void wavePrint();// активная информация по волновым полям для текстовой консоли
 bool logTime( bool=true );  // запрос новых отсчётов с протоколируемым временем
@@ -318,6 +327,7 @@ void logDamp();   // факторы демпфирования смещений 
 void logHydro();  // модель гидромеханики качки и ходкости корабля
 void logStock();  // изменение условий непротекания или волновых увлечений
 void logStop();   // завершение протокола
+void MinMax( Vector &Min, Vector &Max, _Vector V );
 //
 // логико-арифметические операции в тригонометрических особенностях из Flex.cpp
 //
@@ -325,4 +335,64 @@ void logStop();   // завершение протокола
 //void e6( Real &R );
 //Real e8( _Real ); void e6( Real& );        // округление записи для точных сравнений 0.01 мм
 //Vector e8( _Vector ); void e6( Vector& );
+
+//
+//    Самые разные числовые форматы кораблей и судов из CAD-систем
+//     .vsl (.vil) - традиционная таблица плазовых ординат со штевнями
+//     .fef,.ftm,.fbm,.part - всякие упражнения c предвычислениями во free!Ship
+//     .obj - Wavefront Technologies Advanced Visualizer
+//     .stl - Triangle...
+//
+union Color{ unsigned C; byte c[4]; };
+typedef enum { mvPort,mvBoth } BoardView;  // Show half the hull or entire hull
+
+struct freeShip: Hull // Shell оболочка поверхности обшивки корпуса
+{
+ char *ProjName,            // название проекта
+      *Designer,            // автор проекта
+      *Comment,             // расширенное описание
+      *CreatedBy;           // изготовитель цифровой модели
+ int  NoLayers,NoCoPoint,NoFaces; // размеры кривых массивов
+ struct Layers
+ { char *Description;
+    int ID;
+    Color LClr;
+    bool Visible,
+         Symmetric,
+         Developable,
+         UseforIntersection, // fc>=180
+         UseinHydrostatic;
+    Real MaterialDensity,    // fv>=191
+         Thickness;
+    bool ShowInLineSpan;     // fv>=201
+    byte AlphaBlend;         // fv>=261
+ } *L, ActiveLayer;         //! NoLayers
+ struct CoPoint             /// Control Point
+ { Vector V;                // координаты
+ } *P;                      //! NoCoPoint
+ struct Faces               /// Control Faces
+ { int *P,Capacity;         // --> Points
+   int LayerIndex;          // -- слой для всего набора площадок
+ } *F;                      //! NoFaces
+ freeShip(); // ~freeShip(){};
+
+ void freeRead( bool Part=false );
+ void freeDraw( BoardView=mvBoth );
+ void Extents( bool Sizes=true );      // экстремумы по всем контрольным узлам
+ bool LoadExtFile( bool New=true );
+ bool LoadProject();           // быстрая выборка исходного freeShip комплекса
+                               //       в общие структуры в оперативной памяти
+ void ReadFEF( int );          // если >1 - чистый корпус без доп описаний
+ bool LoadFEF();               // здесь Ship.fef == File Exchange Format
+ void ReadObj();               // + полное имя сопутствующего описания MtlLib
+ void ReadStl();               // поверхность из треугольников с нормалями
+ bool Import( fixed );         // 1: WaveFront Technologies Advanced Visualizer
+                               // 2: Triangles.stl
+// bool LoadPart( bool New=true); // простой фрагмент цифровой вещи к freeShip
+public:                        // виртуальные процедуры к Hull
+  bool Read( const char *Name,_Real newDraught=0.0 );
+  freeShip& Write( int ){} // запись Wavefront Technologies Advanced Visualizer
+  freeShip& Floating( bool=false );   // кинематика корабля на морском волнении
+  freeShip& LineDraw( byte Mode ){};// теоретические линии или ключевые контуры
+};
 #endif

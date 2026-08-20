@@ -24,7 +24,7 @@
 //    Независимое изображение корпуса корабля или множественная прорисовка
 //       в несвязанных окнах под управлением собственных мышек и таймеров
 //
-unsigned& Hull::Ins( int n, int k )    // здесь добавляется одна точка в список
+unsigned& HullVsl::Ins( int n, int k )    // здесь добавляется одна точка в список
 { int l=isAlloc((void*)(Shell[--n]))/sizeof(unsigned); // вся выделенная память
    if( !l )Shell[n]=(unsigned*)Allocate((l=120)*sizeof(unsigned)); else // новь
    if( Shell[n][0]>=l-2 )                                  // две точки в запас
@@ -35,13 +35,13 @@ unsigned& Hull::Ins( int n, int k )    // здесь добавляется од
 }
 //    Быстрая выборка координат точки на обшивке по таблице плазовых ординат
 //
-Vector Hull::InShell( int n,unsigned m ) // номер шпации,отсчет индексной маски
+Vector HullVsl::InShell( int n,unsigned m ) // номер шпации,отсчет индексной маски
 { if( m&LeftFrame )return Frame[n][(~LeftFrame)&m];             // левый отсчет
 //if( m&SternPost )return Stern[~FramePost&m];                  // ахтерштевень
 //if( m&StemPost  )return Stem[~FramePost&m];                   //   форштевень
                    return Frame[n+1][m];                        // сам шпангоут
 }
-Vector Hull::Select( int n,int k )              // оболочка Shell[0..N][1..len]
+Vector HullVsl::Select( int n,int k )              // оболочка Shell[0..N][1..len]
 { Vector P={ 0,0,0 }; bool Board=k>0; if( !Board )k=-k;           // k=[1..len]
   if( Shell[n] )                           // по индексной маске общего массива
   if( Shell[n][0]>=k )P=InShell( n,Shell[n][k] );   // для вершин треугольников
@@ -50,7 +50,7 @@ Vector Hull::Select( int n,int k )              // оболочка Shell[0..N][
 //    Выборка координат и индексов точки в таблице плазовых ординат
 //            с учетом удвоения отсчетов по левому и правому борту
 //
-Vector Hull::InSpan( int &n,int &k, bool off )  // точки 0 и Nframes+1 - штевни
+Vector HullVsl::InSpan( int &n,int &k, bool off )  // точки 0 и Nframes+1 - штевни
 { Vector P={0,0,0}; bool Board=k>0; if( !Board )k=-k;    // k=[1..len] правый>0
   if( Shell[n] )                  // проверка построения трёхмерной поверхности
   if( Shell[n][0]>=k )            // сеткой существующих вершин треугольников в
@@ -146,8 +146,8 @@ static bool Span( int l, int r )               // малый: 2S/L  большо
 }
 //   Считывание корпуса отмечается успехом, либо полным завершением программы
 //
-bool Hull::Read( const char* FName,    // здесь имя приходит в кодировке W-1251
-                  _Real newDraught )   //   переустановка конструктивной осадки
+bool HullVsl::Read( const char* FName, // имя приходит в кодировке UTF-8 (1251)
+                    _Real newDraught ) //   переустановка конструктивной осадки
 {
 //     Считывание заголовков и проверка наличия управляющих кодов
 //
@@ -516,8 +516,20 @@ Sign_Fragment: signLb=signRb=0; zl=wl; zr=wr;   /// v0+((x-x0)/(x1-x0))*(v1-v0)
         while( sr<wr-1 )if( R[sr]==R[sr+1] )zr=++sr; else break;
       } while( zl<wl || zr<wr );
       sl=wl; sr=wr;
-      if( wl<L.len || wr<R.len )goto Sign_Fragment;           // к новой шпации
+      if( wl<L.len || wr<R.len )goto Sign_Fragment;      // к повтору по шпации
+      //
+      //    завершена сборка шпации на шпангоутах (без штевней) n: 1..N+1
+      //    здесь можно немного пооптимизировать (или всё перестроить?)
+      //
     }
+    //     Пусть не лучшее место, но экстремумы здесь как-то обобщаются
+    //
+         Min=Max=Zero;          // ноль наверное не стоит сбрасывать с картинки
+    for( i=0; i<=Nframes+1; i++ )
+    for( j=0; j<Frame[i].len; j++ )MinMax( Min,Max,Frame[i][j] );
+    for( j=0; j<Stern.len; j++ )MinMax( Min,Max,Stern[j] );
+    for( j=0; j<Stem.len; j++ )MinMax( Min,Max,Stem[j] );
+    //
     //     небольшая перенастройка визуализации сцены с кораблем
     //        обновлённая дальность, векторы ориентации и обзора
     //
@@ -530,6 +542,11 @@ Bk: textcolor( YELLOW,RED ),
     print( 2,7,"  >>> отмена или ошибка в цифровой модели: %s",FileName ),
     textcolor( LIGHTGRAY,BLACK ); free( ShipName ); ShipName=0;
   return false;
+}
+void MinMax( Vector &Min, Vector &Max, _Vector V )
+{ if( Min.x>V.x )Min.x=V.x; else if( Max.x<V.x )Max.x=V.x;
+  if( Min.y>V.y )Min.y=V.y; else if( Max.y<V.y )Max.y=V.y;
+  if( Min.z>V.z )Min.z=V.z; else if( Max.z<V.z )Max.z=V.z;
 }
 /* C06=0.9945218954,C08=0.9902680687,C12=0.9781476007,C18=0.9510565163,
    C20=0.9396926208,C24=0.9135454576,C30=0.8660254038,C45=0.70710067812,

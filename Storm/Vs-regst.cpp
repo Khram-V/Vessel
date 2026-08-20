@@ -180,7 +180,7 @@ void logWave()
 }
 //inline void printB(unsigned B){ if(B>>1)printB(B>>1); putch((B&1)?'1':'0'); }
 
-Hull& Hull::wPrint( bool log ) // информация по смоченному корпусу на текстовой
+void Hull::wPrint( bool log ) // информация по смоченному корпусу на текстовой
 { //Field &F=*Storm;          //             консоли и в протоколе эксперимента
   textcolor( YELLOW ),       // текстовые данные о состоянии и динамике корабля
   print( 1,14," Time%s +%.2g\"/%.3g \n"
@@ -219,8 +219,8 @@ Hull& Hull::wPrint( bool log ) // информация по смоченному
   { char *s=DtoA( Trim*_Rd,2 ); while( *s==' ' )++s; //logDamp();
     textcolor( WHITE ); print( 1,7,"  >>> %s \n  >>> "
       "{ L=%g, B=%g, T=%g, Ψ=%s\\δd≈%.0fсм }∧%g  №〈A.%d<%+d+>%d.Ф 〉 ",  //∨%g ",
-      ShipName,Length,Breadth,Draught,s,asin( Trim )*Length*50,Ofs.z-Draught,
-      Stern.len,Nframes,Stem.len );                                     //,Kv );
+      ShipName,Length,Breadth,Draught,s,asin( Trim )*Length*50,Ofs.z-Draught, -1,0,1 );
+//!   Stern.len,Nframes,Stem.len );                                     //,Kv );
     print(52,17,"inMass:"
                 "│ %7.0f  %-8.1f  %-9.1f │ ",inMass.x.x,inMass.x.y,inMass.x.z),
     print(59,18,"│ %7.1f  %-8.0f  %-9.1f │ ",inMass.y.x,inMass.y.y,inMass.y.z),
@@ -238,10 +238,11 @@ Hull& Hull::wPrint( bool log ) // информация по смоченному
         "  ⇒ { δ=%.2f, W=%.1f m³, S=%.1f m², F=%.1f m² }\n"
         "  ⇒ С{ x=%.1f, z=%.2f }, zG=%.2f, r=%.2f, h=%.2f [м]\n",
         ShipName,Length,Breadth,Draught,DtoA(Trim*_Rd,2),asin(Trim)*Length*50,
-        Ofs.z-Draught,Stern.len,Nframes,Stem.len,Volume/Length/Breadth/Draught,
+        Ofs.z-Draught,
+        -1,0,1, //! Stern.len,Nframes,Stem.len,
+        Volume/Length/Breadth/Draught,
         Volume,Surface,Floatage,Buoyancy.x,Buoyancy.z,Gravity.z,
         Metacenter.z-Buoyancy.z,hX );
   } }
   if( KtE<2 )logStock(),logDamp(),logHydro(); //fprintf( VIL,"\n" );
-  return *this;
 }

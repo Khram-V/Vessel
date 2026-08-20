@@ -38,8 +38,7 @@ virtual ~View(){ this->~Window(); } // в продолжение последо�
 virtual bool KeyBoard( fixed Keyb );
 virtual bool Draw();
 };
-/*
-  glEnable( GL_COLOR_LOGIC_OP );
-  glLogicOp( GL_XOR ); => GL_COPY | GL_SET
+/* glEnable( GL_COLOR_LOGIC_OP );
+   glLogicOp( GL_XOR ); => GL_COPY | GL_SET
 */
 #endif // __View_

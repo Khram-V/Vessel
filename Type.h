@@ -113,7 +113,7 @@ char* OEMtU( const char *U );            // для считывание DOS-OEM(
 char* WintU( const char *U );            // и старые тексты Russian-Windows1251
 const char* CtU( unsigned u );//, int *l=0 ); // UniCode -» UTF-8 (int->string)
 char* UtC( unsigned &u, const char *U ); // UTF-8 -» UniCode  продвижение буквы
-unsigned UtC( const char *U );           // + на всякий случай
+unsigned UtC( const char *U );           // + на всякий случай ђћ
 
 char* W2U( const wchar_t* WU );          // чисто Windows прилады перекодировок
 wchar_t* U2W( const char* U8 );          // UTF-8 -» UTF-16(LE)=Unicode-Windows
