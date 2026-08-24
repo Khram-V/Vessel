@@ -24,7 +24,6 @@ typedef enum { fiFree,fiStation,fiButtock,fiWaterline,fiDiagonal } IntersectionT
      // intersection lines: free,stations,buttocks,waterlines and diagonal type
 
 const Real Foot=0.3048,Eps=1.0e-5L;
-union Color{ unsigned C; byte c[4]; };
 struct Plane { Real a,b,c,d; }; // Description of 3D plane: a*x+b*y+c*z-d=0.0;
 extern FILE *FM;               // единый или общий файл открывается временно
 extern WCHAR *FName;           // имя файла открытого из командной строки

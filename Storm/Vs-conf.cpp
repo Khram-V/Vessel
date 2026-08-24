@@ -83,7 +83,7 @@ void Hull::Config()
            Break( "Ошибка повторного чтения корпуса %s",FileName );
     //~~ int sKt=Storm->Kt; KtE=0;
       Storm->Original( false ); KtE=0;
-      Initial().Floating(); //Storm->Kt=sKt;
+      Initial().Floating( false ); //Storm->Kt=sKt;
       wPrint( true );
     }                                          // факторы демпфирования сдвигов
     if( _V!=Kv || _Flow!=lFlow )

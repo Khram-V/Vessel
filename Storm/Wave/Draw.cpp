@@ -60,8 +60,9 @@ Waves& Waves::Drawing()
   color( lightred );                             // распределение векторов
   for( Z=0.0; Z>=Depth/-2; Z-=5 )                     //   мгновенных скоростей
   for( X=Long/-2; X<=Long/2; X+=5.0 )
-  { B=Wave( Tlaps+0.5,(Vector){X,0,Z} )-(A=Wave( Tlaps-0.5,(Vector){X,0,Z} ));
-    arrow( A,A+B,abs( B )/4 );
+  { A=Wave( Tlaps,(Vector){X,0,Z} );
+    B=Wave( Tlaps+0.5,(Vector){X,0,Z} )-(Wave( Tlaps-0.5,(Vector){X,0,Z} ));
+    arrow( A-B,A+B,abs( B )/4 );
   }
   //   Траектория частиц жидкости под гребнями трохоидального морского волнения
   //

@@ -33,13 +33,13 @@ static void crossPoint( _Vector A, _Vector B, _Vector C, int a, int b, int c )
   if( fColor!=l )fprintf( F,"usemtl %s\n",(fColor=l)?"green":"gray" );
                  fprintf( F,"f %d %d %d\n",a,b,c );
 }
-HullVsl& HullVsl::Write( int format )
+void HullVsl::Write( int format )
 {
  int i,j,k,n,*oL=(int*)Allocate( (Nframes+3)*sizeof( int ) );
  string FName; FName<<FileName;                // Free!Ship exchange format
   T=Ofs.z; St=Ofs.x;                           // запись с внутренней точностью
   if( !format )
-  { if( !(F=_wfopen( U2W( fext( FName,"fef" ) ),L"wb" )) )return *this;
+  { if( !(F=_wfopen( U2W( fext( FName,"fef" ) ),L"wb" )) )return;
     fprintf( F,"%s\n"      // ProjectName
             "Создатель:\n" // ProjectDesigner
          "©«Аврора»: %s\n" // ProjectFileCreatedBy  ~\_
@@ -130,7 +130,7 @@ HullVsl& HullVsl::Write( int format )
   }
   else            //! Wavefront Technologies 4 Advanced Visualizer
   if( format==1 ) // здесь также тексты .obj сохраняются в рабочем формате UTF8
-  { if( !(F=_wfopen( U2W( fext( FName,"obj" ) ),L"wb" )) )return *this;
+  { if( !(F=_wfopen( U2W( fext( FName,"obj" ) ),L"wb" )) )return;
    Vector P,Q,q;
     fColor=-1;
     //
@@ -177,7 +177,7 @@ HullVsl& HullVsl::Write( int format )
   //!    теперь запись в формате DС2, по варианту изготовления новых чертежей
   //
   else if( format==2 )
-  { if( !(F=_wfopen( U2W( fext( FName,"dc2" ) ),L"wb" )) )return *this;
+  { if( !(F=_wfopen( U2W( fext( FName,"dc2" ) ),L"wb" )) )return;
     //
     //  во первой строке письма общие размерения графического изображения
     //
@@ -224,7 +224,7 @@ HullVsl& HullVsl::Write( int format )
   }                                  ///
   else                               /// варианты красивой трехмерной картинки
   if( format>2 && format<5 )         ///
-  { if( !(F=_wfopen( U2W( fext( FName,"dc3" ) ),L"wb" )) )return *this;
+  { if( !(F=_wfopen( U2W( fext( FName,"dc3" ) ),L"wb" )) )return;
     fprintf( F,"%s 0 %s %s 0 %s %s\n",
       RtoA(Keel[0]+St),RtoA(Keel[Nframes+1]-Keel[0]),RtoA(T*2),RtoA(Breadth/-2),RtoA(Breadth));
     fprintf( F,"20 0 0 0 0 0\n1.0,0.1\n1.0\n*\n; ANSI-1251 DesignCAD Russian\n"
@@ -289,7 +289,7 @@ HullVsl& HullVsl::Write( int format )
     if( format>1 ){ c=';'; sn=UtWin(sn); } fprintf( F,"%c\n%c %s\n",c,c,sn );
     if( format>1 )sm=UtWin(sm); fprintf( F,"%c %04d.%s.%02d ",c,y,sm,d );
     if( format>1 )sw=UtWin(sw); fprintf( F,"%s%s\n",sw,DtoA(onetime(),3,":"));
-  } fclose( F ); return *this;
+  } fclose( F );
 }
 /*      &Entity_Type,       Собственно тип объекта
         &Number_of_Points,  Количество точек

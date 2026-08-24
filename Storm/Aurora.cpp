@@ -316,7 +316,7 @@ Hull& Hull::Initial()       // возврат в исходную позицию
 }
 Hull& Hull::Original()
 { if( !Storm )return *this;          // здесь пролог может быть ещё не завершён
-  Volume=Surface=Floatage=0.0;       // согласовать с Vs-math
+  Volume=Surface=Floatage=0; KtE=0;  // согласовать с Vs-math
   inWater=0.0; inMass=0.0; vR=0.0;   // mM=0.0; - на Three-Initial
   Gravity=Buoyancy=Floatable=Metacenter=Zero; Locate=Zero;
   //!  контролируемый начальный отсчет для запуска всего процесса моделирования
@@ -326,7 +326,8 @@ Hull& Hull::Original()
   Head  += Zero;             // ориентация в пространстве в трёх углах Крылова
   Whirl += Zero;             // скорости изменения крена, дифферента и курса
   Mix   += Zero;             // Mix.z - уровень моря; у - курс; x - скорость ..
- return Initial().Floating();// установка главных осей и геометрические расчеты
+  Initial().Floating(false); // установка главных осей и геометрические расчеты
+ return *this;
 }
 //!    Интерактивное управление выполняющимся вычислительным экспериментом
 ///
@@ -457,7 +458,7 @@ static bool Hull_and_Waves_Draw()        // вся графика исполня
     Storm->Draw();    //  затем картинка штормового волнения вместе с пароходом
     Vessel->wPrint(); //  ... и геометрические таблички -> на текстовую консоль
     recurse=0;        //  при возникновении рекурсии новые рисунки пропускаются
-  //Active_Key &= Storm->Ready() && Vessel->Ready();           // ++WinReady()
+    Active_Key &= Storm->Ready() && Vessel->Ready();           // ++WinReady()
   } return false;     // return WinReady();
 //  return Vessel->Ready() && Storm->Ready();         // - вариант для WaitTime
 }
@@ -486,7 +487,7 @@ int main()                                 // ( int ans, char **av, char **ac )
   feclearexcept( FE_ALL_EXCEPT );     // feclear{raise}except( FE_ALL_EXCEPT );
 #ifdef _OPENMP
   omp_set_dynamic( true );
-  omp_set_nested( true );
+//omp_set_nested( true );
 #endif
   textsize( 92,40 ),
   texttitle( Title ),
@@ -513,6 +514,7 @@ int main()                                 // ( int ans, char **av, char **ac )
 
  int Ac; WCHAR **Av=CommandLineToArgvW( GetCommandLineW(),&Ac );
  char *Fe=0,*Fn=strdup( Ac>1 ? W2U( Av[1] ):"Aurora" ); Ac=strlen( Fn ); // "~באסילי.vsl"
+ bool isVsl=true; // для выбора варианта начальной инициализации всякого чужого
 
   if( Ac>4 ){ Fe=Fn+Ac-4; if( *Fe!='.' )Fe=0; else strlwr( ++Fe ); }
   if( !Fe || strcmp( Fe,"vsl" )==0 || strcmp( Fe,"vil" )==0 )
@@ -520,7 +522,7 @@ int main()                                 // ( int ans, char **av, char **ac )
   } else
   if( !strcmp( Fe,"fef" ) || !strcmp( Fe,"fbm" ) || !strcmp( Fe,"ftm" )
    || !strcmp( Fe,"obj" ) || !strcmp( Fe,"stl" ) )
-  { Vessel = new freeShip();
+  { Vessel = new freeShip(); isVsl=false;
   } else
   Break( "%s\n необходимы: Ship.[vsl,fef,ftm,fbm,obj или stl]",Fn );
 
@@ -537,14 +539,14 @@ int main()                                 // ( int ans, char **av, char **ac )
 //Start_Experiment();     /// !!! - считывание конфигурационного файла !!!
 
   Sea.Original( true );   // конструктор перенастройки волнения и гидромеханики
-                          //  с подготовкой корпуса для начальной инициализации
+  KtE=0;                 //  с подготовкой корпуса для начальной инициализации
   //
   //! для контроля начальной инициализации желателен полный расчёт гидростатики
   //
-    Ship.Floating();        // после конфигурации сброс избыточной остойчивости
+//Ship.Floating( false );   // после конфигурации сброс избыточной остойчивости
 //if( Ship.Gravity.z>Ship.Draught*2 )                               // и др ...
 //  Ship.hX=Ship.Metacenter.z=Ship.Metacenter.x-(Ship.Gravity.z=Ship.Draught*2);
-    KtE=0;                // исходная гидростатика затем будет перепроверяться
+                          // исходная гидростатика затем будет перепроверяться
   Ship.wPrint( true );    // описатели парохода на экране-консоли и в протоколе
   logWave();              // изначальные характеристики волн для протокола
   Sea.Window::KeyBoard( AllKeyb ); // самый нижний уровень виртуальной рекурсии
@@ -553,10 +555,10 @@ int main()                                 // ( int ans, char **av, char **ac )
   Ship.Initial();         // установка главных осей с исходными геометрическими
   Ship.Floating( false ); // расчётами по корпусу, без графической визуализации
                           // часы и оперативная информация в оконных заголовках
-
-  WaitTime( 600 ); //,Hull_and_Waves_Draw,20 ); // и ожидание исполнения вычислительных конструкторов
-
-#pragma omp master
+  WaitTime( 600 ); //,Hull_and_Waves_Draw,20 );
+  Ship.StartExp();        // и ожидание исполнения вычислительных конструкторов
+//Hull_and_Waves_Draw();  // Инициализация всего проекта c первой прорисовкой
+//#pragma omp master
     { Sea.SetTimer( 100 );  // вычисления по волнам и механике корабля (½ сек)
       // do{ WaitTime( 100 ); Sea.Timer(); } while( Sea.Ready() );
     }

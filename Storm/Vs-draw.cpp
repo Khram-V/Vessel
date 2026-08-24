@@ -393,7 +393,8 @@ bool Hull::Draw()                  // Виртуальная процедура 
 //if( !IsWindowVisible( hWnd ) || IsIconic( hWnd ) )return false;
   if( Recurse || !ShipName )return false;
   glContext S( this ); if( !S.Active )return false; Recurse=true; Activate();
-  glEnable( GL_CULL_FACE );
+//glEnable( GL_CULL_FACE );
+  glPolygonMode( GL_FRONT_AND_BACK,GL_FILL ); // @@@@@
   glEnable( GL_DEPTH_TEST );
   glClearColor( BkColor,1 );                  // голубоватый цвет фона и полная
   glClear( GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT ); // расчистка всего экрана
@@ -510,7 +511,7 @@ Hull& Hull::Drawing( byte type )  // 0 - DrawMode; 1 - корпус; 2 + про�
 #define L1( A,B,C ){ color(C,-.25),line(out(A),out(B)),line(out(~A),out(~B)); }
 #define L2(_A,_B,C){ Vector &A=_A,&B=_B; if( A.z!=B.z||A.y&&B.y )L1( A,B,C ) }
 
-HullVsl& HullVsl::LineDraw( byte Mode )   // теоретические или ключевые контуры
+void HullVsl::LineDraw( byte Mode )   // теоретические или ключевые контуры
 { int i,j,k;
 //if( Mode>1 )glDisable( GL_LINE_SMOOTH ); // без сглаживание линий, и зачем?
   if( Mode && Mode!=3 )                    // режимы рисования только для 1 и 2
@@ -532,7 +533,7 @@ HullVsl& HullVsl::LineDraw( byte Mode )   // теоретические или �
     for( k=0; k<Stem.len-1; k++ )
      L1( Stem[k+1],Stem[k],Stem[k].z<0 ? green:freeboard )
     glLineWidth( 1 );
-  } return *this;
+  }
 }
 
 /*

@@ -12,7 +12,7 @@
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option parameters='&quot;Eskuadra\FREE!ship demo 1_weght.fbm&quot; &quot;A-1201 Корвет-Б(а)&quot; &quot;БПК «Стерегущий»-61&quot;' />
+				<Option parameters='&quot;A-1201 Корвет-Б(а)&quot; &quot;БПК «Стерегущий»-61&quot;' />
 				<Option projectCompilerOptionsRelation="2" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
@@ -33,13 +33,14 @@
 				<Option object_output="../../Work/Obj" />
 				<Option type="0" />
 				<Option compiler="gnu_gcc_stable32" />
-				<Option parameters='&quot;A-1201 Корвет-Б(а)&quot; &quot;БПК «Стерегущий»-61&quot;' />
+				<Option parameters='&quot;Крейсер Диана-Аврора.fef&quot; &quot;Galleon «Wasa»&quot; &quot;A-1201 Корвет-Б(а)&quot; &quot;БПК «Стерегущий»-61&quot;' />
 				<Option projectCompilerOptionsRelation="2" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-fopenmp" />
 					<Add option="-Wno-narrowing" />
 					<Add option="-Wno-volatile" />
+					<Add option="-Wno-write-strings" />
 					<Add option="-DGLFW" />
 				</Compiler>
 				<Linker>

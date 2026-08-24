@@ -10,15 +10,15 @@
 #include <Time.h>
 #include <CType.h>
 
-static Color UnderWaterColor;
-static byte  UnderWaterColorAlpha,
-             Units; // 0=метрик, иначе - империал
- typedef enum{ fv100,fv110,fv120,fv130,fv140, fv150,fv160,fv165,fv170,fv180,
-               fv190,fv191,fv195,fv198,fv200, fv201,fv210,fv220,fv230,fv240,
-               fv250,fv261,fv270,fv280,fv290, fv295,fv296,fv297,fv298,fv300,
-               fv302,fv303,fv305,fv309,fv310, fv313,fv314,fv317,fv327,fv332,
-               fv335,fv421,fv430,fv462,fv500, fv510 } FileVersion; // всего=46
- FileVersion FV=fv261;
+static Color UnderWaterColor = seaColor( green );
+static byte  UnderWaterColorAlpha = 100, // 255.0
+             Units = 0;                  // 0=метрик, иначе - имперcкая АСК
+typedef enum{ fv100,fv110,fv120,fv130,fv140, fv150,fv160,fv165,fv170,fv180,
+              fv190,fv191,fv195,fv198,fv200, fv201,fv210,fv220,fv230,fv240,
+              fv250,fv261,fv270,fv280,fv290, fv295,fv296,fv297,fv298,fv300,
+              fv302,fv303,fv305,fv309,fv310, fv313,fv314,fv317,fv327,fv332,
+              fv335,fv421,fv430,fv462,fv500, fv510 } FileVersion; // всего=46
+static FileVersion FV=fv261;
 //
 //!                конструктор с расчисткой и считыванием новой числовой модели
 //
@@ -42,11 +42,11 @@ freeShip::freeShip(): Hull(),
   ActiveLayer.MaterialDensity=1.0;     // плотность воды
   ActiveLayer.Thickness=1.0;           // если 1 - получится площадь
 }
-WCHAR *FName;                    // имя открытого файла в кодировке от Windows
-FILE *FM=NULL;                   // пусть так будет единственно открытый файл
+static WCHAR *FName;             // имя открытого файла в кодировке от Windows
+static FILE *FM=NULL;            // пусть так будет единственно открытый файл
 const char Future[]="FREE!ship"; // признак FREE!Ship цифровой модели Fbm и Ftm
 static string Str;               // рабочая строчка изначально имеет 2К
-bool isBin=false;                // признак двоичной и текстовой записи корпуса
+static bool isBin=false;         // признак двоичной и текстовой записи корпуса
 
 bool freeShip::Read( const char *Name,_Real newDraught )  // смену осадки особо
 { strcpy( FileName,Name );
@@ -60,9 +60,9 @@ bool freeShip::Read( const char *Name,_Real newDraught )  // смену осад
     //
  Real xi;
   View_initial( xi = 2.4*sqrt( sqr(Length)+sqr(Breadth*2)+sqr(Draught*4) ) );
+//glPolygonMode( GL_FRONT_AND_BACK,GL_FILL ); //_LINE _POINT
   Distance=-xi;
-  eyeX=45,eyeY=-15,eyeZ=0; lookX=-1,lookY=-1,lookZ=0;
-  return true;
+  eyeX=45,eyeY=-15,eyeZ=0; lookX=-1,lookY=-1,lookZ=0; return true;
 }
 static bool OpenFile()           // открытие цифровой модели корпуса
 { char FTyp[14];
@@ -129,11 +129,11 @@ bool freeShip::LoadFEF()      // Ship.fef == FreeShip Exchange Format
   } else
   { I=atoi( str ); free( str );
   }
-// TFreeSubdivisionSurface.ImportFEFFile
-//
-   ReadFEF( I );
-   fclose( FM ); FM=NULL;
-   return true;
+  ReadFEF( I );
+  fclose( FM ); FM=NULL;
+  Extent(); Real D;         // расчёт - переопределение графических экстремумов
+  freeShift( (Vector){ 0,0,-Min.z-(D=Draught) } ); Draught=D;
+  return true;
 }
 //   чтение собственно секций всех сплайновых геометрических поверхностей
 //
@@ -184,10 +184,6 @@ void freeShip::ReadFEF( int K )    // количество узлов или и�
      K=0; S=strtok( 0," " ); if( S )sscanf( S,"%i",&K ); F[I].LayerIndex=K+NoL; // № слоя по площадке
    //K=0; S=strtok( 0," " ); if( S )sscanf( S,"%i",&K ); F[I].Selected=K!=0;    // метка выбора
    }
-   //
-   //  теперь выборка загибулин - мимо
-   //
-   Extents();               // расчёт - переопределение графических экстремумов
 }
 //   Основная процедура считывания цифрового проекта корабля
 //
@@ -219,9 +215,7 @@ bool freeShip::LoadProject()
          /* HydrostSectionalAreas=    */ getByte();
          /* HydrostMetacentricHeight= */ getByte();
          /* HydrostLCF=               */ getByte();
-         if( FV>=fv250 )
-         { /* lFlowline=              */ getByte();
-         } //=250
+         if( FV>=fv250 ){ /*lFlowline=*/ getByte(); } //=250
        }   //=220
      }     //=210
    }       //=195
@@ -242,7 +236,7 @@ bool freeShip::LoadProject()
       Units=getInt(); // 0 - метрик, иначе - империал
    /* Set.UseDefaultSplitSectionLocation= */ getByte();
    /* Set.SplitSectionLocation=           */ getFloat();
-   /* if(FV>=fv165)Set.DisableModelCheck= */ getByte();
+   /**if(FV>=fv165)Set.DisableModelCheck= */ getByte(); // здесь ошибка автора
    readText( &Comment );
    readText( &CreatedBy );
    if( FV>=fv210 )
@@ -287,12 +281,15 @@ bool freeShip::LoadProject()
    //
    //!   ... и всякое сбоку-припёку - мимо
    //
-   fclose( FM ); FM=NULL; return true;
+   fclose( FM ); FM=NULL;
+   Extent(); Real D;        // расчёт - переопределение графических экстремумов
+   freeShift( (Vector){ 0,0,-Min.z-(D=Draught) } ); Draught=D;
+   return true;
 }
 //!  считывание собственно секций всех сплайновых геометрических поверхностей
 //
 void freeShip::freeRead( bool Part )
-{ int I,J,K,N,NoI,NoL,NoC,EdErr;                     // isLoad=true;
+{ int I,J,K,N,NoI,NoL,NoC; //,EdErr;                 // isLoad=true;
    NoL=NoLayers;                                     // все новые слои вдогонку
    N=getInt();
    NoLayers+=N;
@@ -341,34 +338,30 @@ void freeShip::freeRead( bool Part )
    if( FV>=fv195 )
    {
 nPart: J=getInt();
-     for( I=0; I<J; I++ ){ getInt();
+     for( I=0; I<J; I++ ){ K=getInt();
        for( int j=0; j<K; j++ )getInt();
        if( !Part )getByte();
      } if( Part )goto Ret;
    }
    NoI=NoFaces;
-   NoFaces+=getInt(); EdErr=0;
+   NoFaces+=getInt();
    F=(Faces*)Allocate( NoFaces*sizeof( Faces ),F );
    for( I=NoI; I<NoFaces; I++ )
    { K=getInt();
-     F[I].Capacity=K;
-     F[I].P=(int*)Allocate( K*sizeof(int) );    // <++ Control Points
+     F[I].Capacity=K;                          //! утечки или перерасход памяти
+     F[I].P=(int*)Allocate( K*sizeof(int) );   // <++ Control Points
      for( int j=0; j<K; j++ )
      { int m=getInt();
-       if( m+NoC>=NoCoPoint || m<0 )EdErr++;
        if( m==-1 )m=0; F[I].P[j]=m+NoC;
      } F[I].LayerIndex=getInt()+NoL;
      if( !Part )/*F[I].Selected=*/getByte();
    }
    if( Part )goto nPart;
-Ret: Extents();             // расчёт - переопределение графических экстремумов
+Ret:; // Extent();           // расчёт - переопределение графических экстремумов
 }
-void freeShip::Extents( bool Sizes )                // Экстремумы по всем контрольным точкам
+void freeShip::Extent()   // (Sizes=true) экстремумы по всем контрольным точкам
 { for( int i=0; i<NoCoPoint; i++ )
-  if( !i )Min=Max=P[0].V; else MinMax( Min,Max,P[i].V );
-  if( !Sizes || !NoLayers ){ Length=Max.x-Min.x,Breadth=Max.y-Min.y,Draught=-Min.z; }
-  for( int i=0; i<NoCoPoint; i++ )P[i].V.z-=Draught+Min.z,
-                                  P[i].V.x-=(Max.x+Min.x)/2;
+   if( !i )Min=Max=P[0].V; else MinMax( Min,Max,P[i].V );
 }
 //
 //   левые приблуды к открытому frreShip формату корабельной поверхности
@@ -417,8 +410,10 @@ bool freeShip::Import( fixed Fmt )
 //Visio.BothSides=false;
 //BoardView( Visio.ModelView )=mvPort;
 //Visio.ModelView=mvPort;
-  Extents( false );   // расчёт - переопределение графических экстремумов
-  if( Min.z<0 && Max.z>0 )Draught=-Min.z;
+  Extent();      //s( false ); расчёт - переопределение графических экстремумов
+  Length=Max.x-Min.x,Breadth=Max.y-Min.y;
+  if( Min.z>=0 || Max.z<=0 )freeShift( (Vector){ 0,0,-0.5*(Min.z+Max.z) } );
+  Draught=-Min.z;
   return true;
 }
 void freeShip::ReadObj()                      // временный оригинал имени файла
@@ -503,7 +498,6 @@ void freeShip::ReadObj()                      // временный оригин
     if( i!=j )L[j]=L[i];
     j++;
   } NoLayers=j;
-//  Extents( false );       // расчёт - переопределение графических экстремумов
 }
 void freeShip::ReadStl()                      // временный оригинал имени файла
 { char *S,T[80]; Vector N;
@@ -602,190 +596,145 @@ binarySTL:   //
 //  изображение на волне
 //  прорисовка исходных многоугольников
 //
-#define uWater { c.c[3]-=c.c[3]/6; c.c[0]=( c.c[0]+UnderWaterColor.c[0] )/2; \
-                                   c.c[1]=( c.c[1]+UnderWaterColor.c[1] )/2; \
-                                   c.c[2]=( c.c[2]+UnderWaterColor.c[2] )/2; }
-
-static void DrawL( Flex &Cont, int i1,int i2, _Real delta, bool right ) // i1-i2 включительно
-{ Vector V,W=Zero;
-  for( int i=i1+1; i<i2; i++ )W+=(Cont[i+1]-Cont[i1])*(Cont[i]-Cont[i1]);
-  glNormal3dv( W );          // в гидромеханике этот расчёт должен быть здесь
-  glBegin( GL_POLYGON );
-    for( int i=i1; i<=i2; i++ ){ (V=Cont[i]).z+=delta; dot( V ); }
-  glEnd();
-  if( right )
-  { W.y=-W.y; glNormal3dv( W );
-    glBegin( GL_POLYGON );
-    for( int i=i2; i>=i1; i-- ){ (V=Cont[i]).z+=delta; V.y=-V.y; dot( V ); }
-    glEnd();
-  }
+extern Color Cu,Cd;          // расцветка надводна / подводная
+extern bool Part,            // false= днище и ватерлиния; true= надводный борт
+            drawHull;        // прорисовка корпуса | гидродинамический процесс
+inline Color cWater( Color c )
+{ c.c[3]-=c.c[3]/6; c.c[0]=( c.c[0]+UnderWaterColor.c[0] )/2;
+                    c.c[1]=( c.c[1]+UnderWaterColor.c[1] )/2;
+                    c.c[2]=( c.c[2]+UnderWaterColor.c[2] )/2; return c;
+}
+#if 1
+static void DrawL( Flex &Cont, bool right ) // i1-i2 включительно
+{ Vector A,B,C; int i,n=Cont.len; A=Cont[0]; B=Cont[1];
+    for( i=2; i<n; i++ )
+       { C=Cont[i]; Vessel->Triangle( A,B,C ); B=C; } if( right )
+    for( --i,A.y=-A.y,B.y=-B.y; i>0; )
+       { C=Cont[--i]; C.y=-C.y; Vessel->Triangle( A,B,C ); B=C; }
 }
 inline bool inInter( _Vector V1, _Vector V2 )
-{    return (V1.z>=0 && V2.z<0) || (V2.z>=0 && V1.z<0);
-}
+     { return (V1.z>=0 && V2.z<0) || (V2.z>=0 && V1.z<0); }
 inline Vector newInter( _Vector V1, _Vector V2 )
-{    return V1 - V1.z*( V2-V1 )/( V2.z-V1.z );
-}
-void freeShip::freeDraw( BoardView Sides )
-{ const Real delta=Draught+Min.z;
-//    Flex &W=WaterLine;
- static Flex W,wL;
- int K; Color c; wL.len=0;
-  for( int N=0; N<NoFaces; N++ ) // синхронная прорисовка треугольников двух бортов
-  if( (K=F[N].Capacity)>2 )             // у граней должно быть боле двух рёбер
-  { const Layers &Layer=L[min(NoLayers,F[N].LayerIndex)]; // указанные свойства
-    const bool right=(Sides==mvBoth && Layer.Symmetric);
-    glLineWidth( 1 );    /// Alice AI из Яндекса стала эдесь хорошим помощником
- #if 1
-   Vector v,V1,V2; int J=-1,i=0; W.len=0;
-    while( i<=K+J )
-    { (V2=P[F[N].P[i%K]].V).z-=delta;
-      if( i++ )                        // i - показывает следующий узел = длину
-      if( inInter( V1,V2 ) )           //     однократно, но по всем рёбрам
-      { if( J<0 || W.len==0 ){ v=V1; if( J<0 )J=i,W.len=0; } else v=V2;
-        if( v.z==0.0 )W+=v; else W+=newInter( V1,V2 );
-        if( W.len>1 )
-        { if( W.len>2 )  //--- невидимые двойки пусть нарисуются, аль нет {wL}?
-          { c.C=Layer.LClr.C;
-            if( W[1].z<0 )uWater else wL+=W[0],wL+=W[-1]; glColor4ubv( c.c );
-            DrawL( W,0,W.len-1,delta,right );
-          } W[0]=W[-1]; W.len=1;
-      } }
-      if( J<0 || W.len>0 )W+=V2; V1=V2; // J<0 по началу, и от пересечения нуля
-    }
-    if( J<0 ) // if( W.len>0 )        // c заданной расцветкой для каждой грани
-    { c.C=Layer.LClr.C;
-      if( W[0].z<0 )uWater glColor4ubv( c.c ); DrawL( W,0,W.len-1,delta,right );
-    }
-#else
-   Flex V; int i=0,j=0,J=0; W.len=0;
-    for( int I=0; I<K; I++ )(V+=P[F[N].P[I]].V).z-=delta;
-    while( i<=K+J ){ int I=i%K,I1=(i+K-1)%K; i++;
-      if( inInter(V[I1],V[I]) )
-      { if( W.len )j=I; else { j=I1; if( !J )J=I+1; }
-        if( V[j].z==0.0 )W+=V[j]; else W+=newInter( V[I1],V[I] );
-        if( j==I )
-        { c.C=Layer.LClr.C;
-          if( W[1].z<0 )uWater else wL+=W[0],wL+=W[-1]; glColor4ubv( c.c );
-          DrawL( W,0,W.len-1,delta,right ); W.len=0; --i; // одной левой точкой
-      } } if( W.len )W+=V[I];
-    }
-    if( !W.len ){ c.C=Layer.LClr.C; if( V[0].z<0 )uWater; glColor4ubv( c.c );
-                  DrawL( V,0,V.len-1,delta,right );
-                }
-#endif
-  }
-  for( int i=0; i<wL.len; i++ )wL[i].z+=delta; color( white ); glLineWidth(2);
-  glDisable( GL_LIGHTING );                       // glNormal3d( 0,0,-1 );
-  for( int i=0; i<wL.len; i+=2 )                  // белая ватерлиния 1|2 борта
-// if( Sides!=mvBoth )line( wL[i],wL[i+1] ); else
-                     liney( wL[i],wL[i+1] );
-/*color( lightmagenta );                          // кривые контрольные контуры
-  for( int K=0; K<NoCurves; K++ )
-  { Vector V,W;
-    for( int I=0; I<C[K].Capacity; I++ ){ W=P[C[K].P[I]].V;
-      if( I ){ if( Sides==mvBoth )liney( V,W ) ; else line( V,W ); } V=W;
-    }
-  }*/
-  glEnable( GL_LIGHTING ); glLineWidth( 0.2 );
-}
+     { return V1 - V1.z*( V2-V1 )/( V2.z-V1.z ); }
 
-extern int //Board=0,       // 'о' штевни; '-' левый и '+' правый борт
-       Level, //=-2,        // -2-днище -1-вода 0-ватерлиния 1-смочен 2-сухой
-       wLine; //=1;         // -1-ниже; +1-выше цвета конструктивной ватерлинии
-extern bool Part, //=false, // false= днище и ватерлиния; true= надводный борт
-        drawHull; //=false; // прорисовка корпуса | гидродинамический процесс
-extern Color Cx;
-
-freeShip& freeShip::Floating( bool onlyDraw ) // кинематика на морском волнении
-{
-  if( onlyDraw )
-  {
-    glEnable( GL_LIGHTING );
-//    freeDraw();
-//    return *this;
-  }
-
-
-
-  int i; Part=false;              // разделение корпуса на прозрачные подуровни
-       drawHull=onlyDraw;       // копия режима расчетов(-) или прорисовки(+)
+void freeShip::Floating( bool onlyDraw ) // кинематика на морском волнении
+{      drawHull=onlyDraw;         // копия режима расчетов(-) или прорисовки(+)
   if( !onlyDraw )ThreeInitial();  // начальная чистка для интегрируемых величин
+//bool Both=false;// есть хоть один левый борт, двойная прорисовка w-ватерлинии
+  Part=false;    // разделение корпуса на прозрачные надводно/подводные уровни
   wL.len=0;      // ватерлиния с нормалями и запутанными разделёнными отрезками
 Part_of_hull:    // разделение корпуса по уровням надводной и смоченной обшивки
-
+ int K,N;
+ static Flex w; w.len=0;           // дубль ватерлинии без малейшей оптимизации
   if( onlyDraw )glEnable( GL_LIGHTING );
-
-  for( int i=0; i<NoFaces; i++ )
-  { int *k;
-    const Layers &Layer=L[min(NoLayers,F[i].LayerIndex)]; // указанные свойства
-    const bool right=Layer.Symmetric && Min.y>=-eps;      // && Sides==mvBoth
-    Vector &A=P[*(k=F[i].P)].V;
-    Cx=Layer.LClr;
-    for( int j=1; j<F[i].Capacity-1; j++,k++ )
-    { Vector &B=P[k[1]].V,
-             &C=P[k[2]].V; Triangle( A,B,C );
-      if( right )Triangle( ~A,~C,~B );
+  for( N=0; N<NoFaces; N++ )      // синхронная прорисовка треугольников бортов
+  { Faces &Face=F[N];
+    if( (K=Face.Capacity)>2 )           // у граней должно быть боле двух рёбер
+    { static Flex W;
+      const Layers &Layer=L[min(NoLayers,Face.LayerIndex)]; // указанные свойства
+      const bool right=Layer.Symmetric;
+      Cu = Layer.LClr;     /// Alice AI из Яндекса стала здесь хорошим помощником
+      Cd = cWater( Cu );
+     Vector v,V1,V2; int J=-1,i=0; W.len=0;
+      for( i=0; i<=K+J; i++ )          // корректное рассечение многоугольников
+      { V2=P[Face.P[i%K]].V;           // с выделение контрольной секущей линии
+        if( i )                        // i - показывает следующий узел = длину
+        if( inInter( V1,V2 ) )         //     однократно, но по всем рёбрам
+        { if( J<0 || W.len==0 ){ v=V1; if( J<0 )J=i,W.len=0; } else v=V2;
+          if( v.z==0.0 )W+=v; else W+=newInter( V1,V2 );
+          if( W.len>1 )
+          { if( W.len>2 )  //--- невидимые двойки пусть нарисуются, аль нет {wL}?
+            { if(W[1].z>=0){ w+=W[0],w+=W[-1]; if(right)w+=~(W[0]),w+=~(W[-1]); }
+              DrawL( W,right );
+            } W[0]=W[-1]; W.len=1;
+        } }
+        if( J<0 || W.len>0 )W+=V2; V1=V2; // J<0 по началу, и от пересечения нуля
+      } if( J<0 )DrawL( W,right );      // c заданной расцветкой для каждой грани
     }
   }
-
-  if( !Part ) //   теоретическая и действующая ватерлиния готовятся с нормалями
-  { static Flex W; Vector wM,fM; Real l,L; bool C; const Real dw=1e-4; // 0.1мм
-    if( !KtE )                   // конструктивная или теоретическая ватерлиния
-      for( WaterLine.len=i=0; i<wL.len; i++ )WaterLine+=wL[i]; Level=0;
-    while( wL.len )
-    { W.len=0; C=false;
-      W+=wL[-2],W+=wL[-1]; i=(wL.len-=3)-3;
-      while( !C && i>=0 )
-      { if( abs( W[0]-wL[i+1] )<dw )W/=wL[i+2]; else
-        if( abs( W[0]-wL[i+2] )<dw )W/=wL[i+1]; else
-        if( abs( W[-1]-wL[i+1] )<dw )W+=wL[i+2]; else
-        if( abs( W[-1]-wL[i+2] )<dw )W+=wL[i+1]; else { i-=3; continue; }
-        if( onlyDraw )                  // стрелочки вдоль и поперёк ватерлинии
-        { const Real aL=Draught/12;
-          Vector q=(wL[i+1]+wL[i+2])/2;
-          arrow( out( wL[i+1] ),out( wL[i+2] ),0.1,navy );
-          arrow( out( q ),out( q+aL*dir( wL[i] ) ),0.2,gray );
-        }
-        wL.Delete( i ),wL.Delete( i ),wL.Delete( i );
-        C = W.len>2 && abs( W[0]-W[-1] )<dw; if( C )break;  i=wL.len-3;
-      }
-      if( !C )W+=W[0];;
-      L=0.0; wM=0.0; fM=0.0;     // c разделением разрывных контуров ватерлинии
-      for( i=0; i<W.len-1; i++ )
-        { L+=(l=abs( W[i]-W[i+1] )); wM+=l*( W[i]+W[i+1] ); }  // длина контура
-      if( L>eps )wM/=2*L;                                   // центр ватерлинии
-        for( i=0; i<W.len-1; i++ )fM+=(W[i]-wM)*(W[i+1]-wM); // площадь к знаку
-      if( Zenit%( LtA( fM ) )<0.0 )                  // ориентация по вертикали
-        for( i=0; i<W.len-1; i++ )drawTriangle( W[i+1],W[i],wM ); else
-        for( i=0; i<W.len-1; i++ )drawTriangle( W[i],W[i+1],wM );
-    }
-//    else
-//    { wM=0.0; L=0.0;          // без слияния контуров ватерлинии - простенько
-//      for( i=0; i<wL.len; i+=3 )
-//      { l=abs( wL[i+2]-wL[i+1] ); L+=l; wM += 0.5*l*( wL[i+1]+wL[i+2] ); }
-//      if( L>eps )wM/=L;
-//      for( i=0; i<wL.len; i+=3 )drawTriangle( wL[i+1],wL[i+2],wM );
-//    }
-    // завершение геометрической графики просто белая конструктивная ватерлиния
-    //
-    if( onlyDraw )
-    { color( !Trim?white:cyan ); glLineWidth( 5 ); // silver
-      for( i=0; i<WaterLine.len; i+=3 )
-         line( out( WaterLine[i+1] ),out( WaterLine[i+2] ) ); glLineWidth( 1 );
-    }
-    // действующая ватерлиния выстраивается из фрагментов пересечения
-    // треугольников в шпациях, с нормалями и стрелками вперед по курсу корабля
-/*
-#define Wline( L )for( i=0; i<L.len-2; i+=2 ){ q=( (L[i]+L[i+2])*0.5 );   \
- arrow(out(L[i]),out(L[i+2]),ArLen*.67),arrow(out(q),out(q+L[i+1]),ArLen*.5); }
-      color( lightblue,DrawMode&3?0.0:0.3 ); Wline( wR ) Wline( wL )
-*/
+  if( onlyDraw )glDisable( GL_LIGHTING ); // двойная прорисовка WL - чужой знак
+  color( black ); for( int i=1; i<w.len; i+=2 )line( out(w[i-1]),out(w[i]) );
+  if( !Part )
+  { waterPlane(); // теоретическая действующая ватерлиния готовятся с нормалями
     Part=true;                       // однократный возврат к перерисовке
     if( onlyDraw )goto Part_of_hull; // только надводного борта, здесь Course=x
   }
-  //
   // выборка и расчёт обновленных параметров корпуса, увеличение счетчика цикла
   //
-  if( !onlyDraw )ThreeFixed(); drawHull=false; return *this;
+  if( !onlyDraw )ThreeFixed(); drawHull=false;
+}
+#else
+void freeShip::Floating( bool onlyDraw )    // кинематика на морском волнении
+{ Vector A,B,C;                             // здесь грубовато, но побыстреньку
+ int i,j,*k; Part=false;         // разделение корпуса на прозрачные подуровни
+       drawHull=onlyDraw;         // копия режима расчетов(-) или прорисовки(+)
+  if( !onlyDraw )ThreeInitial();  // начальная чистка для интегрируемых величин
+  wL.len=0;      // ватерлиния с нормалями и запутанными разделёнными отрезками
+Part_of_hull:    // разделение корпуса по уровням надводной и смоченной обшивки
+  if( onlyDraw )glEnable( GL_LIGHTING );
+  for( i=0; i<NoFaces; i++ )
+  { const Layers &Layer=L[min(NoLayers,F[i].LayerIndex)]; // указанные свойства
+    const bool right=Layer.Symmetric; // && Min.y>=-eps;  // && Sides==mvBoth
+    int n=F[i].Capacity-2;
+    A=P[*(k=F[i].P)++].V;     Cu = Layer.LClr;
+    B=P[*k++].V;              Cd = cWater( Cu );
+    for( j=0; j<n; j++ ){ C=P[*k++].V; Triangle( A,B,C ); B=C; } if( right )
+    for( j=0,--k,A.y=-A.y,B.y=-B.y; j<n; j++ )
+    { --k; C=P[*k].V; C.y=-C.y; Triangle( A,B,C ); B=C; }
+  }
+  if( onlyDraw )glDisable( GL_LIGHTING );
+  if( !Part ) //   теоретическая и действующая ватерлиния готовятся с нормалями
+  { waterPlane(); Part=true;         // однократный возврат к перерисовке
+    if( onlyDraw )goto Part_of_hull; // только надводного борта, здесь Course=x
+  }
+  if( !onlyDraw )ThreeFixed(); drawHull=false;
+}
+#endif
+void freeShip::freeShift( _Vector V )             // сдвиг всех координат сразу
+{ for( int i=0; i<NoCoPoint; i++ )P[i].V+=V; Min+=V; Max+=V; Draught-=V.z;
+}
+void freeShip::freeScale( _Vector V )             // сдвиг всех координат сразу
+{ for( int i=0; i<NoCoPoint; i++ )P[i].V&=V;
+  Extent(); Draught*=V.z; Length*=V.x; Breadth*=V.y<0?-V.y:V.y;
+}
+//
+//       необходим первый взгляд с возможными поправками для новой чужой модели
+//
+void freeShip::StartExp() // начальные условия вычислительного эксперимента
+{ KtE=0;                  // нужна ли преднастройка посадки и начальных условий
+  static Real aK,aD,aS; Vector Scale={1,1,1};
+  Mlist Menu[]={ { 1,0," «Аврора» - Начальные условия штормового" }      // =0
+               , { 1,0,"мореходного вычислительного эксперимента" }      // =1
+               , { 2,6," Аппликаты: z = нижняя точка киля %-6.4lf",&aK } // =2
+               , { 1,6,"            конструктивная осадка %-6.4lf",&aD } // =3
+               , { 1,6,"          метацентрическая высота %-6.4lf",&hX } // =4
+               , { 1,6,"  ослабление парадокса Д'Аламбера %-6.4lf",&Kv } // =5
+               , { 1,4," Масштаб В[%4.2lf",&aS }                         // =5
+               , { 0,4,"]~{ x=%4.2lf",&(Scale.x) }                       // =6
+               , { 0,4,   " y=%4.2lf",&(Scale.y) }                       //=7
+               , { 0,4,   " z=%4.2lf",&(Scale.z) },{0,0,"}"}             // =7-8
+               , { 1,6," интервал времени на графиках %6lg",&sT },{0,0," сек"} // =9-10
+               , { 2,1," ...к бою и походу!  " },{ 0,1,"           ...дробь" }
+               };
+  TextMenu T( Mlist(Menu),this,0,0 );
+  int ans=T.Num-2;   // строка "...к бою и походу!"= вычислительный эксперимент
+  if( Volume<0 )freeScale((Vector){1,-1,1}); // -- крути, не крути - так нельзя
+  do
+  { Initial().Floating( false ); KtE=0;
+    freeShift((Vector){-Buoyancy.x});  // мидель в текущий центр тяжести всегда
+    Initial().Floating(false); KtE=0;  // пересчет гидростатики и массо-инерции
+    Vessel->Draw();   // сначала пароход идёт сам по себе в собственном окошке,
+    Storm->Draw();    //  затем картинка штормового волнения вместе с пароходом
+    Vessel->wPrint(); //  ... и геометрические таблички -> на текстовую консоль
+    Vessel->Refresh();
+    Storm->Refresh();
+    aK=Min.z; aD=Draught; aS=1; Scale=(Vector){1,1,1};
+    switch( ans=T.Answer( ans ) )
+    { case 2: if( aK!=Min.z   )freeShift((Vector){0,0,aK-Min.z}   ); break;
+      case 3: if( aD!=Draught )freeShift((Vector){0,0,Draught-aD} ); break;
+    }
+    if( ans==T.Num-1 )_exit( 255 );             // мгновенный стоп без эпилогов
+    if( aS!=1 )Scale=(Vector){aS,aS,aS};
+    if( Scale.x!=1 || Scale.y!=1 || Scale.z!=1 )freeScale( Scale );
+  } while( ans!=T.Num-2 );
 }

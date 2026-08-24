@@ -10,38 +10,56 @@
 //                       ! условный максимум mH = kW*Omega * Ds*_Pd*Rw/Length
 //                       ! волна - полувысота = радиус ++f{Z} ??
 //
-#if 0
-Vector Waves::Wave( _Real Ti, Vector R )  // новое время и место частичкам воды
-{
- Real xW=_Pd*(Ti*Cw-R.x-Long/2)/Length,   // дистанция по фазовому отсчету
-      Omega=_Pd*Cw/Length;
- Real Xdis=_Pd*(R.x - (Ti*Cw-Long)/2)/Length/GrWave;    // протяженность пакета
-  if( xW >= 0.0 )                         // в диагональ дальнего угла бассейна
-//if( Xdis <= 0.0 )                       // в диагональ дальнего угла бассейна
-  {
-    Real Zr = Rw*exp( _Pd*R.z/Length ); //!-- чистый Герстнер без поправок --
-//  Real Zr=Rw*exp(_Pd*(R.z+(sin(xW)-1)*Rw)/Length);  //!-- поправка по глубине
-    Vector O=R;
-    Vector P=Squad( Ti,R ); P.x-=O.x; P=dir( P )/2.0;
-//Zr=Rw;
-
-      R.x -= Zr*cos( xW ); //*P.x;
-      R.z += Zr*sin( xW ); //*(P.z+1);           //! гармония волны
-
-//      R.x -= Zr*cos( xW + Omega*Ti*-0.5 ); //*P.x;
-//      R.z += Zr*sin( xW + Omega*Ti*-0.5 ); //*(P.z+1); //! гармония волны
-
-      R-=O;
-//    (R.rotY( -0.5*Omega*Ti )*xW )*=Zr;
-      R.rotY( -2*Omega*Ti );
-      R+=O;
-//    if( Exp.waves )R.x-=X;     // 1- волна трохоидальная; 0- длинная одномерная
-  } return R;
+#if 1
+static Real
+   Extend=6,     // протяженность фронта волны меньше для крутого гребня [метр]
+   Ow=6;         // круговая частота чисто прогрессивной волны
+const Real
+   hW=8.0*_Pi/3.0;   // 1.134 - превышение гребня над средним уровнем моря при
+                     //         выравнивании скорости частиц с потоком в гребне
+                     // 0.614 - снижение уровня / подвсплытие корабля в подошве
+                     //         h·k≈0.75 или λ/h≈π·8/3×2 ƒ{⅜}ћ½
+//
+//     точное воспроизведение волны для штормования Авроры
+//
+//atic Real           // на случай, пока не встроены дисперсионные эффекты волн
+//   GrWave=8.89*2.0; // количество гребней в структуре одного волнового пакета
+void
+Waves::iWave( _Real Xdis, // сдвиг-распространение в базисе групповой структуры
+              Vector &P,  // локальные координаты внутри моделируемой акватории
+              Vector &V ) // скорость частицы жидкости по трохоидальной орбите
+{ const Real L=_Pd/Length;                // фазовая длина прогрессивной волны
+  if( Xdis-P.x >0 )
+  { Real xW=L*(Xdis-P.x),                 // дистанция по фазовому отсчету
+         xG=L*(Xdis/2-P.x)/GrWave,        // тоже для огибающей модуляции
+         Rx=cos( xG ),                    // Lg=2×8,89 с поправкой к цугам волн
+         Ry=sin( xG ),
+//       R = Rw*exp( L*P.z );              //!- чистый Герстнер без поправок --
+         R = Rw * exp( L * ( P.z           // глубина жидкости -> радиус орбиты
+           + Rw * ( cos( xW )-1.0 ) ) );   // протяженность групповой структуры
+         R*=exp(-L*R*hW*Rw*cos(xW)/Length); // корректировка уровня во впадинах
+    Real G=Rw/(Length/hW);      // соотношение максимальной волны к действующей
+                             Ry=0; //Rx=1;
+        R *= ( 1.0+( 2*fabs( Rx+Ry )-1.0 )*G ); // групповая модуляция как есть
+    Vector Q={R},O;
+      O=P -= Q.rotY( xW );           // волна боле-мене красива, далее - порча
+        P -= Q.rotY( xW/2 )+O;       // заготовка полуобратки, вместо дисперсии
+     (P.rotY(2*G*L*Cw*Tcalc)/=2)+=O; // - двигать встречную волну по серьёзному
+  }
+}
+Vector Waves::Wave( _Real Ti, Vector R )
+{ Extend = Length*_Pd/Height;  // протяженность центрального девятого вала  [м]
+  Ow = _Pd*Cw/Length;             // круговая частота чисто прогрессивной волны
+  Vector V={0}; Real xW=Ti*Cw-Long/2;   // дистанция по фазовому отсчету
+  iWave( xW,R,V );
+  return R;
 }
 #else
+#if 1
 Vector Waves::Wave( _Real Ti, Vector R )  // новое время и место частичкам воды
 { Real xW=_Pd*(Ti*Cw-R.x-Long/2)/Length,  // дистанция по отсчету волновой фазы
         X=_Pd*Qw;                         //  количество полных фаз на границах
+  Vector O=R;
   if( Exp.crest )X*=2.0;                  // с учётом двойного падения скорости
   if( xW >= 0.0 )                         // в диагональ дальнего угла бассейна
   if( !Qw || xW<=X )                      // ограничение пакета излучаемых волн
@@ -51,6 +69,7 @@ Vector Waves::Wave( _Real Ti, Vector R )  // новое время и место
     if( Crest || Wind )                   // ++ поправки на ветер и подтопление
     { Zr*=exp( _Pd*Zr*( Wind*( sin( xW )-1.0 )      // под косое действие ветра
                  - Crest*cos( xW ) )/Length ); }  // к площади гребня и впадины
+//goto G;
     if( Exp.front )   // плавное вступление волны при смещении аргумента на п/2
     { if( (xW-=_Ph)<_Ph )X=Zr*cos(xW)/(2.25-sin(xW)),R.z+=Zr*(1+sin(xW))/2; }
     else
@@ -60,11 +79,48 @@ Vector Waves::Wave( _Real Ti, Vector R )  // новое время и место
     else
     { //R.z-=Zr*sin( xW );
       //R.z+=Zr*cos( (2.0*asin( fmod( xW/M_PI+1.0,2.0 )-1.0 )+_Pi) );
-
-//    R.z+=Zr*sin( xW-copysign( pow( fabs( cos( xW ) ),0.1 ),cos( xW ) )/M_PI );
+      //R.z+=Zr*sin( xW-copysign( pow( fabs( cos( xW ) ),0.1 ),cos( xW ) )/M_PI );
     }
+G:
+    Real Omega=_Pd*Cw/Length;
+    Vector O=R;          xW*=0.9;
+      R.x -= 0.9*Zr*cos( xW ); //*P.x;
+      R.z += 0.9*Zr*sin( xW ); //*(P.z+1);           //! гармония волны
+      R-=O;
+      R.rotY( -1.85*Omega*Ti ); R/=1.85;
+      R+=O;
   } return R;                  // возврат исходной частицы с волновым смещением
 }
+#else
+Vector Waves::Wave( _Real Ti, Vector R )  // новое время и место частичкам воды
+{ Real xW=_Pd*(Ti*Cw-R.x-Long/2)/Length,  // дистанция по отсчету волновой фазы
+        X=_Pd*Qw;                          // количество полных фаз на границах
+  if( Exp.crest )X*=2.0;                   // с учётом двойного падения скорости
+  if( xW >= 0.0 )                          // в диагональ дальнего угла бассейна
+  if( !Qw || xW<=X )                       // ограничение пакета излучаемых волн
+  { Real Zr = Rw*exp( _Pd*R.z/Length );    //!-- чистый Герстнер без поправок --
+   //Real Zr=Rw*exp(_Pd*(R.z+(sin(xW)-1)*Rw)/Length);  //!-- поправка по глубине
+    if( !Exp.crest )                       // с дисперсией рушится синхронизация
+    if( Crest || Wind )                    // ++ поправки на ветер и подтопление
+    { Zr*=exp( _Pd*Zr*( Wind*( sin( xW )-1.0 )
+                 - Crest*cos( xW ) )/Length ); }
+    // СТОКСОВО СМЕЩЕНИЕ: +½·k·Zr², k=_Pd/Length. Поднимает центры орбит,
+    // чтобы интегральный уровень трохоиды сохранялся в точности.
+    Real Ss = _Pd*Zr*Zr/(2.0*Length);
+    if( Exp.front )   // плавное вступление волны при смещении аргумента на п/2
+    { if( (xW-=_Ph)<_Ph )
+      { Real q=(1.0+sin(xW))/2;            // рампа амплитуды на фронте
+        X=Zr*cos(xW)/(2.25-sin(xW)),R.z+=Zr*q + Ss*q*q; } }
+    else
+    if( xW<_Ph )
+    { Real q=(1.0-cos(2.0*xW))/2;          // полфазы гладко
+      X=Zr*sin( 2*xW )/2,R.z+=Zr*q + Ss*q*q; }
+    if( xW>=_Ph )X=Zr*cos( xW ),R.z+=Zr*sin( xW ) + Ss; //! гармония + Стокс
+    // опционно, дрейф Стокса: R.x += Cw*Ti*2.0*_Pd*Ss/Length;  // u_s = c·(k·Zr)²
+    if( Exp.waves )R.x-=X;     // 1- волна трохоидальная; 0- длинная одномерная
+  } return R;                  // возврат исходной частицы с волновым смещением
+}
+#endif
 #endif
 Vector Waves::Squad( _Real Ti, Vector R ) // огибающая групповой структуры волн
 { Real Xdis = R.x - (Ti*Cw-Long)/2,       // отсчет до границы волнового пакета
@@ -88,7 +144,7 @@ inline void Ftri( Real *A, const int N, int nw ) /// простой треуго
 //
 Waves& Waves::Simulation()
 { Vector A,B,C; int x; bool kDraw=false,inBound=false;
- Real kW=Cw*(dT/=tKrat)/Ds,       // Скорость волны к скорости прохода по сетке      tK=tKrat/(tKrat+1.0),       // граничная поправка однобокого Зоммерфельда      Omega=_Pd*Cw/Length;        //..круговая частота волновых пульсаций [1/с]
+ Real kW=Cw*(dT/=tKrat)/Ds,       // Скорость волны к скорости прохода по сетке      tK=tKrat/(tKrat+1.0);       // граничная поправка однобокого Зоммерфельда//    Omega=_Pd*Cw/Length;        //..круговая частота волновых пульсаций [1/с]
   while( Tcalc<=Tlaps+dT )        //  ... расчёты в догонку к реальному времени
   { inBound=fabs( wH )<Long/2-2;  // подвижная граница внутри расчётной области
     if( inBound )wH+=dT*wV;       // сдвиг отражающей границы по скорости хода
@@ -129,7 +185,6 @@ Waves& Waves::Simulation()
                                 C.x=-C.x,M[Nx]+=C; // сменой знака абсциссы
     } else
 #if 1
-    //
     //     и пробный вариант с возмущением всей волновой поверхности
     //
     for( int x=0; x<=Nx; x++ )                     // поверхностное возмущение
@@ -214,3 +269,62 @@ Waves& Waves::Simulation()
   if( kDraw )++Kd,Drawing().Save().Show();
   return *this;
 }
+
+/*
+Vector Waves::Wave( _Real Ti, Vector R )  // новое время и место частичкам воды
+{
+ Real xW=_Pd*(Ti*Cw-R.x-Long/2)/Length,   // дистанция по фазовому отсчету
+      Omega=_Pd*Cw/Length;
+ Real Xdis=_Pd*(R.x - (Ti*Cw-Long)/2)/Length/GrWave;    // протяженность пакета
+  if( xW >= 0.0 )                         // в диагональ дальнего угла бассейна
+//if( Xdis <= 0.0 )                       // в диагональ дальнего угла бассейна
+  { Real Zr = Rw*exp( _Pd*R.z/Length );   //!-- чистый Герстнер без поправок --
+    Vector O=R;
+    Vector P=Squad( Ti,R ); P.x-=O.x; P=dir( P )/2.0;
+//Zr=Rw;
+      R.x -= Zr*cos( xW ); //*P.x;
+      R.z += Zr*sin( xW ); //*(P.z+1);           //! гармония волны
+//      R.x -= Zr*cos( xW + Omega*Ti*-0.5 ); //*P.x;
+//      R.z += Zr*sin( xW + Omega*Ti*-0.5 ); //*(P.z+1); //! гармония волны
+      R-=O;
+//   (R.rotY( -0.5*Omega*Ti )*xW )*=Zr;
+      R.rotY( -2*Omega*Ti );
+      R+=O;
+//    if( Exp.waves )R.x-=X;     // 1- волна трохоидальная; 0- длинная одномерная
+  } return R;
+}
+
+
+
+
+
+    Vector //Q={ -cos(xW),0,sin(xW) },
+           O={ 0,L*Cw,0 };    Ry=0; //Rx=1;
+
+//        P -= O;
+//        P.rotY( xW*0.45 );
+//        P += O;
+
+//      P += R*Q;
+
+//      P.x -= R*cos( xW );
+//      P.z += R*sin( xW );                                   //! гармония волны
+//      P-=O; P.rotY( G*L*Cw*Tcalc ); P+=O;
+#if 1
+//      V = R*(O*Q);
+//      P += V;//*dT*L;
+
+//      P.x += V.x*dT;
+//      P.z += V.y*dT;
+
+#else
+      O=P;     xW*=0.5; //R*=0.9;
+      P.x -= R*cos( xW );
+      P.z += R*sin( xW );
+      P-=O;
+      P.rotY( -2*G*L*Cw*Tcalc );    // -- двигать встречную волну по серьёзному
+//      P.rotY( -G*Omega*dT ); //R/=1.85;
+      P+=O;
+#endif
+
+*/

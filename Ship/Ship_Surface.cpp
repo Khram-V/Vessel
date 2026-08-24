@@ -63,10 +63,9 @@ void Surface::Drawing( BoardView Sides )
     glLineWidth( 1 );    /// Alice AI из Яндекса стала эдесь хорошим помощником
 #if 1
    Vector v,V1,V2; int J=-1,i=0; W.len=0;
-    while( i<=K+J )
-    { (V2=P[F[N].P[i%K]].V).z-=delta;
-      if( i++ )                        // i - показывает следующий узел = длину
-      if( inInter( V1,V2 ) )           //     однократно, но по всем рёбрам
+    for( i=0; i<=K+J; i++ )            // корректное рассечение многоугольников
+    { (V2=P[F[N].P[i%K]].V).z-=delta;  //     однократно, но по всем рёбрам
+      if( i && inInter( V1,V2) )       // i - показывает следующий узел = длину
       { if( J<0 || W.len==0 ){ v=V1; if( J<0 )J=i,W.len=0; } else v=V2;
         if( v.z==0.0 )W+=v; else W+=newInter( V1,V2 );
         if( W.len>1 )

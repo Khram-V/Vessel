@@ -165,7 +165,7 @@ Field& Field::Simulation()  // моделирование волнения в и
           { Vector &W=Ws[y][x];
                    W.z = Wind.AmH( W ) + Swell.AmH( W ) + Surge.AmH( W );
       } } }
-      Vessel->Floating();    // наложение уровня + расчёт воздействия на корпус
+      Vessel->Floating(false);//наложение уровня + расчёт воздействия на корпус
       Vessel->Movement();    // моделирование гидродинамики корабля на волнении
       Vessel->Protocol(); ++KtE; // счётчик циклов вычислительного эксперимента
   } } WinReady(); return *this;  // переисполнение очереди посторонних запросов

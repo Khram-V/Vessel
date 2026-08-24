@@ -8,11 +8,12 @@
 //    общие данные как бы в стиле Fortran-common блоков
 //
 Vector Min={ 0.0 },Max={ 0.0 };// Экстремумы исходного графического изображения
-byte UnderWaterColorAlpha=0xFF;// для алгоритмов с точным положением ватерлинии
-Color UnderWaterColor={ 0xFFFFFF }; // ~~~ выведены в общий доступ ~~~
-Real  Length=6.0,                   // длина
-      Beam=2.0,                     // ширина
-      Draft=1.0;                    // осадка
+                               // для алгоритмов с точным положением ватерлинии
+Color UnderWaterColor = seaColor( green );   // ~~~ выведены в общий доступ ~~~
+byte  UnderWaterColorAlpha = 100; // 255.0
+Real  Length=6.0,                 // длина
+      Beam=2.0,                   // ширина
+      Draft=1.0;                  // осадка
 //
 //   подготовленные в предыдущем расчёте теоретические контуры
 //
@@ -27,8 +28,7 @@ void InterSection::Drawing( BoardView Sides )                  // mvPort,mvBoth
   if( T[j].NoSplines>0 )
   { glBegin( GL_LINE_STRIP ); //dot( T[j].S[0].P );
     for( int i=0; i<T[j].NoSplines; i++ )dot( T[j].S[i].P ); glEnd();
-  }
-}
+} }
 //   Главная виртуальна процедура изображения всего корабля/проекта
 //
 bool FreeShip::Draw()               // виртуальная процедура с настройкой сцены

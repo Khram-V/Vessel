@@ -137,12 +137,13 @@ public:                           // конструктор, авторская 
  char *FileName,*ShipName; // Имя корабля или название исходного проекта UTF-8
 
  virtual bool Draw();               // виртуальная процедура с настройкой сцены
- virtual Hull& LineDraw( byte Mode )=0;  // теоретические или ключевые контуры
- virtual Hull& Floating( bool=false )=0; // кинематика хода на морском волнении
- virtual Hull& Write( int )=0;  // + Wavefront Technologies Advanced Visualizer
+ virtual void LineDraw( byte Mode )=0;   // теоретические или ключевые контуры
+ virtual void Floating( bool )=0;        // кинематика хода на морском волнении
+ virtual void Write( int )=0;   // + Wavefront Technologies Advanced Visualizer
  virtual bool Read( const char *Name,    // считывание таблицы плазовых ординат
             _Real newDraught=0.0 )=0;    // и изменение осадки на перечитывании
-  Vector nF,nM, // относительные коэффициенты угловых и поступательных движений
+ virtual void StartExp()=0;   // начальные условия вычислительного эксперимента
+ Vector nF,nM,  // относительные коэффициенты угловых и поступательных движений
        muF,muM; // обобщённые параметры демпфирования - задаваемые извне [0÷∞[
       // под большими углами крена и до опрокидывания сопротивление утраивается
   Hull& DampInit(); // инициализация коэффициентов демпфирования на шаг времени
@@ -189,6 +190,7 @@ public:                           // конструктор, авторская 
   void divideTriangle(_Vector,_Real,_Vector,_Real,_Vector,_Real );
   void drawTriangle( _Vector,_Vector,_Vector ); //! малые треугольнички
   void waterPoints( _Vector,_Vector,_Vector );  // нормали и отрезки ватерлинии
+  void waterPlane();                            // еди ная отрисовка ватерлиний
 };
 struct HullVsl: Hull                // таблица плазовых ординат со штевнями
 { HullVsl(); //~HullVsl(){};
@@ -204,11 +206,13 @@ struct HullVsl: Hull                // таблица плазовых орди�
   bool LNext( int,unsigned &m,Vector &L,byte*); // левый/кормовой - шпангоут
   bool RNext( int,unsigned &m,Vector &R,byte*); // правый/носовой контур шпации
 
+public:                               // виртуальные процедуры к Hull
   bool Read( const char *Name,        // считывание таблицы плазовых ординат
-            _Real newDraught=0.0 );   //     изменение осадки на перечитывании
-  HullVsl& Write( int );              // запись + Wavefront.obj и др.
-  HullVsl& Floating( bool=false );    // кинематика корабля на морском волнении
-  HullVsl& LineDraw( byte Mode );     // теоретические или ключевые контуры
+            _Real newDraught=0 );     //     изменение осадки на перечитывании
+  void StartExp();                    // начальные условия нового эксперимента
+  void Write( int );                  // запись + Wavefront.obj и др.
+  void Floating( bool=false );        // кинематика корабля на морском волнении
+  void LineDraw( byte Mode );         // теоретические или ключевые контуры
 };
 //
 //!  § варианты построения групповых структур трохоидального морского волнения
@@ -343,7 +347,7 @@ void MinMax( Vector &Min, Vector &Max, _Vector V );
 //     .obj - Wavefront Technologies Advanced Visualizer
 //     .stl - Triangle...
 //
-union Color{ unsigned C; byte c[4]; };
+//union Color{ unsigned C; byte c[4]; };
 typedef enum { mvPort,mvBoth } BoardView;  // Show half the hull or entire hull
 
 struct freeShip: Hull // Shell оболочка поверхности обшивки корпуса
@@ -377,11 +381,12 @@ struct freeShip: Hull // Shell оболочка поверхности обши�
  freeShip(); // ~freeShip(){};
 
  void freeRead( bool Part=false );
- void freeDraw( BoardView=mvBoth );
- void Extents( bool Sizes=true );      // экстремумы по всем контрольным узлам
+ void Extent();                // MinMax - экстремумы по всем контрольным узлам
+ void freeScale( _Vector );    // Масштабирование и сдвиг координат
+ void freeShift( _Vector );    //      с корректировкой выделенных размерностей
  bool LoadExtFile( bool New=true );
  bool LoadProject();           // быстрая выборка исходного freeShip комплекса
-                               //       в общие структуры в оперативной памяти
+                               //        в общие структуры в оперативной памяти
  void ReadFEF( int );          // если >1 - чистый корпус без доп описаний
  bool LoadFEF();               // здесь Ship.fef == File Exchange Format
  void ReadObj();               // + полное имя сопутствующего описания MtlLib
@@ -391,8 +396,9 @@ struct freeShip: Hull // Shell оболочка поверхности обши�
 // bool LoadPart( bool New=true); // простой фрагмент цифровой вещи к freeShip
 public:                        // виртуальные процедуры к Hull
   bool Read( const char *Name,_Real newDraught=0.0 );
-  freeShip& Write( int ){} // запись Wavefront Technologies Advanced Visualizer
-  freeShip& Floating( bool=false );   // кинематика корабля на морском волнении
-  freeShip& LineDraw( byte Mode ){};// теоретические линии или ключевые контуры
+  void StartExp();              // начальные условия вычислительного эксперимента
+  void Write( int ){}           // o.Wavefront Technologies Advanced Visualizer
+  void Floating( bool=false );  // кинематика корабля на морском волнении
+  void LineDraw( byte Mode ){}; // теоретические линии или ключевые контуры
 };
 #endif
