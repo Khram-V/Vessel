@@ -124,8 +124,7 @@ public:
     unsigned mSec;    // интервал прерываний активированного таймера [мил.сек]
   bool InterruptProcedure( UINT message,WPARAM wParam,LPARAM lParam );
  explicit Window( const char* T=NULL, int X=0,int Y=0, int W=800,int H=600 );
-//virtual
- ~Window();    // деструктор срабатывает в эпилогах производных структур
+ virtual ~Window();   // деструктор срабатывает в эпилогах производных структур
   void Close();       // иначе: вариант завершения только для базовой структуры
   //        -- позиционирование +левого/-правого +верхнего/-нижнего угла Window
   Window& Locate( int X,int Y, int Width,int Height ); // с изменением размеров

@@ -190,8 +190,8 @@ void Hull::wPrint( bool log ) // информация по смоченному 
                " Floatable %1.0f << %1.0f  \n\n"
                " μCenter %4.1f >> %4.1f -- Gravity.z=%+3.1f  \n"
                "       h %4.2f >> %4.2f -- H %3.1f >> %3.1f   ",
-        DtoA( Trun/3600,Trun>3600?2:(Trun>60?3:-3) ),
-        TimeStep,tKrat,Speed*3600/_Mile,
+        DtoA( Trun/3600,Trun>3600?2:(Trun>60?3:-3) ),//  TimeStep,
+        Ts,tKrat,Speed*3600/_Mile,
         Speed/sqrt(_g*Length),sqr(Speed)*_Pd/_g/Length,Volume,iV,Surface,iS,
         Floatage,iF,Metacenter.x,vM.x,Gravity.z,hX,vM.z,Metacenter.y,vM.y ),
   print( 80,8,"Statum{ %X } ",Statum ), // printB( Statum );

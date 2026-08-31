@@ -22,11 +22,12 @@ bool Ship::Import( fixed Fmt )
   if( Min.z<0 && Max.z>0 )Draft=-Min.z;
   return true;
 }
-void Surface::ReadObj( char *Path )           // временный оригинал имени файла
-{ char *S,*Name=strdup( Path ); Real r,g,b,a; char *s; // ссылка не текст в буфере файла
-  print( "\nОткрыт WaveFront файл: %s",Name );
+void Surface::ReadObj( char *Path )     // временный оригинал имени файла
+{ Real r,g,b,a;
+ char *s,*S,*Name=strdup( Path );       // ссылка не текст в буфере файла
  int NoL=NoLayers,                      // уровни будут дополняться сверху
      NoC=NoCoPoint-1;                   // узловые точки отделяются от прошлого
+  print( "\nОткрыт WaveFront файл: %s",Name );
   ActiveLayer.Description="WaveFront";  // Technologies Advanced Visualizer";
   ActiveLayer.ID=NoL;                   // изначально здесь ноль
   ActiveLayer.Symmetric=false;          // пока без правого дублирования
@@ -35,10 +36,11 @@ void Surface::ReadObj( char *Path )           // временный оригин
     memcpy( &L[NoLayers],&ActiveLayer,sizeof( Layers ) );
   }
   while( !feof( FM ) )
-  { if( (s=strchr( S=getString( FM ),'#' ))!=NULL )*s=0;
-    if( strcut( S )<3 )continue;
+  { S=getString( FM );
+    while( (*S)!=0 )if( *S<=' ' )S++; else break; if( (*S)==0 )continue;
+    if( (s=strchr( S,'#' ))!=NULL )*s=0;    if( strcut( S )<3 )continue;
     S[0]=tolower( S[0] );        // сначала первый символ, а затем и вся строка
-    if( !strncmp( S,"v ",2) )
+    if( !strncmp( S,"v ",2 ) )   // пусть с пробелом, для верности (vt,vn,vp)
     { P=(CoPoint*)Allocate( ++NoCoPoint*sizeof( CoPoint ),P );
      CoPoint &p=P[NoCoPoint-1];
 //    sscanf( S+2,"%lg%lg%lg",&p.V.y,&p.V.x,&p.V.z ); p.V.x=-p.V.x; // Новик здесь
@@ -46,7 +48,7 @@ void Surface::ReadObj( char *Path )           // временный оригин
       p.T=svRegular; // svCrease; // svDart; // svCorner;
     } else
     if( !strncmp( S,"f ",2) )
-    { char *z,*w=S+2;
+    { char *s,*z,*w=S+2;
       int k=0,*Rc=(int*)calloc( sizeof( int ),4 ); // Allocate не для маленьких
       do{ s=strchr( w,' ' ); if( s )*s=0;
           z=strchr( w,'/' ); if( z )*z=0;
@@ -96,8 +98,18 @@ void Surface::ReadObj( char *Path )           // временный оригин
      FILE *W=_wfopen( U2W( Name ),L"rt" );   // файл.mtl может быть перепрочтён
       if( !W )print( "\n? %s не открывается.\n",Name ); else
       { while( !feof( W ) )
-        { if( (s=strchr( S=getString( W ),'#' ))!=NULL )*s=0;
+        { S=getString( W );
+
+          while( (*S)!=0 )if( *S<=' ' )S++; else break; if( (*S)==0 )continue;
+          if( (s=strchr( S,'#' ))!=NULL )*s=0;    if( strcut( S )<3 )continue;
+
+/*        while( (*S)!=0 )if( *S<=' ' )S++; else break;
+          if( (*S)==0 )continue;
+          if( *S=='#' || strcut( S )<3 )continue;
+//        if( strchr( S,'#' )!=NULL )continue; //*s=0;
+//        if( (s=strchr( S,'#' ))!=NULL )continue; //*s=0;
           if( strcut( S )<3 )continue;
+*/
           if( !strncmp( Slower( S ),"newmtl",6 ) )
           { L=(Layers*)Allocate( ++NoLayers*sizeof( Layers ),L );
             L[NoLayers-1]=ActiveLayer; // memcpy( &L[NoLayers-1],&ActiveLayer,sizeof( Layers ) );
@@ -111,8 +123,7 @@ void Surface::ReadObj( char *Path )           // временный оригин
           if( !strncmp( S,"d ",2 ) )
           { sscanf( S+2,"%lg",&a ); L[NoLayers-1].LClr.c[3]=byte( 22+a*220 ); } //! [22-222] - пусть пока временно
         } fclose( W );
-      }
-    }
+    } }
   }
 //if( !NoLayers )  // на случай отсутствия послойного описания свойств, будет 1
 //  { L=(Layers*)Allocate( (NoLayers+1)*sizeof( Layers ),L );
@@ -129,8 +140,10 @@ void Surface::ReadObj( char *Path )           // временный оригин
 void Surface::ReadStl( char *Path )           // временный оригинал имени файла
 { char *S,T[80]; Vector N;
   if( !(S=fgets( T,6,FM )) )return;
+  print( "\nОткрыт StereoLithography Triangles" );
   if( memcmp( S,"solid",5 ) )goto binarySTL; //! с двоичными файлами чуть позже
-  print( "\nОткрыт Triangles.ascii файл: %s",Path ); rewind( FM );
+  print( ".ascii файл: %s",Path );
+  rewind( FM );
   //
   //   Standard Triangle Library - ascii
   //
@@ -143,7 +156,7 @@ void Surface::ReadStl( char *Path )           // временный оригин
       L[NoLayers-1].Symmetric=true;
       L[NoLayers-1].ID=NoLayers-1;
       while( !feof( FM ) )
-      { while( !strcut( S=getString( FM ) ) );   // пропуск непустой строки
+      { while( !strcut( S=getString( FM ) ) );   // пропуск до непустой строки
 //      if( !(S=getString( FM ) ) )break;        //        facet normal x,y,z
         if( !memcmp( S,"endsolid",8 ) )break;     // конец данных по фрагменту
         sscanf( S,"%s %s %lg%lg%lg",T,T,&(N.x),&(N.y),&(N.z) );
@@ -172,7 +185,7 @@ void Surface::ReadStl( char *Path )           // временный оригин
 binarySTL:   //
  int n,NoL=NoLayers; fixed c;
   fclose( FM ); if( !(FM=_wfopen( FName,L"rb" ) ) )return; // ~ переоткрытие
-  print( "\nОткрыт Triangles.binary файл: %s",Path );
+  print( ".binary файл: %s",Path );
   fread( T,1,80,FM );                    // Читается заголовок (80 байт)
          T[79]='\0';                      // гарантируется null-termination
   print( "\n«%s»\n",T );
@@ -220,24 +233,28 @@ binarySTL:   //
     memcpy( &L[NoLayers],&ActiveLayer,sizeof( Layers ) );
   } */
 }
-void Surface::WriteSTL( char *FileName )
-{ int ans=MessageBoxW( 0,L"   «Да» -  текстовые фрагменты по расслоениям\n"
-                         L"  «Нет» -  двоичный блок с внутренней расцветкой\n",
-                         L"Stereolithography.stl - триангуляция одобрена !",
-                         MB_YESNO );
-  if( ans==IDNO )
+void Surface::WriteSTL( char *FileName, BoardView ModelView, bool AB )
+{/*  ans=MessageBoxW( 0,L"   «Да» -  текстовые фрагменты по расслоениям\n"
+                        L"  «Нет» -  двоичный блок с внутренней расцветкой\n",
+                        L"Stereolithography.stl - триангуляция одобрена !",MB_YESNO );*/ //if( ans==IDNO )
+ Vector A,B,C,D;
+  if( !AB )             // binary
   { char *S=strdup( FileName ); int nTr=0;
     if( strlen( S=sname( S ) )>80 )S[80]=0;
     fprintf( FM,"%-80s",S );
     fwrite( &nTr,4,1,FM );
     for( int i=0; i<NoFaces; i++ )
-    { Color &C2=L[F[i].LayerIndex].LClr;
+    { Layers &Layer=L[F[i].LayerIndex];
+      bool right=Layer.Symmetric && ModelView==mvBoth;
+      Color &C2=Layer.LClr;
       fixed c=0x8000 | ((31*C2.c[2])/255)<<10
                      | ((31*C2.c[1])/255)<<5 | (31*C2.c[0])/255; //c=0x8888;
       for( int j=0; j<F[i].Capacity-2; j++ )
-      { Vector &A=P[F[i].P[0]].V,
-               &B=P[F[i].P[j+1]].V,
-               &C=P[F[i].P[j+2]].V;
+      for( int l=0; l<=right; l++ )
+      { if( l )A=~A,D=~B,B=~C,C=D;
+          else A=P[F[i].P[0]].V,
+               B=P[F[i].P[j+1]].V,
+               C=P[F[i].P[j+2]].V;
         float M[3]={0,0,0}; nTr++;    fwrite( M,4,3,FM );
         M[0]=A.x; M[1]=A.y; M[2]=A.z; fwrite( M,4,3,FM );
         M[0]=B.x; M[1]=B.y; M[2]=B.z; fwrite( M,4,3,FM );
@@ -246,12 +263,15 @@ void Surface::WriteSTL( char *FileName )
     } free( S ); fseek( FM,80,SEEK_SET ); fwrite( &nTr,4,1,FM );
   } else
   { for( int k=0; k<NoLayers; k++ )
-    { fprintf( FM,"solid %s\n",L[k].Description );
+    { bool right=L[k].Symmetric && ModelView==mvBoth;
+      fprintf( FM,"solid %s\n",L[k].Description );
       for( int i=0; i<NoFaces; i++ )if( F[i].LayerIndex==k )
       for( int j=0; j<F[i].Capacity-2; j++ )
-      { Vector &A=P[F[i].P[0]].V,
-               &B=P[F[i].P[j+1]].V,
-               &C=P[F[i].P[j+2]].V;
+      for( int l=0; l<=right; l++ )
+      { if( l )A=~A,D=~B,B=~C,C=D;
+          else A=P[F[i].P[0]].V,
+               B=P[F[i].P[j+1]].V,
+               C=P[F[i].P[j+2]].V;
         Vector N=dir( (B-A)*(C-A) );
         fprintf( FM," facet normal %g %g %g\n"
                     "  outer loop\n"
@@ -265,4 +285,59 @@ void Surface::WriteSTL( char *FileName )
     }
   } fclose( FM ); FM=NULL;
 }
+static void wrV( _Vector V )
+               { fprintf( FM,"v %g %g %g\n",e5r(V.x),e5r(V.z),e5r(V.y) ); }
+
+void Surface::WriteObj( char *FileName, BoardView ModelView )
+{ //
+  // для начала создается новый список специально для пометки левых узлов
+  //
+ int K=0,N=0,*Z=(int*)Allocate( NoCoPoint*sizeof(int) ); // дополнительные узлы
+  for( int k=0; k<NoLayers; k++ )
+  { Layers &Layer=L[k];
+     if( Layer.Symmetric && ModelView==mvBoth )          // всё для right->left
+     for( int j=0; j<NoFaces; j++ )
+     if( F[j].LayerIndex==k )                      //Layer.ID )
+     for( int i=0; i<F[j].Capacity; i++ )
+     { int n=F[j].P[i]; if( P[n].V.y!=0.0 )Z[n]=1; // F[j].P[i] повторы/повторы
+  } }
+  for( int i=0; i<NoCoPoint; i++ )if( Z[i] )N++;      // для близиру под запись
+  //
+  //  собственно запись в файл зачем-то совсем неоправданно откладывалась
+  //
+  fext( FileName,"mtl" );                    // Material Template Library (MTL)
+  fprintf( FM,"mtllib %s\n",fext( fname( FileName ),"mtl" ) );    //,FileName );
+  fprintf( FM,"#\n# узлы: %d + %d\n#\n",NoCoPoint,N );
+  for( int i=0; i<NoCoPoint; i++ )wrV( P[i].V );
+  for( int i=0; i<NoCoPoint; i++ )if( Z[i] )     // всякие лишние сикось-накось
+     { wrV( ~P[i].V ); Z[i]=NoCoPoint+K++; }
+ FILE *W=_wfopen( U2W( FileName ),L"wb" );
+  for( int k=0; k<NoLayers; k++ )
+  { Layers &Layer=L[k]; Color &C=Layer.LClr;
+    bool right=Layer.Symmetric && ModelView==mvBoth;           // всё для right
+    fprintf( FM,"#\nusemtl %s\n"
+    "# ID=%i Color=0x%X Vis=%i Sym=%i Dev=%i Inter=%i Hydro=%i Lines=%i\n",
+    Layer.Description,Layer.ID,(Layer.LClr.C)^0xFF000000,Layer.Visible,
+    Layer.Symmetric,Layer.Developable,Layer.UseforIntersection,
+    Layer.UseinHydrostatic,Layer.ShowInLineSpan );
+    fprintf(  W,"newmtl %s\nKd %g %g %g\n",Layer.Description,
+                        e5r( Real( C.c[0] )/255.0 ),    // R - красный
+                        e5r( Real( C.c[1] )/255.0 ),    // G - зелёный
+                        e5r( Real( C.c[2] )/255.0 ) );  // B - синий
+    if( C.c[3]!=0xFF )
+    fprintf( W,"d %g\n",e5r( Real( C.c[3] )/255.0 ) );  // A - альфа
+    for( int j=0; j<NoFaces; j++ )       // для начала лепим все узлы не глядя
+    if( F[j].LayerIndex==k )             // Layer.ID )
+    { fprintf( FM,"f" );
+      for( int i=0; i<F[j].Capacity; i++ )fprintf( FM," %d",F[j].P[i]+1 );
+      fprintf( FM,"\n" );
+      if( right )
+      { fprintf( FM,"f" );
+        for( int i=F[j].Capacity-1; i>=0; i-- )
+        { K=F[j].P[i]; if( Z[K] )K=Z[K]; fprintf( FM," %d",K+1 );
+        } fprintf( FM,"\n" );
+    } }
+  } Allocate( 0,Z ); fclose( W ); fclose( FM ); FM=NULL;
+}
+
 

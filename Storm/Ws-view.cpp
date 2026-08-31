@@ -75,7 +75,8 @@ bool Field::Draw()
 { static bool Recurse=false;
 //if( !Ready() )return false;
 //if( !IsWindowVisible( hWnd ) || IsIconic( hWnd ) )return false;
-  if( Recurse || !KtE )return false;
+//if( Recurse || !KtE )return false;
+  if( Recurse )return false;
   glContext S( this ); if( !S.Active )return false; Recurse=true; Activate();
 //glEnable( GL_LIGHTING );
 //glEnable( GL_CULL_FACE );

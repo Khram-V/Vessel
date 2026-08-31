@@ -48,7 +48,8 @@ FILE *FileOpen
   const WCHAR *wType,  // = "rt"
   const WCHAR *Ext,    // = "vsl",
   const WCHAR *Choice, // = "Ship Hull Form (*.vsl)\0*.vsl\0All Files\0*.*\0\0"
-  const WCHAR *Title ) // = "? выбрать корпус или - Esc - для модели МИДВ"
+  const WCHAR *Title,  // = "? выбрать корпус или - Esc - для модели МИДВ"
+        DWORD *iChoice ) // индекс выбора по списку предложений Choice
 { FILE *F=NULL; WCHAR *C=NULL,*Fname=U2W( wName ); // буфер не менее 2К статики
   if( *Title!=L'?' && *wName!='*' )F=_wfopen( Fname,wType ); ///'?' не забывать
   if( !F )
@@ -68,12 +69,12 @@ FILE *FileOpen
                    | OFN_EXPLORER | OFN_HIDEREADONLY; // OFN_ALLOWMULTISELECT
       if( GetOpenFileNameW( &W ) )F=_wfopen( W.lpstrFile,wType );
     } if( C )free( C );
+    if( iChoice )*iChoice=W.nFilterIndex;
     strcpy( wName,W2U( wcscpy( (WCHAR*)( (char*)LS ),W.lpstrFile) ) ); //?Fname
   } return F;
 }
 //      по случаю - чтение файловых строчек со своим (другим!) буфером в памяти
 //
-
 char *getString( FILE *F )        // Чтение текстовой строки произвольной длины
 { int k=0;                        //  с проверкой наличия <cr> перед <lf>
   if( F )                         //

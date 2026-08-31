@@ -34,6 +34,7 @@ extern Real  Beam,             // ширина
 extern Vector Min,Max;         // Экстремумы исходного графического изображения
 extern Color UnderWaterColor;
 extern byte  UnderWaterColorAlpha;
+Real e5r( _Real );
 int getInt();
 Vector getPoint();
 
@@ -157,7 +158,8 @@ public:
   void ReOrder();              // делается попытка вычистки повторяющихся точек
   void ReadFEF( int );         // если >1 - чистый корпус без доп описаний
   void WriteFEF();             // сохранение текущего результата, наконец-то... ++Obj - тоже надо
-  void WriteSTL( char* Name ); // запись стандартных треугольников с нормалями
+  void WriteObj( char*,BoardView );     // technologies Advanced Visualizer
+  void WriteSTL( char*,BoardView,bool );// запись стандартных треугольников с нормалями
   void ReadObj( char *Path );  // полное имя для сопутствующего описания MtlLib
   void ReadStl( char *Path );  // поверхность из треугольников с нормалями
   void EditMenu( Window* );    // числовое смещение и 3D-перемасштабирование
@@ -165,6 +167,12 @@ public:
   void R90Xright();            // положить на правый борт
   void R90Zright();            // поворот вправо по курсу
   void Extents( bool Sizes=true );      // экстремумы по всем контрольным узлам
+/*
+      "[ Вычислительный эксперимент ].vsl\1*.vsl\1"               +=40
+      "[ free!Ship Exchange Format ].fef\1*.fef\1"                 =1
+      "[ technologies Advanced Visualizer.waveFront].obj\1*.obj\1" =2
+      "[ stereolithography Triangle.ascii ].stl\1*.stl\1"          =3
+      "[ stereolithography Triangle.binary ].stl\1*.stl\1\1";      =4 */
 };
 struct Spline{ Vector P; bool Knuckle; };
 struct Items{ int NoSplines; Spline *S; };

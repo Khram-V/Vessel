@@ -195,9 +195,9 @@ void Hull::NavigaInform( Window *Win )
                     " Surface %.0f << %.0f\n"
                     " Floatable %.0f << %.0f\n"
                     " Metacenter %.1f << %.1f\n"
-                    " τ %-4.1f с  h %.1f << %.1f м",
-           DtoA( Trun/3600,Trun>3600?2:(Trun>60?3:-3) ),TimeStep,
-           tKrat,Speed*3600/_Mile,cSp*3600/_Mile,Speed/sqrt(_g*Length),
+                    " τ %3.1f\"    h %.1f << %.1f м",
+           DtoA( Trun/3600,Trun>3600?2:(Trun>60?3:-3) ), //TimeStep,
+           Ts*tKrat,tKrat,Speed*3600/_Mile,cSp*3600/_Mile,Speed/sqrt(_g*Length),
            sqr(Speed)*_Pd/_g/Length,Volume,iV,Surface,iS,Floatage,iF,
            Metacenter.x,vM.x,_Pd*sqrt( inMass.x.x/hX/_g/Volume ),hX,vM.z );
            color( blue,-0.5 ); i-=3;

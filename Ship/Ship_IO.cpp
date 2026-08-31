@@ -18,7 +18,7 @@ static string Str;             // рабочая строчка изначаль
 //atic int LastLayer=-1;       // ID такой без последовательного перечисления
 static Real Scale=1.0;         // масштаб на случай совмещения моделей ...part.
 
-static Real e5r( _Real R ){ return fabs(R)<Eps?0.0:R-remainder( R,Eps ); } //round(R*1e5)/1e5; } //
+Real e5r( _Real R ){ return fabs(R)<Eps?0.0:R-remainder( R,Eps ); } //round(R*1e5)/1e5; } //
 
 static bool OpenFile(WCHAR *FileName) // открытие файла цифровой модели корпуса
 { char FTyp[14];
@@ -402,8 +402,7 @@ void InterSection::Read()
         else P = getPoint();
       } else P = getPoint();
       T[n].S[k].Knuckle=getByte();
-    }
-  }
+  } }
 }
 bool Ship::LoadExtFile( bool New )
 { char FileName[MAX_PATH]; int L; strcpy( FileName,W2U( FName ) );
@@ -611,30 +610,39 @@ void Surface::WriteFEF()
   }
   //    если есть контурные загибулины, то лепим их в конец оболочки "как есть"
   //
-  fprintf( FM,"%i\n",NoCurves );
-  for( int i=0; i<NoCurves; i++ )
-  { fprintf( FM,"%i",C[i].Capacity );
-    for( int j=0; j<C[i].Capacity; j++ )fprintf( FM," %i",C[i].P[j] );
-    fprintf( FM,C[i].Selected?" 1\n":"\n" );   // метка выборки
+  if( NoCurves>0 )
+  { fprintf( FM,"%i\n",NoCurves );
+    for( int i=0; i<NoCurves; i++ )
+    { fprintf( FM,"%i",C[i].Capacity );
+      for( int j=0; j<C[i].Capacity; j++ )fprintf( FM," %i",C[i].P[j] );
+      fprintf( FM,C[i].Selected?" 1\n":"\n" );   // метка выборки
+    } fclose( FM ); FM=NULL;
   }
 }
-void Ship::WriteVSL()
-{ int i,j,n,M; bool vsl=NoStations>0;
-  char FileName[MAX_PATH]; strcpy( FileName,Name ); fext( FileName,"" );        print( "\n\n%s\n\n",Name );
-  if( (FM=FileOpen(FileName,L"wb",vsl?L"vsl":L"fef",// простой выбор имени L"wt"
-        vsl?L"[ Вычислительный эксперимент ].vsl\1*.vsl\1"
+/*      vsl?L"[ Вычислительный эксперимент ].vsl\1*.vsl\1"
              "[ free!Ship Exchange Format ].fef\1*.fef\1"
              "[ stereolithography Triangle ].stl\1*.stl\1"
              "Все файлы (*.*)\1*.*\1\1"
            :L"[ free!Ship Exchange Format ].fef\1*.fef\1"
              "[ stereolithography Triangle ].stl\1*.stl\1"
              "Все файлы (*.*)\1*.*\1\1",
-            L"? Запись для вычислительного эксперимента Aurora.vsl"
-             ", или сохранение в обменном  формате free!Ship.fef"
-    ) )==NULL )
+*/
+void Ship::WriteVSL()
+{ int i,j,n,M; bool vsl=NoStations>0;
+  char FileName[MAX_PATH]; strcpy( FileName,Name ); fext( FileName,"" );        print( "\n\n%s\n\n",Name );
+  WCHAR *Choice=L"[ Вычислительный эксперимент ].vsl\1*.vsl\1"        // ==41
+                 "[ free!Ship Exchange Format ].fef\1*.fef\1"            //=1
+                 "[ advanced Visualizer.waveFront].obj\1*.obj\1"         //=2 ~~ technologies
+                 "[ stereolithography Triangle.ascii ].stl\1*.stl\1"     //=3
+                 "[ stereolithography Triangle.binary ].stl\1*.stl\1\1"; //=4
+//               "Все файлы (*.*)\1*.*\1\1";                             //=5
+  DWORD iD=0;                                      // простой выбор имени L"wt"
+  if( (FM=FileOpen(FileName,L"wb",vsl?L"vsl":L"fef",vsl?Choice:Choice+41, //82,
+          L"? Запись для вычислительного эксперимента Aurora.vsl"
+          ", или сохранение в обменном формате free!Ship.fef ++",&iD) )==NULL )
     { print( "\n~Запись: %s\n не получается, странно...",FileName ); return; }
-  M=strlen( FileName );
-  if( M>4 && strcmp( FileName+M-4,".fef" )==0 )
+  if( !vsl )iD++;
+  if( iD==2 )
   { if( Shell.NoLayers>0 )
     fprintf( FM,"%s\n%s\n%s\n%s\n%g %g %g %g %g %d 1 %d ≈ L,B,T, ρ,σ, Units,Quality\n",
            Set.Name,Set.Designer,Set.Comment,Set.CreatedBy,
@@ -642,37 +650,21 @@ void Ship::WriteVSL()
            Set.WaterDensity,
            Set.AppendageCoefficient,
            Set.Units,PT=fpLow );          // Set.MainparticularsHasBeenset=true
-    Shell.WriteFEF();
-    fclose( FM ); FM=NULL; return;
+    Shell.WriteFEF(); return;
   } else
-  if( M>4 && strcmp( FileName+M-4,".stl" )==0 )
-  { Shell.WriteSTL( FileName );
+  if( iD==3 )
+  { fprintf( FM,"#\n# %s\n# %s\n# %s\n# %s\n# L=%g B=%g T=%g\n#\n",
+             Set.Name,Set.Designer,Set.Comment,Set.CreatedBy,
+             e5r(Length),e5r(Beam),e5r(Draft) );
+    Shell.WriteObj( FileName,Visio.ModelView ); return; // WaveFront
+  } else
+  if( iD==4 || iD==5 )
+  { Shell.WriteSTL( FileName,Visio.ModelView,iD==4 ); // ==4 -> ascii
     return;
   } else
-/*{ char *S=strdup( FileName ); int nTr=0;
-    if( strlen( S=sname( S ) )>80 )S[80]=0;
-    fprintf( FM,"%-80s",S );
-    fwrite( &nTr,4,1,FM );
-    for( int i=0; i<Shell.NoFaces; i++ )
-    { Color &C2=Shell.L[Shell.F[i].LayerIndex].LClr;
-      fixed c=0x8000 | ((31*C2.c[2])/255)<<10
-                     | ((31*C2.c[1])/255)<<5 | (31*C2.c[0])/255; //c=0x8888;
-      for( int j=0; j<Shell.F[i].Capacity-2; j++ )
-      { Vector &A=Shell.P[Shell.F[i].P[0]].V,
-               &B=Shell.P[Shell.F[i].P[j+1]].V,
-               &C=Shell.P[Shell.F[i].P[j+2]].V;
-        float M[3]={0,0,0}; nTr++;    fwrite( M,4,3,FM );
-        M[0]=A.x; M[1]=A.y; M[2]=A.z; fwrite( M,4,3,FM );
-        M[0]=B.x; M[1]=B.y; M[2]=B.z; fwrite( M,4,3,FM );
-        M[0]=C.x; M[1]=C.y; M[2]=C.z; fwrite( M,4,3,FM ); fwrite( &c,2,1,FM );
-      }
-    }
-    fseek( FM,80,SEEK_SET ); fwrite( &nTr,4,1,FM );
-    free( S ); fclose( FM ); FM=NULL; return;
-  } else */
-  if( M>4 && strcmp( FileName+M-4,".vsl" )!=0 )
-    { fclose( FM ); FM=NULL; _wremove( U2W(FileName) ); return;
-    }
+  if( iD!=1 )                                         // iD==0 - запись vsl
+  { fclose( FM ); FM=NULL; _wremove( U2W(FileName) ); return;
+  }
   fprintf( FM,";\n; %s\n; %s\n; %s\n; %s\n;\n\x1E < %s >\n %d %d\n %g %g %g %g\n", // \x1E=
            Set.Name,Set.Designer,Set.Comment,Set.CreatedBy,
            fext( fname( W2U( FName ) ),"" ),NoStations,NoStations/2,

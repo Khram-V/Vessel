@@ -7,6 +7,9 @@
 //
 //    общие данные как бы в стиле Fortran-common блоков
 //
+const char TitleShip[] =
+     "«Aurora» & «free!Ship» корабельные преобразования, view\\convert in C++";
+
 Vector Min={ 0.0 },Max={ 0.0 };// Экстремумы исходного графического изображения
                                // для алгоритмов с точным положением ватерлинии
 Color UnderWaterColor = seaColor( green );   // ~~~ выведены в общий доступ ~~~
@@ -109,7 +112,7 @@ Ship::Ship()
 }
 //     Конструктор не содержит Matrix для движений корпуса в корабельном базисе
 //
-FreeShip::FreeShip():Ship(),View("Free!ship in C++ ",-12,12,640,480) //Matrix()
+FreeShip::FreeShip():Ship(),View( TitleShip,-12,12,640,480 ) //Matrix()
 { //Icon( "Ship" ).
   AlfaVector( 16 );
   Locate( Xpm( 4 ),Ypm( 4 ),min( 1280L,Xpm( 64 ) ),
@@ -121,15 +124,16 @@ FreeShip::FreeShip():Ship(),View("Free!ship in C++ ",-12,12,640,480) //Matrix()
   Draw(); // начальная прорисовка
 }
 //   Интерактивная настройка/управление графическим отображением проекта
+//                         *.vsl,*.ftm,*.fbm,*.fef,*.part + *.obj,*.stl"
 //
 bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой подсказкой
  const static char                                   // по настройкам и методам
-     *Id[]={ "free!Ship","  Корабельные форматы ",   // визуализации корпуса
-               "*.ftm,*.fbm,*.fef,*.part",0 },
-     *Cmds[]={ " F1 "," - справка",
-               " F2 ","запись «Aurorа».vsl,.fef,.stl",
-               " F3 ","добавка [Ship].part,.obj,.stl",
-               " F4 ","смещение с масштабированием",
+     *Id[]={ "«Aurora+free!Ship»","  Корабельные",   // визуализации корпуса
+                                 "преобразования",0 },
+     *Cmds[]={ " F1 ","справка",
+               " F2 ","запись «Ship».vsl,fef,stl,obj",
+               " F3 ","вход.fbm.ftm.fef.part.obj.stl",
+               " F4 "," смещение с масштабированием",
                " F10 "," сброс повторяющихся узлов",0 },
      *Plus[]={ " <Space>  ","раскрытие борт\\полборта",
                " <Ctrl+Space>"," борта - рёбра/грани",
@@ -174,8 +178,8 @@ bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой под
     default: return View::KeyBoard( Keyb );
   } Draw(); return true;           // если исполнено = прорисовка и сброс ввода
 }
-int main() // int argc, char **argv )
-{ texttitle( "free!Ship view\\convert in C++" ); // заголовок текстовой консоли
+int main() // int argc, char **argv ) // заголовок текстовой консоли
+{ texttitle( TitleShip );
   unsigned i,j=0;
 //fixed Ans;
   FreeShip Hull;                   // запуск сразу всей математики и графики

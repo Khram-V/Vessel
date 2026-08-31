@@ -32,6 +32,7 @@ const char
                 " вычислительный эксперимент с отражением волн от корпуса",
                 " эксперимент с учётом скоростей течений и дисперсией волн" };
 #include "Aurora.h"
+static int Ac=0; static WCHAR **Av=CommandLineToArgvW( GetCommandLineW(),&Ac );
 Real Trun=0.0,  // Отсчет времени для завершённого процесса моделирования [сек]
     Tlaps=0.0;  //      Указание отсчета времени продолжения эксперимента [час]
 unsigned KtE=0, // Счётчик исполненных шагов всего вычислительного эксперимента
@@ -69,13 +70,13 @@ HullVsl::HullVsl():Hull(),Keel( 0 ),Frame( 0 ),Shell( 0 )
 Hull::Hull():Matrix(),View// прицеп View окошко графической визуализации OpenGL
 ( Title_Hull, -12,12, 412,136 ), // Xpm( 4 ),Ypm( 4 ), Xpm( 64 ),Ypm( 72 )
   FileName( 0 ),ShipName( 0 ),   // Исходный Файл и название исходного проекта
-//  Keel( 0 ),Frame( 0 ),Shell( 0 ), // шпангоуты + штевни и обечайка по шпациям
+//Keel( 0 ),Frame( 0 ),Shell( 0 ), // шпангоуты + штевни и обечайка по шпациям
   lFlow( false ),                 // ключ вовлечения корабля в волновой поток
   Statum( Mekhanik_Status ),     // индекс режимов вычислительного эксперимента
 //Educt( 255 ),                  // все восемь признаков экстремальных событий
 //DrawMode( Drawing_Hull ),      // изображение корпуса закраской или контурами
   hX( 1.0 ),                     // поперечная метацентрическая высота      [м]
-  sT( 30.0 ),                    // интервал кинематической визуализации  [сек]
+  sT( 60.0 ),                    // интервал кинематической визуализации  [сек]
   Trim( 0.0 ),                   // дифферент по смещению центра величины [рад]
   Kv( 0.5 ),                     // 1-без давления; 0-учёт парадокса Даламбера
   Course( _Ph/3 ),dCs( _Ph/60 ), // курс, руль на борт(1мин), полборта(2) [рад]
@@ -109,24 +110,7 @@ Hull::Hull():Matrix(),View// прицеп View окошко графическо
   WaitTime( 500 );
   Window::Locate( Xpm( 4 ),Ypm( 4 ),min( 1280L,Xpm( 64 ) ),
                                     min( 1024L,Ypm( 72 ) ) ).Clear();
-/*
- int Ac; WCHAR **Av=CommandLineToArgvW( GetCommandLineW(),&Ac );
-  if( !Read(  W2U( Ac>1 ? Av[1] : L"Aurora.vsl" ) ) )
-       Break( "Ошибка считывания корпуса %s -> %s",W2U( Av[1] ),FileName );
-  Distance*=1.08;
-  lookX=1;
-  lookY=-2; //eye.y=-10;
-  lookZ=0; */
 }
-//                      Shell  n = 0 - ахтерштевень;      n = 1 - корма;
-//void Hull::FullFree()    //  n = Frames+2 - форштевень; n = Frames+1 - нос;
-//{ if( Nframes>0 )        //  n = [2..Frames] - корпус,  всего Frames-1 шпаций
-//  { for( int i=0; i<Nframes+3; i++ )
-//       { if( i<Nframes )(Frame+i)->Flex::~Flex(); Allocate( 0,Shell[i] ); }
-//    Allocate( 0,Frame ),Allocate( 0,Shell ); free( FileName ),free(ShipName);
-//    FileName=ShipName=NULL; Shell=NULL,Frame=NULL,Nframes=0,Keel=0;
-//} }
-//!
 ///     Начальные процедуры и повторная конфигурация параметров волновых полей
 //!
 Field::                            // объединенная акватория морского волнения
@@ -137,10 +121,10 @@ Field( _Real L,_Real W, //_Real T, // длина, ширина бассейна,
 : View( Title_Wave, // Корабль и трохоидальные штормовые структуры морских волн
   Xpm(4),Ypm(1),Xpm(95),Ypm(91) ),  // размерения графического окна в процентах
 //Tstep( T ),tKrat( M_SQRT2*3.0 ),  // интервал и кратность шага во времени [с]
-//KtE( 0 ),    // нулевой счетчик инициирует начало вычислительного эксперимента
+//KtE( 0 ),   // нулевой счетчик инициирует начало вычислительного эксперимента
   Long( L ),Wide( W ),Ws( 0 ),  // длина, ширина и адрес опытового бассейна [м]
   Wind( "Волна" ),Swell( "Зыбь" ),Surge( "Вал" ) // 3 групповые структуры волн
-//Info( this,PlaceAbove ) Kt        // текущая информация исполнительного таймера
+//Info( this,PlaceAbove ) Kt      // текущая информация исполнительного таймера
 { const
  int Split=2; // Дробление общей акватории относительно поля ветрового волнения
  Hull &V=*Vessel; // копия ссылки доступа к определению цифровой модели корабля
@@ -163,17 +147,28 @@ Field( _Real L,_Real W, //_Real T, // длина, ширина бассейна,
   //
   //!  все начальные установки считаны, и теперь можно их заново корректировать
   //                            из файлов начальной инициализации эксперимента
+  //   последовательно перечитываются файлы Aurora.vil в директории запуска
+  //   программы, затем в по месту расположения числовой модели,
+  //   и затем с именем файла считываемой модели корабля.
+  //
        int l=1;
-  for( int i=0; i<2; i++ )   // повторение выборки для Aurora.vil и <Model>.vil
-  { strcpy( fname( strcpy( Lst,V.FileName ) ),"Aurora.vil" );
-    if( !i )VIL=_wfopen( U2W( Lst ),L"rt" ); else    // настройка по директории
-    { if( VIL ){ fclose( VIL ); VIL=NULL; ++i; }     //++ с отметкой её наличия
-      if( strcmp( fext( V.FileName,"vil" ),Lst ) )   //= без повторения и порчи
-      { VIL=_wfopen( U2W( fext(V.FileName,"vil") ),L"rb+" ); // файл для модели
-        if( VIL && i<2 )     // без общей настройки волны в долях длины корабля
-        { Lw*=V.Length/36; Ls*=V.Length/36; Lr*=V.Length/36; } // то не мудрёно
-      }
-    }
+  for( int i=0; i<3; i++ )   // повторение выборки для Aurora.vil и <Model>.vil
+  { if( !i )                 // смотрим настройки у самой программы
+    { WCHAR *LW=(WCHAR*)Lst;
+      if( !GetModuleFileNameW( NULL,LW,2046 ) )VIL=NULL; else
+      { wcscpy( LW+( wcslen( LW )-3),L"vil" ); VIL=_wfopen( LW,L"rt" ); } } else
+    if( i==1 )
+    { strcpy( fname( strcpy( Lst,V.FileName ) ),"Aurora.vil" ); // Lst временно
+      VIL=_wfopen( U2W( Lst ),L"rt" );
+    } else
+    if( strcmp( fext( V.FileName,"vil" ),Lst ) )     //= без повторения и порчи
+    { VIL=_wfopen( U2W( fext( V.FileName,"vil" ) ),L"rb+" ); // файл для модели
+      //if( VIL )       //? ? ? без общей настройки волны в долях длины корабля
+      //{ Lw*=V.Length/36; Ls*=V.Length/36; Lr*=V.Length/36; } // то не мудрёно
+    } else { VIL=0; break; }
+//       if( !i  )Message( "~...","File = [%s]",W2U( (WCHAR*)Lst ) ); else
+//       if( i==1)Message( "~...","File = [%s]",Lst ); else
+//                Message( "~...","File = [%s]",V.FileName );
     if( VIL )while( !feof( VIL ) )                        // к настройке модели
     { char *s=getString( VIL );
       if( !(l=strcut( s )) )break;
@@ -200,8 +195,8 @@ Field( _Real L,_Real W, //_Real T, // длина, ширина бассейна,
       if( !memcmp( s,"Эксперимент:",
                    l=strlen( "Эксперимент:" ) ) )V.GetExp( s+l );
       if( !memcmp( s,"Test:",5 ) )V.GetExp( s+5 );
-
-  } }
+    } if( i<2 ){ fclose( VIL ); VIL=NULL; }
+  }
   View_initial( hypot( Long,Wide )/2.0 ); // пара люстр света на полудиагоналях
   Wind.Initial( Lw,Hw,Dw );  // ветровые волны с обрушающимися гребнями [м,%,°]
   Swell.Initial( Ls,Hs,Ds ); // свежая морская зыбь недавно прошумевших штормов
@@ -238,7 +233,7 @@ Field( _Real L,_Real W, //_Real T, // длина, ширина бассейна,
                Educt&128?"по носу"     : "—нос" );
     } fprintf( VIL,
             " акватория: { %.0f×%.0f м }[%d·%d]~δS=%.2f м, { δt=%.1g\"/%.1f }",
-                                           Long,Wide,mX,mY,dS,TimeStep,tKrat );
+                                           Long,Wide,mX,mY,dS,Ts,tKrat );
   }
   //glMaterialfv( GL_FRONT_AND_BACK,GL_SPECULAR,(const float[]){1,1,1,0});
   //glLightModelfv( GL_LIGHT_MODEL_AMBIENT,(const float[]){.8,.8,.8,1} ); //!??
@@ -266,7 +261,8 @@ Waves&                                       //! Cw,Ow строго связан
 Waves::Initial(_Real Lw,_Real Hw,_Real Dir ) // характер и направление волнения
 { Cw = sqrt( _g*Lw/_Pd );         // фазовая скорость трохоидальной волны [м/с]
   Ow = _Pd*Cw/Lw,                 // круговая частота чисто прогрессивной волны
-  Ds = TimeStep*Cw;               //    контролируемый шаг квадратной сетки [м]
+//Ds = Ts*Cw;                     //    контролируемый шаг квадратной сетки [м]
+  Ds = TimeStep*Cw;           //!### .5 контролируемый шаг квадратной сетки [м]
   Mx=int(Storm->Long/Ds/2+1)*2+1, //  волновой бассейн строится только в чётной
   My=int(Storm->Wide/Ds/2+1)*2+1; // размерности с малым перекрытием результата
   H =(Vector**)Allocate( My,Mx*sizeof(Vector),H ); //+ осреднённый поток [м²/с]
@@ -461,18 +457,18 @@ static bool Hull_and_Waves_Draw()        // вся графика исполня
     Active_Key &= Storm->Ready() && Vessel->Ready();           // ++WinReady()
   } return false;     // return WinReady();
 //  return Vessel->Ready() && Storm->Ready();         // - вариант для WaitTime
-}
+}/*
 static bool TryTimer()
 { if( Active_Key ) // &= Storm->Ready() && Vessel->Ready() )
-  { static unsigned /*oKt=0,*/ i=0; WinReady();
+  { static unsigned oKt=0,i=0; WinReady();
     print( 1,23,"%c",( "#0123456789ABCDEF=" )[++i%=18] ); // 🌀
-/*  if( oKt==KtE )                        // принудительный перезапуск таймеров
+    if( oKt==KtE )                        // принудительный перезапуск таймеров
     { Storm->SetTimer( 100 );
       Vessel->SetTimer( 156,Hull_and_Waves_Draw );
       Storm->Timer(); Storm->Draw(); Vessel->Draw();// проблема в часах/таймере
     } oKt=KtE;
-*/} return false;
-}
+  } return false;
+}*/
 //!                      Главная процедура запускает процессы реального времени
 ///                                       и зацикливается на опросах клавиатуры
 #include <Fenv.h>
@@ -508,15 +504,11 @@ int main()                                 // ( int ans, char **av, char **ac )
    // из файла и формирование представления корпуса Aurora в оперативной памяти
    // с построением независимой прорисовки 3D корпуса под мышкой и таймером
    //
-// HullVsl Ship;     //! Исходная модель корабля считывается в оперативную память
-  //                  графическая среда для построения и визуализации групповых
-  //                  трохоидальных структур штормового волнения всей акватории
-
- int Ac; WCHAR **Av=CommandLineToArgvW( GetCommandLineW(),&Ac );
- char *Fe=0,*Fn=strdup( Ac>1 ? W2U( Av[1] ):"Aurora" ); Ac=strlen( Fn ); // "~באסילי.vsl"
+//int Ac; WCHAR **Av=CommandLineToArgvW( GetCommandLineW(),&Ac );
+ char *Fe=0,*Fn=strdup( Ac>1 ? W2U( Av[1] ):"Aurora" ); int l=strlen( Fn ); // "~באסילי.vsl"
  bool isVsl=true; // для выбора варианта начальной инициализации всякого чужого
 
-  if( Ac>4 ){ Fe=Fn+Ac-4; if( *Fe!='.' )Fe=0; else strlwr( ++Fe ); }
+  if( l>4 ){ Fe=Fn+l-4; if( *Fe!='.' )Fe=0; else strlwr( ++Fe ); }
   if( !Fe || strcmp( Fe,"vsl" )==0 || strcmp( Fe,"vil" )==0 )
   { Vessel=new HullVsl();
   } else
@@ -526,39 +518,38 @@ int main()                                 // ( int ans, char **av, char **ac )
   } else
   Break( "%s\n необходимы: Ship.[vsl,fef,ftm,fbm,obj или stl]",Fn );
 
- Hull &Ship = *Vessel;
-  if( !Ship.Read( Fn ) )
-      Break( "Ошибка считывания корпуса %s",Fn );
-
+ Hull &Ship=*Vessel;// Исходная модель корабля считывается в оперативную память
+  if( !Ship.Read( Fn ) )Break( "Ошибка считывания корпуса %s",Fn );
+  //
+  //    графическая среда для построения и визуализации групповых
+  //    трохоидальных структур штормового волнения всей акватории
+  //
  Field Sea( 800,720,    //! Long, Wide - длина и ширина штормовой акватории [м]
   //            0.5,     //.25 TimeStep заданный шаг времени волновых полей [c]
           64,0.9,-165,   //+10 ветровые волны с обрушающимися гребнями  [м,%,°]
          100,0.44,160,   //-20 свежая морская зыбь неподалёку прошедших штормов
          160,0.2,-130 ); //+50 пологие реликтовые волны от удаленных ураганов
 
-//Start_Experiment();     /// !!! - считывание конфигурационного файла !!!
-
+//Start_Experiment();     /// !!! - считывание конфигурационного файла !!! ~~~
   Sea.Original( true );   // конструктор перенастройки волнения и гидромеханики
   KtE=0;                 //  с подготовкой корпуса для начальной инициализации
   //
   //! для контроля начальной инициализации желателен полный расчёт гидростатики
   //
-//Ship.Floating( false );   // после конфигурации сброс избыточной остойчивости
-//if( Ship.Gravity.z>Ship.Draught*2 )                               // и др ...
-//  Ship.hX=Ship.Metacenter.z=Ship.Metacenter.x-(Ship.Gravity.z=Ship.Draught*2);
-                          // исходная гидростатика затем будет перепроверяться
   Ship.wPrint( true );    // описатели парохода на экране-консоли и в протоколе
   logWave();              // изначальные характеристики волн для протокола
   Sea.Window::KeyBoard( AllKeyb ); // самый нижний уровень виртуальной рекурсии
   Ship.Window::KeyBoard( AllKeyb ); // доступен при прямом обращении в Window
-  Ship.Above();           // установка активности окна с прорисовками корабля
   Ship.Initial();         // установка главных осей с исходными геометрическими
   Ship.Floating( false ); // расчётами по корпусу, без графической визуализации
                           // часы и оперативная информация в оконных заголовках
-  WaitTime( 600 ); //,Hull_and_Waves_Draw,20 );
+//  Sea.Refresh();  glFinish();
+//  Ship.Refresh(); glFinish();
+//  WaitTime( 600 ); //,Hull_and_Waves_Draw,20 );
+  Ship.Above();           // установка активности окна с прорисовками корабля
   Ship.StartExp();        // и ожидание исполнения вычислительных конструкторов
 //Hull_and_Waves_Draw();  // Инициализация всего проекта c первой прорисовкой
-//#pragma omp master
+#pragma omp master
     { Sea.SetTimer( 100 );  // вычисления по волнам и механике корабля (½ сек)
       // do{ WaitTime( 100 ); Sea.Timer(); } while( Sea.Ready() );
     }
@@ -576,7 +567,9 @@ int main()                                 // ( int ans, char **av, char **ac )
 #pragma omp single
     {
       do                 //! после выхода обязательно должен исполняться пролог
-      { WaitTime( 600,TryTimer);//секунда проверки работоспособности транзакций
+      { WaitTime( 600 ); //секунда проверки работоспособности транзакций
+        static unsigned i=0; WinReady();
+        print( 1,23,"%c",( "#0123456789ABCDEF=" )[++i%=18] ); // 🌀
         //Sleep( 1000 );    // или вариант приостановки по блокирующему таймеру
       } while( Active_Key &= Ship.Ready() && Sea.Ready() );
     }

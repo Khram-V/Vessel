@@ -7,7 +7,6 @@
 //!  Обобщенный класс Window::Place для OpenGL (и GLFW)
 //
 //                        ©2010-май, В.Н.Храмушин, СахГУ №2010615850/2010-09-08
-//
 #include <StdIO.h>
 #include "Window.h"
 //

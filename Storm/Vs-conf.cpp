@@ -90,6 +90,7 @@ void Hull::Config()
       { _V=(Kv=minmax( 0.0,Kv,1.0 )); _Flow=lFlow; logStock(); }
     if( DM!=muM || DF!=muF ){ logDamp(); DM=muM; DF=muF; }
     sT=max( 0.5,sTime )*60; sTime=sT/60.0;      // протяжённость графиков качки
+    Draw();
   } while( ans!=_Esc );
 }
 //!    Ключи Exp.peak & .wave могут изменяться только здесь
@@ -155,7 +156,8 @@ Field& Field::Config() // Height = 1.134*Lw*Hw/_Pd/2.0;
     Swell.Initial( Swell.Length,hW*Swell.Height/Swell.Length,g2 );
     Surge.Initial( Surge.Length,hW*Surge.Height/Surge.Length,g3 );
     if( Exp.wave!=1 )Original( false );
-    Vessel->DampInit();                     // на случай изменения шага времени
+    Vessel->DampInit();
+    Draw();                     // на случай изменения шага времени
   } while( ans!=_Esc ); logWave();
   return *this;
 }
