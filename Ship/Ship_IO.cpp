@@ -592,16 +592,18 @@ void Surface::WriteFEF()
 //{ fprintf( FM,"%8.6f %8.6f %8.6f",P[i].V.x,P[i].V.y,P[i].V.z );
   { Vector &V=P[i].V;
     fprintf( FM,"%s %s %s",RtoA(V.x,16,6),RtoA(V.y,16,6),RtoA(V.z,16,6) );
-    if( P[i].Selected )fprintf( FM," %i 1",P[i].T ); else
-    if( P[i].T!=svRegular )fprintf( FM," %i",P[i].T ); fprintf( FM,"\n" );
+    if( NoEdges )                         // если это сформировано во free!Ship
+    { if( P[i].Selected )fprintf( FM," %i 1",P[i].T ); else
+      if( P[i].T!=svRegular )fprintf( FM," %i",P[i].T );
+    } fprintf( FM,"\n" );
   }
-  fprintf( FM,"%i\n",NoEdges );
+  fprintf( FM,"%i\n",NoEdges );     // индикатор слома не исключается из записи
   for( int i=0; i<NoEdges; i++ )
   { fprintf( FM,"%i %i %i",G[i].StartIndex,G[i].EndIndex,G[i].Crease );
     if( G[i].Selected )fprintf( FM," 1" ); fprintf( FM,"\n" );
   }
   fprintf( FM,"%i\n",NoFaces );
-  for( int i=0; i<NoFaces; i++ )            /**  ≈ грубо и неприемлемо
+  for( int i=0; i<NoFaces; i++ )            /**  ≈ слишком грубо и неприемлемо
   if( L[F[i].LayerIndex].LClr.c[3]!=0 )   */ //!.. исключение прозрачных граней
   { fprintf( FM,"%i",F[i].Capacity );        // без правки количества
     for( int j=0; j<F[i].Capacity; j++ )fprintf( FM," %d",F[i].P[j] );
@@ -619,14 +621,6 @@ void Surface::WriteFEF()
     } fclose( FM ); FM=NULL;
   }
 }
-/*      vsl?L"[ Вычислительный эксперимент ].vsl\1*.vsl\1"
-             "[ free!Ship Exchange Format ].fef\1*.fef\1"
-             "[ stereolithography Triangle ].stl\1*.stl\1"
-             "Все файлы (*.*)\1*.*\1\1"
-           :L"[ free!Ship Exchange Format ].fef\1*.fef\1"
-             "[ stereolithography Triangle ].stl\1*.stl\1"
-             "Все файлы (*.*)\1*.*\1\1",
-*/
 void Ship::WriteVSL()
 { int i,j,n,M; bool vsl=NoStations>0;
   char FileName[MAX_PATH]; strcpy( FileName,Name ); fext( FileName,"" );        print( "\n\n%s\n\n",Name );

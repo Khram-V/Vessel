@@ -115,10 +115,10 @@ Field& Field::Config() // Height = 1.134*Lw*Hw/_Pd/2.0;
   TextMenu T( Mlist(Menu),this,-2,-1 ); int ans=-1;
   do
   { switch( Exp.wave )
-    { case 0: Menu[1].Msg="Чистое штилевое и безветренное море "; break;
-      case 1: Menu[1].Msg="Математическая модель штормовых волн"; break;
-      case 2: Menu[1].Msg="Трохоидальный вычислительный процесс"; /* break;
-      case 3: Menu[1].Msg="Континуально-корпускулярные решения "; */ }
+    { case 0: Menu[1].Msg="Чистое штилевое и безветренное море."; break;
+      case 1: Menu[1].Msg="Прогрессивное трохоидальное волнение"; break;
+      case 2: Menu[1].Msg="Трохоидальный процесс и девятые валы"; break;
+      case 3: Menu[1].Msg="»Континуально-корпускулярные решения"; }
     switch( Exp.peak )
     { case 0: Menu[2].Msg="Поверхностные волны в полных потоках"; break;
       case 1: Menu[2].Msg="Высокие волны с дрейфовыми течениями"; }
@@ -137,7 +137,7 @@ Field& Field::Config() // Height = 1.134*Lw*Hw/_Pd/2.0;
     H2=h2=hW*Swell.Height/Swell.Length; g2=(_Pi-atan2(Swell.x.y,Swell.x.x))*_Rd;
     H3=h3=hW*Surge.Height/Surge.Length; g3=(_Pi-atan2(Surge.x.y,Surge.x.x))*_Rd;
     switch( ans=T.Answer( ans ) )
-    { case  1: Exp.wave++; Exp.wave%=3; break; // Initial() модель волнения
+    { case  1: Exp.wave++; Exp.wave%=4; break; // Initial() модель волнения
       case  2: Exp.peak^=true;  break;         // Initial() колебания или волны
       case  3: Exp.draw+=ScanStatus()&SHIFT?-1:1; break;
       case  4: Exp.view+=ScanStatus()&SHIFT?-1:1; break;
@@ -146,18 +146,18 @@ Field& Field::Config() // Height = 1.134*Lw*Hw/_Pd/2.0;
 //    case 12: Swell.Height=h2*Swell.Length/hW; break;
 //    case 17: Surge.Height=h3*Surge.Length/hW; break;
     }
-    if( H1!=h1 )Wind.Height=h1*Wind.Length/hW;     // Wind .axiZ( _Pi-g1*_dR );
+    if( H1!=h1 )Wind.Height=h1*Wind.Length/hW;     //  Wind.axiZ( _Pi-g1*_dR );
     if( H2!=h2 )Swell.Height=h2*Swell.Length/hW;   // Swell.axiZ( _Pi-g2*_dR );
     if( H3!=h3 )Surge.Height=h3*Surge.Length/hW;   // Surge.axiZ( _Pi-g3*_dR );
     if(  Wind.Height>Wind.Length/hW  ){ h1=1.0;  Wind.Height=Wind.Length/hW; }
     if( Swell.Height>Swell.Length/hW ){ h2=1.0; Swell.Height=Swell.Length/hW; }
     if( Surge.Height>Surge.Length/hW ){ h3=1.0; Surge.Height=Surge.Length/hW; }
-     Wind.Initial( Wind.Length, hW*Wind.Height/Wind.Length,g1 );
-    Swell.Initial( Swell.Length,hW*Swell.Height/Swell.Length,g2 );
-    Surge.Initial( Surge.Length,hW*Surge.Height/Surge.Length,g3 );
-    if( Exp.wave!=1 )Original( false );
+        Wind.Initial( Wind.Length, hW*Wind.Height/Wind.Length,g1 );
+       Swell.Initial( Swell.Length,hW*Swell.Height/Swell.Length,g2 );
+       Surge.Initial( Surge.Length,hW*Surge.Height/Surge.Length,g3 );
+    if( !Exp.wave || Exp.wave>2 )Original( true ); //false );
     Vessel->DampInit();
-    Draw();                     // на случай изменения шага времени
+    Draw();                                 // на случай изменения шага времени
   } while( ans!=_Esc ); logWave();
   return *this;
 }
@@ -297,7 +297,7 @@ Field& Field::Get( char *s )
   if( z && *z )                   //! выбор режимов генерации морского волнения
   { if( z=strchr( s=z,',' ) )*z++=0;
     if( strcut( s ) )
-    { int i=atoi( s );  if( i>=0&&i<=3 )Exp.wave=byte(i);
+    { int i=atoi( s );  if( i>=0&&i<=3 )Exp.wave=byte(i);    // от нуля до трёх
       if( z && *z )//! уточнение к простым полным потокам или в трохоидальности
       if( strcut( s=z ) )
       { int i=atoi( s ); if( i>=0&&i<=4 )Exp.peak=byte(i);

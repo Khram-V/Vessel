@@ -82,7 +82,8 @@ void Hull::drawTriangle(_Vector a,_Vector b,_Vector c ) // отработка т
 //           (здесь надо найти локализованное решение по выбору ориентации)
 //
 void Hull::waterPoints( _Vector N,_Vector Q,_Vector P )
-{ if( Q==P )return; wL+=N;   /// dir( N )??
+{           // if( Q==P )return;
+  wL+=N;   /// dir( N )??
   if( LtA( N*(P-Q) ).z>=0 ){ wL+=Q; wL+=P; } else { wL+=P; wL+=Q; }
 }
 void Hull::divideTriangle
@@ -192,7 +193,7 @@ void Hull::waterPlane()          // единая унифицированная 
 *   //
     //! собственно блок моделирования отражения потоков/волн от корпуса корабля
 * else
-  if( Storm->Exp.wave>1 )        // отражение локальных скоростей от ватерлинии
+  if( Storm->Exp.wave>2 )        // отражение локальных скоростей от ватерлинии
   { //for( i=0; i<wR.len-2; i+=2 )Storm->Slicks( out(wR[i]),out(wR[i+2]),x ); // dir( (wR[i+1]+wR[i+3])*0.5 ) );
     //for( i=0; i<wL.len-2; i+=2 )Storm->Slicks( out(wL[i]),out(wL[i+2]),x ); // dir( (wL[i+1]+wL[i+3])*0.5 ) );
     for( i=0; i<WaterLine.len; i+=3 )

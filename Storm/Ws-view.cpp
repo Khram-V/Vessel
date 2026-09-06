@@ -117,8 +117,9 @@ bool Field::Draw()
   glPolygonMode( GL_BACK,GL_LINE ); // POINT );
 
   if( ( Exp.draw )!=3 )
-  { int k=max( Exp.draw&2?mY/100:1,1 ); // поля волн надо для палитры раскраски
-    if( Exp.wave==1)Wind.Ghost(Trun),Swell.Ghost(Trun),Surge.Ghost(Trun);
+  { int k=max( Exp.draw&2?mY/100:1,1 ); // поля волн нужны в палитрах раскраски
+    if( Exp.wave==1 || Exp.wave==2 )
+        Wind.Ghost(Trun),Swell.Ghost(Trun),Surge.Ghost(Trun);
     glLineWidth( 0.01 ); // тончайшие линии на случай прорисовки контуров ячеек
     if( Exp.view&2 )
     { liney((Vector){Long/2,Wide/2,0},(Vector){Long/2,Wide/2,Long/-4},lightblue);
