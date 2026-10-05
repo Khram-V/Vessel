@@ -1,6 +1,6 @@
                      //
-#include "View.h"    // Очередная отработка элементарных графических примитивов//#include "..\Math\Vector.h"                              // ©2018-08-22 ‏יְרוּשָׁלַיִם
-const char*_Mnt[]={"январь","февраль","март","апрель","май","июнь","июль","август","сентябрь","октябрь","ноябрь","декабрь"},*_Day[]={"понедельник","вторник","среда","четверг","пятница","суббота","воскресенье"};static Color // чистые цвета графического экрана '33=51,'66=102,'99=153,'CC=204
+#include "View.h"    // Очередная отработка элементарных графических примитивов// #include "..\Math\Vector.h"                           // ©2018-08-22 ‏יְרוּשָׁלַיִם
+const char*_Mnt[]={"январь","февраль","март","апрель","май","июнь","июль","август","сентябрь","октябрь","ноябрь","декабрь"},*_Day[]={"понедельник","вторник","среда","четверг","пятница","суббота","воскресенье"};static Color // чистые цвета графического экрана '33=51,'66=102,'99=153,'CC=204
 SeaColor[black+257] = {  /* переопределение расцветки подобно как в палитре-256
  {255,255,255},{192,192,192},{160,160,160},{128,128,128},{96,96,96},{64,64,64},
  {204,221,238},{255,255,0},{0,128,0},{0,255,0},{160,255,64},{64,255,96},
@@ -13,7 +13,6 @@ SeaColor[black+257] = {  /* переопределение расцветки п
  0xff000080,0xff0000FF,0xff6060FF,0xff0080FF,0xffCCC0FF,         // maroon red lightred orange pink
  0xff800080,0xffC000C0,0xffFF00FF,0xffFF60FF,0xff000000          // purple magenta fuchsia lightmagenta black
 */
-
  0xFFFFFF,0xC0C0C0,0xA0A0A0,0x808080,0x606060,0x404040,// white silver lightgray gray dimgray darkgray
  0xEEDDCC,0x00FFFF,0x008000,0x00FF00,0x40FFA0,0x60FF40,// freeboard yellow green lime olive lightgreen
  0x800000,0xFF0000,0xFF6040,0xA0A000,0xFFFF00,0xD4D460,// navy blue lightblue cyan aqua lightcyan
@@ -59,7 +58,7 @@ void rectangle( const Real *LD,const Real *RU,bool fill )  // прямоугол
   glVertex3dv( LD ),glVertex3d( RU[0],LD[1],LD[2] ),
   glVertex3dv( RU ),glVertex3d( LD[0],RU[1],RU[2] ),glEnd();
 }
-/*
+/*    ==>>  Arrow.cpp
 const Real* arrow( const Real *_a,const Real *_b, _Real l, const colors clr )
 { Vector &a=*(Vector*)_a,
          &b=*(Vector*)_b,d=l*(b-a),e={d.z/8,d.x/8,d.y/8},f={e.z,e.x,e.y};

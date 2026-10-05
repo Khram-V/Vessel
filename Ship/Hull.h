@@ -25,6 +25,7 @@ extern unsigned Hull_Keys; // Набор ключей - параметров
                            // 0x01 -  задействовать сплайн-интерполяцию
 struct MainDraw: public Window
 { MainDraw();        // просто конструктор
+//virtual ~MainDraw(){ exit( 33 ); }
  virtual bool Draw();// главная процедура для прорисовки теоретических чертежей
  void Loft( bool=false ); // общая разметка графического поля
 };
@@ -183,3 +184,5 @@ inline Real e5( _Real R ){ return round( R*1e5 )/1e5; }
 #define gl_GREEN        glColor3ubv((const GLubyte[]){  0,102,0  })
 #define gl_BLUE         glColor3ubv((const GLubyte[]){  0,0,  128})
 #define gl_RED          glColor3ubv((const GLubyte[]){153,0,0})     // 1..18
+
+fixed WaitAnswer( Window &Win );

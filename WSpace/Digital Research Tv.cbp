@@ -133,6 +133,11 @@
 		<Unit filename="../Tv/OS/Sym_CCCP.inc">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="../Tv/OS/Sym_fonts.inc">
+			<Option target="Tv-32" />
+			<Option target="Tv-64" />
+			<Option target="Waves" />
+		</Unit>
 		<Unit filename="../Tv/OS/Tf_Topo.cpp">
 			<Option target="Waves" />
 			<Option target="Hull" />

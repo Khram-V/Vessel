@@ -542,7 +542,7 @@ MainLoop:
                 } while( ans!=_Esc && stWin->Ready() ); break;
     case _Enter: StabWin.Draw();                  // принудительная перерисовка
   }
-  if( ans=StabWin.WaitKey() )
+  if( ans=WaitAnswer( StabWin ) ) // StabWin.WaitKey() )
   if( StabWin.Ready() )goto MainLoop;
 Ret:  W=StabWin.Width;                            // сохраняются размеры экрана
       H=StabWin.Height;                           // для последующих обращений

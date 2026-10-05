@@ -33,6 +33,7 @@ MainDraw::MainDraw():
 Plane wH( "Корпус",     "Y","Z",&Win ),        // Окно проекций: корпус,
       wM( "Бок",        "X","Z",&Win ),        //   бок
       wW( "Полуширота", "X","Y",&Win );        //    и полуширота
+
 static Place MPL( &Win,PlaceAbove ),           // -- позиция и координаты мышки
              TPL( &Win,PlaceAbove );           // -- параллельное время таймера
 static void Hull_Help()
@@ -224,8 +225,9 @@ int main() // int ans, char *argv[], char *envp[] )
           Win.SetTimer( 500,Win_Timer );         // запуск таймера миллисекунды
           Win.Mouse( Mouse_in_Window );          // запуск указателя "мышка"
           First=true;
-MainLoop: if( ans )Win.Draw(); Wid=false;        //  и - главный цикл запросов
-  switch( ans=Win.WaitKey() )
+MainLoop:
+  if( ans )Win.Draw(); Wid=false;                //  и - главный цикл запросов
+  switch( ans=WaitAnswer( Win ) )
   { case _F1: Hull_Help(); ans=0; break;
     case _F2: Kh.Write();  ans=0; break;
     case _F3: strcpy( Kh.Name,"*.vsl" ); while( Kh.Read() );
@@ -241,7 +243,7 @@ MainLoop: if( ans )Win.Draw(); Wid=false;        //  и - главный цик�
               if( ans==18 )Menu_p[18].Msg=Sc[sc^=1];  // ключи скуловой глубины
               if( ans==_Esc )break;                   // аналитического корпуса
           } } if( ans==1 )ans=Set_Power(); else
-              if( ans==2 )ans=Set_Sinus();               // ==> ans=Set_Stem();
+              if( ans==2 )ans=Set_Sinus();            // ==> ans=Set_Stem();
               if( ans )Win.Loft( Active=true ); break;
     case _F5: Hull_Statics(); ans=0; break; // Гидростатика и остойчивость
     case _F7: Hull_Wave( 1 ); ans=0; break; // адаптированный к корпусу Мичелл
@@ -253,6 +255,14 @@ MainLoop: if( ans )Win.Draw(); Wid=false;        //  и - главный цик�
     case _Enter: Wid=true; break;           // безусловная перерисовка в окне
     case _Esc: Win.Close();
   }
-  if( Win.Ready() ){ while( Win.GetKey() ); goto MainLoop; }
+  if( Win.Ready() )goto MainLoop;
+
   return EXIT_SUCCESS;
 }
+fixed WaitAnswer( Window &Win )
+{ int ans; do { WaitTime( 200 );
+                if( !Win.Ready () )ans=_Esc; else ans=Win.GetKey();
+              } while ( !ans ); return ans;
+}
+
+

@@ -81,7 +81,7 @@ bool VideoStage()
                  } } break;
       case _PgDn: ExtFlow=min( 1.0,ExtFlow+0.1 ); break;  // встречное течение
       case _PgUp: ExtFlow=max( -1.0,ExtFlow-0.1 ); break; // или задом наперёд
-      case _F1: Win.Help( Id,Cmds,Plus,-2,2 ); break;
+      case _F1: Win.Help( Id,Cmds,Plus,-2,2 );     break;
       case _F4: Win.GetKey(); Win.Configuration(); break;
      default: if( k>='0' && k<='9' )           // количество активных корпускул
       { k-='0'; ReInstall_TimeSpace( !k?10:k!=nDip ? k:k*k*k ); // один или куб

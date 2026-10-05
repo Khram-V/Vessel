@@ -33,7 +33,7 @@ void Surface::EditMenu( Window *Win ) // сдвиг и масштаб
                                    c.c[1]=( c.c[1]+UnderWaterColor.c[1] )/2; \
                                    c.c[2]=( c.c[2]+UnderWaterColor.c[2] )/2; }
 
-static void Draw( Flex &Cont, int i1,int i2, _Real delta, bool right ) // i1-i2 включительно
+static void Drew( Flex &Cont, int i1,int i2, _Real delta, bool right ) // i1-i2 включительно
 { Vector V,W=Zero;
   for( int i=i1+1; i<i2; i++ )W+=(Cont[i+1]-Cont[i1])*(Cont[i]-Cont[i1]);
   glNormal3dv( W );          // в гидромеханике этот расчёт долен быть здесь
@@ -54,15 +54,16 @@ inline Vector newInter( _Vector V1, _Vector V2 )
 {    return V1 - V1.z*( V2-V1 )/( V2.z-V1.z );
 }
 void Surface::Drawing( BoardView Sides )
-{ static Flex W,wL; const Real delta=Draft+Min.z; int K; Color c; wL.len=0;
+{ const Real delta=Draft+Min.z; static Flex W,wL; Vector v,V1,V2; int K; Color c;
+  wL.len=0;
 //#pragma omp parallel for shared( wL ) //private( K ) // reduction(+: wL.len )
+  glLineWidth( 1 );     /// Alice AI из Яндекса стала эдесь забавным помощником
   for( int N=0; N<NoFaces; N++ ) // синхронная прорисовка треугольников двух бортов
   if( (K=F[N].Capacity)>2 )             // у граней должно быть боле двух рёбер
   { const Layers &Layer=L[min(NoLayers,F[N].LayerIndex)]; // указанные свойства
     const bool right=(Sides==mvBoth && Layer.Symmetric);
-    glLineWidth( 1 );    /// Alice AI из Яндекса стала эдесь хорошим помощником
 #if 1
-   Vector v,V1,V2; int J=-1,i=0; W.len=0;
+    int J=-1,i=0; W.len=0;
     for( i=0; i<=K+J; i++ )            // корректное рассечение многоугольников
     { (V2=P[F[N].P[i%K]].V).z-=delta;  //     однократно, но по всем рёбрам
       if( i && inInter( V1,V2) )       // i - показывает следующий узел = длину
@@ -72,14 +73,14 @@ void Surface::Drawing( BoardView Sides )
         { if( W.len>2 )  //--- невидимые двойки пусть нарисуются, аль нет {wL}?
           { c.C=Layer.LClr.C;
             if( W[1].z<0 )uWater else wL+=W[0],wL+=W[-1]; glColor4ubv( c.c );
-            Draw( W,0,W.len-1,delta,right );
+            Drew( W,0,W.len-1,delta,right );
           } W[0]=W[-1]; W.len=1;
       } }
       if( J<0 || W.len>0 )W+=V2; V1=V2; // J<0 по началу, и от пересечения нуля
     }
     if( J<0 ) // if( W.len>0 )        // c заданной расцветкой для каждой грани
     { c.C=Layer.LClr.C;
-      if( W[0].z<0 )uWater glColor4ubv( c.c ); Draw( W,0,W.len-1,delta,right );
+      if( W[0].z<0 )uWater glColor4ubv( c.c ); Drew( W,0,W.len-1,delta,right );
     }
 #else
    Flex V; int i=0,j=0,J=0; W.len=0;
@@ -95,8 +96,7 @@ void Surface::Drawing( BoardView Sides )
       } } if( W.len )W+=V[I];
     }
     if( !W.len ){ c.C=Layer.LClr.C; if( V[0].z<0 )uWater; glColor4ubv( c.c );
-                  Draw( V,0,V.len-1,delta,right );
-                }
+                  Draw( V,0,V.len-1,delta,right ); }
 #endif
   }
   for( int i=0; i<wL.len; i++ )wL[i].z+=delta; color( white ); glLineWidth(2);
@@ -110,7 +110,7 @@ void Surface::Drawing( BoardView Sides )
     for( int I=0; I<C[K].Capacity; I++ ){ W=P[C[K].P[I]].V;
       if( I ){ if( Sides==mvBoth )liney( V,W ) ; else line( V,W ); } V=W;
     }
-  } glEnable( GL_LIGHTING ); glLineWidth( 0.2 );
+  } glEnable( GL_LIGHTING ); //glLineWidth( 0.2 );
 }
 void Surface::Extents( bool Sizes )                // Экстремумы по всем контрольным точкам
 { for( int i=0; i<NoCoPoint; i++ )

@@ -27,7 +27,7 @@ static Window *First=NULL; // первое окно в последовател�
 //      восстановление картинки для всех фрагментов с опцией PlaceAbove + (Img)
 //
 Window& Window::Refresh()    // сборка изображения с копий в оперативной памяти
-{ if( Site )
+{ if( glAct( this ) )
   { glContext Set( this );     // Clear();      // glAdjust( this ) => навсегда
     if( Set.Active )
     { for( Place *S=(Place*)this; S; S=S->Up )S->Rest();  // если есть Show()
@@ -45,15 +45,7 @@ Place& Place::Refresh(){ if( Site )Site->Refresh(); return *this; }
 //#include <windows.h>
 
 void Window::PutChar( fixed Key )
-{
-//while( waitKey && WinReady() );       // как-то избавиться от повторов-рекурсии
-//if( waitKey )return;
-//if( waitKey )WaitTime( 100 ); //delay( 100 );
-//waitKey=true;
-//                                unsigned K=Key;
-//print( 1,38,"\n Key=%X '%s'...    ",Key,&K );
-
-      KeyBuffer[++KeyPas&=lKey].Key=Key; // занесение одного символа и его кода
+{     KeyBuffer[++KeyPas&=lKey].Key=Key; // занесение одного символа и его кода
       KeyBuffer[KeyPas].Code=KeyStates(); // в кольцевой буфер для букв и кодов
 //    while( isTimer && WinRequest() ); // ожидание выхода таймерных транзакций
   if( KeyPas==KeyPos )
@@ -62,7 +54,6 @@ void Window::PutChar( fixed Key )
   while( KeyPos!=KeyPas )      //  нагромождение очереди запросов от клавиатуры
   { int oK=KeyPos;             // Фиксированная предустановка графической среды
     { //glContext Act( this ); // со сбоем других внешних транзакций над OpenGL
-      //glAct( this );
       //if( Act.Active )
       { if( !KeyBoard( KeyBuffer[++KeyPos&=lKey].Key ) ){ KeyPos=oK; break; }
         WaitEvents(); // при отказе символ возвращается в цикл ожидания очереди
@@ -128,12 +119,12 @@ fixed Break( const char *Msg, ... ) // _Esc - отмена или _Enter - по�
   return ans;
 }
 fixed Message( const char *Title,const char *Msg,... ) //?! остановка программы
-{ va_list V; va_start( V,Msg );
-  char str[512]=""; vsnprintf( str,511,Msg,V ); va_end( V );
-  Window B( 0,0,0,max( max( 12,Ulen( str )+6 ),Ulen( Title )+4 )*9,64 );
-  glColor3b( 63,96,127 ); B.AlfaBit( _8x16 ).Print( 2,1.25,Title );
-  glColor3b( 63,127,96 );                  B.Print( 4,2.5,str );
-#pragma omp barrier
+{ int i,n; va_list V; va_start( V,Msg );
+ char str[512]=""; vsnprintf( str,511,Msg,V ); va_end( V );
+ for( i=n=0; i<strlen( str ); i++ )if( str[i]=='\n' )n++;
+ Window B( 0,0,0,max( max( 12,Ulen( str )+6 ),Ulen( Title )+4 )*9,48+n*16 );
+  glColor3b( 63,96,127 ); B.AlfaBit( _8x08 ).Print( 2,1.5,Title );
+  glColor3b( 63,127,96 ); B.AlfaBit( _8x16 ).Print( 4,2.2,str );
   return B.WaitKey();
 }
 /*

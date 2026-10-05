@@ -39,9 +39,9 @@ bool FreeShip::Draw()               // виртуальная процедура
                                           // glDepthFunc( GL_LESS ); // ~EQUAL~GEQUAL GREATER LEQUAL NOTEQUAL LESS ALWAYS взаимное накрытие объектов
   View::Draw();
   glEnable( GL_LIGHTING );                    // расцветка под теневые закраски
-  glTranslated( (Max.x+Min.x)/-1.75,0,        // -Set.SplitSectionLocation
-                (Max.z+Min.z)/-2 );           // Set.Length/-2
-  Clear(); color( lightgray );                 glLineWidth( .2 );
+  glTranslated( ( Max.x+Min.x )/-1.75,0,      // -Set.SplitSectionLocation
+                ( Max.z+Min.z )/-2 );         // Set.Length/-2
+  Clear(); color( gray );        glLineWidth( .2 );
   Print( 1,1,"%s < %g, %g, %g >",fname( Name ),Length,Beam,Draft );
   axis(*this,Length,Beam,Draft*2,"x","y","z"); glLineWidth( .5 );
   Shell.Drawing( B );                          glLineWidth( 1 );
@@ -56,7 +56,8 @@ bool FreeShip::Draw()               // виртуальная процедура
     if( B==mvBoth ){ glBegin( GL_LINE_STRIP );
       for( i=0; i<FlowLines[k].len; i++ )dot( ~FlowLines[k][i] ); glEnd();
   } }                                          glLineWidth( 1 );
-  Window::Show(); return true;
+  Window::Save().Refresh(); //Show();
+  return true;
 }
 /*
 Surface::Surface()                                 // обнуляется NoLayers тоже!
@@ -82,7 +83,7 @@ Ship::Ship()
   }
   Name=strdup( W2U( FName ) ); // копия имени входного файла
   Visio.ModelView=mvBoth;     // на оба борта, всё другое может быть вычищенным
-                                         // обнуляется NoLayers тоже!
+                                          // обнуляется NoLayers тоже!
   Shell.ActiveLayer.Description="Чистый слой"; // Technologies Advanced Visualizer";
   Shell.ActiveLayer.ID=0;                 // изначально здесь ноль
   Shell.ActiveLayer.LClr.C=0xAAFFFFAA;    // предварительная раскладка
@@ -112,8 +113,9 @@ Ship::Ship()
 }
 //     Конструктор не содержит Matrix для движений корпуса в корабельном базисе
 //
-FreeShip::FreeShip():Ship(),View( TitleShip,-12,12,640,480 ) //Matrix()
-{ //Icon( "Ship" ).
+FreeShip::FreeShip():Ship(),View( TitleShip,-12,12,640,480 ) //,Place( this,PlaceOrtho ) //Matrix()
+{ // Icon( "Ship" ).
+  // Window::Signs=PlaceOrtho;
   AlfaVector( 16 );
   Locate( Xpm( 4 ),Ypm( 4 ),min( 1280L,Xpm( 64 ) ),
                             min( 1024L,Ypm( 72 ) ) );
@@ -121,7 +123,7 @@ FreeShip::FreeShip():Ship(),View( TitleShip,-12,12,640,480 ) //Matrix()
   Distance=-1.75*( Max.x+Max.y-Min.x-Min.y + Width*(Max.z-Min.z)*0.9/Height );
   eyeX=135; // lookX=-60;
   glDisable( GL_FOG );
-  Draw(); // начальная прорисовка
+  Draw(); //Show(); // начальная прорисовка
 }
 //   Интерактивная настройка/управление графическим отображением проекта
 //                         *.vsl,*.ftm,*.fbm,*.fef,*.part + *.obj,*.stl"
@@ -148,16 +150,15 @@ bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой под
  BoardView &B=Visio.ModelView;
   switch( Keyb )
   { case _Esc: exit( 12 );
-    case _F1: Help( Id,Cmds,Plus,1,2 ); break;
+    case _F1: Help( Id,Cmds,Plus,1,2 ); break; //.Refresh();
     case _F2: WriteVSL();               break;
     case _F3: LoadExtFile( false );     break;
     case _F10:Title( " Поиск и расчистка повторов..." );
 #pragma omp barrier       // Синхронизация: все потоки пусть заканчивают работу
 #pragma omp single       //! - синхронизация нужна всем редактирующим операциям
-{             Shell.ReOrder();
-}             break;                         // goto R1;  // расчистка повторов
+            { Shell.ReOrder(); }    break;   // goto R1 расчистка повторов
     case _F4: Title( " Правка размерений с пространственным смещением..." );
-              Shell.EditMenu(this); goto R1; // сдвиги и масштабирование
+              Shell.EditMenu(this); break;   // goto R1 сдвиги и масштабирование
     case _End:Shell.Revolute();     goto R1; // обращение нормалей поверхности
     case _Blank:
      if( ScanStatus()&CTRL )

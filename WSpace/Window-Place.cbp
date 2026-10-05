@@ -175,6 +175,14 @@
 			<Option target="A-lib64" />
 			<Option target="Interpolation-Extrapolation" />
 		</Unit>
+		<Unit filename="../Math/Model.cpp">
+			<Option target="A-lib32" />
+			<Option target="A-lib64" />
+		</Unit>
+		<Unit filename="../Math/Model.h">
+			<Option target="A-lib32" />
+			<Option target="A-lib64" />
+		</Unit>
 		<Unit filename="../Math/Power.cpp">
 			<Option target="A-lib64" />
 			<Option target="A-lib32" />
@@ -254,6 +262,10 @@
 			<Option target="Window Trial" />
 			<Option target="GLFW Shapes" />
 			<Option target="GLFW Trial" />
+		</Unit>
+		<Unit filename="../Window/Arrow.cpp">
+			<Option target="A-lib32" />
+			<Option target="A-lib64" />
 		</Unit>
 		<Unit filename="../Window/ConIO.cpp">
 			<Option target="A-lib32" />

@@ -4,10 +4,10 @@
  **         простейший вариант отработки консольных команд с мышиной вознёй
  **                    (c)2013, В.Храмушин, Санкт-Петербургский университет
  **/
-#include <StdIO.h>
-#include <GL\GLU.h>
-#include "..\Window\Window.h"
-#include "..\Window\ConIO.h"
+#include <StdIO.h>                       //-Wno-volatile
+#include <GL\GLU.h>                      //-Wno-narrowing
+#include "..\Window\Window.h"            //-Wno-literal-suffix
+#include "..\Window\ConIO.h"             //-Wno-write-strings
 #include "..\Math\Tensor.h"
 
 const GLubyte white[]={ 255,255,255 },   red[]={ 255,  0,  0 },
@@ -74,7 +74,7 @@ static void axis( _Real L )
     arrow((Point){0,-L,0},(Point){0,L,0},.1,green),Win.Text(_North,Tv.in((Point){0,L*1.04,0}),"Y");
     arrow((Point){0,0,-L},(Point){0,0,L},.1,blue ),Win.Text(_South,Tv.in((Point){0,0,L*1.04}),"Z");
   }
-//static Base Model;                 // собственный базис геометрического объекта
+static Base Model;                 // собственный базис геометрического объекта
 static bool rotate_OpenGL=false,   // вращение всего пространства OpenGL
              moving_Model=false,   // собственное перемещение объекта
            painting_Model=false;   // признак закраски граней подвижной модели

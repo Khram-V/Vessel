@@ -1,5 +1,5 @@
 //
-//  DesignCAD Complex Русский+Ελληνικά+English ~~ |"-Wno-narrowing"|
+//  DesignCAD Complex Русский+Ελληνικά+English+עִבְרִית ~~ |"-Wno-narrowing"|
 //
 static const
 signed char _Design_font[]={  16, 32, 8, 0,

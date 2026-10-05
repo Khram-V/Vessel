@@ -124,7 +124,7 @@ public:
     unsigned mSec;    // интервал прерываний активированного таймера [мил.сек]
   bool InterruptProcedure( UINT message,WPARAM wParam,LPARAM lParam );
  explicit Window( const char* T=NULL, int X=0,int Y=0, int W=800,int H=600 );
- virtual ~Window();   // деструктор срабатывает в эпилогах производных структур
+         ~Window();   // деструктор срабатывает в эпилогах производных структур
   void Close();       // иначе: вариант завершения только для базовой структуры
   //        -- позиционирование +левого/-правого +верхнего/-нижнего угла Window
   Window& Locate( int X,int Y, int Width,int Height ); // с изменением размеров
@@ -142,7 +142,7 @@ public:
   Window& KeyBoard( bool( *inKey )( fixed ) ){ extKey=inKey; return *this; }
   fixed GetKey(),ScanKey(); // выборка символа или кода без остановки программы
   fixed ScanStatus();  // сопутствующий код от клавиатуры или из буфера выборки
-  fixed WaitKey();     // ожидание нового символа от клавиатуры с приостановкой
+  fixed WaitKey( const fixed X=_Esc ); // ожидание нового символа от клавиатуры
   //
   //   процедуры таймера, работающего от достигнутого времени ?? с надбавкой
   //      выполняется привязка к основному/большому графическому экрану
@@ -151,6 +151,7 @@ public:
   Window& KillTimer();                                // если 0 – сброс таймера
  virtual bool Timer();                               // ++ виртуальных процедур
   int volatile isTimer;       // таймер отслеживает уровень рекурсии транзакций
+  UINT_PTR idEvent;     // идентификатор встроенного таймера прерываний =0x12++
   //
   //! Динамическое окошко для кратких подсказок с управляющими кодами программы
   //   Name[0]   Title подзаголовок - название набора инструкций для Window
@@ -158,10 +159,9 @@ public:
   //   Text      – парное описание команд и операций с кратким предназначением
   //   Plus      – то же для блока дополнительных инструкций и подсказок
   //    ++ определение каждого блока строк заканчивается нулевым адресом
-  void Help( const char *N[],const char *C[],const char *P[],int X=-1,int Y=1 );
-  //
+  Window& Help
+        ( const char *N[],const char *C[],const char *P[],int X=-1,int Y=1 );
   void PutChar( fixed Key );          // один символ(uni16) --> кольцевой буфер
-  UINT_PTR idEvent;     // идентификатор встроенного таймера прерываний =0x12++
 private:      //! подборка скрытых параметров и свободных/отвязанных транзакций
   void PutTimer();     // unsigned iTime ) ==  со временем на момент прерывания
  struct{ fixed Code,Key; }KeyBuffer[lKey+1];  // накопительный буфер клавиатуры
@@ -245,7 +245,8 @@ class TextMenu:Place //! запрос текстового меню с отср�
  virtual bool Draw(); // разделённая прорисовка для таймера, клавиатуры и мышки
  virtual bool Mouse( int x,int y );        // непрерывное мышиное сопровождение
  virtual bool Mouse( int b,int x,int y );  // и реакция на правую\левую клавишу
-public: TextMenu( const Mlist*,const int, Window*,int=1,int=1 ); //~TextMenu();
+public: TextMenu( const Mlist*,const int, Window*,int=1,int=1 );
+//     ~TextMenu(){ this->~Place(); Refresh(); }
   const int Num;           // общее количество строк меню
   int Answer( int=-1 );    // немного отсроченный вызов для пущей перенастройки
 };

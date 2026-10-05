@@ -66,6 +66,8 @@
 					<Add option="-m64" />
 					<Add library="pthread" />
 					<Add library="dl" />
+					<Add library="gdi32" />
+					<Add library="comdlg32" />
 				</Linker>
 			</Target>
 			<Target title="Aurora-night">
@@ -91,28 +93,6 @@
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Option projectCompilerOptionsRelation="0" />
-			</Target>
-			<Target title="Qwen Waves">
-				<Option output="../../Work/QWen" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="Data" />
-				<Option object_output="../../Work/Obj" />
-				<Option type="1" />
-				<Option compiler="gcc" />
-				<Option projectLinkerOptionsRelation="1" />
-				<Linker>
-					<Add library="Lib/libWindow32.a" />
-					<Add library="opengl32" />
-					<Add library="glu32" />
-					<Add library="gdi32" />
-				</Linker>
-			</Target>
-			<Target title="Qwen Ship">
-				<Option output="../../Work/QWen" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="Data" />
-				<Option object_output="../../Work/Obj" />
-				<Option type="0" />
-				<Option compiler="gcc" />
-				<Option projectCompilerOptionsRelation="2" />
 			</Target>
 		</Build>
 		<Compiler>
@@ -159,13 +139,7 @@
 			<Option target="Aurora-night" />
 			<Option target="Aurora-eq" />
 		</Unit>
-		<Unit filename="../Storm/Flex.h">
-			<Option target="Aurora" />
-			<Option target="Aurora-eq" />
-			<Option target="Aurora-stable" />
-			<Option target="Aurora-night" />
-			<Option target="Waves Profile" />
-		</Unit>
+		<Unit filename="../Storm/Flex.h" />
 		<Unit filename="../Storm/Vs-conf.cpp">
 			<Option target="Aurora" />
 			<Option target="Aurora-stable" />
@@ -220,13 +194,6 @@
 		<Unit filename="../Storm/Wave/Math.cpp">
 			<Option target="Waves Profile" />
 		</Unit>
-		<Unit filename="../Storm/Wave/QWen_Ship.c++">
-			<Option target="Qwen Ship" />
-		</Unit>
-		<Unit filename="../Storm/Wave/Qwen3Wave.c++">
-			<Option target="Qwen Waves" />
-			<Option target="Qwen Ship" />
-		</Unit>
 		<Unit filename="../Storm/Wave/Wave.cpp">
 			<Option target="Waves Profile" />
 		</Unit>
@@ -245,13 +212,7 @@
 			<Option target="Aurora-night" />
 			<Option target="Aurora-eq" />
 		</Unit>
-		<Unit filename="../Tools/Allocate.cpp">
-			<Option target="Aurora" />
-			<Option target="Aurora-eq" />
-			<Option target="Aurora-stable" />
-			<Option target="Aurora-night" />
-			<Option target="Waves Profile" />
-		</Unit>
+		<Unit filename="../Tools/Allocate.cpp" />
 		<Unit filename="../Tools/Allocate.h">
 			<Option target="Aurora" />
 			<Option target="Aurora-stable" />
@@ -270,109 +231,32 @@
 			<Option target="Aurora-eq" />
 			<Option target="Aurora-stable" />
 			<Option target="Waves Profile" />
-			<Option target="Qwen Waves" />
 		</Unit>
-		<Unit filename="../Tools/StrCpy.cpp">
-			<Option target="Aurora" />
-			<Option target="Aurora-eq" />
-			<Option target="Aurora-stable" />
-			<Option target="Aurora-night" />
-			<Option target="Waves Profile" />
-		</Unit>
-		<Unit filename="../Type.h">
-			<Option target="Aurora" />
-			<Option target="Aurora-eq" />
-			<Option target="Aurora-stable" />
-			<Option target="Aurora-night" />
-			<Option target="Waves Profile" />
-		</Unit>
-		<Unit filename="../Window/Arrow.cpp">
-			<Option target="Aurora" />
-			<Option target="Aurora-eq" />
-			<Option target="Aurora-stable" />
-			<Option target="Aurora-night" />
-			<Option target="Waves Profile" />
-		</Unit>
-		<Unit filename="../Window/ConIO.cpp">
-			<Option target="Aurora" />
-			<Option target="Aurora-eq" />
-			<Option target="Aurora-stable" />
-			<Option target="Aurora-night" />
-			<Option target="Waves Profile" />
-			<Option target="Qwen Waves" />
-		</Unit>
+		<Unit filename="../Tools/StrCpy.cpp" />
+		<Unit filename="../Type.h" />
+		<Unit filename="../Window/Arrow.cpp" />
+		<Unit filename="../Window/ConIO.cpp" />
 		<Unit filename="../Window/ConIO.h">
-			<Option target="Qwen Waves" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="../Window/Font.cpp">
-			<Option target="Aurora" />
-			<Option target="Aurora-eq" />
-			<Option target="Aurora-stable" />
-			<Option target="Aurora-night" />
-			<Option target="Waves Profile" />
-		</Unit>
-		<Unit filename="../Window/Julian.cpp">
-			<Option target="Aurora" />
-			<Option target="Aurora-eq" />
-			<Option target="Aurora-stable" />
-			<Option target="Aurora-night" />
-			<Option target="Waves Profile" />
-		</Unit>
+		<Unit filename="../Window/Font.cpp" />
+		<Unit filename="../Window/Julian.cpp" />
 		<Unit filename="../Window/Sym_CCCP.c">
 			<Option compilerVar="CC" />
 			<Option compile="0" />
 			<Option link="0" />
-			<Option target="Aurora" />
-			<Option target="Aurora-eq" />
-			<Option target="Aurora-stable" />
-			<Option target="Aurora-night" />
-			<Option target="Waves Profile" />
 		</Unit>
-		<Unit filename="../Window/UniCode.cpp">
-			<Option target="Aurora" />
-			<Option target="Aurora-eq" />
-			<Option target="Aurora-stable" />
-			<Option target="Aurora-night" />
-			<Option target="Waves Profile" />
-		</Unit>
-		<Unit filename="../Window/View.cpp">
-			<Option target="Aurora" />
-			<Option target="Aurora-eq" />
-			<Option target="Aurora-stable" />
-			<Option target="Aurora-night" />
-			<Option target="Waves Profile" />
-		</Unit>
-		<Unit filename="../Window/View.h">
-			<Option target="Aurora" />
-			<Option target="Aurora-eq" />
-			<Option target="Aurora-stable" />
-			<Option target="Aurora-night" />
-			<Option target="Waves Profile" />
-		</Unit>
+		<Unit filename="../Window/UniCode.cpp" />
+		<Unit filename="../Window/View.cpp" />
+		<Unit filename="../Window/View.h" />
 		<Unit filename="../Window/WinGLFW.cpp">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option target="Aurora" />
-			<Option target="Aurora-eq" />
-			<Option target="Aurora-stable" />
-			<Option target="Aurora-night" />
-			<Option target="Waves Profile" />
 		</Unit>
-		<Unit filename="../Window/WinGLFW.h">
-			<Option target="Aurora" />
-			<Option target="Aurora-eq" />
-			<Option target="Aurora-stable" />
-			<Option target="Aurora-night" />
-			<Option target="Waves Profile" />
-		</Unit>
+		<Unit filename="../Window/WinGLFW.h" />
 		<Unit filename="../Window/WinMSoft.cpp">
 			<Option compile="0" />
 			<Option link="0" />
-			<Option target="Aurora" />
-			<Option target="Aurora-eq" />
-			<Option target="Aurora-stable" />
-			<Option target="Aurora-night" />
-			<Option target="Waves Profile" />
 		</Unit>
 		<Unit filename="../Window/Window-Free.cpp">
 			<Option compile="0" />
@@ -384,30 +268,12 @@
 			<Option link="0" />
 			<Option target="Waves Profile" />
 		</Unit>
-		<Unit filename="../Window/Window.cpp">
-			<Option target="Aurora" />
-			<Option target="Aurora-eq" />
-			<Option target="Aurora-stable" />
-			<Option target="Aurora-night" />
-			<Option target="Waves Profile" />
-		</Unit>
+		<Unit filename="../Window/Window.cpp" />
 		<Unit filename="../Window/Window.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="../Window/Window_Help.cpp">
-			<Option target="Aurora" />
-			<Option target="Aurora-eq" />
-			<Option target="Aurora-stable" />
-			<Option target="Aurora-night" />
-			<Option target="Waves Profile" />
-		</Unit>
-		<Unit filename="../Window/Window_Menu.cpp">
-			<Option target="Aurora" />
-			<Option target="Aurora-eq" />
-			<Option target="Aurora-stable" />
-			<Option target="Aurora-night" />
-			<Option target="Waves Profile" />
-		</Unit>
+		<Unit filename="../Window/Window_Help.cpp" />
+		<Unit filename="../Window/Window_Menu.cpp" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>

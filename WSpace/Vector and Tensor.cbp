@@ -11,9 +11,8 @@
 				<Option output="../../Work/Dipole" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Dev/" />
 				<Option object_output="../../Work/Obj" />
-				<Option type="1" />
+				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option use_console_runner="0" />
 				<Compiler>
 					<Add option="-Os" />
 					<Add option="-m32" />
@@ -32,33 +31,24 @@
 				<Option output="../../Work/Vector and Tensor" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Dev/" />
 				<Option object_output="../../Work/Obj" />
-				<Option type="1" />
-				<Option compiler="gnu_gcc_stable" />
-				<Option use_console_runner="0" />
-				<Compiler>
-					<Add option="-Wno-volatile" />
-					<Add option="-Wno-narrowing" />
-					<Add option="-Wno-literal-suffix" />
-					<Add option="-Wno-write-strings" />
-				</Compiler>
+				<Option type="0" />
+				<Option compiler="gcc" />
 			</Target>
 			<Target title="Tensor Base Space">
 				<Option platforms="Windows;" />
 				<Option output="../../Work/Tensor Base Space" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Dev/" />
 				<Option object_output="../../Work/Obj" />
-				<Option type="1" />
+				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option use_console_runner="0" />
 			</Target>
 			<Target title="Phyzical Corpuscules">
 				<Option platforms="Windows;" />
 				<Option output="../../Work/Physical Simulation" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Dev/" />
 				<Option object_output="../../Work/Obj" />
-				<Option type="1" />
+				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option use_console_runner="0" />
 				<Compiler>
 					<Add option="-fopenmp" />
 				</Compiler>
@@ -67,6 +57,15 @@
 					<Add library="gomp" />
 				</Linker>
 			</Target>
+			<Target title="xFoam">
+				<Option platforms="Windows;" />
+				<Option output="../../Work/xFoam" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="Dev/" />
+				<Option object_output="../../Work/Obj" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Option parameters="0 1 2 A B C" />
+			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Os" />
@@ -74,6 +73,7 @@
 		</Compiler>
 		<Linker>
 			<Add option="-s" />
+			<Add library="Lib/libWindow32.a" />
 			<Add library="opengl32" />
 			<Add library="glu32" />
 			<Add library="gdi32" />
@@ -81,44 +81,27 @@
 		<Unit filename="../Math/Complex.h">
 			<Option target="Tensor Base Space" />
 		</Unit>
-		<Unit filename="../Math/Function.cpp">
-			<Option link="0" />
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
 		<Unit filename="../Math/Function.h">
 			<Option target="Tensor Base Space" />
-		</Unit>
-		<Unit filename="../Math/Model.cpp">
-			<Option target="Tensor Base Space" />
-			<Option target="Phyzical Corpuscules" />
 		</Unit>
 		<Unit filename="../Math/Model.h">
 			<Option target="Tensor Base Space" />
 		</Unit>
-		<Unit filename="../Math/Power.cpp">
-			<Option target="Tensor Base Space" />
-			<Option target="Vector-Tensor" />
-		</Unit>
-		<Unit filename="../Math/Tensor.cpp" />
 		<Unit filename="../Math/Tensor.h">
 			<Option target="Tensor Base Space" />
 		</Unit>
 		<Unit filename="../Math/Vector.h">
 			<Option target="Tensor Base Space" />
 		</Unit>
-		<Unit filename="../Math/Volume.cpp">
-			<Option target="Tensor Base Space" />
-			<Option target="Phyzical Corpuscules" />
-		</Unit>
 		<Unit filename="../Math/Volume.h">
 			<Option target="Tensor Base Space" />
 		</Unit>
-		<Unit filename="../Tools/Allocate.cpp" />
-		<Unit filename="../Tools/Math.Rc">
-			<Option compilerVar="WINDRES" />
+		<Unit filename="../Type.h">
+			<Option target="Dipole" />
+			<Option target="Vector-Tensor" />
+			<Option target="Tensor Base Space" />
+			<Option target="Phyzical Corpuscules" />
 		</Unit>
-		<Unit filename="../Tools/StrCpy.cpp" />
-		<Unit filename="../Type.h" />
 		<Unit filename="../Volume/Dipoles.cpp">
 			<Option target="Dipole" />
 		</Unit>
@@ -150,28 +133,28 @@
 		<Unit filename="../Volume/Vector and Tensor.cpp">
 			<Option target="Vector-Tensor" />
 		</Unit>
-		<Unit filename="../Window/Arrow.cpp" />
-		<Unit filename="../Window/ConIO.cpp" />
-		<Unit filename="../Window/ConIO.h" />
-		<Unit filename="../Window/Font.cpp" />
-		<Unit filename="../Window/Julian.cpp" />
-		<Unit filename="../Window/Sym_CCCP.c">
-			<Option compilerVar="CC" />
-			<Option compile="0" />
-			<Option link="0" />
+		<Unit filename="../Volume/xFoam.cpp">
+			<Option target="xFoam" />
 		</Unit>
-		<Unit filename="../Window/UniCode.cpp" />
-		<Unit filename="../Window/View.cpp" />
-		<Unit filename="../Window/View.h" />
-		<Unit filename="../Window/WinMSoft.cpp">
-			<Option compile="0" />
-			<Option link="0" />
+		<Unit filename="../Window/ConIO.cpp">
+			<Option target="xFoam" />
+		</Unit>
+		<Unit filename="../Window/ConIO.h">
 			<Option target="Dipole" />
+			<Option target="Vector-Tensor" />
+			<Option target="Tensor Base Space" />
+			<Option target="Phyzical Corpuscules" />
 		</Unit>
-		<Unit filename="../Window/Window.cpp" />
+		<Unit filename="../Window/View.h">
+			<Option target="Dipole" />
+			<Option target="Vector-Tensor" />
+			<Option target="Tensor Base Space" />
+			<Option target="Phyzical Corpuscules" />
+		</Unit>
+		<Unit filename="../Window/Window.cpp">
+			<Option target="xFoam" />
+		</Unit>
 		<Unit filename="../Window/Window.h" />
-		<Unit filename="../Window/Window_Help.cpp" />
-		<Unit filename="../Window/Window_Menu.cpp" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>

@@ -23,16 +23,15 @@ Place& Place::Area( int X,int Y, int W,int H )     // достаточно сд�
 // if( Signs & PlaceAbove )
    if( Img )   // если ранее сохранялась фоновая подложка, то восстанавливается
    if( X!=pX || Y!=pY || Width!=W || Height!=H )Rest();  // растянутая картинка
-   pX=X,pY=Y,Width=W,Height=H+Th/5;
+   pX=X,pY=Y,Width=W,Height=H+Th/5;  // Img=NULL;      // очистка фона площадки
 /* if( chY>Height-Th ) */ chY=Height-Th; chX=1;     // аппликата верхней строки
-// if( Signs & PlaceAbove )Save();
+// if( Signs&PlaceAbove )Save();
    return *this;
 }
-//      Комплекс встроенных и внутренних процедур
-//      Подготовка площадки для растровых манипуляций
-//
+//    Комплекс встроенных и внутренних процедур
+//    Подготовка площадки для растровых манипуляций
 //#include <GL/Glu.h>
-
+//
 static void PushMatrix()     //! сброс в стек координатных систем OpenGL-Window
 { glPushAttrib( GL_VIEWPORT_BIT | GL_POLYGON_BIT | GL_ENABLE_BIT ); // что надо
   glPushMatrix(),glMatrixMode( GL_PROJECTION ),glPushMatrix(),
@@ -67,7 +66,7 @@ TextContext::TextContext( bool b ): Base( b )
 TextContext::~TextContext(){ if( Base )PopMatrix(); else glPopAttrib(); }
 
 Place& Place::Clear( bool back ) // очистка фоном/true или текущим/false цветом
-{ //if( glAct( Site ) )              // есть окно - есть картинка
+{ if( glAct( Site ) )                // есть окно - есть картинка
   { glScissor( pX,pY,Width,Height ); // Режим обрезки внешнего окружения и его
     glEnable ( GL_SCISSOR_TEST );   // временное включение для очистки площадки
     if( back )glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ); else
@@ -81,13 +80,13 @@ Place& Place::Clear( bool back ) // очистка фоном/true или тек
   } return *this;
 }
 Place& Place::Show()                     //! прорисовка растрового фрагмента из
-{ if( glAct( Site ) )                    // фонового буфера в видимый рисунок
-  { RasterSector Sv( pX,pY,Width,Height );       // glFinish();
+{ if( glAct( Site ) )                    //  фонового буфера в видимый рисунок
+  { RasterSector Sv( pX,pY,Width,Height );    // glFinish();
     glRasterPos2i( 0,0 );                        glDrawBuffer( GL_FRONT );
     glCopyPixels( pX,pY,Width,Height,GL_COLOR ); glDrawBuffer( GL_BACK );
-    glFlush(); // glFinish();
-  //if( Site->Up==this )Site->Save();      // первая площадка сохраняет фоновую
-    if( Signs&PlaceAbove && Site!=this )Save();// на фоне идёт сборная картинка
+    glFlush();
+    if( Signs&PlaceAbove )Save();          // первая площадка сохраняет фоновую
+//  if( Signs&PlaceAbove && this!=(Place*)Site )Save();// на фоне идёт сборная картинка
   } return *this;
 }
 //!    сохранение текущего изображения/фрагмента в буфере оперативной памяти
@@ -97,25 +96,25 @@ Place& Place::Save()                   // фрагментация здесь в
 { if( Width>0 && Height>0 )            // и не требует особой работы со списком
   if( glAct( Site ) )
   { unsigned Size=sizeof( unsigned )*( Width*Height+4 ); // glAct( Site );
-  //glPushAttrib( GL_VIEWPORT_BIT );
+    // glPushAttrib( GL_VIEWPORT_BIT );
     glViewport( 0,0,Site->Width,Site->Height );   // возврат размерений полного
     if( !Img )(Img=(unsigned*)malloc(Size))[0]=Size; else        // окна Window
     if( Size>Img[0] )(Img=(unsigned*)realloc(Img,Size))[0]=Size; // приращение
     if( Img )                                        // памяти на всякий случай
     { Img[3]=0; glReadPixels
       ( pX,pY,Img[1]=Width,Img[2]=Height,GL_RGBA,GL_UNSIGNED_BYTE,Img+4 );
-    } glViewport( pX,pY,Width,Height ); // <=> glPopAttrib();
+    } glViewport( pX,pY,Width,Height ); // glPopAttrib();
   } return *this;
 }
 Place& Place::Rest()     //! прямое восстановление растра из собственной памяти
-{ if( Img )    //  в фоновый буфер изображения с перемасштабированием
-  { if( glAct( Site ) )
-    { RasterSector Sv( pX,pY,Width,Height ); glRasterPos2i( 0,0 );
-      if( Width!=int( Img[1] ) || Height!=int( Img[2] ) )
-        glPixelZoom( float( Width )/Img[1],float( Height )/Img[2] );
-      glDrawPixels( Img[1],Img[2],GL_RGBA,GL_UNSIGNED_BYTE,Img+4 );
-      glPixelZoom ( 1.0,1.0 ); glFlush();
-  } } return *this;
+{ if( Img )              //  в фоновый буфер изображения с перемасштабированием
+  if( glAct( Site ) )
+  { RasterSector Sv( pX,pY,Width,Height ); glRasterPos2i( 0,0 );
+    if( Width!=int( Img[1] ) || Height!=int( Img[2] ) )
+      glPixelZoom( float( Width )/Img[1],float( Height )/Img[2] );
+    glDrawPixels( Img[1],Img[2],GL_RGBA,GL_UNSIGNED_BYTE,Img+4 );
+    glPixelZoom ( 1.0,1.0 ); glFlush();
+  } return *this;
 }
 //glEnable( GL_SCISSOR_TEST ); glScissor( pX,pY,W,H );
 //glDisable( GL_SCISSOR_TEST );

@@ -76,14 +76,14 @@ Real AxisStep( Real D )                        // для разметки осе
 //
 //   Формирование текстовой строки F=0:{-123°46'57"89} 1-deg, 2+min, 3+sec,-hnd
 //
-static char W[12][16]={{0}},w=0;                   // буфер-192 на дюжину чисел
+static char W[16][16]={{0}},w=0;                   // буфер-192 на дюжину чисел
 static char *put10( char *s, int d )               // - составная рекурсия -
      { if( d>=10 )s=put10( s,d/10 ); *s++ =d%10+'0'; return s;
      }
 #define put2hnd *s++=d/10+'0',*s++=d%10+'0';         // -- под сотки из цифирек
 char *DtoA( Real D, int F, const char *c )
 { const Real rnd[]={ 0.499999999,8.333333333e-3,1.388888888e-4 };
-  char *S=W[w],*s=S; int d,f,l=0; (++w)&=0x3;      // счётчик заполняемых полей
+  char *S=W[w],*s=S; int d,f,l=0; (++w)&=0x7;      // счётчик заполняемых полей
   if( (D=remainder( D,360.0 ))<0.0 ){ D=-D; *s++='-'; } else *s++=' '; // ±180°
   if( !F )F=-3; f=F;
   if( F>0 )D+=rnd[F-1]; else{ F=-F; D+=rnd[F-1]/100.0; } d=D; D-=d;
@@ -94,7 +94,7 @@ char *DtoA( Real D, int F, const char *c )
   if( f<0 ){d=D*100; if( d )put2hnd } *s=0; return S;
 }
 char *RtoA( _Real D,int f,int n )      // заполняемое поле и цифры после запятой
-   { char *S=W[w]; (++w)&=0x3; _dtoa( D,S,min(f,16),min(n,f-3) ); return S; }
+   { char *S=W[w]; (++w)&=0x7; _dtoa( D,S,min(f,16),min(n,f-3) ); return S; }
 char *RtoA( _Real R ){ return RtoA( R,16,6 ); }
 //
 //   Разбор строчки с градусами, со свертыванием с минутами и секундами в число
@@ -125,7 +125,6 @@ char *AtoD( char *S, Real& _D )           // на выходе следующе�
 }
 // dtoa() — компактная функция преобразования double → строка
 // с защитой от переполнения (999...999) и без временных буферов
-// Разработано при участии AI-ассистента, 2026
 // v — число, b — буфер, bufsize — размер буфера < 19, p — знаков после точки
 
 void _dtoa( double v, char *b, int space, int p )

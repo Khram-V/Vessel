@@ -265,7 +265,7 @@ void Hull_Wave( const int _Type )
      .Clear();
   Win.Draw( FullDraw ).Draw();            // обновление при вызовах из системы
 MainLoop:   FullDraw();                   // единая процедура полной прорисовки
-  switch( ans=Win.WaitKey() )             // остановка всех операций в ожидании
+  switch( ans=WaitAnswer( Win ) )         // остановка всех операций в ожидании
   { case _Esc: Win.Close(); break;        // откликов с клавиатуры
     case _F1 : HelpWave();  break;
     case _F7 : Type=1;      break;

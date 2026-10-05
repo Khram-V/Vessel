@@ -57,7 +57,7 @@ public:
   //   Text      - парное описание основных кодов с их предназначением
   //   Plus      - то же блока блока дополнительных описаний
   //    ++ определение каждого блока строк заканчивается нулевым адресом
-  void Help( const char *N[],const char *C[],const char *P[],int X=-1,int Y=1 );
+  Window& Help( const char *N[],const char *C[],const char *P[],int X=-1,int Y=1 );
 
   Window& SetTimer( unsigned mSec,bool(*in)()=NULL );  // время и адрес исполнения
   Window& KillTimer(); //{ if( Site )SetTimer( 0 ); return *this; } // сброс таймера - если 0

@@ -65,8 +65,6 @@
 			<Add option="-s" />
 			<Add library="gomp" />
 			<Add library="opengl32" />
-			<Add library="gdi32" />
-			<Add library="comdlg32" />
 		</Linker>
 		<Unit filename="../Math/Complex.h">
 			<Option target="Hull" />
@@ -169,6 +167,8 @@
 		<Unit filename="../Window/WinMSoft.cpp">
 			<Option compile="0" />
 			<Option link="0" />
+			<Option target="Ship" />
+			<Option target="Hull-64" />
 		</Unit>
 		<Unit filename="../Window/Window-Free.cpp">
 			<Option target="&lt;{~None~}&gt;" />

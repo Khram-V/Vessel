@@ -89,12 +89,12 @@ Hull::Hull():Matrix(),View// прицеп View окошко графическо
   Route(),Rate(),Head(),Whirl(),Mix() // конструкторы для кинематики во времени
 { // Vessel=this;               // ссылка на корпус, пусть будет внешний доступ
   Length=Breadth=Draught=1.0; vC=vR=vS=vP=Zero; Identity();
-  Pic.hull=Drawing_Hull;        // изображение закрашенной корабельной обшивки
+  Pic.hull=Drawing_Hull;         // изображение закрашенной корабельной обшивки
   Pic.grid=Pic.flow=Pic.kart=0; // закраска или контуры, поток и место картушки
   Max=(Vector){ 500,8,4 }, Min=-Max;
-  nF=muF=(Vector){ 0.1,0.8,0.6 }; // демпфер по абсциссе, ординате и аппликате
-  nM=muM=(Vector){ 0.2,0.6,0.8 }; // ... по бортовой, килевой качке и рысканию
-  Ofs=Zero; mx=my=0;              // и мышку тоже в исходное
+  nF=muF=(Vector){ 0.1,0.8,0.6 };  // демпфер по абсциссе, ординате и аппликате
+  nM=muM=(Vector){ 0.2,0.6,0.8 };  // ... по бортовой, килевой качке и рысканию
+  Ofs=Zero; mx=my=0;               // и мышку тоже в исходное
   AlfaVector( Height/WinLines ).Activate();        // привязка к Window::Place
   glPolygonMode( GL_FRONT_AND_BACK,GL_FILL );      //   и первый рисунок
   FileName=(char*)calloc( MAX_PATH,4 );            // 260х4 возможно достаточно
@@ -104,7 +104,7 @@ Hull::Hull():Matrix(),View// прицеп View окошко графическо
                           "\nМореходные качества корабля -"
                           "\n  вычислительный эксперимент" );
   color(lightgreen); AlfaVector( 13,0 ).Print( 8,5,
-                          "\n    ©1975-2024 Калининград - Сахалин - יְרוּשָׁלַיִם" );
+                          "\n    ©1975-2026 Калининград - Сахалин - יְרוּשָׁלַיִם" );
   color(lightred); AlfaVector( 13,1 ).Print( -2,-1.8,
                           "Сообразованные архитектура и обводы корпуса\n"
                           " - эффективность всепогодного мореплавания" );
@@ -113,7 +113,7 @@ Hull::Hull():Matrix(),View// прицеп View окошко графическо
   glFinish();
   WaitTime( 500 );
   Window::Locate( Xpm( 4 ),Ypm( 4 ),min( 1280L,Xpm( 64 ) ),
-                                    min( 1024L,Ypm( 72 ) ) ).Clear();
+                                    min( 1024L,Ypm( 72 ) ) ); //.Clear(); //.Save();
 }
 ///     Начальные процедуры и повторная конфигурация параметров волновых полей
 //!
@@ -569,10 +569,11 @@ int main()                                 // ( int ans, char **av, char **ac )
 
 //WaitTime( 1000,TryTimer ); //,100 );          // ежесекундное переподключение
 #pragma omp single
+//#pragma omp task
     {
       do                 //! после выхода обязательно должен исполняться пролог
-      { WaitTime( 600 ); //секунда проверки работоспособности транзакций
-        static unsigned i=0; WinReady();
+      { WaitTime( 600 ); //  секунда проверки работоспособности транзакций
+        static unsigned i=0;
         print( 1,23,"%c",( "#0123456789ABCDEF=" )[++i%=18] ); // 🌀
         //Sleep( 1000 );    // или вариант приостановки по блокирующему таймеру
       } while( Active_Key &= Ship.Ready() && Sea.Ready() );

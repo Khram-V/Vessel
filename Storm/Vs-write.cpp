@@ -179,7 +179,7 @@ void HullVsl::Write( int format )
   else if( format==2 )
   { if( !(F=_wfopen( U2W( fext( FName,"dc2" ) ),L"wb" )) )return;
     //
-    //  во первой строке письма общие размерения графического изображения
+    //  в первой строке общие размерения графического изображения
     //
     fprintf( F,"%s 0 %s %s\n",                      // здесь задаются масштабы
                RtoA(Keel[0]),RtoA(Keel[Nframes+1]-Keel[0]),RtoA(T*2) );

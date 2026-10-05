@@ -497,7 +497,6 @@ Hull& Hull::Drawing( byte type )  // 0 - DrawMode; 1 - корпус; 2 + про�
                                     spot( Route[i]-Locate,5 );
  byte Mode=Pic.hull;                        // собственно 4 режима прорисовки
   LineDraw( Mode );
-
 //if( Mode>1 )glEnable( GL_LINE_SMOOTH );   // восстановление сглаживания линий
                     // включение одноразовой прорисовки корпуса вместо расчетов
   if( type )Pic.hull|=3; Floating( true ); /// изображение корпуса только здесь

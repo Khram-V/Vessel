@@ -27,7 +27,6 @@ struct mlist{ char Y,X,lf,S; char *Msg; void *dat; };
 static bool ins=false;           // InsertKey - признак 1-вставки / 0-замены
 static char *St,*StK,*Str=NULL;  // рабочая строчка и временно сохраняемое поле
                                  //== статика, т.к. на выходе не сохраняются
-
 TextMenu::TextMenu( const Mlist *m,const int n, Window* Win, int x,int y ):
   Place( Win,PlaceAbove ),
   Up( false ),M( m ),Num( n ),Y( y ),X( x ),Lx( 1 ),Ly( 1 ),K( 0 ) //,Hl( NULL )
@@ -162,7 +161,10 @@ bool TextMenu::Draw()            // картинка со списком стр�
           if( ins )glVertex2f( l+kurs-0.1,L.Y );         // изменяемого символа
               else glVertex2f( l+kurs+1,L.Y+0.8 ); glEnd();
           if( ked==-1 )strcpy( StK,Uset( St,i ) );     // изменяемая подстрочка
-  } } } } Show(); return false;
+  } } } }
+//  Save();
+  Show();
+  return false;
 }
 static int State=0; // связка для двух Mouse - повторение нажатой клавиши мышки
 
