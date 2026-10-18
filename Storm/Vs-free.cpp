@@ -414,6 +414,7 @@ bool freeShip::Import( fixed Fmt )
   Length=Max.x-Min.x,Breadth=Max.y-Min.y;
   if( Min.z>=0 || Max.z<=0 )freeShift( (Vector){ 0,0,-0.5*(Min.z+Max.z) } );
   Draught=-Min.z;
+  if( Min.y>=0.0 )for( int i=0; i<NoLayers; i++ )L[i].Symmetric=true;
   return true;
 }
 void freeShip::ReadObj()                      // временный оригинал имени файла
@@ -425,8 +426,8 @@ void freeShip::ReadObj()                      // временный оригин
   ActiveLayer.ID=NoL;                   // изначально здесь ноль
   ActiveLayer.Symmetric=false;          // пока без правого дублирования
   if( !NoLayers )  // на случай отсутствия послойного описания свойств, будет 1
-  { L=(Layers*)Allocate( (NoLayers+1)*sizeof( Layers ),L );
-    memcpy( &L[NoLayers],&ActiveLayer,sizeof( Layers ) );
+  { L=(Layers*)Allocate( sizeof( Layers ),L );
+    memcpy( L,&ActiveLayer,sizeof( Layers ) ); ++NoLayers;
   }
   while( !feof( FM ) )
   { if( (s=strchr( S=getString( FM ),'#' ))!=NULL )*s=0;
@@ -729,8 +730,10 @@ void freeShip::StartExp() // начальные условия вычислит�
     Vessel->Draw();   // сначала пароход идёт сам по себе в собственном окошке,
     Storm->Draw();    //  затем картинка штормового волнения вместе с пароходом
     Vessel->wPrint(); //  ... и геометрические таблички -> на текстовую консоль
+
     Vessel->Refresh();
     Storm->Refresh();
+
     aK=Min.z; aD=Draught; aS=1; Scale=(Vector){1,1,1};
     if( Vessel->Ready() && Storm->Ready() )
     switch( ans=T.Answer( ans ) )

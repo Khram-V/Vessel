@@ -123,7 +123,7 @@ FreeShip::FreeShip():Ship(),View( TitleShip,-12,12,640,480 ) //,Place( this,Plac
   Distance=-1.75*( Max.x+Max.y-Min.x-Min.y + Width*(Max.z-Min.z)*0.9/Height );
   eyeX=135; // lookX=-60;
   glDisable( GL_FOG );
-  Draw(); //Show(); // начальная прорисовка
+  Draw(),Show(),Refresh(),glFinish(); // начальная прорисовка
 }
 //   Интерактивная настройка/управление графическим отображением проекта
 //                         *.vsl,*.ftm,*.fbm,*.fef,*.part + *.obj,*.stl"

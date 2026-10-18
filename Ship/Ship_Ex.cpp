@@ -18,9 +18,12 @@ bool Ship::Import( fixed Fmt )
 //Visio.BothSides=false;
 //BoardView( Visio.ModelView )=mvPort;
   Visio.ModelView=mvPort;
-  Shell.Extents( false );       // расчёт - переопределение графических экстремумов
+  Shell.Extents( false );   // расчёт - переопределение графических экстремумов
   if( Min.z<0 && Max.z>0 )Draft=-Min.z;
-  return true;
+  if( Min.y>=0.0 )
+  { for( int i=0; i<Shell.NoLayers; i++ )Shell.L[i].Symmetric=true;
+    Visio.ModelView=mvBoth;       Shell.ActiveLayer.Symmetric=true;
+  } return true;
 }
 void Surface::ReadObj( char *Path )     // временный оригинал имени файла
 { Real r,g,b,a;
@@ -32,8 +35,8 @@ void Surface::ReadObj( char *Path )     // временный оригинал �
   ActiveLayer.ID=NoL;                   // изначально здесь ноль
   ActiveLayer.Symmetric=false;          // пока без правого дублирования
   if( !NoLayers )  // на случай отсутствия послойного описания свойств, будет 1
-  { L=(Layers*)Allocate( (NoLayers+1)*sizeof( Layers ),L );
-    memcpy( &L[NoLayers],&ActiveLayer,sizeof( Layers ) );
+  { L=(Layers*)Allocate( sizeof( Layers ),L );
+    memcpy( L,&ActiveLayer,sizeof( Layers ) ); ++NoLayers;
   }
   while( !feof( FM ) )
   { S=getString( FM );

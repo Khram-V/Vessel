@@ -80,9 +80,9 @@ static struct _ScreenSave_{ _ScreenSave_()
 //  print( "\n\n AAAA \n" ); getch();
 //  Sleep( 50 ),exit( 33 );
   }
-#endif} __Console__  // статическая инициализация с сохранением исходного состояния  __attribute__( (init_priority( 100 )) )
+#endif} __Console__  // статическая инициализация с сохранением исходного состояния/*_attribute__( (init_priority( 100 )) )
   __attribute__( (constructor) )
-  __attribute__( (destructor) );
+  __attribute__( (destructor) )*/;
 #endif
 /*
 idx RRGGBB:  0 000000 BLACK  1 0000AA BLUE          1 BLUE  2 00AA00 GREEN         2 GREEN  3 00AAAA CYAN          3 GREEN + BLUE  4 AA0000 RED           4 RED  5 AA00AA MAGENTA       5 RED + BLUE  6 AA5500 BROWN         6 RED + GREEN // EGA/VGA (brown)  6 AAAA00                             // Windows (dark yellow)  7 AAAAAA LIGHTGRAY     7 RED + GREEN + BLUE  8 555555 DARKGRAY      8 INTENSITY  9 5555FF LIGHTBLUE     9 INTENSITY + BLUE 10 55FF55 LIGHTGREEN   10 INTENSITY + GREEN 11 55FFFF LIGHTCYAN    11 INTENSITY + GREEN + BLUE 12 FF5555 LIGHTRED     12 INTENSITY + RED 13 FF55FF LIGHTMAGENTA 13 INTENSITY + RED + BLUE 14 FFFF55 YELLOW       14 INTENSITY + RED + GREEN 15 FFFFFF WHITE        15 INTENSITY + RED + GREEN + BLUE*/

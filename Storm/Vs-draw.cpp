@@ -112,8 +112,8 @@ void Hull::NavigaInform( Window *Win )
   for( i=0; i<2; i++ )                              // стрелка выбранного курса
   { if( !i ){ glLineWidth( 2 ); color( gray,0,.75 ); glBegin( GL_LINE_LOOP ); }
        else { glLineWidth( 1 ); color( yellow,0,.3 ); glBegin( GL_POLYGON ); }
-    P(.75,0),P(.4,-.05),P(.5,-.01),P(-.75,-.05),
-    P(-.6,0),P(-.75,.05),P(.5,.01),P(.4,.05); glEnd();
+            P(.75,0),P(.4,-.05),P(.5,-.01),P(-.75,-.05),
+            P(-.6,0),P(-.75,.05),P(.5,.01),P(.4,.05); glEnd();
   }
   //                       подпись - текущий курс в градусах и скорость в узлах
   for( i=0; i<32; i++ )
@@ -196,11 +196,11 @@ void Hull::NavigaInform( Window *Win )
                     " Floatable %.0f << %.0f\n"
                     " Metacenter %.1f << %.1f\n"
                     " τ %3.1f\"    h %.1f << %.1f м",
-           DtoA( Trun/3600,Trun>3600?2:(Trun>60?3:-3) ), //TimeStep,
-           Ts*tKrat,tKrat,Speed*3600/_Mile,cSp*3600/_Mile,Speed/sqrt(_g*Length),
-           sqr(Speed)*_Pd/_g/Length,Volume,iV,Surface,iS,Floatage,iF,
-           Metacenter.x,vM.x,_Pd*sqrt( inMass.x.x/hX/_g/Volume ),hX,vM.z );
-           color( blue,-0.5 ); i-=3;
+        DtoA( Trun/3600,Trun>3600?2:(Trun>60?3:-3) ), //TimeStep,
+        Ts*tKrat,tKrat,Speed*3600/_Mile,cSp*3600/_Mile,Speed/sqrt(_g*Length),
+        sqr(Speed)*_Pd/_g/Length,Volume,iV,Surface,iS,Floatage,iF,Metacenter.x,
+        vM.x,_Pd*sqrt( inMass.x.x/max(0.01,hX)/_g/Volume ),hX,vM.z );
+        color( blue,-0.5 ); i-=3;
   }
   if( Win==this )
   if( (l=Route.len-1)>=12 )
