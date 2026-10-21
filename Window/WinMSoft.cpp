@@ -203,15 +203,15 @@ Window::Window( const char *_title, int x,int y, int w,int h )
      ( _title ? WS_OVERLAPPEDWINDOW:0 )    // ? если без заголовка - нет рамки
               | WS_CLIPSIBLINGS | WS_CLIPCHILDREN
               | WS_POPUPWINDOW | WS_VISIBLE, // стиль окна ? WS_CAPTION
-     WindowX,                              // координаты верхнего левого угла
-     WindowY,                              // CW_USEDEFAULT
+     WindowX,                                // координаты верхнего левого угла
+     WindowY,                                // CW_USEDEFAULT
      Width +( !_title ? 2 : GetSystemMetrics( SM_CXSIZEFRAME )*2 ),
      Height+( !_title ? 2 : GetSystemMetrics( SM_CYSIZEFRAME )*2
                           + GetSystemMetrics( SM_CYCAPTION ) ),
-     HWND_DESKTOP,                         // дескриптор родительского окна
-     NULL,                                 // дескриптор главного меню
-     hInstance,                            // дескриптор приложения
-     NULL                                  // указатель доп.информации
+     HWND_DESKTOP,                            // дескриптор родительского окна
+     NULL,                                    // дескриптор главного меню
+     hInstance,                               // дескриптор приложения
+     NULL                                     // указатель доп.информации
    );
    ZeroMemory( &pfd,sizeof( PIXELFORMATDESCRIPTOR ) );
    pfd.nSize = sizeof( PIXELFORMATDESCRIPTOR );

@@ -6,14 +6,14 @@
 //                если < 0 - в пикселях и нормальных отсчетах, Y - снизу вверх
 //     отсутствие шрифта - подключение окна (не приводит к размеру точки [1x1])
 //
-Place& Place::Area( int X,int Y, int W,int H )     // достаточно сделать шаг
+Place& Place::Area( Real X,Real Y, Real W,Real H ) // достаточно сделать шаг
 { Real fw=AlfaWidth(),fh=AlfaHeight(),Tw=fw,Th=fh; // единичным, далее по Place
 // всё по горизонтали glAct( Site );      // среда opеnGL здесь не используется
    if( !W )W=Site->Width;  else if( W<0 )W=-W,fw=1; else W=W*fw; // связанной с
    if( X>0 )X=(X-1)*fw; else X = Site->Width - W + X*fw;      // базовой Window
-       X=minmax( 0,X,Site->Width-int( Tw ) );         // перерасчет с проверкой
+       X=minmax( 0.0,X,Site->Width-Tw );              // перерасчет с проверкой
    if( X+W>Site->Width  )                             //  жертвуем шириной окна
-     { if( W==Site->Width )W-=X; else X=max( 0,Site->Width-W ); }
+     { if( W==Site->Width )W-=X; else X=max( 0.0,Site->Width-W ); }
 // затем по вертикали
    if( !H )H=Site->Height; else if( H<0 )H=-H,fh=1; else H=H*fh; ++H;
    if( fh>1 ){ if( Y>0 )Y=Site->Height-H-fh*(Y-1); else Y=-Y*fh; }
@@ -27,6 +27,22 @@ Place& Place::Area( int X,int Y, int W,int H )     // достаточно сд�
 /* if( chY>Height-Th ) */ chY=Height-Th; chX=1;     // аппликата верхней строки
 // if( Signs&PlaceAbove )Save();
    return *this;
+}
+TextFrame::TextFrame( Place *P, Real X,Real Y, Real x,Real y, bool s )
+         : TextContext( false ) //,Win( P )
+{ const float ya=y-0.25,ys=ya-(s?0.6:0.4);
+  const int Tw=P->AlfaWidth(),Th=P->AlfaHeight();
+  P->Area( X,Y,x,ya ).Activate( true );              // текст по строкам
+  glScalef( Tw,-Th,1.0 ),glTranslatef( 0,-ya,0 );    // здесь предусматривается
+  glColor4f( .6,.8,1,s?.7:.9 ); glRectf( 0,0,x,ya ); // изменение масштабов
+  glColor4f( 1,.96,.8,s?.7:.9 ); glRectf( 0.3,0.2,x-0.3,ys );       // рамка
+  glColor4f( 0,0,0,0.8 ); glLineWidth( 1.25 ); glBegin( GL_LINES ); // с тенью
+  glVertex2f( 0,ya ); glVertex2f( x,ya ); glVertex2f( x,ya ); glVertex2f( x,0 );
+  glVertex2f( 0.3,ys ); glVertex2f( 0.3,0.2 ); glVertex2f( 0.3,0.2 ); glVertex2f( x-0.3,0.2 );
+  glColor4f( 1,1,1,0.8 );
+  glVertex2f( 0.3,ys ); glVertex2f( x-0.3,ys ); glVertex2f( x-0.3,ys ); glVertex2f( x-0.3,0.2 );
+  glVertex2f( 0,ya ); glVertex2f( 0,0 ); glVertex2f( 0,0 ); glVertex2f( x,0 );
+  glEnd();
 }
 //    Комплекс встроенных и внутренних процедур
 //    Подготовка площадки для растровых манипуляций
@@ -57,7 +73,7 @@ TextContext::TextContext( bool b ): Base( b )
 //    dp( glIsEnabled( GL_DEPTH_TEST ) ),
 //    cf( glIsEnabled( GL_CULL_FACE ) ),
 //    lh( glIsEnabled( GL_LIGHTING ) )
-{ if( Base )PushMatrix(); else glPushAttrib( GL_ENABLE_BIT|GL_POLYGON_BIT );
+{ if( Base )PushMatrix(); else glPushAttrib( GL_ENABLE_BIT|GL_POLYGON_BIT|GL_LINE_BIT );
   glDisable( GL_DEPTH_TEST );
   glDisable( GL_CULL_FACE );
   glDisable( GL_LIGHTING );
@@ -75,7 +91,7 @@ Place& Place::Clear( bool back ) // очистка фоном/true или тек
                   glClearColor( c[4],c[5],c[6],c[7] );
                   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
                   glClearColor( *c,c[1],c[2],c[3] );
-    } //glScissor( 0,0,0,0 );         // разблокирование графических фрагментов
+    } glScissor( 0,0,0,0 );           // разблокирование графических фрагментов
     glDisable( GL_SCISSOR_TEST );     //   и отключение обрезки
   } return *this;
 }

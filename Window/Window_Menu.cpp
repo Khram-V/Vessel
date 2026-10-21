@@ -98,7 +98,7 @@ int TextMenu::Answer( int ans )
            l += Mestr( Ls );         // новая длина строки
            l += Ls->lf;              // + длина входного поля +1
        if( Lx<l )Lx=l;               // выбор ширины окна     -1
-     } Up=true;                      // отметка готовности разметки меню
+     } Up=true; Lx+=2; Ly+=2;        // отметка готовности разметки меню
    }                                 //
    if( ans>=0 && ans<Num )K=ans;     // надо чтобы M[K].lf >0
    Ls=(mlist*)M;                     // это уже рабочая установка для Ls
@@ -142,12 +142,7 @@ Fin: if( ans )Draw(); return ans?K:0; // площадка с текстом ос
 }
 bool TextMenu::Draw()            // картинка со списком строк запросов/форматов
 { Activate();                    // и запросы с представлением исходных величин
-  { TextContext Ts;              // здесь предусматривается изменение масштабов
-    const Real Tw=AlfaWidth(),Th=AlfaHeight();
-    Area( X,Y,Lx+2,Ly+2 ).Activate( true );               // активация разметки
-    glScalef( Tw,-Th,1.0 ),glTranslatef(0,-Ly-2,0);       // листа для текста
-    glColor4f( .6,.8,1,.6 ); glRectf( 0,0,Lx+2,Ly+2 );
-    glColor4f( 1,1,.8,.94 ); glRectf( 0.3,0.3,(Lx+2)-0.3,(Ly+2)-0.5 );
+  { TextFrame Tf( (Window*)this,X,Y,Lx,Ly-0.3,false );    // активация разметки
     for( int k=0; k<Num; k++ )
     { mlist &L=((mlist*)M)[k]; int i=Mestr( &L ),l=i+L.X;
       glColor3f( 0,0.25,0.5 ); Print( L.X+1,L.Y+1,St );
@@ -161,10 +156,8 @@ bool TextMenu::Draw()            // картинка со списком стр�
           if( ins )glVertex2f( l+kurs-0.1,L.Y );         // изменяемого символа
               else glVertex2f( l+kurs+1,L.Y+0.8 ); glEnd();
           if( ked==-1 )strcpy( StK,Uset( St,i ) );     // изменяемая подстрочка
-  } } } }
-//  Save();
-  Show();
-  return false;
+  } } } } //Save();
+  Show(); return false;
 }
 static int State=0; // связка для двух Mouse - повторение нажатой клавиши мышки
 

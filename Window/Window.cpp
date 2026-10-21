@@ -119,13 +119,19 @@ fixed Break( const char *Msg, ... ) // _Esc - отмена или _Enter - по�
   return ans;
 }
 fixed Message( const char *Title,const char *Msg,... ) //?! остановка программы
-{ int i,n; va_list V; va_start( V,Msg );
- char str[512]=""; vsnprintf( str,511,Msg,V ); va_end( V );
- for( i=n=0; i<strlen( str ); i++ )if( str[i]=='\n' )n++;
- Window B( 0,0,0,max( max( 12,Ulen( str )+6 ),Ulen( Title )+4 )*9,48+n*16 );
-  glColor3b( 63,96,127 ); B.AlfaBit( _8x08 ).Print( 2,1.5,Title );
-  glColor3b( 63,127,96 ); B.AlfaBit( _8x16 ).Print( 4,2.2,str );
-  return B.WaitKey();
+{ int i,k,n,w,h,l; va_list V; va_start( V,Msg );
+ char str[512]=""; vsnprintf( str,511,Msg,V ); va_end( V ); l=strlen( str );
+  for( i=k=n=w=0; i<=l; i++ )
+   if( str[i]=='\n' || i==l )
+     { str[i]=0; if( Ulen( str+k )>w )w=Ulen( str+k ); k=i;
+                 if( i<l )str[i]='\n',++n; else break;
+     } w = max( max( 12,w+5 ),Ulen( Title )+4 ); h = n+3;
+ Window B( 0,0,0,w*9,h*18 );
+ Place P( &B,PlaceAbove ); glColor3f( 1,1,1 ); P.Clear( true );
+  P.AlfaBit( _8x16 ); TextFrame T( &P,1,1,w,h+0.25 );
+  glColor3b( 0,32,32 );                 P.Print( 4,2.5,str );   // 63,127,96
+  glColor3b( 0,32,0 ); P.AlfaBit( _8x08 ).Print( 2,2.2,Title ); // 63,96,127
+  return B.Above().WaitKey();
 }
 /*
 fixed Break( const char *Msg, ... )   // Случай аварийного завершения программы

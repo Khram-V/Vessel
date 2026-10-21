@@ -150,9 +150,9 @@ bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой под
  BoardView &B=Visio.ModelView;
   switch( Keyb )
   { case _Esc: exit( 12 );
-    case _F1: Help( Id,Cmds,Plus,1,2 ); break; //.Refresh();
-    case _F2: WriteVSL();               break;
-    case _F3: LoadExtFile( false );     break;
+    case _F1: Help( Id,Cmds,Plus,this,1,2 ); break; //.Refresh();
+    case _F2: WriteVSL();           break;
+    case _F3: LoadExtFile( false ); break;
     case _F10:Title( " Поиск и расчистка повторов..." );
 #pragma omp barrier       // Синхронизация: все потоки пусть заканчивают работу
 #pragma omp single       //! - синхронизация нужна всем редактирующим операциям

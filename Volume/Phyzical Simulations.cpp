@@ -186,7 +186,8 @@ static bool keyboard( fixed key )
                 "Up/Down Right/Left Home/End","  X,Y,Z",0 },
       *Plus[]={ "<Пробел>"," каркас / раскраска",
                 "<Escape>/<ctrlC>"," стоп ",0 };
-      Win.Help( Name,Cmds,Plus ); }           break;
+      Help( Name,Cmds,Plus,&Win );
+    } break;
     case _F2: while( Configuration()!=_Esc ); break;
     case _Ins:
     { Point R={5,4,3}; Vector V={-5,-4,-3};

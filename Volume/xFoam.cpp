@@ -43,7 +43,7 @@ int main( int argc, char** argv )
       *Plus[]={ "Space "," каркас/раскраска поверхности",
                 "Space+Shift или Ctrl"," выбор модели",
                 "Escape/ctrlC"," стоп ",0 };
-      Win.Help( Name,Cmds,Plus ).Clear().Refresh(); //
+      Help( Name,Cmds,Plus,&Win ); Win.Clear().Refresh(); //
     } else
     if( key==_F4 )
     { Vector Afins={1,1,1},Shift={0,0,0};

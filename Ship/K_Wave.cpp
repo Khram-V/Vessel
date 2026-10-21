@@ -243,7 +243,7 @@ static void HelpWave()
                        "<Enter> "," обновление изображения",
                        "<Tab> ","выбор иной модели Мичелла",
                        "<Esc>/<ctrlC> ","   завершение",0
-                     }; mcWin->Help( Name,Cmds,Plus,1,1 );
+                     }; Help( Name,Cmds,Plus,mcWin,1,1 );
 }
 void Hull_Wave( const int _Type )
 { int ans;

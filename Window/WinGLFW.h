@@ -36,9 +36,9 @@ public:
   void PutTimer();
   //
   // обращение к клавиатуре через активное и контекстно настроенное окно Window
-  //        1/2  +  3 - Left/Right.Shift     64 - ScrollLock     ??  - CapsLock
-  //        4/8  + 12 - Left/Right.Ctrl     128 - Insert         ??  -  NumLock
-  //       16/32 + 48 - Left/Right.Alt
+  //      1/2  +  3 - Left/Right.Shift    64 - ScrollLock ?? - CapsLock
+  //      4/8  + 12 - Left/Right.Ctrl    128 - Insert     ?? -  NumLock
+  //     16/32 + 48 - Left/Right.Alt
   //!                                    минимальный набор клавиатурных функций
  virtual bool KeyBoard( fixed key );
   Window& KeyBoard( bool( *inKey )( fixed ) ){ extKey=inKey; return *this; }
@@ -50,17 +50,8 @@ public:
   //   выполняется привязка к основному/большому консольному экрану
   //
  virtual bool Timer();
-  //
-  //! Динамическое окошко для кратких подсказок с управляющими кодами программы
-  //   Name[0]   Title Заголовок для титульной строки графического окна
-  //   Name[1-3] - строки расширенного названия, и признак движения
-  //   Text      - парное описание основных кодов с их предназначением
-  //   Plus      - то же блока блока дополнительных описаний
-  //    ++ определение каждого блока строк заканчивается нулевым адресом
-  Window& Help( const char *N[],const char *C[],const char *P[],int X=-1,int Y=1 );
-
-  Window& SetTimer( unsigned mSec,bool(*in)()=NULL );  // время и адрес исполнения
-  Window& KillTimer(); //{ if( Site )SetTimer( 0 ); return *this; } // сброс таймера - если 0
+  Window& SetTimer( unsigned mSec,bool(*in)()=NULL );//время и адрес исполнения
+  Window& KillTimer(); //{ if(Site)SetTimer(0); return *this; } // сброс если 0
   //
   //   подборка скрытых параметров и свободных/отвязных транзакций
 private:

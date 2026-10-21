@@ -406,7 +406,7 @@ bool Hull::KeyBoard( fixed Keyb )                   // С краткой под�
                "F5 "," изображение обшивки и потока",
                "F8 "," гидромеханика штормования",0 };    // Activate();
   switch( Keyb )
-  { case _F1: Help( Id,Cmds,Plus,1,1 ); break;            // справка с корпусом
+  { case _F1: Help( Id,Cmds,Plus,this,1,1 ); break;       // справка с корпусом
     case _F2: Write( Write_choice( this ) ); break;       // запись 3D-модели
     case _F3: if( Read( "*.vsl" ) )
           { logStop(); KtE=0;
@@ -434,9 +434,9 @@ bool Field::KeyBoard( fixed Keyb )
                   "корабля в открытом море",0 },    // эксперимента
   *Cmds[]={ "F1 -"," краткая справка",
             "F4  ","настройка волнового режима",
-            "F8  ","штормовая гидромеханика",0 };   // Activate();
-  switch( Keyb )                                   // ... справка, что выше
-  { case _F1: Help( Id,Cmds,Plus,-1,-1 ); break;  // краткая подсказка
+            "F8  ","штормовая гидромеханика",0 };     // Activate();
+  switch( Keyb )                                      // ... справка, что выше
+  { case _F1: Help( Id,Cmds,Plus,this,-1,-1 ); break; // краткая подсказка
     case _F4: Config(); break;                   // меню параметров и режимы
     case _F8: Model_Config( this ); break;      // вычислительного эксперимента
     case _Blank: if( ScanStatus()&SHIFT )Vessel->Pic.flow++; // стрелки потоков

@@ -51,7 +51,7 @@ static void Hull_Help()
              *Plus[]={ "<Enter> "," масштаб по ширине окна",
                        "<Space> "," шпангоуты сплайн\\линии",
                        "<Esc>/<ctrlC>","   завершение",0
-                     }; Win.Help( Name,Cmds,Plus,0,1 );
+                     }; Help( Name,Cmds,Plus,&Win,0,1 );
 }
 void Hull_Wave( const int Type );  // волнообразование и волновое сопротивление
 void Hull_Statics();  // Остойчивость и кривые элементов теоретического чертежа

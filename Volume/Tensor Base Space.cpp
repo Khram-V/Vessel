@@ -147,7 +147,7 @@ int main( int argc, char** argv )
       *Plus[]={ "Space "," каркас/раскраска поверхности",
                 "Space+Shift или Ctrl"," выбор модели",
                 "Escape/ctrlC"," стоп ",0 };
-      Win.Help( Name,Cmds,Plus );
+      Help( Name,Cmds,Plus,&Win );
     } else
     { Real com=0.0;
       switch( key )

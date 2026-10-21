@@ -227,7 +227,7 @@ int main( int argc, char** argv )  // начальная настройка ко
                 "<PgUp•PgDn>  ","  размер модели",
                 "lMouse•rMouse>"," поворот|смещение",
                 "<Esc>/<ctrlC>","    стоп ",0 };
-      Win.Help( Id,Cmds,Plus,-2,2 );                    // ...справка, что выше
+      Help( Id,Cmds,Plus,&Win,-2,2 );                   // ...справка, что выше
     }
   } while( Win.Ready() && (key=Win.WaitKey())!=_Esc ); return 0;
 }

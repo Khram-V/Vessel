@@ -520,7 +520,7 @@ void Hull_Statics()           // кривых элементов теорети�
            " zC ","  аппликата центра величины",
            " zM ","  аппликата метацентра",
            " r,R","  поперечный (x) и продольный (y)",
-           "","        метацентрические радиусы",
+           "",    "        метацентрические радиусы",
            " Jx,Jy"," поперечный и продольный моменты",
            "","          инерции площади ватерлинии",0 };
   StabWin.Activate().Mouse( Mouse_in_Window );    // откат обработки прерываний
@@ -535,7 +535,7 @@ void Hull_Statics()           // кривых элементов теорети�
 MainLoop:
   switch( ans )
   { case _Esc: goto Ret; // StabWin.Close(); break; // неявный деструктор позже
-    case _F1: StabWin.Help( Name,Cmds,Plus,0,1 ); break;
+    case _F1: Help( Name,Cmds,Plus,&            StabWin,0,1 ); break;
     case _F4: do{ Real A=Amax;
                   if( !(ans=LD.Stability_Menu()) )goto Ret;
                   if( A!=Amax )LD.Stability(); StabWin.Draw();
