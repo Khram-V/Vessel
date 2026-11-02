@@ -10,8 +10,8 @@ Model& Model::cubic( bool painting_Model, _Real Alfa )
   const Vector V[]={ {o,o,o},{o,o,i},{o,i,o},{o,i,i},
                      {i,o,o},{i,o,i},{i,i,o},{i,i,i} };
   const colors c[]={ black,blue,green,cyan,red,magenta,yellow,white };
-  glBegin( painting_Model?GL_QUADS:GL_LINE_STRIP );
 #define Vertex( k )color( c[k],0,Alfa ),dot( out( V[k] ) )
+  glBegin( painting_Model?GL_QUADS:GL_LINE_STRIP );
         Vertex( 0 ),Vertex( 1 ),Vertex( 3 ),Vertex( 2 );       // левый   - x
         Vertex( 0 ),Vertex( 4 ),Vertex( 5 ),Vertex( 1 );       // нижний  - y
         Vertex( 0 ),Vertex( 2 ),Vertex( 6 ),Vertex( 4 );       // дальний - z
@@ -19,8 +19,8 @@ Model& Model::cubic( bool painting_Model, _Real Alfa )
         Vertex( 6 ),Vertex( 2 ),Vertex( 3 ),Vertex( 7 );       // верхний
         Vertex( 3 ),Vertex( 1 ),Vertex( 5 ),Vertex( 7 );       // ближний
         Vertex( 5 ),Vertex( 4 ),Vertex( 6 ),Vertex( 7 );       // правый
- #undef Vertex
   glEnd(); return *this;
+ #undef Vertex
 }
 //     локальный класс для временного сброса закраски в кэш-буфер
 //

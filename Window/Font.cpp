@@ -136,7 +136,8 @@ void Place::String( const char *T, Real x,Real y )
 { LFont;
   if( y>0 )chY=Height-L.Th*y; else chY=3-L.Th*(y+1);
   if( x>0 )chX=(x-1)*L.Tw; else chX=Width+x*L.Tw;
-  if( L.Bit ){ if( y>0 )chY+=L.Th; } else
+  if( L.Bit )
+    { if( y<=0 )chY+=L.Th*1.7; if( x>0 )chX+=L.Tw; else chX-=L.Tw-2; } else
     { Real Scale=L.Th/Design.H; chX/=Scale,chY=(chY+L.Th/8)/Scale-Design.B; }
   bX=chX;
   if( x<=0 || y<=0 ){ SIZE l=AlfaRect( T ); // во внутренних размерениях шрифта

@@ -364,7 +364,7 @@ static bool AllKeyb( fixed Keyb )
 }                             // все иные запросы клавиатуры здесь сбрасываются
 static int Write_choice( Window* Win )
 { fixed ans=1;
-  Mlist Menu[]={ { 1,0," Выходной формат модели корпуса корабля" },
+  Mlist Menu[]={ { 0,0," Выходной формат модели корпуса корабля" },
                  { 2,47,"Free!ship exchange format (треугольники)   .fef" },
                  { 1,47,"Wavefront Technologies Advanced Visualizer .obj" },
                  { 1,47,"Шпангоуты и контуры диаметральной плоскости.dc2" },

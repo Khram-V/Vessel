@@ -48,7 +48,8 @@ public:                      // открытая информация и про�
   //  каждая площадка привязывается к окну Window, в том числе временно
   //
   Place& Activate( bool=false ); // активизация графического контекста площадки
-  Place& Area( Real X,Real Y,Real W,Real H );// установка и проявление площадки
+  Place& Area( Real X,Real Y, Real W,Real H, bool Frame=false ); //! this==Site
+  // установка и проявление площадки, Frame - добавляет пространство для рамки
   //   если X,Y > 0 - отсчеты от левого верхнего угла, <=0 - от правого нижнего
   //   если Width,Height > 0 - отсчеты в символах, если 0 - до границы окна,
   //                если < 0 - в пикселях и нормальных отсчетах Y - снизу вверх
@@ -151,7 +152,7 @@ public:
   Window& SetTimer( unsigned mSec,bool(*inTime)()=NULL ); // время и транзакция
   Window& KillTimer();                                // если 0 – сброс таймера
  virtual bool Timer();                               // ++ виртуальных процедур
-  int volatile isTimer;       // таймер отслеживает уровень рекурсии транзакций
+//int volatile isTimer;       // таймер отслеживает уровень рекурсии транзакций
   UINT_PTR idEvent;     // идентификатор встроенного таймера прерываний =0x12++
 private:      //! подборка скрытых параметров и свободных/отвязанных транзакций
   void PutTimer();     // unsigned iTime ) ==  со временем на момент прерывания
@@ -209,9 +210,9 @@ class TextContext{ const bool Base; // Polygon, Depth_Test, Cool_Face, Lighting
 public: TextContext( bool Space=false );  // ++ Space -> матрицы сцены и модели
        ~TextContext();
 };
-class TextFrame: TextContext
-{ public: TextFrame( Place*,Real,Real,Real,Real,bool=false );
-};
+struct TextFrame: TextContext
+     { TextFrame( Place*,Real,Real,Real,Real,bool=false );
+     };
 class RasterSector{ // Подготовка площадки растровых манипуляций под glViewPort
 public: RasterSector( int pX,int pY, int Width,int Height, Real Scale=1.0 );
        ~RasterSector();
@@ -222,7 +223,6 @@ public: RasterSector( int pX,int pY, int Width,int Height, Real Scale=1.0 );
 //    Text      – парное описание команд и операций с кратким предназначением
 //    Plus      – то же для блока дополнительных инструкций и подсказок
 //             ++ определение каждого блока строк заканчивается нулевым адресом
-//
 Course Help
   ( const char *N[],const char *C[],const char *P[],Window*,int X=-1,int Y=1 );
 //
@@ -238,8 +238,8 @@ struct Mlist{ short skip,lf; const char *Msg; void *dat; };
 //        Msg : NULL - чистое входное поле --> выходной формат
 //        dat : NULL & lf<>0 - меню-запрос --> адрес изменяемого объекта
 //
-class TextMenu:Place //! запрос текстового меню с отсрочкой полного завершения
-{ const Mlist *M;  // собственно список меню Mlist / mlist
+class TextMenu: Place //! запрос текстового меню с отсрочкой полного завершения
+{ const Mlist *M; // собственно список меню Mlist / mlist
   const int Y,X;  // местоположение на экране (++/слева-сверху,--/снизу-справа)
   int Lx,Ly,K,    // размеры и номер редактируемого поля / последнего обращения
        ked,       // номер реально редактируемого поля (-1 без редактирования)
@@ -253,6 +253,18 @@ public: TextMenu( const Mlist*,const int, Window*,int=1,int=1 );
 //     ~TextMenu(){ this->~Place(); Refresh(); }
   const int Num;           // общее количество строк меню
   int Answer( int=-1 );    // немного отсроченный вызов для пущей перенастройки
+};
+//     обработка именованных групп графических объектов
+//               с помощью списка текстовых последовательностей
+//
+struct TextList: Place
+{ TextList
+  ( char*  (*Fl)( int ), int N,        // Построение строчки по номеру в списке
+    Course (*Hl)( int ), Window *Win,  // Прерывание для запроса с комментарием
+    int X=0, int Y=0,                // Местоположение последовательности, её
+    int x=32, int y=24                  // размерения в правилах Window-площадки
+  );
+ ~TextList(){};
 };
 extern
  const unsigned char _8x08[],_8x14[],_8x16[]; // растровые шрифты из эпохи СССР

@@ -21,7 +21,7 @@ Place::Place( Window *Win, byte Mode ): Site( Win ),Signs( Mode ),Up( NULL ),
 { if( this!=(Place*)Win )   // обход неприкасаемого базового окна Window.Place
   { Place *S=(Place*)Win;   // Tw=S->Tw; Th=S->Th; Bit=NULL;
     while( S->Up )S=S->Up; S->Up=this;   // новая площадка набрасывается сверху
-//  if( glAct( Site ) )      // связь контекста OpenGL с требуемым окном Window
+    if( glAct( Site ) )      // связь контекста OpenGL с требуемым окном Window
 //  if( Signs&PlaceAbove )Save();        // первый фрагмент сохраняет всё окно?
     chY=Height-AlfaHeight(); // буквенная позиция изначально будет сверху/слева
 //  Area( 0,0,Width,Height );
@@ -39,9 +39,10 @@ Place& Place::Activate( bool act )        // активизация графич
       { Real r=Real( Width )/Height;              // исходное ортонормированное
         if( r>1 )glOrtho( -r,r,-1,1,-1,1 );       // масштабирование  экрана во
             else glOrtho( -1,1,-1/r,1/r,-1,1 );   // внутренний 3D-размер[-1:1]
-      } else     glOrtho( 0,Width,0,Height,-1,1 ); // отсчет растра слева/снизу
+      } else glOrtho( 0,Width+1,0,Height+1,-1,1 ); // отсчет растра слева/снизу
       glMatrixMode(GL_MODELVIEW); glLoadIdentity(); // единичная матрица модели
-  } } return *this;
+    }
+  } return *this;
 }
 bool Place::Draw()       // в виртуальной среде Draw доступен внутренний пролог
 { if( extDraw )          // настройки OpenGL с контекстным эпилогом прорисовки

@@ -114,24 +114,30 @@ fixed Window::ScanStatus()      // обновление в случае отсу
 fixed Break( const char *Msg, ... ) // _Esc - отмена или _Enter - подтверждение
 { char str[256]=""; bool msg=*Msg=='~'; fixed ans; va_list V;
   va_start( V,Msg ); vsnprintf( str,255,Msg,V ); va_end( V );
+//glColor3f( msg?0:1,msg?1:0,0.5 );
   ans=Message( msg?"...к сведению":"Завершение",str );
-  if( !msg )exit( MB_OK+4 );                    // ! со всеми деструкторами ...
+  if( !msg )exit( MB_OK );                      // ! со всеми деструкторами ...
   return ans;
 }
 fixed Message( const char *Title,const char *Msg,... ) //?! остановка программы
-{ int i,k,n,w,h,l; va_list V; va_start( V,Msg );
+{ int i,k,n,w,l; va_list V; va_start( V,Msg );
  char str[512]=""; vsnprintf( str,511,Msg,V ); va_end( V ); l=strlen( str );
   for( i=k=n=w=0; i<=l; i++ )
    if( str[i]=='\n' || i==l )
      { str[i]=0; if( Ulen( str+k )>w )w=Ulen( str+k ); k=i;
                  if( i<l )str[i]='\n',++n; else break;
-     } w = max( max( 12,w+5 ),Ulen( Title )+4 ); h = n+3;
- Window B( 0,0,0,w*9,h*18 );
- Place P( &B,PlaceAbove ); glColor3f( 1,1,1 ); P.Clear( true );
-  P.AlfaBit( _8x16 ); TextFrame T( &P,1,1,w,h+0.25 );
-  glColor3b( 0,32,32 );                 P.Print( 4,2.5,str );   // 63,127,96
-  glColor3b( 0,32,0 ); P.AlfaBit( _8x08 ).Print( 2,2.2,Title ); // 63,96,127
-  return B.Above().WaitKey();
+     } w = max( max( 12,w+5 ),Ulen( Title )+4 ); n+=3;
+ Window B( 0,0,0,(w+1.6)*9,(n+1.6)*18.0 );
+ Place P( &B,PlaceAbove );
+ TextFrame T( &P,0,0,w,n );
+  glColor3b( 0,32,32 );                 P.Print( 4,2.5,str );      // 63,127,96
+  glColor3b( 0,32,0 ); P.AlfaBit( _8x08 ).Print( 2,2.2,Title );    // 63,96,127
+#ifdef GLFW
+  glfwSetWindowAttrib( B.glfwWindow,GLFW_FOCUS_ON_SHOW,GLFW_TRUE ); //~FOCUSED~FLOATING
+#else
+  SetWindowPos( B.hWnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE ); //! захват
+#endif
+  return B.Above().WaitKey();                     // | SWP_NOACTIVATE
 }
 /*
 fixed Break( const char *Msg, ... )   // Случай аварийного завершения программы

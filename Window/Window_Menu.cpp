@@ -27,10 +27,11 @@ struct mlist{ char Y,X,lf,S; char *Msg; void *dat; };
 static bool ins=false;           // InsertKey - признак 1-вставки / 0-замены
 static char *St,*StK,*Str=NULL;  // рабочая строчка и временно сохраняемое поле
                                  //== статика, т.к. на выходе не сохраняются
-TextMenu::TextMenu( const Mlist *m,const int n, Window* Win, int x,int y ):
+TextMenu:: TextMenu( const Mlist *m,const int n, Window* Win, int x,int y ) :
   Place( Win,PlaceAbove ),
-  Up( false ),M( m ),Num( n ),Y( y ),X( x ),Lx( 1 ),Ly( 1 ),K( 0 ) //,Hl( NULL )
-{ // Activate().AlfaVector( 20  );    // с подстройкой на текущий шрифт
+  Up( false ),M( m ),Num( n ),Y( y ),X( x ),Lx( 1 ),Ly( 1 ),K( 0 )//,Hl( NULL )
+//  TextFrame( Win,x,y,Lx,Ly-0.3,Init() )     // активация разметки
+{ //    Activate().AlfaVector( 20  );         // с подстройкой на текущий шрифт
   AlfaBit( _8x16 );                   // Простой растровый шрифт русского языка
   if( !Str )StK=( Str=(char*)malloc( 512 ) )+256;  // заведомо избыточная длина
 }
@@ -63,6 +64,22 @@ static int Mestr( mlist *Ls )
   Uset( St,l+=k )[0]=0;
   for( lc=Ulen( St ); lc<l; lc++ )Uset( St,lc," " ); return k;
 }
+//   все расчеты графических позиций и поддержка текстовых запросов
+/*
+bool TextMenu::Init()
+{ int l,k; mlist *Ls=(mlist*)M;     // собственно список запросов / форматов
+  if( !Up )                         // это дополнение к конструктору
+  { bool key=( Ls->X==0 ); St=Str;  // Переразметка исходного
+    for( k=l=0; k<Num; Ls++,k++ )   //        списка запросов
+    { if( key )Ls->Y+=Ly;           // новый номер строки
+      if( Ls->Y!=Ly )l=0,Ly=Ls->Y;  // поиск новой строки
+      if( key )Ls->X=l+1;           // позиция начала сообщения
+          l += Mestr( Ls );         // новая длина строки
+          l += Ls->lf;              // + длина входного поля +1
+      if( Lx<l )Lx=l;               // выбор ширины окна     -1
+    } Up=true; Lx+=2; Ly+=2;        // отметка готовности разметки меню
+  } return false;
+} */
 //   Информационные процедуры для активного окна
 //
 static void Get( mlist *M, int& ked )      // -- команда на считывание
@@ -84,8 +101,8 @@ int TextMenu::Answer( int ans )
   Window *A=Ready();              // ссылка для обращений к активному окну
      ked=-1;                      // номер редактируемого поля(-1 без редакции)
      kurs=0;                      // kurs - положение курсора внутри строки
-   if( A )while( A->GetKey() );   // очистка буфера клавиатуры к вызову WaitKey
-   else{ ans=0; goto Fin; }
+   if( !A ){ ans=0; goto Fin; }   // очистка буфера клавиатуры к вызову WaitKey
+   // else while( A->GetKey() );
    //
    //  все расчеты графических позиций и поддержка текстовых запросов
    //
@@ -98,7 +115,7 @@ int TextMenu::Answer( int ans )
            l += Mestr( Ls );         // новая длина строки
            l += Ls->lf;              // + длина входного поля +1
        if( Lx<l )Lx=l;               // выбор ширины окна     -1
-     } Up=true; Lx+=2; Ly+=2;        // отметка готовности разметки меню
+     } Up=true; Lx+=2; Ly++;         // отметка готовности разметки меню
    }                                 //
    if( ans>=0 && ans<Num )K=ans;     // надо чтобы M[K].lf >0
    Ls=(mlist*)M;                     // это уже рабочая установка для Ls
@@ -113,7 +130,7 @@ int TextMenu::Answer( int ans )
      kurs=max( 0,min( l,kurs ) );             // контроль позиции внутри строки
 Rep: ins=GetKeyState( VK_INSERT );            // признак 1-вставки / 0-замены
      switch( ans )
-     {//case _Ins : ins^=true; break;
+     { //case _Ins: ins^=true; break;
        case _West : if( kurs>0 ){ --kurs; break; } if( ked==K )break;
        case _North: for( i=Num-1; i>=1; i-- )
                     if( Ls[(K+i)%Num].lf!=0 ){ K=(K+i)%Num; break; } break;
@@ -123,7 +140,7 @@ Rep: ins=GetKeyState( VK_INSERT );            // признак 1-вставки
                     if( Ls[(K+i)%Num].lf!=0 ){ K=(K+i)%Num; break; } break;
        case _Enter: if( ked==K )Get( Ls,ked );  // принудительное считывание и
                     goto Fin;                   // выход из затянутой процедуры
-       case _Esc  : if( ked!=-1 ){ ked=-1; break; }  // и сброс редактирования
+       case _Esc  : if( ked!=-1 ){ ked=-1; break; }  //  и сброс редактирования
                     K=_Esc; goto Fin;                // разрушение меню и выход
        case _BkSp : if( kurs>0 )--kurs;
        case _Del  : Uset( StK,kurs,"",false );
@@ -132,7 +149,7 @@ Rep: ins=GetKeyState( VK_INSERT );            // признак 1-вставки
       default: if( Ls[K].dat && ans>=' ' )
              { Uset( StK,kurs,CtU( ans ),ins ); ked=K; if( kurs<l )++kurs; }
      }
-     if( ked!=-1 && ked!=K ){ K=ked; Get( Ls,ked ); }     // будет новое число?
+     if( ked!=-1 && ked!=K ){ K=ked; Get( Ls,ked ); }    // будет новое число?
      Draw();
 #pragma omp barrier
      if( !(ans=A->WaitKey() ) )break;                  // случай закрытия окна
@@ -142,22 +159,24 @@ Fin: if( ans )Draw(); return ans?K:0; // площадка с текстом ос
 }
 bool TextMenu::Draw()            // картинка со списком строк запросов/форматов
 { Activate();                    // и запросы с представлением исходных величин
-  { TextFrame Tf( (Window*)this,X,Y,Lx,Ly-0.3,false );    // активация разметки
+  { TextFrame Tf( this,X,Y,Lx,Ly,false );                 // активация разметки
     for( int k=0; k<Num; k++ )
-    { mlist &L=((mlist*)M)[k]; int i=Mestr( &L ),l=i+L.X;
+    { mlist &L=((mlist*)M)[k]; int i=Mestr( &L ),l=i+L.X+1;
       glColor3f( 0,0.25,0.5 ); Print( L.X+1,L.Y+1,St );
       if( L.lf )
-      { glColor3f( k==ked?0.7:1,1,k==K?0:1 ); glRectf( l,L.Y-.1,l+L.lf,L.Y+1 );
-        glColor3f( 0,0,0.75 ); Print( l+1,L.Y+1,k==ked?StK:Uset( St,i ) );
+      { glColor3f( k==ked?0.7:1,1,k==K?0:1 ); glRectf( l,L.Y+.9,l+L.lf,L.Y+2 );
+        glColor3f( 0,0,0.75 ); Print( l,L.Y+1,k==ked?StK:Uset( St,i ) );
         if( k==K )if( L.dat )
         { glColor3f( 1,0,0 ); kurs=minmax( 0,kurs,L.lf-1 );
           glBegin( GL_LINE_STRIP );
-                   glVertex2f( l+kurs-0.1,L.Y+0.8 );      // текстовый курсор
-          if( ins )glVertex2f( l+kurs-0.1,L.Y );         // изменяемого символа
-              else glVertex2f( l+kurs+1,L.Y+0.8 ); glEnd();
+                   glVertex2f( l+kurs-0.1,L.Y+1.8 );      // текстовый курсор
+          if( ins )glVertex2f( l+kurs-0.1,L.Y+1 );         // изменяемого символа
+              else glVertex2f( l+kurs+1,L.Y+1.8 ); glEnd();
           if( ked==-1 )strcpy( StK,Uset( St,i ) );     // изменяемая подстрочка
-  } } } } //Save();
-  Show(); return false;
+        }
+      }
+    } //Save();
+  }   Show(); return false;
 }
 static int State=0; // связка для двух Mouse - повторение нажатой клавиши мышки
 
@@ -165,7 +184,7 @@ bool TextMenu::Mouse( int x, int y )
 { if( !Up )return Place::Mouse( x,y ); x/=AlfaWidth(),y=(y-8)/AlfaHeight()+1;
   for( int k=0; k<Num; k++ )
   { mlist &L=((mlist*)M)[k]; int l=Mestr( &L )+L.X;         // это длина строки
-    if( x<l^x<=l+L.lf && y<L.Y+0.2^y<=L.Y+1 )
+    if( x<l ^ x<=l+L.lf && y<L.Y+1 ^ y<=L.Y+2 )
       { K=k; kurs=minmax( 0,x-l,L.lf-1 ); break; }
     if( ked!=K )Get( &L,ked );             // и по выходу считывание результата
   }

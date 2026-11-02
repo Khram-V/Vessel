@@ -396,7 +396,7 @@ inline char* Slower( char *str ) // пригодно лишь к латинск�
 bool freeShip::Import( fixed Fmt )
 { isBin=false;             // чисто текстовое представление числовой информации
   if( !(FM=_wfopen( FName,L"rt" ) ) )
-  { print( "?\7 не открывается инородный %s ",W2U(FName) ); getch(); exit( 2 );
+  { Break( "?\7 не открывается инородный %s ",W2U(FName) ); //getch(); exit(2);
   }
  time_t lt=time(0); char *S=asctime( gmtime( &lt ) ); strcut( S );
   if( !ProjName )ProjName=strdup( ShipName ); // ~ без вычистки
@@ -704,7 +704,7 @@ void freeShip::freeScale( _Vector V )             // сдвиг всех коо�
 void freeShip::StartExp() // начальные условия вычислительного эксперимента
 { KtE=0;                  // нужна ли преднастройка посадки и начальных условий
   static Real aK,aD,aS; Vector Scale={1,1,1};
-  Mlist Menu[]={ { 1,0,"«Аврора» - Начальные условия штормового" }      // =0
+  Mlist Menu[]={ { 0,0,"«Аврора» - Начальные условия штормового" }      // =0
                , { 1,0,"мореходного вычислительного эксперимента" }      // =1
                , { 2,6," Аппликаты: z = нижняя точка киля %-6.4lf",&aK } // =2
                , { 1,6,"            конструктивная осадка %-6.4lf",&aD } // =3

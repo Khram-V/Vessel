@@ -666,6 +666,10 @@
 		<Unit filename="../Window/Window.cpp" />
 		<Unit filename="../Window/Window.h" />
 		<Unit filename="../Window/Window_Help.cpp" />
+		<Unit filename="../Window/Window_List.cpp">
+			<Option target="Window-shapes" />
+			<Option target="Window-shapes_x" />
+		</Unit>
 		<Unit filename="../Window/Window_Menu.cpp">
 			<Option target="Aurora Storm" />
 			<Option target="Waves Profile" />

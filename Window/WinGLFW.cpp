@@ -218,7 +218,7 @@ Window::~Window()                     // Разрушение окна в обр
 //       { Cur->Next=Next; break; }              // самого первого из найденных
     glfwDestroyWindow( glfwWindow );             // закрытие окна с переходом
     if( Cur )glAct( Cur ),WinReady();            // - на смежный нижний уровень
-    else{ First=NULL; glfwTerminate(); _exit( 22 ); } // Cur->Activate();
+    else{ First=NULL; glfwTerminate(); } //_exit( 22 ); } // Cur->Activate();
   }
   glfwWindow = NULL;
   Site = NULL;                                   //! сброс повторов деструктора

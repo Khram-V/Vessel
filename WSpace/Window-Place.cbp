@@ -19,9 +19,8 @@
 				<Option output="../../Work/Window-shapes" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="Data/" />
 				<Option object_output="../../Work/Obj" />
-				<Option type="1" />
+				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option use_console_runner="0" />
 				<Linker>
 					<Add library="comdlg32" />
 				</Linker>
@@ -401,6 +400,12 @@
 			<Option target="Window Trial" />
 			<Option target="GLFW Shapes" />
 			<Option target="GLFW Trial" />
+		</Unit>
+		<Unit filename="../Window/Window_List.cpp">
+			<Option target="Window Shapes" />
+			<Option target="A-lib32" />
+			<Option target="A-lib64" />
+			<Option target="GLFW Shapes" />
 		</Unit>
 		<Unit filename="../Window/Window_Menu.cpp">
 			<Option target="A-lib64" />

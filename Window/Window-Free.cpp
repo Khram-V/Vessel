@@ -6,10 +6,10 @@
 //                если < 0 - в пикселях и нормальных отсчетах, Y - снизу вверх
 //     отсутствие шрифта - подключение окна (не приводит к размеру точки [1x1])
 //
-Place& Place::Area( Real X,Real Y, Real W,Real H ) // достаточно сделать шаг
-{ Real fw=AlfaWidth(),fh=AlfaHeight(),Tw=fw,Th=fh; // единичным, далее по Place
+Place& Place::Area( Real X,Real Y, Real W,Real H, bool Frame ) // сделать шаг
+{ Real fw=AlfaWidth(),Tw=fw,fh=AlfaHeight(),Th=fh; // единичным, далее по Place
 // всё по горизонтали glAct( Site );      // среда opеnGL здесь не используется
-   if( !W )W=Site->Width;  else if( W<0 )W=-W,fw=1; else W=W*fw; // связанной с
+   if( !W )W=Site->Width; else if( W<0 )W=-W,fw=1; else W=W*fw; // связанной с
    if( X>0 )X=(X-1)*fw; else X = Site->Width - W + X*fw;      // базовой Window
        X=minmax( 0.0,X,Site->Width-Tw );              // перерасчет с проверкой
    if( X+W>Site->Width  )                             //  жертвуем шириной окна
@@ -26,23 +26,62 @@ Place& Place::Area( Real X,Real Y, Real W,Real H ) // достаточно сд�
    pX=X,pY=Y,Width=W,Height=H+Th/5;  // Img=NULL;      // очистка фона площадки
 /* if( chY>Height-Th ) */ chY=Height-Th; chX=1;     // аппликата верхней строки
 // if( Signs&PlaceAbove )Save();
+/* if( Frame )
+   { pX=max( 0,pX-8 ); if( (Width+16)<=Site->Width )Width+=16; else pX=Site->Width-Width;
+     pY=max( 0,pY-8 ); if( (Height+16)<=Site->Height )Height+=16; else pY=Site->Height-Height;
+//   if( this==Site )
+//       Site->Locate( 0,0,Width,Height );
+//       Site->Locate( Site->WindowX+pX,Site->WindowY+pY,Width,Height );
+//   glViewport( pX,pY,Width,Height );
+     Activate( true );
+     glColor4f( 0.6,.8,1,.7 ); glRectf( 0,0,Width,Height );
+     glColor4f( 1,.96,.8,.9 ); glRectf( 5,5,Width-5,Height-5 );
+     glLineWidth( 1.25 );
+#define V( a,b ) glVertex2f( a,b )
+     glColor4f( 1,1,1,.8 ),glBegin( GL_LINES );
+       V( 0,0 ),V( 0,Height ),V( 0,Height ),V( Width,Height );
+       V( 4,4 ),V( Width-4,4 ),V( Width-4,4 ),V( Width-4,Height-4 );
+     glColor4f( 0,0,0,0.8 );
+       V( 0,0 ),V( Width,0 ),V( Width,0 ),V( Width,Height );
+       V( 4,4 ),V( 4,Height-4 ),V( 4,Height-4 ),V( Width-4,Height-4 );
+     glEnd();
+#undef V
+     glTranslatef( pX+8,pY-8-Height,0 );             // изменение масштаба со сдвигом
+     glScalef( Tw,-Th,1.0 );                   // здесь предусматривается
+   }
+*/
    return *this;
 }
-TextFrame::TextFrame( Place *P, Real X,Real Y, Real x,Real y, bool s )
-         : TextContext( false ) //,Win( P )
-{ const float ya=y-0.25,ys=ya-(s?0.6:0.4);
-  const int Tw=P->AlfaWidth(),Th=P->AlfaHeight();
-  P->Area( X,Y,x,ya ).Activate( true );              // текст по строкам
-  glScalef( Tw,-Th,1.0 ),glTranslatef( 0,-ya,0 );    // здесь предусматривается
-  glColor4f( .6,.8,1,s?.7:.9 ); glRectf( 0,0,x,ya ); // изменение масштабов
-  glColor4f( 1,.96,.8,s?.7:.9 ); glRectf( 0.3,0.2,x-0.3,ys );       // рамка
-  glColor4f( 0,0,0,0.8 ); glLineWidth( 1.25 ); glBegin( GL_LINES ); // с тенью
-  glVertex2f( 0,ya ); glVertex2f( x,ya ); glVertex2f( x,ya ); glVertex2f( x,0 );
-  glVertex2f( 0.3,ys ); glVertex2f( 0.3,0.2 ); glVertex2f( 0.3,0.2 ); glVertex2f( x-0.3,0.2 );
-  glColor4f( 1,1,1,0.8 );
-  glVertex2f( 0.3,ys ); glVertex2f( x-0.3,ys ); glVertex2f( x-0.3,ys ); glVertex2f( x-0.3,0.2 );
-  glVertex2f( 0,ya ); glVertex2f( 0,0 ); glVertex2f( 0,0 ); glVertex2f( x,0 );
+
+TextFrame::TextFrame( Place *W,Real X,Real Y,Real x,Real y,bool s )
+         : TextContext( false )                            //  0.4 \ 0.2 / -0.4
+{ W->AlfaBit( _8x16 );                                      //  s:0.6 \_/ 0.4
+//  W->Area( X,Y,x,y,true );
+//  glScalef( W->AlfaWidth(),-W->AlfaHeight(),1.0 );   // здесь предусматривается
+//  return;
+
+  const float lr=0.4,up=0.2,dn=s?0.6:0.4;
+  if( X>0 ){ if( X<lr )X=lr+0.5; } else if( X<=0 ){ if( X>-lr )X=-lr-0.5; }
+  if( Y>0 ){ if( Y<up )Y=up+0.5; } else if( Y<=0 ){ if( Y>-dn )Y=-dn-0.5; }
+  W->Area( X,Y,x+=lr+lr+1,y+=up+dn+1 ).Activate( true );   // текст по строкам
+  glScalef( W->AlfaWidth(),-W->AlfaHeight(),1.0 );   // здесь предусматривается
+  glTranslatef( 0,-y,0 );                      // изменение масштаба со сдвигом
+  glColor4f( 0.6,.8,1,s?.7:.9 ); glRectf( 0,0,x,y );  // двойная полупрозрачная
+  glColor4f( 1,.96,.8,s?.7:.9 ); glRectf( lr,up,x-lr,y-dn ); // рамка с простым
+#define V( a,b ) glVertex2f( a,b )
+  glColor4f( 0,0,0,.8 ),glLineWidth( 1.25 ); glBegin( GL_LINES ); // затенением
+    V( 0,y ),V( x,y ),V( x,y ),V( x,0 );
+    V( lr,y-dn ),V( lr,up ),V( lr,up ),V( x-lr,up );
+  glColor4f( 1,1,1,0.8 );                  // осветлённый контур поверху-налево
+    V( 0,y ),V( 0,0 ),V( 0,0 ),V( x,0 );
+    V( lr,y-dn ),V( x-lr,y-dn ),V( x-lr,y-dn ),V( x-lr,up );
   glEnd();
+#undef V
+//glTranslatef( -lr+0.5,dn-0.5,0 ); // W->Save();                  <= по мере заполнения текстового поля
+//  glTranslatef( lr+0.5,up+0.5,0 ); //  <= по мере заполнения текстового поля
+
+//W->Area( X+lr+0.5,Y-dn-0.5,x-=(lr+lr+1),y-=(up+dn+1) );
+
 }
 //    Комплекс встроенных и внутренних процедур
 //    Подготовка площадки для растровых манипуляций

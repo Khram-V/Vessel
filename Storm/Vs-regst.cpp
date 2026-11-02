@@ -39,7 +39,7 @@ void logDamp()
         H.muF.x,H.muF.y,H.muF.z,H.muM.x,H.muM.y,H.muM.z,H.Kv );
 } }
 void Model_Config( Window* Win ){ byte &St=Vessel->Statum,ans=St;
-  Mlist Menu[]={ {1,0,"  Выбор модели гидромеханики корабля"},{2,45,Model[0]},
+  Mlist Menu[]={ {0,0,"  Выбор модели гидромеханики корабля"},{2,45,Model[0]},
              {1,45,Model[1]},{1,45,Model[2]},{1,45,Model[3]},{1,45,Model[4]} };
   TextMenu T( Mlist( Menu ),Win,47,1 );
   if( (ans=T.Answer( ans+1 )-1)==_Esc-1 )ans=St;
