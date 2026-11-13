@@ -62,6 +62,7 @@ void Surface::Drawing( BoardView Sides )
   if( (K=F[N].Capacity)>2 )             // у граней должно быть боле двух рёбер
   { const Layers &Layer=L[min(NoLayers,F[N].LayerIndex)]; // указанные свойства
     const bool right=(Sides==mvBoth && Layer.Symmetric);
+    if( !Layer.Visible )continue;
 #if 1
     int J=-1,i=0; W.len=0;
     for( i=0; i<=K+J; i++ )            // корректное рассечение многоугольников

@@ -25,6 +25,20 @@
 //    )         - на выходе площадь под угловыми точками     1L-----2
 //                                                            Ld  Rd
 //                                                          Aim
+Base::Base(){ X=x=1; Y=y=~X; } // Собственно построение физического базиса
+Base::Base(_Point U,_Point V ){ Axis( U,V ); } // Установка координатный осей
+Real Base::Axis(_Point U,_Point V )
+  {           y=U,x=V;                  // Axis - определение локального базиса
+   const Real det=y.y*x.x - y.x*x.y;    //      - обращение матрицы переходов
+              Y.y=x.x/det,Y.x=-y.x/det; //
+              X.x=y.y/det,X.y=-x.y/det; return det;
+  }
+Point Base::Goint( _Point A ){ return (Point){ A.x*X.x+A.y*Y.x,A.y*Y.y+A.x*X.y }; }
+Point Base::Goext( _Point a ){ return (Point){ a.x*x.x+a.y*y.x,a.y*y.y+a.x*x.y }; }
+
+Point Basis::Goint( _Point A ){ return Base::Goint( A-R ); } // к локальному базису
+Point Basis::Goext( _Point a ){ return Base::Goext( a )+R; } // снова в глобальный
+
 Basis_Area::Basis_Area():Basis(),B( (Field){ 0,0,1,1 } ),ky( 0.0 ),kx( 0.0 )
 {   S.Axis( (Point){ 1.0,1.0 },-y,-x );
 }

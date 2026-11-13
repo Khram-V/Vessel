@@ -15,10 +15,6 @@ Curve& Curve::free()
 { if( _2 )_2=(Real*)Allocate( 0,_2 );
   if( _C )_C=(Point*)Allocate( 0,_C ); N=0; return *this;
 }
-//Point& Curve::operator[]( int Ind )
-//{ if( fixed( Ind )>=N )Break( "?Curve.%d[%d] off range",N,Ind );
-//  return _C[Ind];
-//}
 Curve& Curve::operator += ( Point& P )
 { Point *C=_C;
   for( int k=0; k<N; k++ )*C++ += P; return *this;
@@ -75,48 +71,5 @@ void Curve::SpLine()
   for( k=n-1; k>=0; k-- )_2[k]=_2[k]*_2[k+1]+u[k];
   Allocate( 0,u );
 }
-#if 0
-void Curve::SpLine( Real yp1, Real ypn )
-{ if( N<3 ){ if( _2 )Allocate( 0,_2 ); _2=0; return; }
- int i,k,n=N-1;
- Real p,qn,sig,un,*u;
- Point *P=_C;	       _2=(Real*)Allocate( N*sizeof( Real ),_2 );
-			u=(Real*)Allocate( n*sizeof( Real ) );
-  if( yp1>.99e30 )_2[0]=u[0]=0.0; else
-    { _2[0]=-0.5;
-      p=X(1)-X(0); u[0]=3*( (Y(1)-Y(0))/p - yp1 )/p;
-    }      	     P++;
-  for( i=1; i<n; i++,P++ )
-  { sig=( X(0)-X(-1) )/( X(1)-X(-1) ); p=sig*_2[i-1]+2;
-   _2[i]=( sig-1 )/p;
-    u[i]=( Y(1)-Y(0)  )/( X(1)-X(0) )
-	-( Y(0)-Y(-1) )/( X(0)-X(-1) );
-    u[i]=(6.0*u[i]/(X(1)-X(-1))-sig*u[i-1])/p;
-  }
-  if( ypn>.99e30 )qn=un=0.0; else
-    { qn=0.5;
-      p=X(0)-X(-1); un=3*( ypn-( Y(0)-Y(-1) )/p )/p;
-    }
-			 _2[n]=( un-qn*u[n-1] )/( qn*_2[n-1]+1.0 );
-  for( k=n-1; k>=0; k-- )_2[k]=_2[k]*_2[k+1]+u[k];
-  Allocate( 0,u );
-}
-#endif
 #undef X
 #undef Y
-//
-//	Подготовка экстремумов функции и аргумента
-/*
-void Curve::Extreme( Field& Fm )
-{ for( int i=0; i<N; i++ )
-  { Point P=_C[i];
-    if( i )
-    { if( Fm.Jy>P.y )Fm.Jy=P.y; else if( Fm.Ly<P.y )Fm.Ly=P.y;
-      if( Fm.Jx>P.x )Fm.Jx=P.x; else if( Fm.Lx<P.x )Fm.Lx=P.x;
-    } else
-    { Fm.Lx=( Fm.Jx=P.x )+1.0e-12;
-      Fm.Ly=( Fm.Jy=P.y )+1.0e-12;
-  } } Fm.Ly-=Fm.Jy;
-      Fm.Lx-=Fm.Jx;
-}
-*/

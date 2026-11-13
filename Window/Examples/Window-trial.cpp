@@ -105,7 +105,7 @@ struct _One: public Window
         { Icon( "Flag" ); };
   virtual ~_One(){ print( 1,15,"One::Destructor \n" ); gotoxy( 1,21 ); }
   virtual bool KeyBoard( fixed key )
-  { if( key==_F1 ){ Help( Nam1,Cmds,Plus ); return true; } return false;
+  { if( key==_F1 ){ Help( Nam1,Cmds,Plus,this ); return true; } return false;
   }                      // остальное в очередь ожиданий для get- или waitKey()
   virtual bool Timer()
   { Activate( true ); Rotation( Real(cw=ElapsedTime())/250.0 );  // WaitTime( 500 );
@@ -122,8 +122,8 @@ struct _One: public Window
 //
 static Window *Win2=NULL;    // случай свободной процедуры со ссылкой на Window
 static bool FreeHelp( fixed Keyb )
-{ if( Win2 && Keyb==_F1 ){ Win2->Help( Nam2,Cmds,Plus ); return true; }
-                                                         return false; }
+{ if( Win2 && Keyb==_F1 ){ Help( Nam2,Cmds,Plus,Win2 ); return true; }
+                                                        return false; }
 static bool SecondTimer()
 { static unsigned cw,dw=0,cnt=0;
   Win2->Activate( true ); Rotation( Real(cw=ElapsedTime())/-333.0 );

@@ -7,11 +7,12 @@ bool Ship::Import( fixed Fmt )
   { print( "?\7 не открывается инородный %s ",W2U(FName) ); getch(); exit( 2 );
   }
  time_t lt=time(0); char *S=asctime( gmtime( &lt ) ); strcut( S );
-  if( !Set.Name    )Set.Name=strdup( fname( Name ) ); // ~ без вычистки
-  if( !Set.Designer)Set.Designer="@2026-Ship.exe viewer for „free!Ship“";
-  if( !Set.Comment )Set.Comment="Application for «Аврора» stormy seakeeping of ship";
-  if( !Set.CreatedBy)Set.CreatedBy=S;
-//if( !Set.CreatedBy)Set.CreatedBy=ctime( &lt );
+#define M( N ) if( N!=NULL )if( !strcmp( N,"·" ) )N
+  M( Set.Name      )= strdup( fname( Name ) );                 // ~ без вычистки
+  M( Set.Designer  )= "@2026-Ship.exe viewer for „free!Ship“";
+  M( Set.Comment   )= "Application for «Аврора» stormy seakeeping of ship";
+  M( Set.CreatedBy )= S;
+#undef M
   if( Fmt==2 )Shell.ReadStl( W2U( FName ) ); else
   if( Fmt==1 )Shell.ReadObj( W2U( FName ) );
   fclose( FM ); FM=NULL;
@@ -28,38 +29,40 @@ bool Ship::Import( fixed Fmt )
 void Surface::ReadObj( char *Path )     // временный оригинал имени файла
 { Real r,g,b,a;
  char *s,*S,*Name=strdup( Path );       // ссылка не текст в буфере файла
- int NoL=NoLayers,                      // уровни будут дополняться сверху
+ string Lm,Ln,Lu,Lg,Lo; Lm[0]='\1';     // уже и пять раз по два килобайта
+ int NoL=NoLayers,NoMtl=0,              // уровни будут дополняться сверху
      NoC=NoCoPoint-1;                   // узловые точки отделяются от прошлого
+ Layers *M=NULL;                        // внешние описатели, если таковые есть
   print( "\nОткрыт WaveFront файл: %s",Name );
   ActiveLayer.Description="WaveFront";  // Technologies Advanced Visualizer";
   ActiveLayer.ID=NoL;                   // изначально здесь ноль
   ActiveLayer.Symmetric=false;          // пока без правого дублирования
   if( !NoLayers )  // на случай отсутствия послойного описания свойств, будет 1
   { L=(Layers*)Allocate( sizeof( Layers ),L );
-    memcpy( L,&ActiveLayer,sizeof( Layers ) ); ++NoLayers;
+    memcpy( L,&ActiveLayer,sizeof( Layers ) ); //NoLayers++; atoi
   }
   while( !feof( FM ) )
   { S=getString( FM );
-    while( (*S)!=0 )if( *S<=' ' )S++; else break; if( (*S)==0 )continue;
-    if( (s=strchr( S,'#' ))!=NULL )*s=0;    if( strcut( S )<3 )continue;
-    S[0]=tolower( S[0] );        // сначала первый символ, а затем и вся строка
-    if( !strncmp( S,"v ",2 ) )   // пусть с пробелом, для верности (vt,vn,vp)
+    while( (*S)!=0 )if( *S<=' ' )S++; else break; if( (*S)==0 )continue; //пусто
+    if( (s=strchr( S,'#' ))!=NULL )*s=0;    if( strcut( S )<3 )continue; //мимо
+    S[0]=tolower( S[0] );      //!! сначала первый символ, а затем и вся строка
+    if( !strncmp( S,"v ",2 ) ) // пусть с пробелом, для верности (vt,vn,vp)
     { P=(CoPoint*)Allocate( ++NoCoPoint*sizeof( CoPoint ),P );
      CoPoint &p=P[NoCoPoint-1];
 //    sscanf( S+2,"%lg%lg%lg",&p.V.y,&p.V.x,&p.V.z ); p.V.x=-p.V.x; // Новик здесь
-      sscanf( S+2,"%lg%lg%lg",&p.V.x,&p.V.z,&p.V.y ); // так готовится в Авроре #+# p.V.y=-p.V.y;
+//    sscanf( S+2,"%lg%lg%lg",&p.V.x,&p.V.z,&p.V.y ); // так готовится в Авроре #+# p.V.y=-p.V.y;
+      sscanf( S+2,"%lg%lg%lg",&p.V.y,&p.V.z,&p.V.x ); //p.V.y=-p.V.y;
       p.T=svRegular; // svCrease; // svDart; // svCorner;
     } else
     if( !strncmp( S,"f ",2) )
     { char *s,*z,*w=S+2;
-      int k=0,*Rc=(int*)calloc( sizeof( int ),4 ); // Allocate не для маленьких
-      do{ s=strchr( w,' ' ); if( s )*s=0;
-          z=strchr( w,'/' ); if( z )*z=0;
+      int k=0,*Rc=(int*)calloc( 4,sizeof( int ) ); // Allocate не для маленьких
+      do{ while( *w<=' ' )w++; s=strchr( w,' ' ); if( s )*s=0;
+                               z=strchr( w,'/' ); if( z )*z=0;
           if( k>3 )Rc=(int*)realloc( Rc,sizeof(int)*(k+1) );
-          while( *w<=' ' )w++;
           Rc[k]=atoi( w )+NoC; w=s+1; ++k;  // нормали получаются задом наперёд
       } while( s );
-      if( k>2 )                             // наверняка прямые так не строятся
+      if( k>2 )   //! наверняка прямые здесь так не строятся! - и почему бы нет
       { F=(Faces*)Allocate( ++NoFaces*sizeof(Faces),F );
         Faces &f=F[NoFaces-1]; f.Capacity=k;
                                f.P=Rc;
@@ -81,52 +84,51 @@ void Surface::ReadObj( char *Path )     // временный оригинал �
         f.P[2]=c+NoC;
       } */
     } else
-    if( !strncmp( Slower( S ),"usemtl",6 ) ) // Slower дале уже готов для всех
-    { ActiveLayer.ID=-1;
-      if( NoL<NoLayers )
-      for( int i=NoL; i<NoLayers; i++ )
-      if( !strcmp( S+7,L[i].Description ) )
-        { ActiveLayer.ID=i;  // print( "\n%d %s[%d] ",i,L[i].Description,i+1 );
-          break;             //  ... или первый из попавшихся
-        }
-      if( ActiveLayer.ID==-1 )    // если слой не найден, тогда создание нового
-      { L=(Layers*)Allocate( ++NoLayers*sizeof( Layers ),L );
-        L[NoLayers-1]=ActiveLayer; // memcpy( &L[NoLayers-1],&ActiveLayer,sizeof( Layers ) );
-        L[NoLayers-1].Description=strdup( S+7 );         // новое имя по ссылке
-        L[NoLayers-1].ID=0; ActiveLayer.ID=NoLayers-1;   // NoLayers;
-      }
-    } else
     if( !strncmp( S,"mtllib",6 ) )  // разборка расцветки по уровням расслоений
     { strcpy( fname( Name ),S+7 );                                              // print( "\n собран файл %s ",Name );
      FILE *W=_wfopen( U2W( Name ),L"rt" );   // файл.mtl может быть перепрочтён
       if( !W )print( "\n? %s не открывается.\n",Name ); else
       { while( !feof( W ) )
         { S=getString( W );
-
           while( (*S)!=0 )if( *S<=' ' )S++; else break; if( (*S)==0 )continue;
           if( (s=strchr( S,'#' ))!=NULL )*s=0;    if( strcut( S )<3 )continue;
-
-/*        while( (*S)!=0 )if( *S<=' ' )S++; else break;
-          if( (*S)==0 )continue;
-          if( *S=='#' || strcut( S )<3 )continue;
-//        if( strchr( S,'#' )!=NULL )continue; //*s=0;
-//        if( (s=strchr( S,'#' ))!=NULL )continue; //*s=0;
-          if( strcut( S )<3 )continue;
-*/
           if( !strncmp( Slower( S ),"newmtl",6 ) )
-          { L=(Layers*)Allocate( ++NoLayers*sizeof( Layers ),L );
-            L[NoLayers-1]=ActiveLayer; // memcpy( &L[NoLayers-1],&ActiveLayer,sizeof( Layers ) );
-            L[NoLayers-1].Description=strdup( S+7 );
-            L[NoLayers-1].ID=0; /*NoLayers;*/ } else
+          { M=(Layers*)Allocate( ++NoMtl*sizeof( Layers ),M );
+            M[NoMtl-1]=ActiveLayer; // memcpy( &M[NoMtl-1],&ActiveLayer,sizeof( Layers ) );
+            M[NoMtl-1].Description=strdup( S+7 );
+            M[NoMtl-1].ID=0; /*NoLayers;*/ } else
           if( !strncmp( S,"kd ",3 ) )
-          { Color &c=L[NoLayers-1].LClr;        c.c[3]=0xFF;
+          { Color &c=M[NoMtl-1].LClr;           c.c[3]=0xFF;
             sscanf( S+3,"%lg%lg%lg",&r,&g,&b ); c.c[2]=byte( b*255 );
                                                 c.c[1]=byte( g*255 );
                                                 c.c[0]=byte( r*255 ); } else
           if( !strncmp( S,"d ",2 ) )
-          { sscanf( S+2,"%lg",&a ); L[NoLayers-1].LClr.c[3]=byte( 22+a*220 ); } //! [22-222] - пусть пока временно
+          { sscanf( S+2,"%lg",&a ); M[NoMtl-1].LClr.c[3]=byte( 22+a*220 ); } //! [22-222] - пусть пока временно
         } fclose( W );
-    } }
+      }                                        // и снова не всё так однозначно
+    } else                                    // Slower дале уже готов для всех
+    if( S[0]=='g' )strcut( strcpy( Lg,S+2 ) ); else
+    if( S[0]=='o' )strcut( strcpy( Lo,S+2 ) ); else
+    if( !strncmp( Slower( S ),"usemtl",6 ) )
+    { strcut( strcpy( Lu,S+7 ) );
+      Ln[0]=0; ((((Ln<<Lo)<<".")<<Lg)<<".")<<Lu;   // в трёхзнамённом заголовке
+      ActiveLayer.ID=-1;                           // поиск старых атрибутов
+      if( NoL<NoLayers )
+      for( int i=NoL; i<NoLayers; i++ )
+       if( !strcmp( Lm,Ln ) ){ ActiveLayer.ID=i; break; }
+      if( ActiveLayer.ID==-1 )
+      { strcpy( Lm,Ln );
+        L=(Layers*)Allocate( ++NoLayers*sizeof( Layers ),L );
+        L[NoLayers-1]=ActiveLayer; // memcpy( &L[NoLayers-1],&ActiveLayer,sizeof( Layers ) );
+        L[NoLayers-1].Description=strdup( Lm );          // новое имя по ссылке
+        L[NoLayers-1].ID=0; ActiveLayer.ID=NoLayers-1;   // NoLayers;
+        for( int i=0; i<NoMtl; i++ )              //! внешний приоритет повышен
+        if( !strcmp( Lu,M[i].Description ) )
+        { char *W=L[NoLayers-1].Description;         // имя длинное - иное
+                  L[NoLayers-1]=M[i]; // memcpy( &L[NoLayers-1],&M[i],sizeof( Layers ) );
+                  L[NoLayers-1].Description=W; break;     // по первому вхождению
+      } }
+    }
   }
 //if( !NoLayers )  // на случай отсутствия послойного описания свойств, будет 1
 //  { L=(Layers*)Allocate( (NoLayers+1)*sizeof( Layers ),L );
@@ -138,6 +140,9 @@ void Surface::ReadObj( char *Path )     // временный оригинал �
     if( i!=j )L[j]=L[i];
     j++;
   } NoLayers=j;                                                                 for( int I=NoL; I<NoLayers; I++ )print( "\nID=%d Descr=%s Color=%X",L[I].ID,L[I].Description,L[I].LClr.C );
+  if( M )
+  { for( j=0; j<NoMtl; j++ )free( M[j].Description ); Allocate( 0,M );
+  }
 //  Extents( false );       // расчёт - переопределение графических экстремумов
 }
 void Surface::ReadStl( char *Path )           // временный оригинал имени файла

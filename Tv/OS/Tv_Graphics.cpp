@@ -7,6 +7,7 @@
 //nclude <Signal.h>
 #include "Tv_Graph.h"
 #include "SYM_CCCP.inc"
+#include "SYM_fonts.inc"
 
 static char *str=NULL;              // =[1024] пустая статическая строчка
 viewporttype Tport,                 // Текстовое окно размерами JX-Tx, JY-Ty
@@ -294,7 +295,12 @@ void needle( Real X,Real Y,Real x,Real y )
            { needle( _ix_(X),_iy_(Y),_ix_(x),_iy_(y) ); }
 void line  ( Real X,Real Y,Real x,Real y )
            { line( _ix_(X),_iy_(Y),_ix_(x),_iy_(y) ); }
-//
+/*
+void moveto( _point p ){ moveto( p.x,p.y ); }
+void lineto( _point q ){ lineto( q.x,q.y ); }
+void line  ( _point p,_point q ){ line  ( p.x,p.y,q.x,q.y ); }
+void needle( _point p,_point q ){ needle( p.x,p.y,q.x,q.y ); }
+*/
 //      Tv_fc: контроль координат изображения
 //
 bool Tv_fc( Point *P )
@@ -543,8 +549,8 @@ Leave:     K.x = x;
   }
   lins( wp,cnt ); OldP=X; return ans;
 }                                     //
-Course Wgets( char* S, int L, int X ) // С перкодировкой из ДОС
-{ Course Ans;                         // в Виндовс и обратно
+Course Wgets( char* S, int L, int X ) // С перекодировкой из ДОС-866
+{ Course Ans;                         // в Windows-1251 и обратно
   CharToOemBuff( S,S,strcut( S )+1 ); Ans=Tgets( S,L,X );
   OemToCharBuff( S,S,strcut( S )+1 ); return Ans;
 }                                     //
@@ -678,3 +684,10 @@ int Bfont::Text( Real X,Real Y,const char* _s ){ return Text(  _ix_(X),_iy_(Y),_
 
 int Bfont::Text( Course d,point p,const char* _s){ return Text(d,p.x,p.y,_s ); }
 int Bfont::Text(          point p,const char* _s){ return Text(  p.x,p.y,_s ); }
+//
+//    переуступка вызовов на старый манер
+//
+short get2( FILE *F ){ short d=0; fread( &d,2,1,F ); return d; }
+float getf( FILE *F ){ float d=0; fread( &d,4,1,F ); return d; }
+//oid put2( short d, FILE *F ){ fwrite( &d,2,1,F ); }
+//oid putf( float d, FILE *F ){ fwrite( &d,4,1,F ); }

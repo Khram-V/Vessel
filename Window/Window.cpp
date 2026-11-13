@@ -16,9 +16,8 @@ static Window *First=NULL; // первое окно в последовател�
 //
 // ════════════════════════════════════════════════════════════════════════════
 //   Window Procedure - общая для всех процедура обработки Windows прерываний
-//     Виртуальные процедуры динамического управления текущим окном Window
-//       теряются после переобъявления в охватывающих(производных) классах
-//
+//        Виртуальные процедуры динамического управления текущим окном Window
+//          теряются после переобъявления в охватывающих(производных) классах
 #ifdef GLFW
 #include "WinGLFW.cpp"                      // GLFW OpenGL
 #else
@@ -34,20 +33,17 @@ Window& Window::Refresh()    // сборка изображения с копи�
       Show();                               // только обновление новой картинки
 //    SwapBuffers( hDC );                   // возможно так значительно быстрее
       glFlush();                            // картинка исполнена и - сохранена
-  } } return *this;                         // и больше ничего рисовать не надо
-}                                           //   опять туда же на всё окно
+    } WaitEvents();                         // и больше ничего рисовать не надо
+  } return *this;                           // и опять туда же на исходное окно
+}
 Place& Place::Refresh(){ if( Site )Site->Refresh(); return *this; }
 //
 //   и лишь по внешнему виду две общие процедуры для клавиатуры
 //
-//static volatile bool waitKey=false;
-//#include "ConIO.h"
-//#include <windows.h>
-
 void Window::PutChar( fixed Key )
-{     KeyBuffer[++KeyPas&=lKey].Key=Key; // занесение одного символа и его кода
-      KeyBuffer[KeyPas].Code=KeyStates(); // в кольцевой буфер для букв и кодов
-//    while( isTimer && WinRequest() ); // ожидание выхода таймерных транзакций
+{    KeyBuffer[++KeyPas&=lKey].Key=Key;  // занесение одного символа и его кода
+     KeyBuffer[KeyPas].Code=KeyStates(); // в кольцевой буфер для букв и кодов
+//while( isTimer && WinRequest() );     // ожидание выхода таймерных транзакций
   if( KeyPas==KeyPos )
     { MessageBeep( MB_OK ); ++KeyPos&=lKey; } else             // сброс-перебор
   if( !onKey )                 // блок рекурсивных прерываний от активного окна
@@ -56,31 +52,14 @@ void Window::PutChar( fixed Key )
     { //glContext Act( this ); // со сбоем других внешних транзакций над OpenGL
       //if( Act.Active )
       { if( !KeyBoard( KeyBuffer[++KeyPos&=lKey].Key ) ){ KeyPos=oK; break; }
-        WaitEvents(); // при отказе символ возвращается в цикл ожидания очереди
-      // glFinish();       ~~ до/при/пере/пред/установка фона графической среды
+        // glFinish(); // ~~~ до/при/пере/пред/установка фона графической среды
+        WaitEvents();  // на отказе символ возвращается в цикл ожидания очереди
     } }
-  }
-  WaitEvents(); // hWnd );   // освобождение от всех запросов в Windows
+  } WaitEvents(); // hWnd );   // освобождение от всех запросов в Windows
   //waitKey=false;
 }
-#if 0
 bool Window::KeyBoard( fixed key )// виртуальная процедура обработки прерываний
-{ if( extKey ){ glContext S( this );  // установка графического контента OpenGL
-              return extKey( key ); // true - символ принят, false - к возврату
-  } return false; //!KeyPas!=KeyPos; либо все недочитанные символы сбрасываются
-}
-fixed Window::GetKey()         // запрос появления нового символа на клавиатуре
-  { WaitEvents(); if( KeyPas==KeyPos )return 0; return KeyBuffer[ ++KeyPos&=lKey ].Key; } // WaitKey(); }
-fixed Window::ScanKey()        // просто проверка текущей активности клавиатуры
-  { WaitEvents(); return KeyPas==KeyPos ? 0 : KeyBuffer[KeyPos].Key; }
-fixed Window::ScanStatus()      // обновление в случае отсутствия новых запросов
-  { WaitEvents(); if( KeyPas==KeyPos )return KeyStates();
-                        return KeyBuffer[KeyPos].Code;
-  }
-#else
-
-bool Window::KeyBoard( fixed key )// виртуальная процедура обработки прерываний
-{ if( Ready() )
+{ if( Ready() )                // здесь Ready делает выборку очереди прерываний
   if( extKey ){ glContext S( this ); // установка графического контента OpenGL
               return extKey( key ); // true - символ принят, false - к возврату
   } return onlyVirtualKeybord;  // вариант отмены привычных ожиданий клавиатуры
@@ -93,12 +72,11 @@ fixed Window::ScanKey()        // просто проверка текущей �
 { if( Ready() )
   if( KeyPas!=KeyPos )return KeyBuffer[KeyPos].Key; return 0;
 }
-fixed Window::ScanStatus()      // обновление в случае отсутствия новых запросов
+fixed Window::ScanStatus()     // обновление в случае отсутствия новых запросов
 { if( Ready() )
   if( KeyPas!=KeyPos )return KeyBuffer[KeyPos].Code;
                       return KeyStates();
 }
-#endif
 //  ...  все согласованные процедуры объединяются в единый модуль интерактивной
 //  графической среды Window::Place в/исключая независимые операции с Юлианским
 //        календарем и перекодировками Unicode/UTF-8 для Windows-1251 и OEM-866
@@ -114,8 +92,7 @@ fixed Window::ScanStatus()      // обновление в случае отсу
 fixed Break( const char *Msg, ... ) // _Esc - отмена или _Enter - подтверждение
 { char str[256]=""; bool msg=*Msg=='~'; fixed ans; va_list V;
   va_start( V,Msg ); vsnprintf( str,255,Msg,V ); va_end( V );
-//glColor3f( msg?0:1,msg?1:0,0.5 );
-  ans=Message( msg?"...к сведению":"Завершение",str );
+  ans=Message( msg?"\x1...к сведению":"\x2Завершение",str );
   if( !msg )exit( MB_OK );                      // ! со всеми деструкторами ...
   return ans;
 }
@@ -126,26 +103,21 @@ fixed Message( const char *Title,const char *Msg,... ) //?! остановка �
    if( str[i]=='\n' || i==l )
      { str[i]=0; if( Ulen( str+k )>w )w=Ulen( str+k ); k=i;
                  if( i<l )str[i]='\n',++n; else break;
-     } w = max( max( 12,w+5 ),Ulen( Title )+4 ); n+=3;
- Window B( 0,0,0,(w+1.6)*9,(n+1.6)*18.0 );
- Place P( &B,PlaceAbove );
- TextFrame T( &P,0,0,w,n );
-  glColor3b( 0,32,32 );                 P.Print( 4,2.5,str );      // 63,127,96
-  glColor3b( 0,32,0 ); P.AlfaBit( _8x08 ).Print( 2,2.2,Title );    // 63,96,127
+     } w = max( max( 12,w+5 ),Ulen( Title )+4 ); n+=2;
+ Window B( 0,0,0,(w+1.8)*9,(n+2.6)*18.0 );
+ Place P( &B,PlaceAbove ); TextContext Ts; P.AlfaBit( _8x16 ); glColor3f( 255,0,0 );
+  P.Frame( 0,0,w,n ); glColor3f( 0,0,0.5 );
+  P.Print( 4,2.5,str );                                            // 63,127,96
+  if( *Title==1 )glColor3f( 0,1,0 ); else
+  if( *Title==2 )glColor3f( 1,0,0 ); else
+                 glColor3f( 0,.3,.3 );
+  P.AlfaBit( _8x08 ).Print( 2,2.2,*Title>2?Title:Title+1 );        // 63,96,127
 #ifdef GLFW
-  glfwSetWindowAttrib( B.glfwWindow,GLFW_FOCUS_ON_SHOW,GLFW_TRUE ); //~FOCUSED~FLOATING
+#if defined( GLFW_VERSION_MINOR ) && ( GLFW_VERSION_MINOR == 5 )                // B.glfwWindow->focusOnShow = true
+   glfwSetWindowAttrib( B.glfwWindow,GLFW_FOCUS_ON_SHOW,GLFW_TRUE );            //~FOCUSED~FLOATING
+#endif
 #else
   SetWindowPos( B.hWnd,HWND_TOPMOST,0,0,0,0,SWP_NOMOVE|SWP_NOSIZE ); //! захват
 #endif
   return B.Above().WaitKey();                     // | SWP_NOACTIVATE
 }
-/*
-fixed Break( const char *Msg, ... )   // Случай аварийного завершения программы
-{ char str[256];
-  va_list V; va_start( V,Msg );       // или приостановка с первым символом "~"
-  vsnprintf( str,255,Msg,V ); va_end( V );   //! с длиной что-то не то ??
-  MessageBoxW( NULL,U2W(str),*Msg=='~'?L"...к сведению":L"Завершение",MB_ICONASTERISK|MB_OK );
-  if( *Msg!='~' )exit( MB_OK+4 );          // ! со всеми деструкторами ...
-return 0;
-}
-// char str[vsprintf( 0,Msg,V )*2+16]; // автоматическая память из стека */

@@ -14,9 +14,9 @@ Vector Min={ 0.0 },Max={ 0.0 };// Экстремумы исходного гра
                                // для алгоритмов с точным положением ватерлинии
 Color UnderWaterColor = seaColor( green );   // ~~~ выведены в общий доступ ~~~
 byte  UnderWaterColorAlpha = 100; // 255.0
-Real  Length=6.0,                 // длина
-      Beam=2.0,                   // ширина
-      Draft=1.0;                  // осадка
+Real  Length=0.0,                 // длина
+      Beam=0.0,                   // ширина
+      Draft=0.0;                  // осадка
 //
 //   подготовленные в предыдущем расчёте теоретические контуры
 //
@@ -36,11 +36,10 @@ void InterSection::Drawing( BoardView Sides )                  // mvPort,mvBoth
 //
 bool FreeShip::Draw()               // виртуальная процедура с настройкой сцены
 { BoardView &B=Visio.ModelView; int i,k;  // glDepthRange( -Distance,0 ); // Distance );
-                                          // glDepthFunc( GL_LESS ); // ~EQUAL~GEQUAL GREATER LEQUAL NOTEQUAL LESS ALWAYS взаимное накрытие объектов
-  View::Draw();
-  glEnable( GL_LIGHTING );                    // расцветка под теневые закраски
-  glTranslated( ( Max.x+Min.x )/-1.75,0,      // -Set.SplitSectionLocation
-                ( Max.z+Min.z )/-2 );         // Set.Length/-2
+  View::Draw();                           // glDepthFunc( GL_LESS ); // ~EQUAL~GEQUAL GREATER LEQUAL NOTEQUAL LESS ALWAYS взаимное накрытие объектов
+  glEnable( GL_LIGHTING );                // расцветка под теневые закраски
+  glTranslated( ( Max.x+Min.x )/-1.75,0,  // -Set.SplitSectionLocation
+                ( Max.z+Min.z )/-2 );     //  Set.Length/-2
   Clear(); color( gray );        glLineWidth( .2 );
   Print( 1,1,"%s < %g, %g, %g >",fname( Name ),Length,Beam,Draft );
   axis(*this,Length,Beam,Draft*2,"x","y","z"); glLineWidth( .5 );
@@ -92,6 +91,10 @@ Ship::Ship()
   Shell.ActiveLayer.ShowInLineSpan=true;  // включается в теоретические чертежи
   Shell.ActiveLayer.MaterialDensity=1.0;  // плотность воды
   Shell.ActiveLayer.Thickness=1.0;        // если 1 - получится площадь
+  Set.Name=               // название проекта
+  Set.Designer=           // автор проекта
+  Set.Comment=            // расширенное описание
+  Set.CreatedBy="·";      // изготовитель цифровой модели
 
 //argc=wcslen( FName );
 //print( "Открыт %s файл: %s\n",isBin?"двоичный":"текстовый",W2U(FileName)); textcolor(LIGHTBLUE);
@@ -107,6 +110,9 @@ Ship::Ship()
   textcolor( WHITE );
   print( "\n%s\nLayer: %d, Knot: %d, Edge: %d, Face: %d, Curve: %d",
     Name,Shell.NoLayers,Shell.NoCoPoint,Shell.NoEdges,Shell.NoFaces,Shell.NoCurves );
+  if( Length==0.0 )
+  { Length=Max.x-Min.x; Beam=Max.y-Min.y; Draft=(Max.z+Min.z)/2.0;
+  }
   print( "\n Длина : [ %6.2f - %-6.2f ] = %g ",Min.x,Max.x,Max.x-Min.x );
   print( "\n Ширина: [ %6.2f - %-6.2f ] = %g : { %g }",Min.y,Max.y,(Max.y>-Min.y?Max.y:-Min.y)*2,(Max.y+Min.y)/2.0 );
   print( "\n Высота: [ %6.2f - %-6.2f ] = %g ",Min.z,Max.z,Max.z-Min.z );
@@ -128,16 +134,17 @@ FreeShip::FreeShip():Ship(),View( TitleShip,-12,12,640,480 ) //,Place( this,Plac
 //   Интерактивная настройка/управление графическим отображением проекта
 //                         *.vsl,*.ftm,*.fbm,*.fef,*.part + *.obj,*.stl"
 //
-bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой подсказкой
- const static char                                   // по настройкам и методам
+bool FreeShip::KeyBoard( fixed Keyb )                // С краткой подсказкой
+{ const static char                                  // по настройкам и методам
      *Id[]={ "«Aurora+free!Ship»","  Корабельные",   // визуализации корпуса
                                  "преобразования",0 },
      *Cmds[]={ " F1 ","справка",
                " F2 ","запись «Ship».vsl,fef,stl,obj",
-               " F3 ","вход.fbm.ftm.fef.part.obj.stl",
+               " F3 ","ввод.fbm.ftm.fef.part.obj.stl",
                " F4 "," смещение с масштабированием",
-               " F10 "," сброс повторяющихся узлов",0 },
-     *Plus[]={ " <Space>  ","раскрытие борт\\полборта",
+               " F5 "," список графических слоёв",
+               " F10 ","сброс повторяющихся узлов",0 },
+     *Plus[]={ " <Space>  ","раскрытие борт/полборта",
                " <Ctrl+Space>"," борта - рёбра/грани",
                " <Shift+Tab>  "," общая прозрачность",
                " <стрелки·leftMouse>"," ориентация",
@@ -159,6 +166,21 @@ bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой под
             { Shell.ReOrder(); }    break;   // goto R1 расчистка повторов
     case _F4: Title( " Правка размерений с пространственным смещением..." );
               Shell.EditMenu(this); break;   // goto R1 сдвиги и масштабирование
+    case _F5: { //List *Line=(List*)Allocate( Shell.NoLayers*sizeof( List ) );
+                TextList Tf( Shell.NoLayers,this ); //,0,0,32,0 ); } break;
+                for( int i=0; i<Shell.NoLayers; i++ )
+                { Tf.Lines[i].lst=Shell.L[i].Description;
+                  Tf.Lines[i].cmd=(Shell.L[i].Visible?1:0) +
+                                  (Shell.L[i].Symmetric?2:0) +
+                                  (Shell.L[i].UseinHydrostatic?4:0);
+                }
+                do                  // обработка графических расслоений корпуса
+                { for( int i=0; i<Shell.NoLayers; i++ )
+                  { Shell.L[i].Visible = (Tf.Lines[i].cmd&1)!=0;
+                    Shell.L[i].Symmetric = (Tf.Lines[i].cmd&2)!=0;
+                  } Draw();
+                } while( Tf.Answer()!=_Esc );
+              } break;
     case _End:Shell.Revolute();     goto R1; // обращение нормалей поверхности
     case _Blank:
      if( ScanStatus()&CTRL )
@@ -182,13 +204,11 @@ bool FreeShip::KeyBoard( fixed Keyb ){               // С краткой под
 int main() // int argc, char **argv ) // заголовок текстовой консоли
 { texttitle( TitleShip );
   unsigned i,j=0;
-//fixed Ans;
-  FreeShip Hull;                   // запуск сразу всей математики и графики
+  FreeShip Hull; //pHull=&Hull;    // запуск сразу всей математики и графики
   Hull.onlyVirtualKeybord=true;    // и никаких ожиданий запросов от клавиатуры
 //#pragma omp parallel ~~ смех да грех, и зачем...
 #pragma omp master
-{
-  do                                // посекундные отсчёты активности программы
+{ do                                // посекундные отсчёты активности программы
   { if( (i=ElapsedTime()/1000)!=j )Hull.Title( DtoA( Real( j=i )/3600,3 ) );
 //  Hull.Title( DtoA( Real(ElapsedTime())/3600000.0,-3 ) );
 //  if( (Ans=Hull.GetKey())==_Esc )break;

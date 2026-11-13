@@ -208,8 +208,8 @@ struct Ship                    // Сборка корпуса в целом
                *Diagonals;     // рыбины     LoadDiagonals
   Marker *Marks;
   Flex* FlowLines;
+  Ship();                      //! очищающий конструктор
   bool YesShip;                // ... и это здесь не особо-то необходимо ?
-  Ship();                      // очищающий конструктор
   bool LoadProject();          // быстрая выборка всего комплекса данных
                                // в общие структуры в оперативной памяти
   void WriteVSL();             // запись теоретических контуров k Hull+Aurora

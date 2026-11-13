@@ -49,6 +49,7 @@ public:                      // открытая информация и про�
   //
   Place& Activate( bool=false ); // активизация графического контекста площадки
   Place& Area( Real X,Real Y, Real W,Real H, bool Frame=false ); //! this==Site
+  Place& Frame( Real X,Real Y, Real W,Real H, bool Sign=false );
   // установка и проявление площадки, Frame - добавляет пространство для рамки
   //   если X,Y > 0 - отсчеты от левого верхнего угла, <=0 - от правого нижнего
   //   если Width,Height > 0 - отсчеты в символах, если 0 - до границы окна,
@@ -152,9 +153,10 @@ public:
   Window& SetTimer( unsigned mSec,bool(*inTime)()=NULL ); // время и транзакция
   Window& KillTimer();                                // если 0 – сброс таймера
  virtual bool Timer();                               // ++ виртуальных процедур
-//int volatile isTimer;       // таймер отслеживает уровень рекурсии транзакций
+  int volatile isTimer;       // таймер отслеживает уровень рекурсии транзакций
   UINT_PTR idEvent;     // идентификатор встроенного таймера прерываний =0x12++
 private:      //! подборка скрытых параметров и свободных/отвязанных транзакций
+ Place *pMouse;        // адрес последнего поиска пропущенной площадки от мышки
   void PutTimer();     // unsigned iTime ) ==  со временем на момент прерывания
  struct{ fixed Code,Key; }KeyBuffer[lKey+1];  // накопительный буфер клавиатуры
   int KeyPos,KeyPas;    // кольцевые счетчики для последовательности символов
@@ -167,6 +169,8 @@ private:      //! подборка скрытых параметров и сво
   void PutMouse( UINT State, int x,int y );  // внутренняя обработка прерываний
   bool (*extKey)(fixed); // свободная процедура обработки прерываний клавиатуры
   bool (*extTime)();   // внешняя процедура, на выход запрос нового изображения
+//public:
+//void Help( const char *N[],const char *C[],const char *P[],int X=-1,int Y=1 );
 };
 class glContext{ HDC DC; HGLRC RC; // временное задействование контекстного
 public:          bool Active;      // графического 3D-интерфейса того же OpenGL
@@ -210,9 +214,9 @@ class TextContext{ const bool Base; // Polygon, Depth_Test, Cool_Face, Lighting
 public: TextContext( bool Space=false );  // ++ Space -> матрицы сцены и модели
        ~TextContext();
 };
-struct TextFrame: TextContext
-     { TextFrame( Place*,Real,Real,Real,Real,bool=false );
-     };
+//struct TextFrame: TextContext
+//     { TextFrame( Place*,Real,Real,Real,Real,bool=false );
+//     };
 class RasterSector{ // Подготовка площадки растровых манипуляций под glViewPort
 public: RasterSector( int pX,int pY, int Width,int Height, Real Scale=1.0 );
        ~RasterSector();
@@ -254,17 +258,26 @@ public: TextMenu( const Mlist*,const int, Window*,int=1,int=1 );
   const int Num;           // общее количество строк меню
   int Answer( int=-1 );    // немного отсроченный вызов для пущей перенастройки
 };
+//
 //     обработка именованных групп графических объектов
 //               с помощью списка текстовых последовательностей
 //
-struct TextList: Place
-{ TextList
-  ( char*  (*Fl)( int ), int N,        // Построение строчки по номеру в списке
-    Course (*Hl)( int ), Window *Win,  // Прерывание для запроса с комментарием
-    int X=0, int Y=0,                // Местоположение последовательности, её
-    int x=32, int y=24                  // размерения в правилах Window-площадки
+struct List{ fixed cmd; char *lst; };
+class TextList: Place
+{ int N,X,Y,x,y,w,h,L,K,k;// размерения и позиция первой строки и номер текущей
+ void Initial();                       // инициализация по заполнению массива
+ bool Drawing();                       // мышка может список перерисовывать
+ bool Mouse( int x,int y );            // непрерывное мышиное сопровождение
+ bool Mouse( int b,int x,int y );      // и реакция на правую\левую клавишу
+public:
+ List *Lines;                          // Список строится и пользуется снаружи
+ fixed Answer();                       // Запрос команд через активность списка
+ TextList                              // Прерывание для запроса с комментарием
+  ( int N, Window *Win,                // Построение строчки по номеру в списке
+    int X=0, int Y=0,                  // Местоположение последовательности, её
+    int x=0, int y=0                   // размерения в правилах Window-площадки
   );
- ~TextList(){};
+ virtual ~TextList();//{}
 };
 extern
  const unsigned char _8x08[],_8x14[],_8x16[]; // растровые шрифты из эпохи СССР

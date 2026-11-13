@@ -1,177 +1,97 @@
+#include <stdio.h>
 #include "..\Window\Window.h"
 /*
-class TextList: Place // работа с группами списка текстовых последовательностей
-  int X,Y,x,y,           // размерения окна в позициях символов для Place::Area
-      N,Kx,Ky;           // общая длина списка, позиции на строке и и по строке
-  char*  (*Fl)( int );   // динамическое представление последовательности строк
-  Course (*Hl)( int );   // информация по строке с внешней обработкой списка
+class TextList: Place // СЂР°Р±РѕС‚Р° СЃ РіСЂСѓРїРїР°РјРё СЃРїРёСЃРєР° С‚РµРєСЃС‚РѕРІС‹С… РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚РµР№
+  int X=0,Y=0,x=32,y=24, // СЂР°Р·РјРµСЂРµРЅРёСЏ РѕРєРЅР° РІ РїРѕР·РёС†РёСЏС… СЃРёРјРІРѕР»РѕРІ РґР»СЏ Place::Area
+      N,L,K,k;           // РѕР±С‰Р°СЏ РґР»РёРЅР° СЃРїРёСЃРєР°, РїРѕР·РёС†РёРё РЅР° СЃС‚СЂРѕРєРµ Рё Рё РїРѕ СЃС‚СЂРѕРєРµ
+  char*  (*Fl)( int );   // РґРёРЅР°РјРёС‡РµСЃРєРѕРµ РїСЂРµРґСЃС‚Р°РІР»РµРЅРёРµ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё СЃС‚СЂРѕРє
+  Course (*Hl)( int );   // РёРЅС„РѕСЂРјР°С†РёСЏ РїРѕ СЃС‚СЂРѕРєРµ СЃ РІРЅРµС€РЅРµР№ РѕР±СЂР°Р±РѕС‚РєРѕР№ СЃРїРёСЃРєР°
+                         //   0С…01 РѕС‚РјРµС‚РєР° РїРѕРґ РґРµР№СЃС‚РІРёСЏ
+                         //   0x02 ~ СЃС‚СЂРѕРєР° РёР·РјРµРЅРµРЅР° ...
 */
-TextList::TextList
-( char*  (*Fl)( int ), int N,          // Построение строчки по номеру в списке
-  Course (*Hl)( int ), Window *Win,    // Прерывание для запроса с комментарием
-  int X, int Y,                        // Местоположение последовательности, её
-  int w, int h                         // размерения в правилах Window-площадки
-) : Place( Win,PlaceAbove )                       // сначала шрифт затем список
-{ TextFrame TX( this,X,Y,w,h );                   // и окно запросов клавиатуры
-
-
-
+TextList::TextList                     // РџРѕСЃС‚СЂРѕРµРЅРёРµ СЃС‚СЂРѕС‡РєРё РїРѕ РЅРѕРјРµСЂСѓ РІ СЃРїРёСЃРєРµ
+( int _n, Window *Win,                 // РџСЂРµСЂС‹РІР°РЅРёРµ РґР»СЏ Р·Р°РїСЂРѕСЃР° СЃ РєРѕРјРјРµРЅС‚Р°СЂРёРµРј
+  int _X, int _Y,                      // РњРµСЃС‚РѕРїРѕР»РѕР¶РµРЅРёРµ РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚Рё, РµС‘
+  int _x, int _y                       // СЂР°Р·РјРµСЂРµРЅРёСЏ РІ РїСЂР°РІРёР»Р°С… Window-РїР»РѕС‰Р°РґРєРё
+) : Place( Win,PlaceAbove ),Lines( (List*)calloc( N,sizeof( List ) ) ),
+  N(_n),X(_X),Y(_Y),x(_x),y(_y),L(0),K(0),k(-1)
+{ AlfaBit(_8x16 ); w=AlfaWidth(); h=AlfaHeight();     // СЃС‚СЂРѕРіРѕ РІ СЂР°Р·РјРµСЂ С€СЂРёС„С‚Р°
+  L=( Win->Height/h )-2;
+  K=( Win->Width/w )/3;
+  k=-1234;
+}
+void TextList::Initial() // РїРµСЂРІР°СЏ РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїРѕСЃР»Рµ Р·Р°РїРѕР»РЅРµРЅРёСЏ РјР°СЃСЃРёРІР° СЃС‚СЂРѕРє
+{ int hMax=L,wMax=K,i,j;
+  if( x<=0 || x>wMax )          // РІС‹Р±РѕСЂ С€РёСЂРёРЅС‹ РѕРєРЅР° РґР»СЏ СЃРїРёСЃРєР° РїРѕ РґР»РёРЅР°Рј СЃС‚СЂРѕРє
+  for( x=12,i=0; i<N; i++ )
+  { j=Ulen( Lines[i].lst )+1; if( x<j )x=j;
+  } if( x>wMax )x=wMax; //else if( x<12 )x=12;
+  if( y<=0 || y>=hMax || y>N )y=min( hMax-1,N );   // Рё С‚РµРїРµСЂСЊ С‚Рѕ Р¶Рµ РґР»СЏ РІС‹СЃРѕС‚С‹
+  if( Y>0 ){ if( Y+y>hMax )Y=max( 1,hMax-y+1 ); }
+      else { if( -Y+y>hMax-1 )Y=min( 0,-hMax+y ); } L=K=k=0; // СЂР°Р·РјРµС‚РєР° СЃРїРёСЃРєР°
 }
 
-#if 0
-//   void Twindow( int,int,int,int, int=0 ); // Раскрытие текстового окна
-//   void Tback();                           //   восстановление подложки
-//
-//      Процедура формирования списка выбора и поиска на графическом мониторе
-//        Возвращается команда выхода из поиска, где:
-//        Ki - Номер элемента в списке на выходе из программы;
+TextList::~TextList(){ free( Lines ); } // Р’РѕРїСЂРѕСЃС‹ РїРѕ РЅРµР·Р°РІРµСЂС€С‘РЅРєРµ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ?
 
-
-//      <ret> команда с клавиатуры приведшая к выходу из программы:
-//           если с клавиатуры посылается видимый символ, то начинается поиск
-//           по всему списку, если происходит сбой в сортировке, то курсор
-//           устанавливается на первом символе последнего из выбранных слов.
-//
-Course Tcase
-(
-  int jx, int jy, int lx, int ly, // Размерения матрицы на экране монитора
-  int N,                          // Полная длина списка
-  char*  Fl(int),                 // Построение строчки по номеру в списке
-  Course Hl(int),                 // Прерывание для запроса с комментарием
-    int& Ki,                      // Номер текущего элемента (-1 из прошлого)
-    int  ret=0                    // 1 первый; 0 разовый; -1 повторный вход
-);                                //
-Course Tcase( int,int,int,int, int, char* Fl(int),int,int&,int=0 );
-
-//
-//  Mlist - Список параметров одного для запроса на терминал
-//      INPUT                           ACTIVE
-//  skip:skip string                    :номер сроки
-//  lf  : 0 - запрос не производится    :длина входного сообщения
-//  Msg :NULL - чистое входное поле     :выходной формат
-//  dat :NULL & lf<>0 - меню-запрос     :адрес изменяемого объекта
-//
-//  Tv_case                                                          92.10.16
-//
-//  Процедура формирования списка выбора и поиска на графическом мониторе
-//
-//    Ki - Номер элемента в списке с которого осуществлен выход из программы;
-//  Возвращается команда выхода из поиска
-//   <ret> команда с клавиатуры приведшая к выходу из программы:
-//         если с клавиатуры посылается видимый символ,
-//              то начинается поиск по всему списку,
-//         если происходит сбой в сортировке,
-//              то возвращается первый символ последнего из выбранных слов.
-//
-//
-//     Отметка текущей записи
-//
-static void Mark( int ls, int y, int x, int da, int ic )
-{ Tgo( x*ls+1,y );  color( ic?WHITE:Tv.BkColor );
-  x=Tv.Tw*ls-4;     Tpoint.x++;
-  y=Tv.Th+(da>0);   Tpoint.y+=y-2;
-  moveto( Tpoint ); Tpoint.y-=y;
-  lineto( Tpoint ); Tpoint.x+=x;
-  lineto( Tpoint ); color( ic?(Tv.BkColor==BLACK?LIGHTGRAY:BLACK):Tv.BkColor );
-                    Tpoint.y+=y;
-  lineto( Tpoint ); Tpoint.x-=x;
-  lineto( Tpoint );
-}
-Course Tcase(           //
- field& M,              // Размерения матрицы на экране монитора
-   int ls,              // Максимальная длина информационной строки
- char*  Fl(int),        // Построение строчки по номеру в списке
- Course Hl(int),        // Прерывание для внешнего управления списком
-                        // Если на выходе 0: перерисовка текущей таблицы
-                        //               -1: перерисовка и к новой строке
-   int  N,              // Полная длина списка
-   int& Ki,             // Номер текущего элемента (-1 из прошлого)
-   int  ret             //       1 выход с сохранением
-){                      //       0 обычный вход и выход
- char * S;              //      -1 вход без инициализации
-static int _K=-11;      // Запоминаемый индекс положения в списке
- int  C,L,Lp,i,k,l,y,x, // Полная длина видимого списка
-      Ls,a=0,K=0,       // Длина одной записи и позиция поиска символа
-      Nb,Ne,            // Номера первой и последней из видимых записей
-      Ly,Lx;            // Количество строк и столбцов
- char s[12];            // Буферная строчка для организации поиска
- int  ans;              //
-   C=Tv.Color;          //
-  Ls=ls+2;   L=(Ly=M.Ly)*(Lx=M.Lx);
-  l=L/2;     if( Ki>=0 )K=Ki; else K=_K; if( K>=N )K=N-1; if( K<0 )K=0;
-  Nb=K-l;    if( Nb<0  )Nb=0;
-  Ne=Nb+L-1; if( Ne>=N )
-             { Ne=N-1; Nb=N-L; if( Nb<0 )Nb=0,L=N,Ly=(L+Lx-1)/Lx; }
- if( ret>=0 ){ color( LIGHTGRAY ); Twindow( M.Jx,M.Jy,M.Lx*Ls,Ly,M.wb );
-             }
-ReView: color( C );  k=Nb;
-  for( x=0; x<Lx; x++ )
-  for( y=0; y<Ly && k<=Ne; y++,k++ )
-  { S=Fl( k ); Tgo( x*Ls+2,y+1 );
-    for( ans=1,i=0; i<Ls-2; i++ )
-    { if( ans )ans=S[i]; Tputc( ans?ans:' ' ); } color( C );
-  }
-  Lp=Lx>1?Ly*((Lx-1)/3+1):Ly-1;
-  for( ;; )
-  { Mark( Ls,y=(K-Nb)%Ly+1,x=(K-Nb)/Ly,a,1 ); Tgo( x+a+1,y );
-    if(  a )ans=Tgetc(); else
-    if( Hl )ans=Hl( K ); else
-    do ans=Tv_getc(); while( ans>=_MouseMoved && ans<=_MouseReleased );
-    Mark( Ls,y,x,a,0 ); l=0;       // Признак движения окна
-                        k=K;       // Признак движения курсора
-    if( ans==0xFF )ans=South,k=-1; // Признак отметки элемента списка
-    if( !ans )goto ReView;         // - то же с немедленной перерисовкой
-    if( ans<0xF1 && ans>=' ' )     //
-    { int dir=0;                   // Запуск процесса поиска
-//    ans=ucod( ans );             //
-      scpy( s,S=Fl( K ),12 );      // <<ucpy>>
-      if( ans>s[a] )dir=1;  else
-      if( ans<s[a] )dir=-1; else ++a;
-      if( dir && a<12 )
-      while( (dir>0 && K<N-1) || (dir<0 && K>0) )
-      { S=Fl( K+dir );
-        for( i=0; i<a; i++ )if( S[i]!=s[i] )goto Leave; // <<ucod>>
-        if( (i=(ans-S[a]))*dir<0 )break; K+=dir;        // <<ucod>>
-        if( !i ){ ++a; break; }
-      }
-    Leave: if( k!=K )
-      {    if( K<=Nb ){ l=-1; if( Nb>0   )Nb=K+Ly/2; }
-           if( K>=Ne ){ l=1;  if( Ne<N-1 )Ne=K-Ly/2; }
-    } } else
-    { switch( ans )
-      { case North     :        if( K>0  )--K;              break;
-        case North_West: K=0;   if( Nb>0 )Nb=1;     else    break;
-        case North_East: --l;
-        case       West: K-=K-Ly<Nb?Lp:Ly; if( K<0 )K=0;    break;
-        case South     :        if( K<N-1 )++K;             break;
-        case South_West: K=N-1; if( Ne<N-1 )Ne=N-2; else    break;
-        case South_East: ++l;
-        case       East: K+=K+Ly>Ne?Lp:Ly; if( K>=N )K=N-1; break;
-       default:
-        if( !ret )Tback(); Ki=K; color( C ); return Course( ans );
-      } a=0;
+fixed TextList::Answer()
+{ if( k==-1234 )Initial();        // РёРЅРґРµРєСЃ РїРѕР·РёС†РёРё РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РѕС‚СЂРёС†Р°С‚РµР»СЊРЅС‹Рј
+  Window *Win; fixed ans=_Center; // РјР°СЃСЃРёРІ - РјРѕР¶РµС‚, РЅРµРјРЅРѕРіРѕ РЅРµСѓРєР»СЋР¶Рµ, РЅРѕ РїСѓСЃС‚СЊ
+  while( Win=Ready() )
+  { switch( ans )
+    { case _East: if( k<x-1 )++k; else k=0; break;
+      case _West: if( k>1 )--k; else k=x-1; break;
+      case _North:Win->ScanStatus()&SHIFT ? --L:K--; break;
+      case _South:Win->ScanStatus()&SHIFT ? ++L:K++; break;
+      case _PgUp: Win->ScanStatus()&SHIFT ? L-=12:K-=12; break;
+      case _PgDn: Win->ScanStatus()&SHIFT ? L+=12:K+=12; break;
+      case _Tab:  Lines[K+L].cmd^=1; break;
+      case ' ':   Lines[K+L].cmd^=2;     // РїСЂРѕР±РЅС‹Рµ РІР°СЂРёР°РЅС‚С‹ РїРѕ РїРµСЂРІРѕР№ РѕС‚Р»Р°РґРєРµ
+      case _Center: break;               // РєРѕРјР°РЅРґС‹ СЃРѕР±РёСЂР°СЋС‚СЃСЏ РІ РєРѕСЂРѕС‚РєРѕРј СЃР»РѕРІРµ
+     default: goto Fin;                  // РЅРµС‚ РєРѕРјР°РЅРґС‹ РІРЅСѓС‚СЂРё - Р±СѓРґРµС‚ СЃРЅР°СЂСѓР¶Рё
     }
-    if( k!=K )
-    { if( l<0 )
-      { if( Nb>0 ){ Nb-=Lp; if( Nb<0 )Nb=0; Ne=Nb+L-1; goto ReView; } }
-      else
-      if( l>0 )
-      { if( Ne<N-1 ){ Ne+=Lp; if(Ne>=N)Ne=N-1; Nb=Ne-L+1; goto ReView; } }
-      else
-      if( K<Nb || K>Ne )
-      { if( K<Nb ){ Nb-=Lp; if( Nb<0  )Nb=0;   Ne=Nb+L-1; k=-1; }else
-        if( K>Ne ){ Ne+=Lp; if( Ne>=N )Ne=N-1; Nb=Ne-L+1; k=-1; }
-      } if( k<0  )goto ReView;
-  } }
+    Drawing();                           //! Р·РґРµСЃСЊ РїСЂРѕРІРµСЂСЏСЋС‚СЃСЏ РїР°СЂР°РјРµС‚СЂС‹ СЃРїРёСЃРєР°
+    ans=Win->WaitKey();
+  } Fin: return ans;
 }
-Course Tcase(           //
- field& M,              // Размерения матрицы на экране монитора
-   int  ls,             // Максимальная длина информационной строки
- char*  Fl( int ),      // Построение строчки по номеру в списке
-   int  N,              // Полная длина списка
-   int& Ki,             // Номер текущего элемента (-1 из прошлого)
-   int  ret             // Режим сохранения изображения
-){                      //
-  return Tcase( M,ls,Fl,0,N,Ki,ret );
+bool TextList::Drawing()
+{ TextContext Ts;
+  Frame( X,Y,x+5.5,y,true ); int i;               // Рё РѕРєРЅРѕ Р·Р°РїСЂРѕСЃРѕРІ РєР»Р°РІРёР°С‚СѓСЂС‹
+  if( K<0 ){ L+=K,K=0; } else                     // Р·РґРµСЃСЊ РїСЂРѕСЃС‚РµРЅСЊРєРёР№ РєРѕРЅС‚СЂРѕР»СЊ
+  if( K>y-1 ){ L+=K-y+1,K=y-1; }                          // СЃ С‚СЂР°РЅСЃРіСЂР°РЅРёС‡РЅС‹РјРё
+  if( L<0 )L=0; else if( L>N-y )L=N-y;                    //   РїРµСЂРµСЃС‚СЂРѕРµРЅРёСЏРјРё
+  glColor4f( .8,.9,1,.7); glRectf( 5.2,K+1,x+6,K+2 );     // РґРІРѕР№РЅР°СЏ РїСЂРѕР·СЂР°С‡РЅР°СЏ
+  glLineWidth( 1 ),glColor3b( 64,64,64 ),glBegin( GL_LINES );
+  for( i=2; i<=y+1; i++ )                                // РїРѕСЃС‚СЂРѕС‡РЅР°СЏ СЂР°Р·РјРµС‚РєР°
+   glVertex2i( 5,i-1 ),glVertex2i( 5,i ),glVertex2i( 5,i ),glVertex2i( 6+x,i );
+  glColor3b( 100,0,0 );                           // СѓРіРѕР»РѕРє РєСѓСЂСЃРѕСЂР° (РЅР° Р·Р°РјРµРЅСѓ)
+  glVertex2f( 5.5+k,K+1 ),glVertex2f( 5.5+k,K+1.9 );
+  glVertex2f( 5.5+k,K+1.9 ),glVertex2f( 6.5+k,K+1.9 ); glEnd();
+  for( i=0; i<y; i++ )
+  { glColor3f(0,0,1),Print( 1.8,i+1.1,Lines[i+L].cmd&1 ? "в€љ":"В·" ); // В» \x10
+    glColor3f(0,.5,0),Print( 2.6,i+1.1,Lines[i+L].cmd&2 ? "в‰Ґ":" " ); // \x09
+    glColor3f(0,.25,.25),Print( 3.4,i+1.1,Lines[i+L].cmd&4 ? "в‰€":" " );
+    glColor3f(0,0,0),Print( 5.5,i+1.1,Lines[i+L].lst );
+  }
+ char S[x]; S[i=0]=0; glColor3f( .5,.6,.7 ); AlfaBit( _8x08 );
+  if( L>0 ){ Print( 4.5,1,".\x18\x18\x18" ); i=sprintf( S," %d",L ); }
+                                            i+=sprintf( S+i," < %d > ",N );
+  if( L<N-y ){ Print( 5.5,-1,"\x19\x19\x19" ); sprintf( S+i,"%d ",N-L-y ); }
+  Print( 0,-1,S ); Show(); AlfaBit( _8x16 );             // РѕС‚РјРµС‚РєР° Р·Р°РіСЂР°РЅРёС‡РЅР°СЏ
+  return false;
 }
-#endif
+bool TextList::Mouse( int _x, int _y )
+{ const Real X=minmax(  5.5,Real(_x)/w,x+5.5 ),
+             Y=Real( _y )/h-0.3;        // minmax( -0.5,Real(_y)/h,y+2.0 )-0.3;
+  if( X<0 ^ _x<=Width && Y<0 ^ _y<=Height )
+  { if( Y<1 )--L,K=0; else
+    if( Y>y+1 )++L,K=y-1; else K=Y-1;
+    k=X-5.5;   Drawing();               // printf( "\nK= %d, %g, %g  ",K,X,Y );
+  } return false;
+}
+bool TextList::Mouse( int b, int x, int y )
+{ if( b&_MouseWheel )                            // Р°РЅР°Р»РѕРіРёС‡РЅРѕ Draw
+    { y>=0?--L:L++; if( L<0 )L=0; else if( L>N-y )L=N-y; } else
+  if( b&_MouseRight )Lines[K+L].cmd&=~1; else
+  if( b&_MouseLeft )Lines[K+L].cmd=1;
+  Drawing(); return false;
+}

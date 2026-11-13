@@ -52,7 +52,27 @@ Place& Place::Area( Real X,Real Y, Real W,Real H, bool Frame ) // сделать
 */
    return *this;
 }
-
+Place& Place::Frame( Real X,Real Y,Real x,Real y,bool s )  //  0.4 \ 0.2 / -0.4
+{ // AlfaBit( _8x16 ) <-- при объявлении Place             //  s:0.6 \_/ 0.4
+  const float lr=0.4,up=0.2,dn=s?0.6:0.4; y++;
+// if( X>0 ){ if( X<lr )X=lr+0.5; } // else if( X<=0 ){ if( X>-lr )X=-lr-0.5; }
+// if( Y>0 ){ if( Y<up )Y=up+0.5; } // else if( Y<=0 ){ if( Y>-dn )Y=-dn-0.5; }
+  Area( X,Y,x+=lr+lr+1,y+=up+dn+1 ).Activate( true );   // текст по строкам
+  glScalef( AlfaWidth(),-AlfaHeight(),1.0 );   // здесь предусматривается
+  glTranslatef( 0,-y,0 );                      // изменение масштаба со сдвигом
+  glColor4f( 0.6,.8,1,s?.7:.9 ); glRectf( 0,0,x,y );  // двойная полупрозрачная
+  glColor4f( 1,.96,.8,s?.7:.9 ); glRectf( lr,up,x-lr,y-dn ); // рамка с простым
+#define V( a,b ) glVertex2f( a,b )
+  glColor4f( 0,0,0,.8 ),glLineWidth( 1.25 ); glBegin( GL_LINES ); // затенением
+    V( 0,y ),V( x,y ),V( x,y ),V( x,0 );
+    V( lr,y-dn ),V( lr,up ),V( lr,up ),V( x-lr,up );
+  glColor4f( 1,1,1,0.8 );                  // осветлённый контур поверху-налево
+    V( 0,y ),V( 0,0 ),V( 0,0 ),V( x,0 );
+    V( lr,y-dn ),V( x-lr,y-dn ),V( x-lr,y-dn ),V( x-lr,up );
+  glEnd();
+#undef V
+}
+#if 0
 TextFrame::TextFrame( Place *W,Real X,Real Y,Real x,Real y,bool s )
          : TextContext( false )                            //  0.4 \ 0.2 / -0.4
 { W->AlfaBit( _8x16 );                                      //  s:0.6 \_/ 0.4
@@ -79,10 +99,9 @@ TextFrame::TextFrame( Place *W,Real X,Real Y,Real x,Real y,bool s )
 #undef V
 //glTranslatef( -lr+0.5,dn-0.5,0 ); // W->Save();                  <= по мере заполнения текстового поля
 //  glTranslatef( lr+0.5,up+0.5,0 ); //  <= по мере заполнения текстового поля
-
 //W->Area( X+lr+0.5,Y-dn-0.5,x-=(lr+lr+1),y-=(up+dn+1) );
-
 }
+#endif
 //    Комплекс встроенных и внутренних процедур
 //    Подготовка площадки для растровых манипуляций
 //#include <GL/Glu.h>
@@ -112,13 +131,14 @@ TextContext::TextContext( bool b ): Base( b )
 //    dp( glIsEnabled( GL_DEPTH_TEST ) ),
 //    cf( glIsEnabled( GL_CULL_FACE ) ),
 //    lh( glIsEnabled( GL_LIGHTING ) )
-{ if( Base )PushMatrix(); else glPushAttrib( GL_ENABLE_BIT|GL_POLYGON_BIT|GL_LINE_BIT );
+{ if( Base )PushMatrix();
+  /*else*/ glPushAttrib( GL_ENABLE_BIT|GL_POLYGON_BIT|GL_LINE_BIT );
   glDisable( GL_DEPTH_TEST );
   glDisable( GL_CULL_FACE );
   glDisable( GL_LIGHTING );
   glPolygonMode( GL_BACK,GL_FILL );
 }
-TextContext::~TextContext(){ if( Base )PopMatrix(); else glPopAttrib(); }
+TextContext::~TextContext(){ if( Base )PopMatrix(); /*else*/ glPopAttrib(); }
 
 Place& Place::Clear( bool back ) // очистка фоном/true или текущим/false цветом
 { if( glAct( Site ) )                // есть окно - есть картинка

@@ -45,16 +45,11 @@
 struct Base                   // Линейные преобразования в единичном базисе
 { Point y,x,                  // Вид локального базиса в глобальных координатах
         Y,X;                  //  и отображение главных осей в локальном базисе
-        Base(){ X=x=1; Y=y=~X; } // Собственно построение физического базиса
-        Base(_Point U,_Point V ){ Axis( U,V ); } // Установка координатный осей
-  Real  Axis(_Point U,_Point V )        //
-  {           y=U,x=V;                  // Axis - определение локального базиса
-   const Real det=y.y*x.x - y.x*x.y;    //      - обращение матрицы переходов
-              Y.y=x.x/det,Y.x=-y.x/det; //
-              X.x=y.y/det,X.y=-x.y/det; return det;
-  }
- Point Goint( _Point A ){ return (Point){ A.x*X.x+A.y*Y.x,A.y*Y.y+A.x*X.y }; }
- Point Goext( _Point a ){ return (Point){ a.x*x.x+a.y*y.x,a.y*y.y+a.x*x.y }; }
+        Base();               // Собственно построение физического базиса
+        Base(_Point,_Point ); // Установка координатный осей
+ Real  Axis(_Point U,_Point V ); // Axis - определение локального базиса
+ Point Goint( _Point A );
+ Point Goext( _Point a );
 };
 class Basis: protected Base      // Точка отсчета и базисные оси
 { Point R;                       // Центр отсчета внешней системы координат
@@ -62,8 +57,8 @@ public: Basis():Base(){ R=0.0; } //   и единичный конструктор
   Real Axis(_Point Re,_Point _Y,_Point _X ){ R=Re; return Base::Axis(_Y,_X); };
   Real Euler(_Point Re,Real Angle,_Point Scl=(Point){1.0,1.0} ); // в Эйлеровом
 //Real Decart( _Point Re,_Point x );                            // пространстве
-  Point Goint( _Point A ){ return Base::Goint( A-R ); }  // к локальному базису
-  Point Goext( _Point a ){ return Base::Goext( a )+R; }  // снова в глобальный
+  Point Goint( _Point A );//{ return Base::Goint( A-R ); }  // к локальному базису
+  Point Goext( _Point a );//{ return Base::Goext( a )+R; }  // снова в глобальный
 };
 //    Установка прямоугольного окна Field B с билинейной подстройкой на Basis S
 //         добавляется возможность деформации базиса, что          ( 93.11.23 )

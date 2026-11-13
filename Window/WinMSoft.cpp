@@ -22,7 +22,9 @@ static void WaitEvents( HWND hW=NULL )// с нулём опрос сразу в�
  } } */
 Window* Place::Ready()             // либо одно активное, либо все окна Windows
 { if( First )if( Site )if( Site->hWnd )
-    { /*WaitEvents( Site->hWnd );*/ return Site; } return NULL;
+    { WaitEvents( Site->hWnd );
+      return Site;
+    } return NULL;
 }
 bool WinReady( Window *Win )       // без указания адреса опрашиваются все окна
 { WaitEvents(); if( Win )return Win->Ready()!=NULL; // if( First )WaitEvents();
@@ -160,8 +162,8 @@ Window::Window( const char *_title, int x,int y, int w,int h )
 //ScreenWidth( GetSystemMetrics( SM_CXSCREEN ) ),
 //ScreenHeight( GetSystemMetrics( SM_CYSCREEN ) ),
   onlyVirtualKeybord( false ),     // все символы ставятся в очередь считывания
-  Next( NULL ), hDC( 0 ), hWnd( 0 ), hRC( 0 ), mSec( 0 ), // isTimer( 0 ),
-  isMouse( false ), idEvent( 12 ), // tId + номер окна
+  Next( NULL ), hDC( 0 ), hWnd( 0 ), hRC( 0 ), mSec( 0 ), isTimer( 0 ),
+  isMouse( false ), pMouse( NULL ), idEvent( 12 ), // tId + номер окна
   KeyPos( 0 ),KeyPas( 0 ),onKey( false ),extKey( NULL ),extTime( NULL )
 { //ATOM atom;
   WNDCLASSW wc={ sizeof( WNDCLASSW ) };
@@ -313,16 +315,16 @@ fixed Window::WaitKey( const fixed Exc )           // стандартный ц�
   while( KeyPos==KeyPas )                                   // || isTimer>0
        { if( !Site )return Exc;                             // окно закрыто
          if( !WinRequest() )WaitMessage(); // glFinish();   // на всякий случай
-       }                                                    //    всё исполнить
+       } // WaitEvents();                                   //    всё исполнить
   onKey=false;                                              // SetFocus( FWin )
   return KeyBuffer[++KeyPos&=lKey].Key;                     //   wctob( key )=>
 }                                                           //   Uni16=>Win1251
 //
 // мышка работает на площадках, однако прерывания организуются из главного окна
 //                                           предотвращение рекурсии прерываний
-#define call if( !isMouse){ isMouse=true; glContext S(this); bool ret=P->Mouse(
-#define end ); if( ret ){ if( P==this )Save().Refresh(); else P->Show(); } \
-                                                          isMouse=false; }
+#define call if(!isMouse){ isMouse=true; glContext S(this); bool ret=pMouse->Mouse(
+#define end ); if( ret ){ if( pMouse==this )Save().Refresh(); \
+                         else pMouse->Show(); }  isMouse=false; }
 void Window::PutMouse( UINT State, int x,int y )
 { switch( State )                        // ? ( и как теперь с виртуальностью )
   { case WM_MOUSEMOVE    : break;        // ? контекст OpenGL не сверяется
@@ -338,20 +340,22 @@ void Window::PutMouse( UINT State, int x,int y )
     case WM_MOUSEWHEEL   : MouseState =   _MouseWheel;  break; // сдвиг
    default: MouseState=0; return;
   }
-  if( MouseState==_MouseWheel )           // прокрутка проходит сама по себе
-  { if( y||x )                            // колёсико не привязано к площадке??
-    if( !isMouse )
-    { isMouse=true; glContext S( this ); bool ret=Mouse( _MouseWheel,x,y );
-      if( ret )Save().Refresh(); isMouse=false; MouseState=0;
+  if( MouseState==_MouseWheel )          // прокрутка не проходит сама по себе
+  { if( y||x )                           // колёсико не привязано к площадке ??
+    if( pMouse )                         // мышка ещё не приводилась до окна
+    if( !isMouse )                       // рекурсия: нелады производительности
+    { isMouse=true; glContext S( this ); // с предварительным сохранением среды
+      bool ret=pMouse->Mouse( _MouseWheel,x,y ); // ну и сами мышиные выкрутасы
+      if( ret )Save().Refresh(); isMouse=false; MouseState=0;   // очень жестко
   } } else
-  { Place *P=this; int px=x,py=y;         //   поиск последней/верхней площадки
-    for( Place *S=P; S; S=S->Up )         //      по общему списку их наложений
-    { int _x=x-S->pX,_y=y+S->pY-Height+S->Height; //       выход будет успешным
+  { pMouse=this; int px=x,py=y;             // поиск последней/верхней площадки
+    for( Place *S=pMouse; S; S=S->Up )      // по общему списку их наложений
+    { int _x=x-S->pX,_y=y+S->pY-Height+S->Height;       // выход будет успешным
       if( unsigned( _y )<=unsigned( S->Height )
-       && unsigned( _x )<=unsigned( S->Width ) ){ P=S; py=_y,px=_x; }
-    }                                     //  рекурсия мышиных прерываний c
-    if( !MouseState )                     //  координатами предыдущих вхождений
-    { if( xo<-1 )ClipCursor( NULL ); xo=yo=-1;      //  yo=-1 окно не захвачено
+       && unsigned( _x )<=unsigned( S->Width ) ){ pMouse=S; py=_y,px=_x; }
+    }                                      // рекурсия мышиных прерываний c
+    if( !MouseState )                      // координатами предыдущих вхождений
+    { if( xo<-1 )ClipCursor( NULL ); xo=yo=-1;       // yo=-1 окно не захвачено
       call px,py end
     } else
     { if( KeyStates()==L_ALT && MouseState==_MouseLeft )
@@ -362,13 +366,15 @@ void Window::PutMouse( UINT State, int x,int y )
           WindowY+y-yo-(Caption?GetSystemMetrics(SM_CYSIZEFRAME)
                               + GetSystemMetrics(SM_CYCAPTION):1),Width,Height);
       } else if( yo>=0 )yo=-1; else
-      { POINT LU={ P->pX,Height-P->pY-P->Height }; ClientToScreen( hWnd,&LU );
+      { POINT LU={ pMouse->pX,Height-pMouse->pY-pMouse->Height };
+        ClientToScreen( hWnd,&LU );
         if( xo!=-2 )              // xo=-2 - установлено ограничение хода мышки
-        { RECT RC={LU.x,LU.y,LU.x+P->Width,LU.y+P->Height}; ClipCursor(&RC);
+        { RECT RC={LU.x,LU.y,LU.x+pMouse->Width,LU.y+pMouse->Height};
+          ClipCursor( &RC );
         } call MouseState,px,py end xo=-2;
       }
     } // MouseState &= ~_MouseWheel;
-  }   // WaitEvents( hWnd  );
+  }      WaitEvents( hWnd  );
 }
 bool Window::Timer()// контроль транзакций, вызов процедуры внешнего исполнения
    { if( extTime )return extTime(); return false;
@@ -396,14 +402,14 @@ static void CALLBACK TimerProc( HWND hWind,UINT uMsg,UINT_PTR timerId,DWORD St)
   { Window *Win=Find( hWind );                // исполнение в контекстной среде
     if( Win )
     if( !Win->mSec )::KillTimer( hWind,timerId ); else
-//  if( !Win->isTimer++ )
+    if( !Win->isTimer++ )
     { glContext S( Win );        // пролог контекстной настройки графики openGL
 //    ::KillTimer( hWind,timerId );
       if( S.Active )
       if( Win->Timer() )Win->Save().Refresh();      // на виртуальную процедуру
 //    if( Win->mSec>0 )
 //    ::SetTimer( hWind,timerId,Win->mSec,TimerProc ); // ...заведомо старт
-      WaitEvents(); // Win->isTimer=0;
+      WaitEvents(); Win->isTimer=0;
     } return;
   }
   if( IdT!=timerId )return;              // всякие Sleep и т.п. пусть идут мимо
@@ -411,7 +417,7 @@ static void CALLBACK TimerProc( HWND hWind,UINT uMsg,UINT_PTR timerId,DWORD St)
   if( extFree )                          // запуск вычислений на заданное время
   { unsigned Rt,T; //, St=GetTickCount() -- отсчет начала приоритетных расчётов
     do
-    { T=GetTickCount();                  //= отметка реального времени расчётов
+    { T=GetTickCount(); WaitEvents();    //= отметка реального времени расчётов
       if( !extFree() )mWait=0;           //! исполнение или полный выход =false
       RealTime+=(Rt=GetTickCount())-T;   //  использованный интервал времени #0
       if( mWait && Rt-St>=mWork )        //- перезапуск по истечению указанного
@@ -426,10 +432,9 @@ unsigned WaitTime( unsigned Wait,        // активная задержка д
                 unsigned Work )       // время исполнения рабочего процесса [мСек]
 { extFree=inStay,mWork=Work,mWait=Wait;               // инициализация таймеров
   if( Wait )IdT=::SetTimer( 0,0,Wait,TimerProc );     // כל = (со всеми окнами)
-#pragma omp single                                    // Sleep( Wait );
+#pragma omp single                                    // Sleep( Wait )
   while( First && mWait )                             // ожидание чистки mWait
-   if( !WinRequest() )WaitMessage();
-                 else WaitEvents(),glFinish();
+     if( !WinRequest() )WaitMessage(); else WaitEvents(); //,glFinish();
   return RealTime;                                    // выход в особом случае
 }
 Window& Window::SetTimer( unsigned mS,bool(*inTm)() ) // время+адрес исполнения

@@ -13,8 +13,8 @@ static void print3( _Real x, _Real y, _Real z, int f=2 )
 { const char Flg[]="v %s %s %s\n"; fprintf( F,Flg+f,RtoA(x),RtoA(y),RtoA(z) );
 }
 static void printF( _Vector V )   // спаренные координатные точки WaveFront.obj
-{ print3( V.x,V.z,V.y<=0?0:V.y, 0 );                                           // fprintf( F,Flg,RtoA(V.x,12,6),RtoA(V.z,12,6),RtoA(V.y<=0?0:V.y,12,6) );
-  print3( V.x,V.z,V.y<=0?0:-V.y,0 );                                           // fprintf( F,Flg,RtoA(V.x,12,6),RtoA(V.z,12,6),RtoA(V.y<=0?0:-V.y,12,6) );
+{ print3( V.y<=0?0:V.y,V.z,V.x, 0 );                                           // fprintf( F,Flg,RtoA(V.x,12,6),RtoA(V.z,12,6),RtoA(V.y<=0?0:V.y,12,6) );
+  print3( V.y<=0?0:-V.y,V.z,V.x,0 );                                             // fprintf( F,Flg,RtoA(V.x,12,6),RtoA(V.z,12,6),RtoA(V.y<=0?0:-V.y,12,6) );
 }
 static void crossDC( _Vector A, _Vector B, _Vector C )
 { if( fabs( A.y )<eps && fabs( B.y )<eps && fabs( C.y )<eps )return;

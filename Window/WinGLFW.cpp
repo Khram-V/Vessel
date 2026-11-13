@@ -135,7 +135,7 @@ Window::Window( const char *_title, int x,int y,int w,int h )
         isCursorInside( true ),     // Flag if cursor inside this window or not
         dTime( 0 ),nextTime( 0 ),   // шаг и ожидаемое прерывание таймера [µсек]
         isTimer( 0 ),isMouse( 0 ),onKey( false ),mods( 0 ),
-        extKey( NULL ),extTime( NULL )
+        pMouse( NULL ),extKey( NULL ),extTime( NULL )
 {
  // Изначальная инициализация glfw библиотеки
  //       ++ включение нового объекта в конец простого списка - перечисления
@@ -159,6 +159,7 @@ Window::Window( const char *_title, int x,int y,int w,int h )
  // glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR,3 );
  //?glfwWindowHint( GLFW_HOVERED,true ); // контроль присутствия курсора в окне
  //?glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT,GLFW_TRUE );
+ // glfwWindowHint( GLFW_SCALE_TO_MONITOR,GLFW_TRUE );
 #pragma omp barrier
     glfwWindow=glfwCreateWindow                   // Создание независимого окна
       ( Width,Height,_title?_title:"Window-Place",   // glfwGetPrimaryMonitor()
@@ -338,7 +339,7 @@ bool Window::Timer()
     if( extTime )        // настройка OpenGL с контекстным эпилогом перерисовки
 //  if( !isTimer )       // подготовка среды, вызов процедуры внешнего исполнения
     { bool Res; /*isTimer=true;*/ Res=extTime(); /*isTimer=false;*/ return Res;
-    }
+    } //WaitEvents();
   } return false;
 }
 Window& Window::SetTimer(unsigned mSec,bool(*inTm)()) // время,адрес исполнения
@@ -360,14 +361,11 @@ void Window::PutTimer()             //? внутренняя обработка 
   { ++isTimer;                        // на повторах - сбрасываются расчеты
     { glContext( this );
 //    if( Timer() )Save().Refresh();  // с восстановлением наложенных страничек
-//    if( Timer() )Show();            // с перерисовкой картинки
+//    if( Timer() )Show();
       if( Timer() )Refresh();         // с перерисовкой картинки
-//    Timer();
-//    Refresh(); WaitEvents();
     } isTimer=0;                      // разрешение повторных вхождений таймера
-  }// WaitEvents()                    // после завершения всех операций OpenGL
+  } //WaitEvents();                   // после завершения всех операций OpenGL
 }
-
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 void Window::WaitEvents( bool stop )
@@ -444,3 +442,7 @@ unsigned WaitTime( unsigned mWait, // активная задержка для �
 //  ...  все согласованные процедуры объединяются в единый модуль интерактивной
 //  графической среды Window::Place в/исключая независимые операции с Юлианским
 //        календарем и перекодировками Unicode/UTF-8 для Windows-1251 и OEM-866
+//
+#if GLFW_VERSION_MINOR <= 2
+extern "C" { void __chkstk_ms(){} }  /* то же имя, но функция, а не данные */
+#endif

@@ -276,9 +276,8 @@ bool Ship::LoadProject()
 }
 //!  считывание собственно секций всех сплайновых геометрических поверхностей
 //
-void Surface::Read( bool Part )
-{ int I,K,N,NoI,NoL,NoC,EdErr;                       // isLoad=true;
-   textbackground( BLUE );                           // First load layerdata
+void Surface::Read( bool Part )                         // isLoad=true;
+{ int I,K,N,NoI,NoL,NoC,EdErr; textbackground( BLUE );  // First load layerdata
    NoL=NoLayers;                                     // все новые слои вдогонку
    N=getInt();
    NoLayers+=N;                                                                 print( "< Surface.LayerData >\nNoLaeyrs = %d => %d\n",NoL,NoLayers );
@@ -463,9 +462,9 @@ bool Ship::LoadFEF()      // Ship.fef == FreeShip Exchange Format
   { print( "?не открывается free!Ship Exchange Format %s ",W2U( FName ) ); getch(); exit( 2 );
   } print( "\nОткрыт файл: %s (free!Ship exchange format)\n",W2U( FName ) );
   readText( &str );
-  for( I=0; I<6 && str[I]; I++ )               // в первой строке текстовое имя
-    if( !isdigit( str[I] ) ){ I=-1; break; }   // или сразу количество узлов
-  if( I<=0 ){  Set.Name=str;                                                    print( "< Project >\nName     =%s\n",Set.Name );
+  for( I=0; I<16 && str[I]; I++ )              // в первой строке текстовое имя
+   if( str[I]<'0' || str[I]>'9' ){ I=-1; break; } // или сразу количество узлов
+  if( I==-1 ){ Set.Name=str;                                                    print( "< Project >\nName     =%s\n",Set.Name );
     readText( &Set.Designer );                                                  print(              "Designer =%s\n",Set.Designer );
     readText( &Set.Comment );                                                   print(              "Comment  =%s\n",Set.Comment );
     readText( &Set.CreatedBy );                                                 print(              "CreatedBy=%s\n",Set.CreatedBy );
@@ -491,10 +490,10 @@ bool Ship::LoadFEF()      // Ship.fef == FreeShip Exchange Format
 void Surface::ReadFEF( int K )    // количество узлов или их <= одного
 { int I,NoC,NoL,NoI; isBin=false; // isLoad=true; First load layerdata
    NoL=NoLayers;
-   if( K<=1 )
+   if( K<1 )    // == -1
    { K=getInt();                                                                print( "< Surface.LaeyrData >\nNoLaeyrs = %d -> %d\n",NoLayers,K );
      if( !K )K=getInt();                                                        print( "NoLaeyrs(повтор) = %d\n",K );
-     NoLayers+=K;                            // счетчик слоёв здесь идет в начало
+     NoLayers+=K;                          // счетчик слоёв здесь идет в начало
      L=(Layers*)Allocate( max(1,NoLayers+1)*sizeof( Layers ),L );
      for( I=NoL; I<NoLayers; I++ )
      { Layers &T=L[I]; int v,d,s,u,w,p; char str[12]="";
@@ -508,9 +507,14 @@ void Surface::ReadFEF( int K )    // количество узлов или их
          T.UseinHydrostatic=w,
          T.ShowInLineSpan=p;                                                    print( ", ID=%d, Color=%X, Vis=%i, Symm=%i, ... Плотность=%g, Толщина=%g \n",T.ID,T.LClr.C,T.Visible,T.Symmetric,T.MaterialDensity,T.Thickness );
      } K=getInt();
-   } else L=(Layers*)Allocate( (NoLayers+1)*sizeof( Layers ),L ); // сверх-слой
-   L[NoLayers].LClr.C=0xAAAAAA88;                  // серенькая сверх-подсветка
-   L[NoLayers].Symmetric=true;
+   } else
+   L=(Layers*)Allocate( (NoLayers+1)*sizeof( Layers ),L );        // сверх-слой
+   if( NoL==NoLayers )                         // Запасной слой, если нет иного
+   { L[NoL].LClr.C=0xAAAAAA88;                 // серенькая сверх-подсветка
+     L[NoL].Visible=true;
+     L[NoL].Symmetric=true;
+     L[NoL].Description="FreeShip-V.1"; ++NoLayers;
+   }
    NoC=NoCoPoint;
    NoCoPoint+=K;                                                                print( "< ControlPoints > %d->%d",NoC,NoCoPoint );
    P=(CoPoint*)Allocate( NoCoPoint*sizeof( CoPoint ),P );

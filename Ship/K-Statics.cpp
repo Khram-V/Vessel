@@ -439,7 +439,7 @@ glLogicOp( GL_XOR ); => GL_COPY | GL_SET
 }
 int Hydrostatic::Stability_Menu()
 { const Real z=Draught-Do;
-  Mlist Menu_S[]={ { 1,0,"   Диаграмма Рида" }
+  Mlist Menu_S[]={ { 0,0,"   Диаграмма Рида" }
                  , { 2,1 },{ 0,5,"%5.2lf",&Zmet }       // выбор типа диаграммы
                  , { 1,5,"Максимальный угол крена %1°",&Amax }
                  , { 1,2,"Выбор ватерлиний  с %2d",&w1},{0,2,"  по %2d",&wN} };

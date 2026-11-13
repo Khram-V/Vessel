@@ -159,7 +159,7 @@ Fin: if( ans )Draw(); return ans?K:0; // площадка с текстом ос
 }
 bool TextMenu::Draw()            // картинка со списком строк запросов/форматов
 { Activate();                    // и запросы с представлением исходных величин
-  { TextFrame Tf( this,X,Y,Lx,Ly,false );                 // активация разметки
+  { TextContext Ts; Frame( X,Y,Lx,Ly );                   // активация разметки
     for( int k=0; k<Num; k++ )
     { mlist &L=((mlist*)M)[k]; int i=Mestr( &L ),l=i+L.X+1;
       glColor3f( 0,0.25,0.5 ); Print( L.X+1,L.Y+1,St );

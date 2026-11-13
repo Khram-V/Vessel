@@ -251,7 +251,7 @@ inline void needle( _point p,_point q ){ needle( p.x,p.y,q.x,q.y ); }
 //
 //     Простая и зеленая подсказка
 //
-  void Ghelp(); inline void Thelp(){ Ghelp(); }
+  void Ghelp();                   // inline void Thelp(){ Ghelp(); }
   void Ghelp( const char*,... );  // Временное сообщение
   void Thelp( const char*,... );  // -- в русском
 Course Help( const char *Name[], const char** Text, const char** Plus=NULL );
@@ -286,8 +286,8 @@ IsoLine *Tf_curve // Программа подготавливает полный список изолиний с
    int _Nx,       // Длина исходной строки в файле или в памяти
    int _Jy,int _Jx, int _Ly,int _Lx // Сектор для выборки
 );
-inline short get2( FILE *F ){ short d=0; fread( &d,2,1,F ); return d; }
-inline float getf( FILE *F ){ float d=0; fread( &d,4,1,F ); return d; }
-inline void  put2( short d, FILE *F ){ fwrite( &d,2,1,F ); }
-inline void  putf( float d, FILE *F ){ fwrite( &d,4,1,F ); }
+short get2( FILE *F ); //{ short d=0; fread( &d,2,1,F ); return d; }
+float getf( FILE *F ); //{ float d=0; fread( &d,4,1,F ); return d; }
+inline void put2( short d, FILE *F ){ fwrite( &d,2,1,F ); }
+inline void putf( float d, FILE *F ){ fwrite( &d,4,1,F ); }
 #endif

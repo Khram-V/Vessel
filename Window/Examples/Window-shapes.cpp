@@ -4,19 +4,19 @@
        подсказок и меню настройки параметров объёмных геометрических фигур
 */
 static const char
- *Name[]={ "«Window-Place» ",
-  " Контекстно-зависимая","  объектная библиотека","  интерактивной графики ",0 },
+ *Name[]={ "  «Window-Place»   ",
+  "Контекстно-зависимая","объектная библиотека","интерактивной графики. ",0 },
  *Cmds[]={ " i I  "," Show info",
            "=+ -_ ","Increase/Decrease slices",
            ",< .> ","Decrease/Increase stacks",
            "9( 0) ","Decr./Incr. depth (Sierpinski Sponge)",
            "up/down ","Increase/Decrease \"outer radius\"",
            "left/right ","Decrease/Increase \"inner radius\"",0 },
- *Plus[]={ "F1 ","справка        «ммм» . «mmm»",
-           "F2 ","меню настроек  «МММ» . «MMM»",
-           "F3 ","графический шрифт   , H«ёЁё»HЁ",
-           "PgUp/PgDn ","Next shape-drawing function",
-           "Esc/<altX>/<ctrlC>"," стоп ",0
+ *Plus[]={ " F1 "," справка        «ммм» . «mmm»",
+           " F2 "," меню настроек  «МММ» . «MMM»",
+           " F3 "," графический шрифт   , H«ёЁё»HЁ",
+           " PgUp/PgDn ","Next shape-drawing function",
+           " Esc/<altX>/<ctrlC> "," стоп ",0
          },
  *_Mnt[]={"январь","февраль","март","апрель","май","июнь","июль","август","сентябрь","октябрь","ноябрь","декабрь"},
  *_Day[]={"понедельник","вторник","среда","четверг","пятница","суббота","воскресенье"};
@@ -100,8 +100,10 @@ bool Pro::KeyBoard( fixed key )
     case '9': case '(': if( depth>-1 )depth--;   break;
     case '0': case ')': ++depth;                 break;
     case ' ': clrscr(); Clear();                 break;
-    case _F1: Help( Name,Cmds,Plus,-1,2 );       break;
-    case _F2: while( TextMenu( Mlist( Menu_a ),this ).Answer()!=_Esc ); break;
+    case _F1: Help( Name,Cmds,Plus,(Window*)this,-1,2 ); break;
+    case _F2: while( (key=TextMenu( Mlist( Menu_a ),this,1,1 ).Answer())!=_Esc )
+              { if( key==1 )++function_index; function_index%=12;
+              } break;
     case _F3: // GetKey(); -- в прерывания символ из буфера не выбира(ется)лись
     { Place R( this,PlaceAbove ); glClearColor( 1,1,0.8,1 ),glColor3f( 0,0,.75 );
       const char
@@ -136,6 +138,25 @@ bool Pro::KeyBoard( fixed key )
       } R.Print( "\n│ « ёЁ » " ).Show();
       glClearColor( 0.9,1,0.95,1 );     // восстановление фонового цвета
       WaitKey();
+    } break;
+    case _F5:
+    { int N=136,X=0,Y=5,w=0,h=44,i;                         ///<===<===<===<===
+      TextList Line       // Months,136, char*(*Fl)(int),int N, Построение строчки по номеру в списке
+      ( N,(Window*)this,// Course(*Hl)(int),Win, Прерывание для запроса с комментарием
+        X,Y,   //  int X, int Y,          Местоположение последовательности, её
+        w,h    //  int w, int h           размерения в правилах Window-площадки
+      );
+      for( i=0; i<N; i++ )Line.Lines[i].lst=(char*)_Mnt[i%12],
+                          Line.Lines[i].cmd=i%16;
+/*    glColor3f( 1,0,0 ); Line.Print( 1,1,"1\\1" );
+                          Line.Print( 1,h,"1/%d",h );
+                          Line.Print( w-3,1,"%d/1",w-3 );
+                          Line.Print( w-4,h,"%d\\%d",w,h-4 );
+      glColor3f( 0,0,1 ); Line.Print( 1,1,"1/1" );
+                          Line.Print( 1,0,"1\\%d",h );
+                          Line.Print( 0,1,"%d\\1",w );
+                          Line.Print( 0,0,"%d/%d",w,h ); Line.Save(); */
+      while( (Y=Line.Answer())!=_Esc )printf( "\n... %d -> %d ...",X++,Y );
     } break;
     default:
     { switch( key )
@@ -293,6 +314,7 @@ int main( int argc,char *argv[] )
     //
     //  Этот текст должен появляться на экране без дополнительных Show-указаний
     //
+    glAct( &Tvm );
 //  Tvm.AlfaBit( _8x16 )                          // в GLFW пока происходит
 //  Tvm.Alfabet( 24,"Times New Roman" )           // подмена на растр DispCCCP
     Tvm.AlfaVector( 0 ) //.Area( 1,1,200,100 ).Activate()
@@ -301,7 +323,7 @@ int main( int argc,char *argv[] )
              "█ - третья строка ЩЩ");
     glColor3f(1,1,0); Tvm.Print("ЩЩ,\n запятая и продолжение\n с новой записи ЩЩ");
     glColor3f(0,1,1); Tvm.Print("ЩЩ, \n запятая, и снова продолжение");
-    glColor3f(1,1,0); Tvm.Print(-6,8,"Строки справа-налево\nс общим отступом = -6");
+    glColor3f(1,1,0); Tvm.Print(-6,8,"Строки справа-налево ...\nс общим отступом = -6");
     glColor3f(1,1,1); Tvm.Print
 //       ( -12,-8,"Это -3 строки снизу и справа\n"
 //                "с отличным отступом = -12 и\n"
@@ -342,9 +364,9 @@ int main( int argc,char *argv[] )
    aOne=&One;
     One.Mouse( OneMove )
        .Mouse( OnePress )
-//     .AlfaBit( _8x08 )               //  маленькие буквочки на большом окне
+       .AlfaBit( _8x16 )//08 )               //  маленькие буквочки на большом окне
 //     .Alfabet( 12,"Arial" )
-       .AlfaVector( 16 )
+//     .AlfaVector( 16 )
        .Area( 20,2,112,36 )
 //     .Area( 0,0,0,0 )
        .Activate( true )
@@ -360,6 +382,6 @@ int main( int argc,char *argv[] )
     } textcolor( LIGHTRED,YELLOW ); print( 48,20,"  При(у)ехали  " );
 
   //Tvm.KillTimer();
-  Break( "Как бы всё благополучно" );
+  Break( "Как бы\n всё благополучно\n или нет?" );
   return EXIT_SUCCESS;
 }
