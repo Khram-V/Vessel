@@ -198,7 +198,7 @@ Vector Waves::Squad( _Real Ti, Vector R ) // огибающая группово
     R.z+=cos( xW )*Xdis;  // +Rw)/2 -- двойная высота без нуля в подошве ++Z ??
   } return R=1.0;
 }
-inline void Ftri( Real *A, const int N, int nw ) /// простой треугольный фильтр
+static void Ftri( Real *A, const int N, int nw ) /// простой треугольный фильтр
 { Real w,W[N]; memcpy( W,A,N*sizeof(Real) );     // =дубль всего числового ряда
   for( int i=0,j,n; i<N; i++ )
   { for( j=0,n=min( nw,N-i ),w=0; j<n; j++ )w+=W[i+j]*(Real(n-j-1)+0.5)/n/n;
@@ -331,7 +331,7 @@ Waves& Waves::Simulation()
     kDraw=true;                                // ++ необходимость перерисовки
   }                                            // -- и возврат целого интервала
   dT*=tKrat;               // после кратного уменьшения расчетного шага времени
-  if( kDraw )++Kd,Drawing().Save().Show();
+  if( kDraw )++Kd,Drawing().Save().Show(); //Ready();
   return *this;
 }
 
@@ -358,10 +358,6 @@ Vector Waves::Wave( _Real Ti, Vector R )  // новое время и место
 //    if( Exp.waves )R.x-=X;     // 1- волна трохоидальная; 0- длинная одномерная
   } return R;
 }
-
-
-
-
 
     Vector //Q={ -cos(xW),0,sin(xW) },
            O={ 0,L*Cw,0 };    Ry=0; //Rx=1;

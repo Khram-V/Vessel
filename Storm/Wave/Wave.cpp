@@ -66,10 +66,11 @@ void Waves::Initial() // и весь вычислительный экспери
 }
 //   Проведение вычислительного эксперимента по таймеру в реальном времени
 //
-bool Waves::Timer()             // картинки готовятся по прерываниям таймера
+bool Waves::Timer()                // картинки готовятся по прерываниям таймера
 { static volatile bool recurse=false,stop=false;
-  if( ScanStatus()&CTRL )   // всего вычислительного процесса до повтора <Ctrl>
-    { stop=ScanStatus()&SHIFT; Instant=Event()-Tcalc/3600; } else
+  if( ScanStatus()&CTRL )  // всего вычислительного процесса до повтора <Ctrl>
+    { stop=ScanStatus()&SHIFT; Instant=Event()-Tcalc/3600;
+    } else
   if( stop )Instant=Event()-Tcalc/3600; else // Ctrl отпущен, требование полной
   if( !recurse )                 // остановки фиксируется аккордом <Ctrl+Shift>
     { recurse=true;              //! блокировка частых прерываний по таймеру
@@ -77,17 +78,17 @@ bool Waves::Timer()             // картинки готовятся по пр
       Tlaps=(T-Instant)*3600.0;  // отсчеты времени всего волнового поля  [сек]
       Simulation();  //! собственно вычислительный эксперимент в штормовом море
   //  Drawing();     // выделенная подпрограмма прорисовки одномерной картинки
-  //  Save();        // сброс картинки в графический буфер текущего изображения
-      recurse=false; Refresh(); // и здесь запрос к перерисовке всей картинки
-    } return false;                           // -- иначе всё без изменений
+      Refresh();     // сброс картинки в графический буфер текущего изображения
+      recurse=false; // и здесь запрос к перерисовке всей картинки
+    } return false;  // -- иначе всё без изменений
 }
 int main()
-{ feclearexcept( FE_ALL_EXCEPT );
-  textsize( 80,24 );
+{ feclearexcept( FE_ALL_EXCEPT ); textsize( 80,24 );
   texttitle
   ( "Отработка трохоидальных волновых профилей - распространение и отражение" );
-  Waves Side;    do{ WaitTime( 50 );         // Side.Simulation();
-      } while( Side.Ready() && Side.GetKey()!=_Esc );
+  Waves Side;//  do{ Sleep( 50 )
+    do{ WaitTime( 50 );        // Side.Simulation();
+      } while( Side.Ready() ); // && Side.ScanKey()!=_Esc );
 }
 //   Управление вычислительным экспериментом с клавиатуры компьютера
 //
@@ -133,7 +134,7 @@ bool Waves::KeyBoard( fixed Keyb )
 { const char
    *Name[]={ "Wave","    Моделирование",          // Краткая подсказка по
                     "нестационарной плоской ",    // настройкам и визуализации
-                    "  трохоидальной волны",0 },  // →  ←
+                    "  трохоидальной волны",0 },
    *Cmds[]={ "F1  "," эта справка",
              "F2  "," ... ... ",
              "F4  ","настройка эксперимента",0 },
@@ -143,11 +144,10 @@ bool Waves::KeyBoard( fixed Keyb )
              "<Ctrl>  ","задержка вычислений",
              "<Space> ","очистка\\сброс",
              "<Esc>/<ctrlC>"," стоп ",0 };
-//print( "\n WH=%g Long=%g",wH,Long );
   switch( Keyb )
-  { case _F1: Help( Name,Cmds,Plus,-2,-2 ); break;
+  { case _F1: ::Help( Name,Cmds,Plus,(Window*)this,-2,-2 ); break;
     case _F4: Config(); break;               // за прос параметров эксперимента
-    case _Enter: if( wH>Long )                // четыре режима волнообразования
+    case _Enter: if( wH>Long )               // четыре режима волнообразования
                 { wH=Exp.bound==Waves_meet?0:Long/(Exp.bound==Wave_right?-4:4);
                   wV=0; break; } else
     case _Blank: if( fabs( wV )<Eps )wH=Long+1; else wV=0;
@@ -155,5 +155,5 @@ bool Waves::KeyBoard( fixed Keyb )
     case _Left:  wV-=Cw/8; break;
     case _Right: wV+=Cw/8; break;
    default: return false;
-  }         return true;
+  }         return true; //Ready(); //true; // Window::KeyBoard( Keyb );
 }
