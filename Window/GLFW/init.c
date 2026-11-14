@@ -51,7 +51,8 @@ _GLFWlibrary _glfw;
 //
 static GLFWerrorfun _glfwErrorCallback = NULL;
 
-
+#if !defined( _glfwInputError )
+//
 // Returns a generic string representation of the specified error
 //
 static const char* getErrorString(int error)
@@ -83,10 +84,7 @@ static const char* getErrorString(int error)
     }
 }
 
-
-//////////////////////////////////////////////////////////////////////////
-//////                         GLFW event API                       //////
-//////////////////////////////////////////////////////////////////////////
+//  GLFW event API
 
 void _glfwInputError(int error, const char* format, ...)
 {
@@ -115,11 +113,9 @@ void _glfwInputError(int error, const char* format, ...)
         _glfwErrorCallback(error, description);
     }
 }
+#endif
 
-
-//////////////////////////////////////////////////////////////////////////
-//////                        GLFW public API                       //////
-//////////////////////////////////////////////////////////////////////////
+///  GLFW public API
 
 GLFWAPI int glfwInit(void)
 {
@@ -148,9 +144,7 @@ GLFWAPI int glfwInit(void)
 GLFWAPI void glfwTerminate(void)
 {
     int i;
-
-    if (!_glfwInitialized)
-        return;
+    if (!_glfwInitialized)return;
 
     memset(&_glfw.callbacks, 0, sizeof(_glfw.callbacks));
 

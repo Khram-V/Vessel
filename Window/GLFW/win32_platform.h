@@ -70,9 +70,9 @@
 
 #include <wctype.h>
 #include <windows.h>
-#include <mmsystem.h>
-#include <dinput.h>
-#include <xinput.h>
+//#include <mmsystem.h>
+//#include <dinput.h>
+//#include <xinput.h>
 #include <dbt.h>
 
 #if defined(_MSC_VER)
@@ -130,7 +130,7 @@ typedef enum PROCESS_DPI_AWARENESS
 } PROCESS_DPI_AWARENESS;
 #endif /*DPI_ENUMS_DECLARED*/
 
-// HACK: Define macros that some xinput.h variants don't
+/***** HACK: Define macros that some xinput.h variants don't
 #ifndef XINPUT_CAPS_WIRELESS
  #define XINPUT_CAPS_WIRELESS 0x0002
 #endif
@@ -163,12 +163,12 @@ typedef enum PROCESS_DPI_AWARENESS
 #ifndef DIDFT_OPTIONAL
  #define DIDFT_OPTIONAL	0x80000000
 #endif
-
+*/
 // winmm.dll function pointer typedefs
 typedef DWORD (WINAPI * TIMEGETTIME_T)(void);
 #define _glfw_timeGetTime _glfw.win32.winmm.timeGetTime
 
-// xinput.dll function pointer typedefs
+/* xinput.dll function pointer typedefs
 typedef DWORD (WINAPI * XINPUTGETCAPABILITIES_T)(DWORD,DWORD,XINPUT_CAPABILITIES*);
 typedef DWORD (WINAPI * XINPUTGETSTATE_T)(DWORD,XINPUT_STATE*);
 #define _glfw_XInputGetCapabilities _glfw.win32.xinput.XInputGetCapabilities
@@ -177,7 +177,7 @@ typedef DWORD (WINAPI * XINPUTGETSTATE_T)(DWORD,XINPUT_STATE*);
 // dinput8.dll function pointer typedefs
 typedef HRESULT (WINAPI * DIRECTINPUT8CREATE_T)(HINSTANCE,DWORD,REFIID,LPVOID*,LPUNKNOWN);
 #define _glfw_DirectInput8Create _glfw.win32.dinput8.DirectInput8Create
-
+*/
 // user32.dll function pointer typedefs
 typedef BOOL (WINAPI * SETPROCESSDPIAWARE_T)(void);
 typedef BOOL (WINAPI * CHANGEWINDOWMESSAGEFILTEREX_T)(HWND,UINT,DWORD,PCHANGEFILTERSTRUCT);
@@ -250,7 +250,7 @@ typedef struct _GLFWlibraryWin32
         HINSTANCE       instance;
         TIMEGETTIME_T   timeGetTime;
     } winmm;
-
+/*****
     struct {
         HINSTANCE            instance;
         DIRECTINPUT8CREATE_T DirectInput8Create;
@@ -262,7 +262,7 @@ typedef struct _GLFWlibraryWin32
         XINPUTGETCAPABILITIES_T XInputGetCapabilities;
         XINPUTGETSTATE_T        XInputGetState;
     } xinput;
-
+*/
     struct {
         HINSTANCE                     instance;
         SETPROCESSDPIAWARE_T          SetProcessDPIAware;

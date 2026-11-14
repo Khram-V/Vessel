@@ -89,10 +89,7 @@ static _GLFWmonitor* createMonitor(DISPLAY_DEVICEW* adapter,
     return monitor;
 }
 
-
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW internal API                      //////
-//////////////////////////////////////////////////////////////////////////
+/// GLFW internal API
 
 // Change the current video mode
 //
@@ -145,10 +142,7 @@ void _glfwRestoreVideoModeWin32(_GLFWmonitor* monitor)
     }
 }
 
-
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW platform API                      //////
-//////////////////////////////////////////////////////////////////////////
+/// GLFW platform API
 
 _GLFWmonitor** _glfwPlatformGetMonitors(int* count)
 {
@@ -384,10 +378,7 @@ void _glfwPlatformSetGammaRamp(_GLFWmonitor* monitor, const GLFWgammaramp* ramp)
     DeleteDC(dc);
 }
 
-
-//////////////////////////////////////////////////////////////////////////
-//////                        GLFW native API                       //////
-//////////////////////////////////////////////////////////////////////////
+/// GLFW native API
 
 GLFWAPI const char* glfwGetWin32Adapter(GLFWmonitor* handle)
 {

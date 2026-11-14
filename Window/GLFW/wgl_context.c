@@ -30,10 +30,8 @@
 >>>>>>> 0e43744 (Подготовка и построение пробных операций со списками)
 
 #include "internal.h"
-
 #include <stdlib.h>
 #include <malloc.h>
-#include <assert.h>
 
 
 // Returns the specified attribute of the specified pixel format
@@ -41,8 +39,6 @@
 static int getPixelFormatAttrib(_GLFWwindow* window, int pixelFormat, int attrib)
 {
     int value = 0;
-
-    assert(_glfw.wgl.ARB_pixel_format);
 
     if (!_glfw.wgl.GetPixelFormatAttribivARB(window->context.wgl.dc,
                                              pixelFormat,
@@ -387,9 +383,7 @@ static void loadExtensions(void)
 }
 
 
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW internal API                      //////
-//////////////////////////////////////////////////////////////////////////
+/// GLFW internal API
 
 // Initialize WGL
 //
@@ -419,16 +413,13 @@ GLFWbool _glfwInitWGL(void)
 // Terminate WGL
 //
 void _glfwTerminateWGL(void)
-{
-    if (_glfw.wgl.instance)
-        FreeLibrary(_glfw.wgl.instance);
+{ if (_glfw.wgl.instance)FreeLibrary(_glfw.wgl.instance);
 }
 
 #define setWGLattrib(attribName, attribValue) \
 { \
     attribs[index++] = attribName; \
     attribs[index++] = attribValue; \
-    assert((size_t) index < sizeof(attribs) / sizeof(attribs[0])); \
 }
 
 // Create the OpenGL or OpenGL ES context
@@ -670,9 +661,7 @@ int _glfwAnalyzeContextWGL(_GLFWwindow* window,
 }
 
 
-//////////////////////////////////////////////////////////////////////////
-//////                        GLFW native API                       //////
-//////////////////////////////////////////////////////////////////////////
+/// GLFW native API
 
 GLFWAPI HGLRC glfwGetWGLContext(GLFWwindow* handle)
 {

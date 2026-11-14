@@ -710,6 +710,7 @@
 		<Unit filename="../Window/Window_List.cpp">
 			<Option target="Window-shapes" />
 			<Option target="Window-shapes_x" />
+			<Option target="Ship Viewer" />
 		</Unit>
 		<Unit filename="../Window/Window_Menu.cpp">
 			<Option target="Aurora Storm" />

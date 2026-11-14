@@ -34,21 +34,15 @@
 #include <stdlib.h>
 #include <malloc.h>
 
-#include <initguid.h>
-DEFINE_GUID(GUID_DEVINTERFACE_HID,0x4d1e55b2,0xf16f,0x11cf,0x88,0xcb,0x00,0x11,0x11,0x00,0x00,0x30);
+//#include <initguid.h>
+//DEFINE_GUID(GUID_DEVINTERFACE_HID,0x4d1e55b2,0xf16f,0x11cf,0x88,0xcb,0x00,0x11,0x11,0x00,0x00,0x30);
+
+static const GUID GUID_DEVINTERFACE_HID =
+    {0x4d1e55b2,0xf16f,0x11cf,{0x88,0xcb,0x00,0x11,0x11,0x00,0x00,0x30}};
 
 #if defined(_GLFW_USE_HYBRID_HPG) || defined(_GLFW_USE_OPTIMUS_HPG)
 
-// Applications exporting this symbol with this value will be automatically
-// directed to the high-performance GPU on Nvidia Optimus systems with
-// up-to-date drivers
-//
 __declspec(dllexport) DWORD NvOptimusEnablement = 1;
-
-// Applications exporting this symbol with this value will be automatically
-// directed to the high-performance GPU on AMD PowerXpress systems with
-// up-to-date drivers
-//
 __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 
 #endif // _GLFW_USE_HYBRID_HPG
@@ -245,9 +239,7 @@ static HWND createHelperWindow(void)
 }
 
 
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW internal API                      //////
-//////////////////////////////////////////////////////////////////////////
+/// GLFW internal API
 
 // Returns a wide string version of the specified UTF-8 string
 //
@@ -294,9 +286,7 @@ char* _glfwCreateUTF8FromWideStringWin32(const WCHAR* source)
 }
 
 
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW platform API                      //////
-//////////////////////////////////////////////////////////////////////////
+/// GLFW platform API
 
 int _glfwPlatformInit(void)
 {

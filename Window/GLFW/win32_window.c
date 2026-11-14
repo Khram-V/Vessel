@@ -911,11 +911,7 @@ static void destroyWindow(_GLFWwindow* window)
         window->win32.handle = NULL;
     }
 }
-
-
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW internal API                      //////
-//////////////////////////////////////////////////////////////////////////
+/// GLFW internal API
 
 // Registers the GLFW window class
 //
@@ -960,10 +956,7 @@ void _glfwUnregisterWindowClassWin32(void)
     UnregisterClassW(_GLFW_WNDCLASSNAME, GetModuleHandleW(NULL));
 }
 
-
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW platform API                      //////
-//////////////////////////////////////////////////////////////////////////
+///  GLFW platform API
 
 int _glfwPlatformCreateWindow(_GLFWwindow* window,
                               const _GLFWwndconfig* wndconfig,
@@ -1638,9 +1631,7 @@ const char* _glfwPlatformGetClipboardString(_GLFWwindow* window)
     return _glfw.win32.clipboardString;
 }
 
-//////////////////////////////////////////////////////////////////////////
-//////                        GLFW native API                       //////
-//////////////////////////////////////////////////////////////////////////
+/// GLFW native API
 
 GLFWAPI HWND glfwGetWin32Window(GLFWwindow* handle)
 {   _GLFWwindow* window = (_GLFWwindow*) handle;

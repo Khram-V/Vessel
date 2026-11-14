@@ -31,10 +31,7 @@
 
 #include "internal.h"
 
-
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW internal API                      //////
-//////////////////////////////////////////////////////////////////////////
+/// GLFW internal API
 
 GLFWbool _glfwInitThreadLocalStorageWin32(void)
 {
@@ -56,10 +53,7 @@ void _glfwTerminateThreadLocalStorageWin32(void)
         TlsFree(_glfw.win32_tls.context);
 }
 
-
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW platform API                      //////
-//////////////////////////////////////////////////////////////////////////
+/// GLFW platform API
 
 void _glfwPlatformSetCurrentContext(_GLFWwindow* context)
 {
@@ -70,4 +64,3 @@ _GLFWwindow* _glfwPlatformGetCurrentContext(void)
 {
     return TlsGetValue(_glfw.win32_tls.context);
 }
-

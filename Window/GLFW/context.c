@@ -31,7 +31,6 @@
 
 #include "internal.h"
 
-#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
@@ -88,9 +87,7 @@ static GLFWbool parseVersionString(int* api, int* major, int* minor, int* rev)
 }
 
 
-//////////////////////////////////////////////////////////////////////////
-//////                       GLFW internal API                      //////
-//////////////////////////////////////////////////////////////////////////
+/// GLFW internal API
 
 GLFWbool _glfwIsValidContextConfig(const _GLFWctxconfig* ctxconfig)
 {
@@ -454,9 +451,7 @@ GLFWbool _glfwStringInExtensionString(const char* string, const char* extensions
 }
 
 
-//////////////////////////////////////////////////////////////////////////
-//////                        GLFW public API                       //////
-//////////////////////////////////////////////////////////////////////////
+/// GLFW public API
 
 GLFWAPI void glfwMakeContextCurrent(GLFWwindow* handle)
 {
@@ -490,16 +485,11 @@ GLFWAPI GLFWwindow* glfwGetCurrentContext(void)
 GLFWAPI void glfwSwapBuffers(GLFWwindow* handle)
 {
     _GLFWwindow* window = (_GLFWwindow*) handle;
-    assert(window != NULL);
-
     _GLFW_REQUIRE_INIT();
-
     if (window->context.client == GLFW_NO_API)
-    {
-        _glfwInputError(GLFW_NO_WINDOW_CONTEXT, NULL);
+    {  _glfwInputError(GLFW_NO_WINDOW_CONTEXT, NULL);
         return;
     }
-
     window->context.swapBuffers(window);
 }
 
@@ -520,17 +510,11 @@ GLFWAPI void glfwSwapInterval(int interval)
 }
 
 GLFWAPI int glfwExtensionSupported(const char* extension)
-{
-    _GLFWwindow* window;
-
-    assert(extension != NULL);
-
+{   _GLFWwindow* window;
     _GLFW_REQUIRE_INIT_OR_RETURN(GLFW_FALSE);
-
     window = _glfwPlatformGetCurrentContext();
     if (!window)
-    {
-        _glfwInputError(GLFW_NO_CURRENT_CONTEXT, NULL);
+    {  _glfwInputError(GLFW_NO_CURRENT_CONTEXT, NULL);
         return GLFW_FALSE;
     }
 
@@ -586,10 +570,7 @@ GLFWAPI int glfwExtensionSupported(const char* extension)
 }
 
 GLFWAPI GLFWglproc glfwGetProcAddress(const char* procname)
-{
-    _GLFWwindow* window;
-    assert(procname != NULL);
-
+{   _GLFWwindow* window;
     _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
 
     window = _glfwPlatformGetCurrentContext();
