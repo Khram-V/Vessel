@@ -155,7 +155,7 @@ void Surface::ReadStl( char *Path )           // временный оригин
   //
   //   Standard Triangle Library - ascii
   //
-  while( !feof( FM ) )                       // первая строка "solid имя" мимо
+  while( !feof( FM ) )                        // первая строка "solid имя" мимо
   { while( !strcut( S=getString( FM ) ) );
     if( !memcmp( S,"solid",5 ) )               // начинаем считывание франмента
     { L=(Layers*)Allocate( ++NoLayers*sizeof( Layers ),L );
@@ -164,8 +164,8 @@ void Surface::ReadStl( char *Path )           // временный оригин
       L[NoLayers-1].Symmetric=true;
       L[NoLayers-1].ID=NoLayers-1;
       while( !feof( FM ) )
-      { while( !strcut( S=getString( FM ) ) );   // пропуск до непустой строки
-//      if( !(S=getString( FM ) ) )break;        //        facet normal x,y,z
+      { while( !strcut( S=getString( FM ) ) );    // пропуск до непустой строки
+//      if( !(S=getString( FM ) ) )break;         //        facet normal x,y,z
         if( !memcmp( S,"endsolid",8 ) )break;     // конец данных по фрагменту
         sscanf( S,"%s %s %lg%lg%lg",T,T,&(N.x),&(N.y),&(N.z) );
         if( !(S=getString( FM ) ) )break;        //         пропуск outer loop
@@ -176,7 +176,7 @@ void Surface::ReadStl( char *Path )           // временный оригин
         f.Capacity=3;
         f.LayerIndex=NoLayers-1;
         for( int i=0; i<3; i++ )
-        { if( !(S=getString( FM ) ) )break;  // последовательно читаются x,y,z
+        { if( !(S=getString( FM ) ) )break;   // последовательно читаются x,y,z
          Vector &V=P[NoCoPoint+i-3].V;
           sscanf( S,"%s %lg%lg%lg",T,&(V.x),&(V.y),&(V.z) );
           f.P[i]=NoCoPoint+i-3;
@@ -192,9 +192,9 @@ void Surface::ReadStl( char *Path )           // временный оригин
   } return;  // Standard Triangle Library - binary
 binarySTL:   //
  int n,NoL=NoLayers; fixed c;
-  fclose( FM ); if( !(FM=_wfopen( FName,L"rb" ) ) )return; // ~ переоткрытие
+  fclose( FM ); if( !(FM=_wfopen( FName,L"rb" ) ) )return;    // ~ переоткрытие
   print( ".binary файл: %s",Path );
-  fread( T,1,80,FM );                    // Читается заголовок (80 байт)
+  fread( T,1,80,FM );                     // Читается заголовок (80 байт)
          T[79]='\0';                      // гарантируется null-termination
   print( "\n«%s»\n",T );
   isBin=true; n=getInt();                 // Читается количество треугольников
@@ -215,7 +215,7 @@ binarySTL:   //
           *(P[j+2].V-W))%N<0 ){ int C=f.P[0]; f.P[0]=f.P[2]; f.P[2]=C; }
     }
    Color C;
-    fread( &c,2,1,FM );                 // расцветка разбирается в расслоениях
+    fread( &c,2,1,FM );                  // расцветка разбирается в расслоениях
     if( c&0x8000 )
     { C.C=0;
       C.c[0]=(255*( c&0x1F ))/31;
@@ -224,14 +224,14 @@ binarySTL:   //
     } else C.C=ActiveLayer.LClr.C;
    bool k=false; j=NoL;
     while( j<NoLayers )
-    { if( L[j].LClr.C==C.C ){ f.LayerIndex=j; k=true; break; } ++j; } j=NoLayers;
+    { if(L[j].LClr.C==C.C){ f.LayerIndex=j; k=true; break; } ++j; } j=NoLayers;
     if( !k )                                              // j==NoLayers )
     { L=(Layers*)Allocate( ++NoLayers*sizeof( Layers ),L );
       memcpy( &L[NoLayers-1],&ActiveLayer,sizeof( Layers ) );
-      sprintf( T,"%i Цвет: r:%i,g:%i,b:%i - %i",j,C.c[0],C.c[1],C.c[2],C.c[3] );
+      sprintf(T,"%i Цвет: r:%i,g:%i,b:%i - %i",j,C.c[0],C.c[1],C.c[2],C.c[3] );
       L[j].Symmetric=true;
       L[j].Description=strdup( T );
-      L[j].ID=NoLayers-1;                         //      C.c[3]=0xFF;
+      L[j].ID=NoLayers-1;                                       // C.c[3]=0xFF;
       L[j].LClr=C;
     }
   } NoCoPoint+=n*3;
@@ -293,8 +293,8 @@ void Surface::WriteSTL( char *FileName, BoardView ModelView, bool AB )
     }
   } fclose( FM ); FM=NULL;
 }
-static void wrV( _Vector V )
-               { fprintf( FM,"v %g %g %g\n",e5r(V.x),e5r(V.z),e5r(V.y) ); }
+static void wrV( _Vector V )                                       // x-z-y
+               { fprintf( FM,"v %g %g %g\n",e5r(V.y),e5r(V.z),e5r(V.x) ); }
 
 void Surface::WriteObj( char *FileName, BoardView ModelView )
 { //

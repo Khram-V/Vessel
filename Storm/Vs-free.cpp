@@ -437,7 +437,8 @@ void freeShip::ReadObj()                      // временный оригин
     { P=(CoPoint*)Allocate( ++NoCoPoint*sizeof( CoPoint ),P );
      CoPoint &p=P[NoCoPoint-1];
 //    sscanf( S+2,"%lg%lg%lg",&p.V.y,&p.V.x,&p.V.z ); p.V.x=-p.V.x; // Новик здесь
-      sscanf( S+2,"%lg%lg%lg",&p.V.x,&p.V.z,&p.V.y ); // так готовится в Авроре #+# p.V.y=-p.V.y;
+//    sscanf( S+2,"%lg%lg%lg",&p.V.x,&p.V.z,&p.V.y ); // так готовится в Авроре #+# p.V.y=-p.V.y;
+      sscanf( S+2,"%lg%lg%lg",&p.V.y,&p.V.z,&p.V.x );
 //    p.T=svRegular; // svCrease; // svDart; // svCorner;
     } else
     if( !strncmp( S,"f ",2) )
