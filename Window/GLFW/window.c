@@ -515,15 +515,13 @@ GLFWAPI void glfwGetFramebufferSize(GLFWwindow* handle, int* width, int* height)
 GLFWAPI void glfwGetWindowFrameSize(GLFWwindow* handle,
                                     int* left, int* top,
                                     int* right, int* bottom)
-{
-    _GLFWwindow* window = (_GLFWwindow*) handle;
+{  _GLFWwindow* window = (_GLFWwindow*) handle;
     if (left)   *left = 0;
     if (top)    *top = 0;
     if (right)  *right = 0;
     if (bottom) *bottom = 0;
-
-    _GLFW_REQUIRE_INIT();
-    _glfwPlatformGetWindowFrameSize(window, left, top, right, bottom);
+   _GLFW_REQUIRE_INIT();
+   _glfwPlatformGetWindowFrameSize(window, left, top, right, bottom);
 }
 
 GLFWAPI void glfwIconifyWindow(GLFWwindow* handle)
@@ -559,12 +557,9 @@ GLFWAPI void glfwShowWindow(GLFWwindow* handle)
 }
 
 GLFWAPI void glfwHideWindow(GLFWwindow* handle)
-{
-    _GLFWwindow* window = (_GLFWwindow*) handle;
-    _GLFW_REQUIRE_INIT();
-
+{  _GLFWwindow* window = (_GLFWwindow*) handle;
+   _GLFW_REQUIRE_INIT();
     if (window->monitor)return;
-
     _glfwPlatformHideWindow(window);
 }
 
@@ -576,48 +571,28 @@ GLFWAPI void glfwFocusWindow(GLFWwindow* handle)
 }
 
 GLFWAPI int glfwGetWindowAttrib(GLFWwindow* handle, int attrib)
-{
-    _GLFWwindow* window = (_GLFWwindow*) handle;
-    _GLFW_REQUIRE_INIT_OR_RETURN(0);
+{ _GLFWwindow* window = (_GLFWwindow*) handle;
+  _GLFW_REQUIRE_INIT_OR_RETURN(0);
     switch (attrib)
-    {   case GLFW_FOCUSED:
-            return _glfwPlatformWindowFocused(window);
-        case GLFW_ICONIFIED:
-            return _glfwPlatformWindowIconified(window);
-        case GLFW_VISIBLE:
-            return _glfwPlatformWindowVisible(window);
-        case GLFW_MAXIMIZED:
-            return _glfwPlatformWindowMaximized(window);
-        case GLFW_RESIZABLE:
-            return window->resizable;
-        case GLFW_DECORATED:
-            return window->decorated;
-        case GLFW_FLOATING:
-            return window->floating;
-        case GLFW_CLIENT_API:
-            return window->context.client;
-        case GLFW_CONTEXT_CREATION_API:
-            return window->context.source;
-        case GLFW_CONTEXT_VERSION_MAJOR:
-            return window->context.major;
-        case GLFW_CONTEXT_VERSION_MINOR:
-            return window->context.minor;
-        case GLFW_CONTEXT_REVISION:
-            return window->context.revision;
-        case GLFW_CONTEXT_ROBUSTNESS:
-            return window->context.robustness;
-        case GLFW_OPENGL_FORWARD_COMPAT:
-            return window->context.forward;
-        case GLFW_OPENGL_DEBUG_CONTEXT:
-            return window->context.debug;
-        case GLFW_OPENGL_PROFILE:
-            return window->context.profile;
-        case GLFW_CONTEXT_RELEASE_BEHAVIOR:
-            return window->context.release;
-        case GLFW_CONTEXT_NO_ERROR:
-            return window->context.noerror;
+    {   case GLFW_FOCUSED:   return _glfwPlatformWindowFocused(window);
+        case GLFW_ICONIFIED: return _glfwPlatformWindowIconified(window);
+        case GLFW_VISIBLE:   return _glfwPlatformWindowVisible(window);
+        case GLFW_MAXIMIZED: return _glfwPlatformWindowMaximized(window);
+        case GLFW_RESIZABLE: return window->resizable;
+        case GLFW_DECORATED: return window->decorated;
+        case GLFW_FLOATING:  return window->floating;
+        case GLFW_CLIENT_API:return window->context.client;
+        case GLFW_CONTEXT_CREATION_API: return window->context.source;
+        case GLFW_CONTEXT_VERSION_MAJOR: return window->context.major;
+        case GLFW_CONTEXT_VERSION_MINOR: return window->context.minor;
+        case GLFW_CONTEXT_REVISION:      return window->context.revision;
+        case GLFW_CONTEXT_ROBUSTNESS:    return window->context.robustness;
+        case GLFW_OPENGL_FORWARD_COMPAT: return window->context.forward;
+        case GLFW_OPENGL_DEBUG_CONTEXT:  return window->context.debug;
+        case GLFW_OPENGL_PROFILE:        return window->context.profile;
+        case GLFW_CONTEXT_RELEASE_BEHAVIOR: return window->context.release;
+        case GLFW_CONTEXT_NO_ERROR:      return window->context.noerror;
     }
-
     _glfwInputError(GLFW_INVALID_ENUM, "Invalid window attribute %i", attrib);
     return 0;
 }
@@ -634,148 +609,104 @@ GLFWAPI void glfwSetWindowMonitor(GLFWwindow* wh,
                                   int xpos, int ypos,
                                   int width, int height,
                                   int refreshRate)
-{
-    _GLFWwindow* window = (_GLFWwindow*) wh;
-    _GLFWmonitor* monitor = (_GLFWmonitor*) mh;
-    _GLFW_REQUIRE_INIT();
-
-    if (width <= 0 || height <= 0)
-    {
-        _glfwInputError(GLFW_INVALID_VALUE,
-                        "Invalid window size %ix%i",width,height);
-        return;
-    }
-
-    if (refreshRate < 0 && refreshRate != GLFW_DONT_CARE)
-    {
-        _glfwInputError(GLFW_INVALID_VALUE,
-                        "Invalid refresh rate %i",
-                        refreshRate);
-        return;
-    }
-
-    window->videoMode.width       = width;
-    window->videoMode.height      = height;
-    window->videoMode.refreshRate = refreshRate;
-
-    _glfwPlatformSetWindowMonitor(window, monitor,
-                                  xpos, ypos, width, height,
-                                  refreshRate);
+{  _GLFWwindow* window = (_GLFWwindow*) wh;
+   _GLFWmonitor* monitor = (_GLFWmonitor*) mh;
+   _GLFW_REQUIRE_INIT();
+   if (width <= 0 || height <= 0)
+   {  _glfwInputError(GLFW_INVALID_VALUE,
+                     "Invalid window size %ix%i",width,height);
+       return;
+   }
+   if (refreshRate < 0 && refreshRate != GLFW_DONT_CARE)
+   {  _glfwInputError(GLFW_INVALID_VALUE,
+                     "Invalid refresh rate %i",refreshRate);
+       return;
+   }
+   window->videoMode.width       = width;
+   window->videoMode.height      = height;
+   window->videoMode.refreshRate = refreshRate;
+  _glfwPlatformSetWindowMonitor(window, monitor,
+                                xpos, ypos, width, height, refreshRate);
 }
-
 GLFWAPI void glfwSetWindowUserPointer(GLFWwindow* handle, void* pointer)
-{
-    _GLFWwindow* window = (_GLFWwindow*) handle;
-    _GLFW_REQUIRE_INIT();
-    window->userPointer = pointer;
+{  _GLFWwindow* window = (_GLFWwindow*) handle;
+   _GLFW_REQUIRE_INIT();
+   window->userPointer = pointer;
 }
-
 GLFWAPI void* glfwGetWindowUserPointer(GLFWwindow* handle)
-{
-    _GLFWwindow* window = (_GLFWwindow*) handle;
-    _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
-    return window->userPointer;
+{  _GLFWwindow* window = (_GLFWwindow*) handle;
+   _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
+   return window->userPointer;
 }
-
 GLFWAPI GLFWwindowposfun glfwSetWindowPosCallback(GLFWwindow* handle,
                                                   GLFWwindowposfun cbfun)
-{
-    _GLFWwindow* window = (_GLFWwindow*) handle;
-    _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
-    _GLFW_SWAP_POINTERS(window->callbacks.pos, cbfun);
-    return cbfun;
+{  _GLFWwindow* window = (_GLFWwindow*) handle;
+   _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
+   _GLFW_SWAP_POINTERS(window->callbacks.pos, cbfun);
+   return cbfun;
 }
-
 GLFWAPI GLFWwindowsizefun glfwSetWindowSizeCallback(GLFWwindow* handle,
                                                     GLFWwindowsizefun cbfun)
-{
-    _GLFWwindow* window = (_GLFWwindow*) handle;
-    _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
-    _GLFW_SWAP_POINTERS(window->callbacks.size, cbfun);
-    return cbfun;
+{  _GLFWwindow* window = (_GLFWwindow*) handle;
+   _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
+   _GLFW_SWAP_POINTERS(window->callbacks.size, cbfun);
+   return cbfun;
 }
-
 GLFWAPI GLFWwindowclosefun glfwSetWindowCloseCallback(GLFWwindow* handle,
                                                       GLFWwindowclosefun cbfun)
-{
-    _GLFWwindow* window = (_GLFWwindow*) handle;
-    _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
-    _GLFW_SWAP_POINTERS(window->callbacks.close, cbfun);
-    return cbfun;
+{  _GLFWwindow* window = (_GLFWwindow*) handle;
+   _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
+   _GLFW_SWAP_POINTERS(window->callbacks.close, cbfun);
+   return cbfun;
 }
-
 GLFWAPI GLFWwindowrefreshfun glfwSetWindowRefreshCallback(GLFWwindow* handle,
                                                           GLFWwindowrefreshfun cbfun)
-{
-    _GLFWwindow* window = (_GLFWwindow*) handle;
-    _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
-    _GLFW_SWAP_POINTERS(window->callbacks.refresh, cbfun);
-    return cbfun;
+{  _GLFWwindow* window = (_GLFWwindow*) handle;
+   _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
+   _GLFW_SWAP_POINTERS(window->callbacks.refresh, cbfun);
+   return cbfun;
 }
-
 GLFWAPI GLFWwindowfocusfun glfwSetWindowFocusCallback(GLFWwindow* handle,
                                                       GLFWwindowfocusfun cbfun)
-{
-    _GLFWwindow* window = (_GLFWwindow*) handle;
-    _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
-    _GLFW_SWAP_POINTERS(window->callbacks.focus, cbfun);
-    return cbfun;
+{  _GLFWwindow* window = (_GLFWwindow*) handle;
+   _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
+   _GLFW_SWAP_POINTERS(window->callbacks.focus, cbfun);
+   return cbfun;
 }
-
 GLFWAPI GLFWwindowiconifyfun glfwSetWindowIconifyCallback(GLFWwindow* handle,
                                                           GLFWwindowiconifyfun cbfun)
-{
-    _GLFWwindow* window = (_GLFWwindow*) handle;
-    _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
-    _GLFW_SWAP_POINTERS(window->callbacks.iconify, cbfun);
-    return cbfun;
+{  _GLFWwindow* window = (_GLFWwindow*) handle;
+   _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
+   _GLFW_SWAP_POINTERS(window->callbacks.iconify, cbfun);
+   return cbfun;
 }
-
 GLFWAPI GLFWframebuffersizefun glfwSetFramebufferSizeCallback(GLFWwindow* handle,
                                                               GLFWframebuffersizefun cbfun)
-{
-    _GLFWwindow* window = (_GLFWwindow*) handle;
-    _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
-    _GLFW_SWAP_POINTERS(window->callbacks.fbsize, cbfun);
-    return cbfun;
+{  _GLFWwindow* window = (_GLFWwindow*) handle;
+   _GLFW_REQUIRE_INIT_OR_RETURN(NULL);
+   _GLFW_SWAP_POINTERS(window->callbacks.fbsize, cbfun);
+   return cbfun;
 }
-
 GLFWAPI void glfwPollEvents(void)
-{
-    _GLFW_REQUIRE_INIT();
-    _glfwPlatformPollEvents();
+{  _GLFW_REQUIRE_INIT();
+   _glfwPlatformPollEvents();
 }
-
 GLFWAPI void glfwWaitEvents(void)
-{
-    _GLFW_REQUIRE_INIT();
-
-    if (!_glfw.windowListHead)
-        return;
-
-    _glfwPlatformWaitEvents();
+{  _GLFW_REQUIRE_INIT();
+    if (!_glfw.windowListHead)return;
+   _glfwPlatformWaitEvents();
 }
-
 GLFWAPI void glfwWaitEventsTimeout(double timeout)
-{
-    _GLFW_REQUIRE_INIT();
-
+{  _GLFW_REQUIRE_INIT();
     if (timeout != timeout || timeout < 0.0 || timeout > DBL_MAX)
-    {
-        _glfwInputError(GLFW_INVALID_VALUE, "Invalid time %f", timeout);
+    {  _glfwInputError(GLFW_INVALID_VALUE, "Invalid time %f", timeout);
         return;
     }
-
-    _glfwPlatformWaitEventsTimeout(timeout);
+   _glfwPlatformWaitEventsTimeout(timeout);
 }
-
 GLFWAPI void glfwPostEmptyEvent(void)
-{
-    _GLFW_REQUIRE_INIT();
-
-    if (!_glfw.windowListHead)
-        return;
-
-    _glfwPlatformPostEmptyEvent();
+{  _GLFW_REQUIRE_INIT();
+    if (!_glfw.windowListHead)return;
+   _glfwPlatformPostEmptyEvent();
 }
 

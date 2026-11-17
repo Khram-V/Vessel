@@ -51,12 +51,6 @@ typedef void (* _GLFWdestroycontextfun)(_GLFWwindow*);
 #define GL_CONTEXT_PROFILE_MASK 0x9126
 #define GL_CONTEXT_COMPATIBILITY_PROFILE_BIT 0x00000002
 #define GL_CONTEXT_CORE_PROFILE_BIT 0x00000001
-#define GL_RESET_NOTIFICATION_STRATEGY_ARB 0x8256
-#define GL_LOSE_CONTEXT_ON_RESET_ARB 0x8252
-#define GL_NO_RESET_NOTIFICATION_ARB 0x8261
-#define GL_CONTEXT_RELEASE_BEHAVIOR 0x82fb
-#define GL_CONTEXT_RELEASE_BEHAVIOR_FLUSH 0x82fc
-#define GL_CONTEXT_FLAG_NO_ERROR_BIT_KHR 0x00000008
 
 typedef int	GLint;
 typedef unsigned int GLuint;
@@ -165,8 +159,6 @@ struct _GLFWcontext
 
     // This is defined in the context API's context.h
     _GLFW_PLATFORM_CONTEXT_STATE;
-    // This is defined in egl_context.h
-//  _GLFW_EGL_CONTEXT_STATE;
 };
 
 /*! @brief Window and context structure.
@@ -287,12 +279,8 @@ struct _GLFWlibrary
     _GLFW_PLATFORM_LIBRARY_CONTEXT_STATE;
     // This is defined in the platform's time.h
     _GLFW_PLATFORM_LIBRARY_TIME_STATE;
-    // This is defined in the platform's joystick.h
-//  _GLFW_PLATFORM_LIBRARY_JOYSTICK_STATE;
     // This is defined in the platform's tls.h
     _GLFW_PLATFORM_LIBRARY_TLS_STATE;
-    // This is defined in egl_context.h
-//  _GLFW_EGL_LIBRARY_CONTEXT_STATE;
 };
 
 

@@ -61,6 +61,7 @@
 			<Add option="-fexec-charset=UTF-8" />
 			<Add option="-finput-charset=UTF-8" />
 			<Add option="-Wunused" />
+			<Add option="-Wno-write-strings" />
 		</Compiler>
 		<Linker>
 			<Add option="-s" />

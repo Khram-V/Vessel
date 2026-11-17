@@ -11,13 +11,11 @@
 // Parses the client API version string and extracts the version number
 //
 static GLFWbool parseVersionString(int* api, int* major, int* minor, int* rev)
-{
-    int i;
+{ int i;
     _GLFWwindow* window;
     const char* version;
     const char* prefixes[] =
-    {
-        "OpenGL ES-CM ",
+    {   "OpenGL ES-CM ",
         "OpenGL ES-CL ",
         "OpenGL ES ",
         NULL
@@ -56,7 +54,6 @@ static GLFWbool parseVersionString(int* api, int* major, int* minor, int* rev)
 
     return GLFW_TRUE;
 }
-
 
 /// GLFW internal API
 
@@ -166,9 +163,7 @@ GLFWbool _glfwIsValidContextConfig(const _GLFWctxconfig* ctxconfig)
 const _GLFWfbconfig* _glfwChooseFBConfig(const _GLFWfbconfig* desired,
                                          const _GLFWfbconfig* alternatives,
                                          unsigned int count)
-{
-    unsigned int i;
-    unsigned int missing, leastMissing = UINT_MAX;
+{   unsigned int i, missing, leastMissing = UINT_MAX;
     unsigned int colorDiff, leastColorDiff = UINT_MAX;
     unsigned int extraDiff, leastExtraDiff = UINT_MAX;
     const _GLFWfbconfig* current;
@@ -194,33 +189,22 @@ const _GLFWfbconfig* _glfwChooseFBConfig(const _GLFWfbconfig* desired,
         {
             missing = 0;
 
-            if (desired->alphaBits > 0 && current->alphaBits == 0)
-                missing++;
-
-            if (desired->depthBits > 0 && current->depthBits == 0)
-                missing++;
-
-            if (desired->stencilBits > 0 && current->stencilBits == 0)
-                missing++;
-
+            if (desired->alphaBits > 0 && current->alphaBits == 0)missing++;
+            if (desired->depthBits > 0 && current->depthBits == 0)missing++;
+            if (desired->stencilBits>0 && current->stencilBits==0)missing++;
             if (desired->auxBuffers > 0 &&
                 current->auxBuffers < desired->auxBuffers)
-            {
-                missing += desired->auxBuffers - current->auxBuffers;
+            {   missing += desired->auxBuffers - current->auxBuffers;
             }
-
             if (desired->samples > 0 && current->samples == 0)
-            {
-                // Technically, several multisampling buffers could be
+            {   // Technically, several multisampling buffers could be
                 // involved, but that's a lower level implementation detail and
                 // not important to us here, so we count them as one
                 missing++;
             }
         }
-
         // These polynomials make many small channel size differences matter
         // less than one large channel size difference
-
         // Calculate color channel size difference value
         {
             colorDiff = 0;
@@ -420,7 +404,6 @@ GLFWbool _glfwStringInExtensionString(const char* string, const char* extensions
 
     return GLFW_TRUE;
 }
-
 
 /// GLFW public API
 

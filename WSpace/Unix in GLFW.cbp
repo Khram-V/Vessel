@@ -205,6 +205,7 @@
 			<Add option="-fno-exceptions" />
 			<Add option="-Wunused" />
 			<Add option="-ffunction-sections" />
+			<Add option="-Wno-write-strings" />
 			<Add option="-DGLFW" />
 			<Add option="-D_GLFW_WIN32" />
 			<Add directory="../Window/GLFW" />
@@ -503,14 +504,6 @@
 			<Option target="Window-shapes" />
 			<Option target="Window-trial" />
 		</Unit>
-		<Unit filename="../Window/GLFW/init.c.bak">
-			<Option target="Aurora Storm" />
-			<Option target="Waves Profile" />
-			<Option target="Hull Theory" />
-			<Option target="Ship Viewer" />
-			<Option target="Window-shapes" />
-			<Option target="Window-trial" />
-		</Unit>
 		<Unit filename="../Window/GLFW/input.c">
 			<Option compilerVar="CC" />
 			<Option target="Aurora Storm" />
@@ -521,14 +514,6 @@
 			<Option target="Window-trial" />
 		</Unit>
 		<Unit filename="../Window/GLFW/internal.h">
-			<Option target="Aurora Storm" />
-			<Option target="Waves Profile" />
-			<Option target="Hull Theory" />
-			<Option target="Ship Viewer" />
-			<Option target="Window-shapes" />
-			<Option target="Window-trial" />
-		</Unit>
-		<Unit filename="../Window/GLFW/internal.h.bak">
 			<Option target="Aurora Storm" />
 			<Option target="Waves Profile" />
 			<Option target="Hull Theory" />
@@ -571,14 +556,6 @@
 			<Option target="Window-shapes" />
 			<Option target="Window-trial" />
 		</Unit>
-		<Unit filename="../Window/GLFW/win32_init.c.bak">
-			<Option target="Aurora Storm" />
-			<Option target="Waves Profile" />
-			<Option target="Hull Theory" />
-			<Option target="Ship Viewer" />
-			<Option target="Window-shapes" />
-			<Option target="Window-trial" />
-		</Unit>
 		<Unit filename="../Window/GLFW/win32_monitor.c">
 			<Option compilerVar="CC" />
 			<Option target="Aurora Storm" />
@@ -598,14 +575,6 @@
 		</Unit>
 		<Unit filename="../Window/GLFW/win32_time.c">
 			<Option compilerVar="CC" />
-			<Option target="Aurora Storm" />
-			<Option target="Waves Profile" />
-			<Option target="Hull Theory" />
-			<Option target="Ship Viewer" />
-			<Option target="Window-shapes" />
-			<Option target="Window-trial" />
-		</Unit>
-		<Unit filename="../Window/GLFW/win32_time.h">
 			<Option target="Aurora Storm" />
 			<Option target="Waves Profile" />
 			<Option target="Hull Theory" />

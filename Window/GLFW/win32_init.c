@@ -39,12 +39,9 @@ static void freeLibraries(void){}
 // Create key code translation tables
 //
 static void createKeyTables(void)
-{
-    int scancode;
-
+{ int scancode;
     memset(_glfw.win32.publicKeys, -1, sizeof(_glfw.win32.publicKeys));
     memset(_glfw.win32.nativeKeys, -1, sizeof(_glfw.win32.nativeKeys));
-
     _glfw.win32.publicKeys[0x00B] = GLFW_KEY_0;
     _glfw.win32.publicKeys[0x002] = GLFW_KEY_1;
     _glfw.win32.publicKeys[0x003] = GLFW_KEY_2;
@@ -168,12 +165,10 @@ static void createKeyTables(void)
     _glfw.win32.publicKeys[0x04A] = GLFW_KEY_KP_SUBTRACT;
 
     for (scancode = 0;  scancode < 512;  scancode++)
-    {
-        if (_glfw.win32.publicKeys[scancode] > 0)
-            _glfw.win32.nativeKeys[_glfw.win32.publicKeys[scancode]] = scancode;
+    {  if (_glfw.win32.publicKeys[scancode] > 0)
+           _glfw.win32.nativeKeys[_glfw.win32.publicKeys[scancode]] = scancode;
     }
 }
-
 // Creates a dummy window for behind-the-scenes work
 //
 static HWND createHelperWindow(void)
@@ -187,8 +182,7 @@ static HWND createHelperWindow(void)
                                   GetModuleHandleW(NULL),
                                   NULL);
     if (!window)
-    {
-        _glfwInputError(GLFW_PLATFORM_ERROR,
+    {   _glfwInputError(GLFW_PLATFORM_ERROR,
                         "Win32: Failed to create helper window");
         return NULL;
     }
@@ -209,53 +203,34 @@ static HWND createHelperWindow(void)
    return window;
 }
 
-
 /// GLFW internal API
-
 // Returns a wide string version of the specified UTF-8 string
 //
 WCHAR* _glfwCreateWideStringFromUTF8Win32(const char* source)
-{
-    WCHAR* target;
-    int length;
-
+{ WCHAR* target;
+  int length;
     length = MultiByteToWideChar(CP_UTF8, 0, source, -1, NULL, 0);
-    if (!length)
-        return NULL;
-
+    if (!length)return NULL;
     target = calloc(length, sizeof(WCHAR));
-
     if (!MultiByteToWideChar(CP_UTF8, 0, source, -1, target, length))
-    {
-        free(target);
+    {   free(target);
         return NULL;
-    }
-
-    return target;
+    }   return target;
 }
 
 // Returns a UTF-8 string version of the specified wide string
 //
 char* _glfwCreateUTF8FromWideStringWin32(const WCHAR* source)
-{
-    char* target;
-    int length;
-
+{ char* target;
+  int length;
     length = WideCharToMultiByte(CP_UTF8, 0, source, -1, NULL, 0, NULL, NULL);
-    if (!length)
-        return NULL;
-
+    if (!length)return NULL;
     target = calloc(length, sizeof(char));
-
     if (!WideCharToMultiByte(CP_UTF8, 0, source, -1, target, length, NULL, NULL))
-    {
-        free(target);
+    {   free(target);
         return NULL;
-    }
-
-    return target;
+    }   return target;
 }
-
 
 /// GLFW platform API
 

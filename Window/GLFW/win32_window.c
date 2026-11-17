@@ -400,24 +400,15 @@ static LRESULT CALLBACK windowProc(HWND hWnd, UINT uMsg,
 {
     _GLFWwindow* window = GetPropW(hWnd, L"GLFW");
     if (!window)
-    {
-        // This is the message handling for the hidden helper window
-
+    {  // This is the message handling for the hidden helper window
         switch (uMsg)
-        {
-            case WM_DEVICECHANGE:
-            {
-                if (wParam == DBT_DEVNODES_CHANGED)
-                {
-                    _glfwInputMonitorChange();
-                    return TRUE;
-                }
-                break;
+        {   case WM_DEVICECHANGE:
+            {   if (wParam == DBT_DEVNODES_CHANGED)
+                {  _glfwInputMonitorChange(); return TRUE;
+                }  break;
             }
-        }
-        return DefWindowProcW(hWnd, uMsg, wParam, lParam);
+        }   return DefWindowProcW(hWnd, uMsg, wParam, lParam);
     }
-
     switch (uMsg)
     {
         case WM_SETFOCUS:
@@ -934,70 +925,19 @@ int _glfwPlatformCreateWindow(_GLFWwindow* window,
                               const _GLFWctxconfig* ctxconfig,
                               const _GLFWfbconfig* fbconfig)
 {
-    int status;
-
-    if (!createWindow(window, wndconfig))
-        return GLFW_FALSE;
-
+    if (!createWindow(window, wndconfig))return GLFW_FALSE;
     if (ctxconfig->client != GLFW_NO_API)
-    {
-        if (ctxconfig->source == GLFW_NATIVE_CONTEXT_API)
-        {
-            if (!_glfwCreateContextWGL(window, ctxconfig, fbconfig))
-                return GLFW_FALSE;
-
-            status = _glfwAnalyzeContextWGL(window, ctxconfig, fbconfig);
-
-            if (status == _GLFW_RECREATION_IMPOSSIBLE)
-                return GLFW_FALSE;
-
-            if (status == _GLFW_RECREATION_REQUIRED)
-            {
-                // Some window hints require us to re-create the context using WGL
-                // extensions retrieved through the current context, as we cannot
-                // check for WGL extensions or retrieve WGL entry points before we
-                // have a current context (actually until we have implicitly loaded
-                // the vendor ICD)
-
-                // Yes, this is strange, and yes, this is the proper way on WGL
-
-                // As Windows only allows you to set the pixel format once for
-                // a window, we need to destroy the current window and create a new
-                // one to be able to use the new pixel format
-
-                // Technically, it may be possible to keep the old window around if
-                // we're just creating an OpenGL 3.0+ context with the same pixel
-                // format, but it's not worth the added code complexity
-
-                // First we clear the current context (the one we just created)
-                // This is usually done by glfwDestroyWindow, but as we're not doing
-                // full GLFW window destruction, it's duplicated here
-                window->context.makeCurrent(NULL);
-
-                // Next destroy the Win32 window and WGL context (without resetting
-                // or destroying the GLFW window object)
-                window->context.destroy(window);
-                destroyWindow(window);
-
-                // ...and then create them again, this time with better APIs
-                if (!createWindow(window, wndconfig))
-                    return GLFW_FALSE;
-                if (!_glfwCreateContextWGL(window, ctxconfig, fbconfig))
-                    return GLFW_FALSE;
-            }
+    {   if (ctxconfig->source == GLFW_NATIVE_CONTEXT_API)
+        {  if (!_glfwCreateContextWGL(window, ctxconfig, fbconfig))
+           return GLFW_FALSE;
         }
     }
-
     if (window->monitor)
-    {
-        _glfwPlatformShowWindow(window);
-        _glfwPlatformFocusWindow(window);
-        if (!acquireMonitor(window))
-            return GLFW_FALSE;
-
-        centerCursor(window);
+    { _glfwPlatformShowWindow(window);
+      _glfwPlatformFocusWindow(window);
+       if (!acquireMonitor(window))return GLFW_FALSE;
+       centerCursor(window);
     }
-
     return GLFW_TRUE;
 }
 
