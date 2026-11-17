@@ -109,7 +109,7 @@ static byte getByte()
 }
 //   Полноценная числовая модель в варианте с базовым форматом, без излишеств
 //
-bool freeShip::LoadFEF()      // Ship.fef == FreeShip Exchange Format
+bool freeShip::LoadFEF()                // Ship.fef == FreeShip Exchange Format
 { int I; isBin=false; char *str=NULL;
   if( !(FM=_wfopen( FName,L"rt" ) ) )Break( "?не открывается free!Ship Exchange Format %s ",FileName );
   readText( &str );
@@ -170,20 +170,24 @@ void freeShip::ReadFEF( int K )    // количество узлов или и�
    K=getInt();
    for( I=0; I<K; I++ )
    { int K1,K2,Ck;                               Ck=0;
-     sscanf( getString( FM ),"%i%i%i%i",&K1,&K2,&Ck,&NoI );
+     sscanf( getString( FM ),"%i%i%i%i",&K1,&K2,&Ck,&NoI );  // чисто обходится
    }
-   NoI=NoFaces;
+   NoI=NoFaces;         // в NoI будет накапливаться реальное количество граней
    NoFaces+=getInt();
-   F=(Faces*)Allocate( NoFaces*sizeof( Faces ),F );
+   F=(Faces*)Allocate( NoFaces*sizeof(Faces),F ); // память под максимум граней
    for( I=NoI; I<NoFaces; I++ ) // здесь уж чтение напрямую из текстового файла
-   { char *S=strtok( getString( FM )," " );
-     K=0; sscanf( S,"%i",&K ); F[I].Capacity=K;
-     F[I].P=(int*)Allocate( K*sizeof(int) );             /// <++ Control Points
+   { char *S=strtok( getString( FM )," " ); K=0; // bool ym=false,yp=false;
+     sscanf( S,"%i",&K ); F[NoI].Capacity=K;    // количество узлов одной грани
+     F[NoI].P=(int*)Allocate( K*sizeof(int),F[NoI].P );  /// <++ Control Points
      for( int j=0; j<K; j++ )
-        { int &M=F[I].P[j]; S=strtok( 0," " ); sscanf( S,"%i",&M ); M+=NoC; }
-     K=0; S=strtok( 0," " ); if( S )sscanf( S,"%i",&K ); F[I].LayerIndex=K+NoL; // № слоя по площадке
-   //K=0; S=strtok( 0," " ); if( S )sscanf( S,"%i",&K ); F[I].Selected=K!=0;    // метка выбора
-   }
+        { int &M=F[NoI].P[j]; S=strtok( 0," " ); sscanf( S,"%i",&M ); M+=NoC;
+          //Real &Y=P[M].V.y;
+          //if( Y>0.0 )yp=true; else
+          //if( Y<0.0 )ym=true;
+        } //if( ym && !yp )continue;
+     K=0; S=strtok( 0," " ); if( S )sscanf( S,"%i",&K );
+     F[NoI++].LayerIndex=K+NoL;                           // № слоя по площадке
+   } NoFaces=NoI;
 }
 //   Основная процедура считывания цифрового проекта корабля
 //

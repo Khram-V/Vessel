@@ -70,7 +70,7 @@ Place::~Place()  // освобождение площадки, шрифтов, �
     if( Img ){ free( Img ); Img=NULL; }      // все связные объекты расчищаются
     if( Ft ){ free( Ft ); Ft=NULL; }         // отключение привязанного шрифта
 //  AlfaBit( 0 );                           // здесь нулевой эпилог шрифту СССР
-    Site->pMouse=NULL;                      // вычистка от случайного обращения
+//  Site->pMouse=NULL;                      // вычистка от случайного обращения
     if( this==(Place*)Site )Site=NULL; else // полная блокировка площадки Place
       for( Place *S=(Place*)Site; S; S=S->Up )
         if( S->Up==this ){ S->Up=Up; break; }

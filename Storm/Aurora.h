@@ -374,14 +374,14 @@ struct freeShip: Hull // Shell оболочка поверхности обши�
          Thickness;
     bool ShowInLineSpan;     // fv>=201
     byte AlphaBlend;         // fv>=261
- } *L, ActiveLayer;         //! NoLayers
- struct CoPoint             /// Control Point
- { Vector V;                // координаты
- } *P;                      //! NoCoPoint
- struct Faces               /// Control Faces
- { int *P,Capacity;         // --> Points
-   int LayerIndex;          // -- слой для всего набора площадок
- } *F;                      //! NoFaces
+ } *L, ActiveLayer;          //! NoLayers
+ struct CoPoint              //! Control Point
+ { Vector V;                 //  координаты
+ } *P;                       //! NoCoPoint
+ struct Faces                //! Control Faces
+ { int *P,Capacity;          // --> Points
+   int LayerIndex;           // -- слой для всего набора площадок
+ } *F;                       //! NoFaces
  freeShip(); ~freeShip(){};
 
  void freeRead( bool Part=false );
